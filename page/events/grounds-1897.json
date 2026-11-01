@@ -1,0 +1,470 @@
+{
+  "chain": "grounds-1897",
+  "about": "The 1897 grounds' hooks from Magic's docs/magic/pass2-hooks-grounds.md (req 2567): lake, east landing, harbour, forest edge, cabin site by Story's eight steps, kitchen garden, glass range, paddock, pitch, owlery approach, gates. Held: the squid, the creatures, pumpkins, Dementors, the crossing. Place ids are provisional until Grounds' pages name them.",
+  "first_visit": [],
+  "room": [
+    {
+      "when": [
+        "place = lake",
+        "time = evening",
+        "weather != rain"
+      ],
+      "show": [
+        "on a still evening the lake as smooth as glass, the castle upside down in it"
+      ],
+      "canon": "Magic's req 2567 (docs/magic/pass2-hooks-grounds.md, The lake: B1 ch6 L2278; ours)"
+    },
+    {
+      "when": [
+        "place = lake",
+        "weather = rain"
+      ],
+      "show": [
+        "in rain the loch pocked with rings, the far mountains gone grey"
+      ],
+      "canon": "Magic's req 2567 (docs/magic/pass2-hooks-grounds.md, The lake: castle-wide-1027.md sections 4 and 5)"
+    },
+    {
+      "when": [
+        "place = lake",
+        "season = summer",
+        "time = day",
+        "weather = clear"
+      ],
+      "show": [
+        "a gnat-cloud over the shallows and a swift skimming low; high on the far side an osprey, rare, taking nothing from the water"
+      ],
+      "canon": "Magic's req 2567 (docs/magic/pass2-hooks-grounds.md, The lake: castle-wide-1027.md section 5; ours; no squid line in year one, settled 184 and 186)"
+    },
+    {
+      "when": [
+        "place = east landing"
+      ],
+      "show": [
+        "a dozen small boats lie off the quay in a line, four to a boat, nudging on the swell, painters slack; one swings round on its mooring and settles"
+      ],
+      "canon": "Magic's req 2567 (docs/magic/pass2-hooks-grounds.md, East landing: B1 ch6 L2272, L2274; docs/grounds/build.json east-landing)"
+    },
+    {
+      "when": [
+        "place = east landing",
+        "time = evening"
+      ],
+      "show": [
+        "the boats lie empty, no oars and no one in them; the line a little neater than at morning, as if tidied"
+      ],
+      "canon": "Magic's req 2567 (docs/magic/pass2-hooks-grounds.md, East landing: ours, the castle's housework)"
+    },
+    {
+      "when": [
+        "place = harbour"
+      ],
+      "show": [
+        "through a curtain of ivy a wide opening in the cliff, a dark tunnel and the boats' underground harbour; water slapping stone, hulls bumping at their berths, a drip"
+      ],
+      "canon": "Magic's req 2567 (docs/magic/pass2-hooks-grounds.md, Cliff harbour: B1 ch6 L2280; ours, the sounds)"
+    },
+    {
+      "when": [
+        "place = forest edge"
+      ],
+      "show": [
+        "leaves rustling in the wood and a twig breaking far in, never nearer than the edge; the trees swaying darkly on a windy day"
+      ],
+      "canon": "Magic's req 2567 (docs/magic/pass2-hooks-grounds.md, Forest edge: B1 ch15 L5309; B2 ch15 L11949; B1 ch9 L2949)"
+    },
+    {
+      "when": [
+        "place = forest edge",
+        "time = morning",
+        "season != summer"
+      ],
+      "show": [
+        "a few red deer at the trees' edge, heads lifting and leaving as he comes near"
+      ],
+      "canon": "Magic's req 2567 (docs/magic/pass2-hooks-grounds.md, Forest edge: castle-wide-1027.md section 5; ours)"
+    },
+    {
+      "when": [
+        "place = forest edge",
+        "season = autumn"
+      ],
+      "show": [
+        "the sycamore's keys spinning down on an autumn breeze"
+      ],
+      "canon": "Magic's req 2567 (docs/magic/pass2-hooks-grounds.md, Forest edge: B2 ch15 L11939; ours)"
+    },
+    {
+      "when": [
+        "place = forest edge",
+        "time = morning",
+        "weather != rain"
+      ],
+      "show": [
+        "dawn ground mist lying low along the track and thinning with the sun"
+      ],
+      "canon": "Magic's req 2567 (docs/magic/pass2-hooks-grounds.md, Forest edge: build.json unicorn-mist; ours)"
+    },
+    {
+      "when": [
+        "place = forest edge",
+        "time = evening"
+      ],
+      "show": [
+        "rooks and jackdaws going to roost in the wood's top, a robin on the nearest fence"
+      ],
+      "canon": "Magic's req 2567 (docs/magic/pass2-hooks-grounds.md, Forest edge: castle-wide-1027.md section 1; ours)"
+    },
+    {
+      "when": [
+        "place = forest cabin",
+        "year = 1",
+        "date >= 09-03",
+        "date <= 12-24"
+      ],
+      "show": [
+        "one gale-felled oak a season down, bark on, its root plate weathered; wind combs the long grass along it and a wren works in its limbs"
+      ],
+      "canon": "Magic's req 2567 (docs/magic/pass2-hooks-grounds.md, The cabin's site, step 0: docs/story/cabin-and-squid.md, settled 184 and 189; nothing says whose it is; dated provisionally by the school year until Story's own step var exists)"
+    },
+    {
+      "when": [
+        "place = forest cabin",
+        "year = 1",
+        "date >= 12-25"
+      ],
+      "show": [
+        "the oak's crown limbed and the branches stacked and drying; a breeze lifts dry leaves off the stack; a trodden track runs to the wood"
+      ],
+      "canon": "Magic's req 2567 (docs/magic/pass2-hooks-grounds.md, The cabin's site, step 1: docs/story/cabin-and-squid.md, settled 184 and 189; nothing says whose it is; dated provisionally by the school year until Story's own step var exists)"
+    },
+    {
+      "when": [
+        "place = forest cabin",
+        "year = 1",
+        "date >= 03-01",
+        "date <= 08-31"
+      ],
+      "show": [
+        "sawn planks stickered on sleepers, four footing stones in a square; wind whistles thinly through the stickers and cart ruts lie fresh in the grass"
+      ],
+      "canon": "Magic's req 2567 (docs/magic/pass2-hooks-grounds.md, The cabin's site, step 2: docs/story/cabin-and-squid.md, settled 184 and 189; nothing says whose it is; dated provisionally by the school year until Story's own step var exists)"
+    },
+    {
+      "when": [
+        "place = forest cabin",
+        "year = 2",
+        "date >= 09-01",
+        "date <= 11-14"
+      ],
+      "show": [
+        "an open timber frame, shavings stirring and chasing across the ground, a loose strip of bark tapping a post"
+      ],
+      "canon": "Magic's req 2567 (docs/magic/pass2-hooks-grounds.md, The cabin's site, step 3: docs/story/cabin-and-squid.md, settled 184 and 189; nothing says whose it is; dated provisionally by the school year until Story's own step var exists)"
+    },
+    {
+      "when": [
+        "place = forest cabin",
+        "year = 2",
+        "date >= 11-15"
+      ],
+      "show": [
+        "walls boarded, a gap where the door will hang; a flap of canvas over the gap rippling, rain running down the boards"
+      ],
+      "canon": "Magic's req 2567 (docs/magic/pass2-hooks-grounds.md, The cabin's site, step 4: docs/story/cabin-and-squid.md, settled 184 and 189; nothing says whose it is; dated provisionally by the school year until Story's own step var exists)"
+    },
+    {
+      "when": [
+        "place = forest cabin",
+        "year = 2",
+        "date >= 03-01",
+        "date <= 08-31"
+      ],
+      "show": [
+        "the roof on, the shingles still yellow; rain drumming softly on it and a drip from the eave"
+      ],
+      "canon": "Magic's req 2567 (docs/magic/pass2-hooks-grounds.md, The cabin's site, step 5: docs/story/cabin-and-squid.md, settled 184 and 189; nothing says whose it is; dated provisionally by the school year until Story's own step var exists)"
+    },
+    {
+      "when": [
+        "place = forest cabin",
+        "year = 3",
+        "date >= 09-01"
+      ],
+      "show": [
+        "the door hung, shutters, a chimney stack, no smoke; a shutter unlatched and knocking in a gale, a leaf in the doorway"
+      ],
+      "canon": "Magic's req 2567 (docs/magic/pass2-hooks-grounds.md, The cabin's site, step 6: docs/story/cabin-and-squid.md, settled 184 and 189; nothing says whose it is; dated provisionally by the school year until Story's own step var exists)"
+    },
+    {
+      "when": [
+        "place = forest cabin",
+        "year >= 4"
+      ],
+      "show": [
+        "the first thin smoke from the chimney; nobody seen going in or out"
+      ],
+      "canon": "Magic's req 2567 (docs/magic/pass2-hooks-grounds.md, The cabin's site, step 7: docs/story/cabin-and-squid.md, settled 189; B1 ch8 L2840)"
+    },
+    {
+      "when": [
+        "place = kitchen garden",
+        "time != night"
+      ],
+      "show": [
+        "a working garden in rough beds: kale and leeks stirring in the wind, bean poles creaking, a barrow left at the gap"
+      ],
+      "canon": "Magic's req 2567 (docs/magic/pass2-hooks-grounds.md, Kitchen garden: build.json kitchen-garden; B2 ch6 L8357; ours)"
+    },
+    {
+      "when": [
+        "place = kitchen garden",
+        "season = summer",
+        "time = day"
+      ],
+      "show": [
+        "bees low at the lavender on the wall, swifts overhead"
+      ],
+      "canon": "Magic's req 2567 (docs/magic/pass2-hooks-grounds.md, Kitchen garden: castle-wide-1027.md; ours)"
+    },
+    {
+      "when": [
+        "place = kitchen garden",
+        "season = autumn",
+        "time = day"
+      ],
+      "show": [
+        "an apple falling softly in the grass"
+      ],
+      "canon": "Magic's req 2567 (docs/magic/pass2-hooks-grounds.md, Kitchen garden: ours)"
+    },
+    {
+      "when": [
+        "place = glass range",
+        "weather != rain",
+        "time = day"
+      ],
+      "show": [
+        "the long curved run of glass takes the passing sky, clouds sliding across it; roof vents propped open on their rods, a rod rattling in the wind"
+      ],
+      "canon": "Magic's req 2567 (docs/magic/pass2-hooks-grounds.md, Glass range: build.json kitchen-garden, the curvilinear range; ours)"
+    },
+    {
+      "when": [
+        "place = glass range",
+        "time = morning"
+      ],
+      "show": [
+        "on a cold dawn the inside beads and drips; after rain a pane or two is a little brighter than its neighbours when he looks twice"
+      ],
+      "canon": "Magic's req 2567 (docs/magic/pass2-hooks-grounds.md, Glass range: ours; the castle's housework)"
+    },
+    {
+      "when": [
+        "place = creatures paddock",
+        "era != books"
+      ],
+      "show": [
+        "an empty field: rough grass in the wind, a dry-stone shelter with a heather-turf roof, a gate on the path round the Forest's edge; nothing in it"
+      ],
+      "canon": "Magic's req 2567 (docs/magic/pass2-hooks-grounds.md, Paddock: B3 ch6 L15470; build.json paddock-shelter; no creature in 1897)"
+    },
+    {
+      "when": [
+        "place = creatures paddock",
+        "season = summer",
+        "time = day"
+      ],
+      "show": [
+        "swallows in and out of the shelter's eaves, a wren in the wall, rooks on the fence"
+      ],
+      "canon": "Magic's req 2567 (docs/magic/pass2-hooks-grounds.md, Paddock: ours)"
+    },
+    {
+      "when": [
+        "place = quidditch pitch"
+      ],
+      "show": [
+        "three golden hoops at each end, fifty feet up, turning a few degrees on a gust and ticking in the wind; the stands empty"
+      ],
+      "canon": "Magic's req 2567 (docs/magic/pass2-hooks-grounds.md, Pitch: B1 ch10 L3430; B1 ch11 L3799; ours)"
+    },
+    {
+      "when": [
+        "place = quidditch pitch",
+        "time = evening",
+        "weather != rain"
+      ],
+      "show": [
+        "a practice evening: tiny figures circling in the late light, a Quaffle passed, all silent from the castle; never a match, never a named player"
+      ],
+      "canon": "Magic's req 2567 (docs/magic/pass2-hooks-grounds.md, Pitch: B1 ch10 L3502, practice three evenings a week; world-rules, Canon, no plot night)"
+    },
+    {
+      "when": [
+        "place = quidditch pitch",
+        "weather = rain"
+      ],
+      "show": [
+        "the changing rooms at the ends of the long axis, chilly, their doors banging gently in the gale"
+      ],
+      "canon": "Magic's req 2567 (docs/magic/pass2-hooks-grounds.md, Pitch: B3 ch8 L16108; B3 ch9 L16813)"
+    },
+    {
+      "when": [
+        "place = owlery approach",
+        "time = evening"
+      ],
+      "show": [
+        "at dusk the school owls leave the tower's loops by ones and twos and cross the west lawns low and silent; a feather turning down onto the grass"
+      ],
+      "canon": "Magic's req 2567 (docs/magic/pass2-hooks-grounds.md, Owlery approach: B1 ch8 L2756; docs/magic/rooms.md, The Owlery, 1897)"
+    },
+    {
+      "when": [
+        "place = owlery approach",
+        "time = morning"
+      ],
+      "show": [
+        "at dawn the owls come back the same way, one dropping a note into the post-office basket"
+      ],
+      "canon": "Magic's req 2567 (docs/magic/pass2-hooks-grounds.md, Owlery approach: B1 ch8 L2754)"
+    },
+    {
+      "when": [
+        "place = gates"
+      ],
+      "show": [
+        "the stone columns and the winged boars stand weathered in every light; a wren on a boar's wing, moss on the plinth; the iron gates shut"
+      ],
+      "canon": "Magic's req 2567 (docs/magic/pass2-hooks-grounds.md, Gates: B3 ch5 L15023; docs/grounds/gatehouse.md)"
+    },
+    {
+      "when": [
+        "place = gates",
+        "era != books",
+        "time = evening"
+      ],
+      "show": [
+        "the lodge new in 1897: a thread of smoke on a cold day, a lamp in the bay window from dusk"
+      ],
+      "canon": "Magic's req 2567 (docs/magic/pass2-hooks-grounds.md, Gates: settled 203; docs/grounds/gatehouse.md; ours)"
+    }
+  ],
+  "records": [
+    {
+      "id": "grounds-1897.lake-pebble",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "weight": 1,
+      "moment": "tap lake pebble",
+      "when": [
+        "place = lake"
+      ],
+      "show": [
+        "a flat stone thrown from the shore skips and rings, and a pebble under a lesson spell hangs, sets down and rings once; the lake itself takes nothing and shows nothing"
+      ],
+      "starts": [],
+      "canon": "Magic's req 2567 (docs/magic/pass2-hooks-grounds.md, The lake, what answers a spell: B1 ch10 L3512; ours, the feather's rule outdoors)"
+    },
+    {
+      "id": "grounds-1897.boat-rock",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "weight": 1,
+      "moment": "tap quay boat",
+      "when": [
+        "place = east landing"
+      ],
+      "show": [
+        "a boat rocks to the touch as any boat does, knocks its neighbour once, and stays; none leaves the quay"
+      ],
+      "starts": [],
+      "canon": "Magic's req 2567 (docs/magic/pass2-hooks-grounds.md, East landing, what answers a spell: B1 ch6 L2278; world-rules, Canon: traces, never re-creations; the crossing is Story's and is never replayed)"
+    },
+    {
+      "id": "grounds-1897.forest-lumos",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "weight": 1,
+      "moment": "tap forest dark",
+      "when": [
+        "place = forest edge"
+      ],
+      "show": [
+        "a small light at the wand's end shows the next few trunks and the path, and no more; the dark beyond does not answer"
+      ],
+      "starts": [],
+      "canon": "Magic's req 2567 (docs/magic/pass2-hooks-grounds.md, Forest edge, what answers a spell: B2 ch15 L11941, a tiny light just enough to watch the path)"
+    },
+    {
+      "id": "grounds-1897.seed-tray",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "weight": 1,
+      "moment": "tap seed tray",
+      "when": [
+        "place = kitchen garden"
+      ],
+      "show": [
+        "a seed tray, flowerpot or cloche lid lifts and sets down as a feather does, no more; nothing here grows faster at a word"
+      ],
+      "starts": [],
+      "canon": "Magic's req 2567 (docs/magic/pass2-hooks-grounds.md, Kitchen garden, what answers a spell: B1 ch10 L3512; ours)"
+    },
+    {
+      "id": "grounds-1897.pitch-edge",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "weight": 1,
+      "moment": "tap pitch edge",
+      "when": [
+        "place = quidditch pitch"
+      ],
+      "show": [
+        "a lesson spell at the pitch's edge answers as on any lawn; the hoops and the balls take none, the balls locked in the changing room's chest"
+      ],
+      "starts": [],
+      "canon": "Magic's req 2567 (docs/magic/pass2-hooks-grounds.md, Pitch, what answers a spell: ours; B1 ch10 L3512)"
+    },
+    {
+      "id": "grounds-1897.gate-latch",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "weight": 1,
+      "moment": "tap gate latch",
+      "when": [
+        "place = gates",
+        "era != books"
+      ],
+      "show": [
+        "Alohomora on the latch gives nothing; the latch stays, and the bell at the gate is answered and the gate opened by hand, kindly"
+      ],
+      "starts": [],
+      "canon": "Magic's req 2567 (docs/magic/pass2-hooks-grounds.md, Gates, what answers a spell: B6 ch8 L57317, L57319; docs/magic/alohomora-1897.md)"
+    },
+    {
+      "id": "grounds-1897.gate-bell",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "weight": 1,
+      "moment": "tap gate bell",
+      "when": [
+        "place = gates",
+        "era != books"
+      ],
+      "show": [
+        "the bell pull sounds once, answered from the desk by Mr. Yett, slow and kindly, who swings the gate by a lever from inside"
+      ],
+      "starts": [],
+      "canon": "Magic's req 2567 (docs/magic/pass2-hooks-grounds.md, Gates: settled 203; the lodge keeper's title is not written)"
+    }
+  ]
+}
