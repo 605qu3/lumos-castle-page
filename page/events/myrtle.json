@@ -4,7 +4,8 @@
     {
       "when": [
         "place = myrtles bathroom",
-        "year >= 2"
+        "year >= 2",
+        "era = books"
       ],
       "show": [
         "the stone flags damp and dull-shining, a thin film of water near the end stall and under the sinks",
@@ -15,7 +16,8 @@
     {
       "when": [
         "place = myrtles bathroom",
-        "castle date >= 2 12-15"
+        "castle date >= 2 12-15",
+        "era = books"
       ],
       "show": [
         "a sooty scorch under the rim of one toilet in a nameless stall, where a little fire once crackled"
@@ -25,7 +27,8 @@
     {
       "when": [
         "place = second floor east corridor",
-        "myrtle_water = fresh"
+        "myrtle_water = fresh",
+        "era = books"
       ],
       "show": [
         "water seeping out under the bathroom door and spreading over the flags, across half the corridor's width at most, the light caught in it"
@@ -35,7 +38,8 @@
     {
       "when": [
         "place = second floor east corridor",
-        "myrtle_water = drying"
+        "myrtle_water = drying",
+        "era = books"
       ],
       "show": [
         "the flags before the bathroom door dark where water lay"
@@ -53,7 +57,8 @@
       "moment": "arrive",
       "when": [
         "place = myrtles bathroom",
-        "year >= 2"
+        "year >= 2",
+        "era = books"
       ],
       "show": [
         "the end stall's toilet brimming over, the floor awash from wall to wall, the candles' doubles swimming in it, water still seeping out under the door into the corridor"
@@ -89,7 +94,8 @@
       "moment": "arrive",
       "when": [
         "place = myrtles bathroom",
-        "year >= 2"
+        "year >= 2",
+        "era = books"
       ],
       "who": [
         {
@@ -118,7 +124,8 @@
       "moment": "arrive",
       "when": [
         "place = myrtles bathroom",
-        "year >= 2"
+        "year >= 2",
+        "era = books"
       ],
       "who": [
         {
@@ -148,7 +155,8 @@
       "moment": "wait 30-150 s",
       "when": [
         "place = second floor east corridor",
-        "time != night"
+        "time != night",
+        "era = books"
       ],
       "who": [
         {
@@ -178,7 +186,8 @@
       "moment": "wait 30-150 s",
       "when": [
         "place = second floor east corridor",
-        "time != night"
+        "time != night",
+        "era = books"
       ],
       "who": [
         {
@@ -208,7 +217,8 @@
       "moment": "wait 30-150 s",
       "when": [
         "place = second floor east corridor",
-        "time != night"
+        "time != night",
+        "era = books"
       ],
       "starts": []
     },
@@ -222,7 +232,8 @@
       "moment": "wait 30-150 s",
       "when": [
         "place = second floor east corridor",
-        "time = night"
+        "time = night",
+        "era = books"
       ],
       "who": [
         {
@@ -252,7 +263,8 @@
       "moment": "wait 30-150 s",
       "when": [
         "place = second floor east corridor",
-        "time = night"
+        "time = night",
+        "era = books"
       ],
       "starts": []
     },
@@ -266,7 +278,8 @@
       "moment": "tap myrtle-door",
       "when": [
         "place = second floor east corridor",
-        "year <= 1"
+        "year <= 1",
+        "era = books"
       ],
       "who": [
         {
@@ -296,7 +309,8 @@
       "moment": "tap myrtle-door",
       "when": [
         "place = second floor east corridor",
-        "year <= 1"
+        "year <= 1",
+        "era = books"
       ],
       "who": [
         {
@@ -342,7 +356,8 @@
       "moment": "arrive",
       "when": [
         "place = second floor east corridor",
-        "days since myrtle_flood >= 5"
+        "days since myrtle_flood >= 5",
+        "era = books"
       ],
       "who": [
         {
@@ -373,7 +388,8 @@
       "leans": [],
       "moment": "leave",
       "when": [
-        "myrtle_water = drying"
+        "myrtle_water = drying",
+        "era = books"
       ],
       "starts": [
         "set myrtle_water = none"
@@ -387,7 +403,8 @@
       "leans": [],
       "moment": "leave",
       "when": [
-        "myrtle_water = fresh"
+        "myrtle_water = fresh",
+        "era = books"
       ],
       "starts": [
         "set myrtle_water = drying"
@@ -403,7 +420,8 @@
       "when": [
         "place = myrtles bathroom",
         "year >= 2",
-        "myrtle_met != yes"
+        "myrtle_met != yes",
+        "era = books"
       ],
       "who": [
         {
@@ -456,6 +474,105 @@
       "moment": "wait 40-160 s",
       "when": [
         "place = myrtles bathroom",
+        "year >= 2"
+      ],
+      "starts": []
+    },
+    {
+      "id": "myrtle.pipes-gurgle-corridor",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "myrtle-pipes",
+      "weight": 1,
+      "moment": "wait 60-240 s",
+      "when": [
+        "place = second floor east corridor",
+        "era = 1890s"
+      ],
+      "show": [
+        "in the wall the pipes gurgle, a long wet swallow, and quiet again"
+      ],
+      "canon": "Magic's req 2287 (docs/magic/rooms.md, the second-floor girls' bathroom, 1897; Story's names-1897-floors 18: ordinary, nobody haunting it): the pipes are ours, never a voice and never sobs; plain old plumbing in a stone wall; no canon line, so no cite"
+    },
+    {
+      "id": "myrtle.pipes-knock-corridor",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "myrtle-pipes",
+      "weight": 1,
+      "moment": "wait 60-240 s",
+      "when": [
+        "place = second floor east corridor",
+        "era = 1890s"
+      ],
+      "show": [
+        "somewhere inside the wall a pipe knocks twice, as if something small had come loose, and settles"
+      ],
+      "canon": "Magic's req 2287 (docs/magic/rooms.md, the second-floor girls' bathroom, 1897; Story's names-1897-floors 18: ordinary, nobody haunting it): the pipes are ours, never a voice and never sobs; plain old plumbing in a stone wall; no canon line, so no cite"
+    },
+    {
+      "id": "myrtle.pipes-none-corridor",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "myrtle-pipes",
+      "weight": 4,
+      "moment": "wait 60-240 s",
+      "when": [
+        "place = second floor east corridor",
+        "era = 1890s"
+      ],
+      "starts": []
+    },
+    {
+      "id": "myrtle.pipes-gurgle-room",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "myrtle-pipes-room",
+      "weight": 1,
+      "moment": "wait 60-240 s",
+      "when": [
+        "place = myrtles bathroom",
+        "era = 1890s",
+        "year >= 2"
+      ],
+      "show": [
+        "in the wall the pipes gurgle, a long wet swallow, and quiet again"
+      ],
+      "canon": "Magic's req 2287 (docs/magic/rooms.md, the second-floor girls' bathroom, 1897; Story's names-1897-floors 18: ordinary, nobody haunting it): the pipes are ours, never a voice and never sobs; plain old plumbing in a stone wall; no canon line, so no cite"
+    },
+    {
+      "id": "myrtle.pipes-knock-room",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "myrtle-pipes-room",
+      "weight": 1,
+      "moment": "wait 60-240 s",
+      "when": [
+        "place = myrtles bathroom",
+        "era = 1890s",
+        "year >= 2"
+      ],
+      "show": [
+        "somewhere inside the wall a pipe knocks twice, as if something small had come loose, and settles"
+      ],
+      "canon": "Magic's req 2287 (docs/magic/rooms.md, the second-floor girls' bathroom, 1897; Story's names-1897-floors 18: ordinary, nobody haunting it): the pipes are ours, never a voice and never sobs; plain old plumbing in a stone wall; no canon line, so no cite"
+    },
+    {
+      "id": "myrtle.pipes-none-room",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "myrtle-pipes-room",
+      "weight": 4,
+      "moment": "wait 60-240 s",
+      "when": [
+        "place = myrtles bathroom",
+        "era = 1890s",
         "year >= 2"
       ],
       "starts": []
