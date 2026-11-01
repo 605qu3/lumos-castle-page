@@ -1,0 +1,303 @@
+{
+ "chain": "bean-trail-1897",
+ "about": "The 1897 bean trail (Story's settled 226, Godric's 1 on req 2644; Magic's cue, req 2660): a boy lays a bean in a plain brown twist with his rhyme or joke; his brother tastes it and the funny flavour names the next room; at most six beans; the last is chocolate beside a prize. Records for Honeydukes, the common room, the kitchens and the den. `bean_trail` and `bean_count` are the brothers' carried state (B26's rule, reqs 293 and 294); the carry rides the brother-post's turn, the Reader's and Interaction's. Tap ids (bean ledge, bean twist) wait on the pages. The tasting picks among nine flavours at random until the first boy's laying is carried; the prize shelf waits on Godric.",
+ "first_visit": [],
+ "room": [],
+ "records": [
+  {
+   "id": "bean-trail-1897.set-and-twist-honeydukes-ledge",
+   "tier": "fixed",
+   "source": "device",
+   "leans": [],
+   "weight": 1,
+   "moment": "tap bean ledge",
+   "when": [
+    "era = 1890s",
+    "place = honeydukes",
+    "bean_trail = none"
+   ],
+   "show": [
+    "he lays one bean in a small twist of plain brown paper on the ledge by the barrel and writes or speaks a rhyme or a joke on it, in his own words; the twist looks like any scrap, nothing glows and nothing marks it"
+   ],
+   "starts": [
+    "set bean_trail = laid",
+    "set bean_count = 1"
+   ],
+   "canon": "Godric's 1 on req 2644 (1 November 2026, 4.36 pm; settled 226) via Magic's req 2660 (docs/magic/rooms.md, The bean trail, 1897); the beans' flavours (B1 ch6 L2100), the ordinary kinds (B1 ch6 L2094), Honeydukes' barrel (B3 ch10 L17248), marmalade at the Hall's table (B1 ch8 L2756); a bean that names a room and a trail of them are ours; the writing and recording on the twist are the Reader's and Interaction's, the year a trail lies in is B26's rule (reqs 293, 294); gentle kinds only, no glow, no score, no count shown, words private to the two (FDP-25), no hourglass"
+  },
+  {
+   "id": "bean-trail-1897.set-and-twist-common-room-table",
+   "tier": "fixed",
+   "source": "device",
+   "leans": [],
+   "weight": 1,
+   "moment": "tap bean ledge",
+   "when": [
+    "era = 1890s",
+    "place = common room",
+    "bean_trail = none"
+   ],
+   "show": [
+    "he lays one bean in a small twist of plain brown paper on the table and writes or speaks a rhyme or a joke on it, in his own words; the twist looks like any scrap, nothing glows and nothing marks it"
+   ],
+   "starts": [
+    "set bean_trail = laid",
+    "set bean_count = 1"
+   ],
+   "canon": "Godric's 1 on req 2644 (1 November 2026, 4.36 pm; settled 226) via Magic's req 2660 (docs/magic/rooms.md, The bean trail, 1897); the beans' flavours (B1 ch6 L2100), the ordinary kinds (B1 ch6 L2094), Honeydukes' barrel (B3 ch10 L17248), marmalade at the Hall's table (B1 ch8 L2756); a bean that names a room and a trail of them are ours; the writing and recording on the twist are the Reader's and Interaction's, the year a trail lies in is B26's rule (reqs 293, 294); gentle kinds only, no glow, no score, no count shown, words private to the two (FDP-25), no hourglass"
+  },
+  {
+   "id": "bean-trail-1897.set-and-twist-kitchens-step",
+   "tier": "fixed",
+   "source": "device",
+   "leans": [],
+   "weight": 1,
+   "moment": "tap bean ledge",
+   "when": [
+    "era = 1890s",
+    "place = kitchens",
+    "bean_trail = none"
+   ],
+   "show": [
+    "he lays one bean in a small twist of plain brown paper on the step and writes or speaks a rhyme or a joke on it, in his own words; the twist looks like any scrap, nothing glows and nothing marks it"
+   ],
+   "starts": [
+    "set bean_trail = laid",
+    "set bean_count = 1"
+   ],
+   "canon": "Godric's 1 on req 2644 (1 November 2026, 4.36 pm; settled 226) via Magic's req 2660 (docs/magic/rooms.md, The bean trail, 1897); the beans' flavours (B1 ch6 L2100), the ordinary kinds (B1 ch6 L2094), Honeydukes' barrel (B3 ch10 L17248), marmalade at the Hall's table (B1 ch8 L2756); a bean that names a room and a trail of them are ours; the writing and recording on the twist are the Reader's and Interaction's, the year a trail lies in is B26's rule (reqs 293, 294); gentle kinds only, no glow, no score, no count shown, words private to the two (FDP-25), no hourglass"
+  },
+  {
+   "id": "bean-trail-1897.tasted-grass",
+   "tier": "fixed",
+   "source": "device",
+   "leans": [],
+   "weight": 1,
+   "moment": "tap bean twist",
+   "when": [
+    "era = 1890s",
+    "bean_trail = laid"
+   ],
+   "show": [
+    "he unfolds the twist, reads the rhyme and tastes the bean: \"Grass. Not mown, either.\" He is left to read the flavour as a clue; the paper is only paper, and the room it points to is never named"
+   ],
+   "starts": [
+    "set bean_trail = tasted"
+   ],
+   "canon": "Godric's 1 on req 2644 (1 November 2026, 4.36 pm; settled 226) via Magic's req 2660 (docs/magic/rooms.md, The bean trail, 1897); the beans' flavours (B1 ch6 L2100), the ordinary kinds (B1 ch6 L2094), Honeydukes' barrel (B3 ch10 L17248), marmalade at the Hall's table (B1 ch8 L2756); a bean that names a room and a trail of them are ours; the writing and recording on the twist are the Reader's and Interaction's, the year a trail lies in is B26's rule (reqs 293, 294); gentle kinds only, no glow, no score, no count shown, words private to the two (FDP-25), no hourglass; the flavour pairs with greenhouse (ours), the tasting line provisional, the line-writer's to polish"
+  },
+  {
+   "id": "bean-trail-1897.tasted-toast",
+   "tier": "fixed",
+   "source": "device",
+   "leans": [],
+   "weight": 1,
+   "moment": "tap bean twist",
+   "when": [
+    "era = 1890s",
+    "bean_trail = laid"
+   ],
+   "show": [
+    "he unfolds the twist, reads the rhyme and tastes the bean: \"Toast. Somebody is up before the rest.\" He is left to read the flavour as a clue; the paper is only paper, and the room it points to is never named"
+   ],
+   "starts": [
+    "set bean_trail = tasted"
+   ],
+   "canon": "Godric's 1 on req 2644 (1 November 2026, 4.36 pm; settled 226) via Magic's req 2660 (docs/magic/rooms.md, The bean trail, 1897); the beans' flavours (B1 ch6 L2100), the ordinary kinds (B1 ch6 L2094), Honeydukes' barrel (B3 ch10 L17248), marmalade at the Hall's table (B1 ch8 L2756); a bean that names a room and a trail of them are ours; the writing and recording on the twist are the Reader's and Interaction's, the year a trail lies in is B26's rule (reqs 293, 294); gentle kinds only, no glow, no score, no count shown, words private to the two (FDP-25), no hourglass; the flavour pairs with kitchens (ours), the tasting line provisional, the line-writer's to polish"
+  },
+  {
+   "id": "bean-trail-1897.tasted-coffee",
+   "tier": "fixed",
+   "source": "device",
+   "leans": [],
+   "weight": 1,
+   "moment": "tap bean twist",
+   "when": [
+    "era = 1890s",
+    "bean_trail = laid"
+   ],
+   "show": [
+    "he unfolds the twist, reads the rhyme and tastes the bean: \"Coffee. Strong enough to knock on a door.\" He is left to read the flavour as a clue; the paper is only paper, and the room it points to is never named"
+   ],
+   "starts": [
+    "set bean_trail = tasted"
+   ],
+   "canon": "Godric's 1 on req 2644 (1 November 2026, 4.36 pm; settled 226) via Magic's req 2660 (docs/magic/rooms.md, The bean trail, 1897); the beans' flavours (B1 ch6 L2100), the ordinary kinds (B1 ch6 L2094), Honeydukes' barrel (B3 ch10 L17248), marmalade at the Hall's table (B1 ch8 L2756); a bean that names a room and a trail of them are ours; the writing and recording on the twist are the Reader's and Interaction's, the year a trail lies in is B26's rule (reqs 293, 294); gentle kinds only, no glow, no score, no count shown, words private to the two (FDP-25), no hourglass; the flavour pairs with staff room door (ours), the tasting line provisional, the line-writer's to polish"
+  },
+  {
+   "id": "bean-trail-1897.tasted-marmalade",
+   "tier": "fixed",
+   "source": "device",
+   "leans": [],
+   "weight": 1,
+   "moment": "tap bean twist",
+   "when": [
+    "era = 1890s",
+    "bean_trail = laid"
+   ],
+   "show": [
+    "he unfolds the twist, reads the rhyme and tastes the bean: \"Marmalade, and the owls have not been at it yet.\" He is left to read the flavour as a clue; the paper is only paper, and the room it points to is never named"
+   ],
+   "starts": [
+    "set bean_trail = tasted"
+   ],
+   "canon": "Godric's 1 on req 2644 (1 November 2026, 4.36 pm; settled 226) via Magic's req 2660 (docs/magic/rooms.md, The bean trail, 1897); the beans' flavours (B1 ch6 L2100), the ordinary kinds (B1 ch6 L2094), Honeydukes' barrel (B3 ch10 L17248), marmalade at the Hall's table (B1 ch8 L2756); a bean that names a room and a trail of them are ours; the writing and recording on the twist are the Reader's and Interaction's, the year a trail lies in is B26's rule (reqs 293, 294); gentle kinds only, no glow, no score, no count shown, words private to the two (FDP-25), no hourglass; the flavour pairs with great hall (ours), the tasting line provisional, the line-writer's to polish"
+  },
+  {
+   "id": "bean-trail-1897.tasted-baked-bean",
+   "tier": "fixed",
+   "source": "device",
+   "leans": [],
+   "weight": 1,
+   "moment": "tap bean twist",
+   "when": [
+    "era = 1890s",
+    "bean_trail = laid"
+   ],
+   "show": [
+    "he unfolds the twist, reads the rhyme and tastes the bean: \"Baked bean, on a Thursday, and not a bit of toast.\" He is left to read the flavour as a clue; the paper is only paper, and the room it points to is never named"
+   ],
+   "starts": [
+    "set bean_trail = tasted"
+   ],
+   "canon": "Godric's 1 on req 2644 (1 November 2026, 4.36 pm; settled 226) via Magic's req 2660 (docs/magic/rooms.md, The bean trail, 1897); the beans' flavours (B1 ch6 L2100), the ordinary kinds (B1 ch6 L2094), Honeydukes' barrel (B3 ch10 L17248), marmalade at the Hall's table (B1 ch8 L2756); a bean that names a room and a trail of them are ours; the writing and recording on the twist are the Reader's and Interaction's, the year a trail lies in is B26's rule (reqs 293, 294); gentle kinds only, no glow, no score, no count shown, words private to the two (FDP-25), no hourglass; the flavour pairs with staff dining room (ours), the tasting line provisional, the line-writer's to polish"
+  },
+  {
+   "id": "bean-trail-1897.tasted-strawberry",
+   "tier": "fixed",
+   "source": "device",
+   "leans": [],
+   "weight": 1,
+   "moment": "tap bean twist",
+   "when": [
+    "era = 1890s",
+    "bean_trail = laid"
+   ],
+   "show": [
+    "he unfolds the twist, reads the rhyme and tastes the bean: \"Strawberry. Out of season, and proud of it.\" He is left to read the flavour as a clue; the paper is only paper, and the room it points to is never named"
+   ],
+   "starts": [
+    "set bean_trail = tasted"
+   ],
+   "canon": "Godric's 1 on req 2644 (1 November 2026, 4.36 pm; settled 226) via Magic's req 2660 (docs/magic/rooms.md, The bean trail, 1897); the beans' flavours (B1 ch6 L2100), the ordinary kinds (B1 ch6 L2094), Honeydukes' barrel (B3 ch10 L17248), marmalade at the Hall's table (B1 ch8 L2756); a bean that names a room and a trail of them are ours; the writing and recording on the twist are the Reader's and Interaction's, the year a trail lies in is B26's rule (reqs 293, 294); gentle kinds only, no glow, no score, no count shown, words private to the two (FDP-25), no hourglass; the flavour pairs with kitchen garden (ours), the tasting line provisional, the line-writer's to polish"
+  },
+  {
+   "id": "bean-trail-1897.tasted-coconut",
+   "tier": "fixed",
+   "source": "device",
+   "leans": [],
+   "weight": 1,
+   "moment": "tap bean twist",
+   "when": [
+    "era = 1890s",
+    "bean_trail = laid"
+   ],
+   "show": [
+    "he unfolds the twist, reads the rhyme and tastes the bean: \"Coconut, and a little sugar on the tongue.\" He is left to read the flavour as a clue; the paper is only paper, and the room it points to is never named"
+   ],
+   "starts": [
+    "set bean_trail = tasted"
+   ],
+   "canon": "Godric's 1 on req 2644 (1 November 2026, 4.36 pm; settled 226) via Magic's req 2660 (docs/magic/rooms.md, The bean trail, 1897); the beans' flavours (B1 ch6 L2100), the ordinary kinds (B1 ch6 L2094), Honeydukes' barrel (B3 ch10 L17248), marmalade at the Hall's table (B1 ch8 L2756); a bean that names a room and a trail of them are ours; the writing and recording on the twist are the Reader's and Interaction's, the year a trail lies in is B26's rule (reqs 293, 294); gentle kinds only, no glow, no score, no count shown, words private to the two (FDP-25), no hourglass; the flavour pairs with honeydukes ledge (ours), the tasting line provisional, the line-writer's to polish"
+  },
+  {
+   "id": "bean-trail-1897.tasted-curry",
+   "tier": "fixed",
+   "source": "device",
+   "leans": [],
+   "weight": 1,
+   "moment": "tap bean twist",
+   "when": [
+    "era = 1890s",
+    "bean_trail = laid"
+   ],
+   "show": [
+    "he unfolds the twist, reads the rhyme and tastes the bean: \"Curry. Something here is warming, and it is not the fire.\" He is left to read the flavour as a clue; the paper is only paper, and the room it points to is never named"
+   ],
+   "starts": [
+    "set bean_trail = tasted"
+   ],
+   "canon": "Godric's 1 on req 2644 (1 November 2026, 4.36 pm; settled 226) via Magic's req 2660 (docs/magic/rooms.md, The bean trail, 1897); the beans' flavours (B1 ch6 L2100), the ordinary kinds (B1 ch6 L2094), Honeydukes' barrel (B3 ch10 L17248), marmalade at the Hall's table (B1 ch8 L2756); a bean that names a room and a trail of them are ours; the writing and recording on the twist are the Reader's and Interaction's, the year a trail lies in is B26's rule (reqs 293, 294); gentle kinds only, no glow, no score, no count shown, words private to the two (FDP-25), no hourglass; the flavour pairs with potions dungeon door (ours), the tasting line provisional, the line-writer's to polish"
+  },
+  {
+   "id": "bean-trail-1897.tasted-sardine",
+   "tier": "fixed",
+   "source": "device",
+   "leans": [],
+   "weight": 1,
+   "moment": "tap bean twist",
+   "when": [
+    "era = 1890s",
+    "bean_trail = laid"
+   ],
+   "show": [
+    "he unfolds the twist, reads the rhyme and tastes the bean: \"Sardine. Somebody has been fishing.\" He is left to read the flavour as a clue; the paper is only paper, and the room it points to is never named"
+   ],
+   "starts": [
+    "set bean_trail = tasted"
+   ],
+   "canon": "Godric's 1 on req 2644 (1 November 2026, 4.36 pm; settled 226) via Magic's req 2660 (docs/magic/rooms.md, The bean trail, 1897); the beans' flavours (B1 ch6 L2100), the ordinary kinds (B1 ch6 L2094), Honeydukes' barrel (B3 ch10 L17248), marmalade at the Hall's table (B1 ch8 L2756); a bean that names a room and a trail of them are ours; the writing and recording on the twist are the Reader's and Interaction's, the year a trail lies in is B26's rule (reqs 293, 294); gentle kinds only, no glow, no score, no count shown, words private to the two (FDP-25), no hourglass; the flavour pairs with lake quay (ours), the tasting line provisional, the line-writer's to polish"
+  },
+  {
+   "id": "bean-trail-1897.continues",
+   "tier": "fixed",
+   "source": "device",
+   "leans": [],
+   "weight": 1,
+   "moment": "tap bean twist",
+   "when": [
+    "era = 1890s",
+    "bean_trail = tasted",
+    "bean_count < 5"
+   ],
+   "show": [
+    "in the room the flavour named he finds the next twist, plain brown paper on an ordinary ledge, and the trail goes on; no count of beans is kept in sight and nothing says how far it runs"
+   ],
+   "starts": [
+    "set bean_trail = laid",
+    "add bean_count 1"
+   ],
+   "canon": "Godric's 1 on req 2644 (1 November 2026, 4.36 pm; settled 226) via Magic's req 2660 (docs/magic/rooms.md, The bean trail, 1897); the beans' flavours (B1 ch6 L2100), the ordinary kinds (B1 ch6 L2094), Honeydukes' barrel (B3 ch10 L17248), marmalade at the Hall's table (B1 ch8 L2756); a bean that names a room and a trail of them are ours; the writing and recording on the twist are the Reader's and Interaction's, the year a trail lies in is B26's rule (reqs 293, 294); gentle kinds only, no glow, no score, no count shown, words private to the two (FDP-25), no hourglass; at most six beans (ours), Events and Interaction may shorten it"
+  },
+  {
+   "id": "bean-trail-1897.last-with-the-prize",
+   "tier": "fixed",
+   "source": "device",
+   "leans": [],
+   "weight": 1,
+   "moment": "tap bean twist",
+   "when": [
+    "era = 1890s",
+    "bean_trail = tasted",
+    "bean_count >= 5"
+   ],
+   "show": [
+    "the last bean is chocolate, the kind that names nothing, and it lies beside the prize the first boy chose, set out in its room; he finds both and the two share it; nothing is scored and no one wins"
+   ],
+   "starts": [
+    "set bean_trail = ended"
+   ],
+   "canon": "Godric's 1 on req 2644 (1 November 2026, 4.36 pm; settled 226) via Magic's req 2660 (docs/magic/rooms.md, The bean trail, 1897); the beans' flavours (B1 ch6 L2100), the ordinary kinds (B1 ch6 L2094), Honeydukes' barrel (B3 ch10 L17248), marmalade at the Hall's table (B1 ch8 L2756); a bean that names a room and a trail of them are ours; the writing and recording on the twist are the Reader's and Interaction's, the year a trail lies in is B26's rule (reqs 293, 294); gentle kinds only, no glow, no score, no count shown, words private to the two (FDP-25), no hourglass; the prize shelf (a Chocolate Frog and card, a sugar quill, a Fizzing Whizzbee, a drawing of his own) waits on Godric as its own small question (Story's req 2661)"
+  },
+  {
+   "id": "bean-trail-1897.twists-kept",
+   "tier": "fixed",
+   "source": "device",
+   "leans": [],
+   "weight": 1,
+   "moment": "tap bean twist",
+   "when": [
+    "era = 1890s",
+    "place = den",
+    "bean_trail = ended"
+   ],
+   "show": [
+    "the twists are folded flat and kept with his other finds, a bean wrapper and a rhyme; the rooms are as before, and a new trail may be laid at once"
+   ],
+   "starts": [
+    "set bean_trail = none"
+   ],
+   "canon": "Godric's 1 on req 2644 (1 November 2026, 4.36 pm; settled 226) via Magic's req 2660 (docs/magic/rooms.md, The bean trail, 1897); the beans' flavours (B1 ch6 L2100), the ordinary kinds (B1 ch6 L2094), Honeydukes' barrel (B3 ch10 L17248), marmalade at the Hall's table (B1 ch8 L2756); a bean that names a room and a trail of them are ours; the writing and recording on the twist are the Reader's and Interaction's, the year a trail lies in is B26's rule (reqs 293, 294); gentle kinds only, no glow, no score, no count shown, words private to the two (FDP-25), no hourglass"
+  }
+ ]
+}
