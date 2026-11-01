@@ -191,7 +191,7 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <script src="depth-ties.js?v=1"></script>
 <script src="corridor/suit.js?v=6"></script>
 <script src="corridor/knight.js?v=2"></script>
-<script src="shell-w5a.js?v=82"></script>
+<script src="shell-w5a.js?v=83"></script>
 <script src="shell-things-2.js?v=22"></script>
 <script src="shell-things-7.js?v=4"></script>
 <script src="shell-things-3.js?v=4"></script>
@@ -1153,6 +1153,39 @@ var CUP = (function () {
   });
   panG(67.04, r[1] + 0.01, 67.16, r[1] + 0.1, 0.5, 0.72, bristleM, 'cupboard-besom-2-head');
   panG(67.33, r[1] + 0.01, 67.5, r[1] + 0.16, 0.57, 0.72, rag, 'cupboard-mop-2-head');
+  /* req 2217 room 1 (docs/curator/ground-floor-historical-1031.md n 1; docs/interiors/ground-floor-by-purpose-1031.md, last section), the
+     Architect's: what the floor and shelves cannot take hangs on the walls. On the south wall, x 66.5 to 66.98, a plain board at 1.15
+     (0.22 deep, two brackets) with the housemaid's box on it (0.4 by 0.14 by 0.17, lid shut, a carrying handle; it holds her blacklead,
+     brushes and cloths, c) and over it the cinder-sifter hung by its rim from a nail at 1.95 (0.3 across, wire mesh in a wooden hoop);
+     on the east wall south of the door (the door is y 63.6 to 64.4) the japanned cinder-pail by its bail from a hook at 1.72, y 63.36,
+     clear of the sand pail's top at 0.28; on the east wall north of the door a short rail at 1.55 (y 64.5 to 64.75) with three small
+     bare brass hooks, the wand-rack of a cupboard where nobody keeps a wand (b: the magic that is not there). Drawn plain; the pieces
+     housemaids-box-1 and cinder-pail-1 are staged, not generated (gaps for Objects) */
+  var japan = kit.solid(0x15130f, { roughness: 0.25 }), brassM = kit.solid(0x9a7c3a, { roughness: 0.5 }), meshM = kit.solid(0x3a3835, { roughness: 0.7 });
+  panG(66.5, r[1] - 0.02, 66.98, r[1] + 0.22, 1.13, 1.15, wood, 'cupboard-shelf-box');
+  [66.58, 66.9].forEach(function (x) { panG(x - 0.01, r[1] - 0.02, x + 0.01, r[1] + 0.18, 0.98, 1.13, ironC, 'cupboard-shelf-box-bracket'); });
+  panG(66.54, r[1] + 0.03, 66.94, r[1] + 0.17, 1.15, 1.31, wood, 'cupboard-housemaids-box');
+  panG(66.53, r[1] + 0.03, 66.95, r[1] + 0.18, 1.29, 1.32, kit.solid(0x4a3a2c), 'cupboard-housemaids-box-lid');
+  panG(66.72, r[1] + 0.085, 66.76, r[1] + 0.115, 1.32, 1.36, brassM, 'cupboard-housemaids-box-handle-post');
+  panG(66.68, r[1] + 0.085, 66.8, r[1] + 0.115, 1.36, 1.38, brassM, 'cupboard-housemaids-box-handle');
+  panG(66.535, r[1] + 0.14, 66.545, r[1] + 0.165, 1.2, 1.26, brassM, 'cupboard-housemaids-box-clasp');
+  var sifC = P(66.74, r[1] + 0.035, 2.1), sifN = P(66.74, r[1] + 1.035, 2.1).sub(sifC).normalize();
+  var sifQ = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), sifN);
+  var sifRim = own(new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.15, 0.07, 22, 1, true), wood), 'cupboard-sifter-hoop');
+  sifRim.material = wood; sifRim.position.copy(sifC); sifRim.quaternion.copy(sifQ);
+  var sifMesh = own(new THREE.Mesh(new THREE.CylinderGeometry(0.147, 0.147, 0.006, 22), meshM), 'cupboard-sifter-mesh');
+  sifMesh.position.copy(P(66.74, r[1] + 0.045, 2.1)); sifMesh.quaternion.copy(sifQ);
+  panG(66.725, r[1] - 0.02, 66.755, r[1] + 0.03, 2.27, 2.3, ironC, 'cupboard-sifter-nail');
+  panG(66.735, r[1] + 0.005, 66.745, r[1] + 0.03, 2.2, 2.27, ironC, 'cupboard-sifter-cord');
+  panG(r[2] - 0.07, 63.345, r[2] + 0.02, 63.375, 1.71, 1.74, ironC, 'cupboard-pail-hook');
+  panG(r[2] - 0.07, 63.345, r[2] - 0.045, 63.375, 1.64, 1.74, ironC, 'cupboard-pail-hook-tip');
+  var cpail = own(new THREE.Mesh(new THREE.CylinderGeometry(0.13, 0.1, 0.28, 20), japan), 'cupboard-cinder-pail'); cpail.position.copy(P(r[2] - 0.15, 63.36, 1.5));
+  var cpl = own(new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.133, 0.045, 20), japan), 'cupboard-cinder-pail-lid'); cpl.position.copy(P(r[2] - 0.15, 63.36, 1.66));
+  panG(r[2] - 0.065, 63.352, r[2] - 0.055, 63.368, 1.64, 1.72, ironC, 'cupboard-cinder-pail-bail');
+  panG(r[2] - 0.1, 63.352, r[2] - 0.0, 63.368, 1.695, 1.71, brassM, 'cupboard-cinder-pail-rim-band');
+  panG(r[2] - 0.04, 64.5, r[2] + 0.02, 64.75, 1.53, 1.57, wood, 'cupboard-wand-rail');
+  [64.55, 64.625, 64.7].forEach(function (y) { panG(r[2] - 0.075, y - 0.01, r[2] - 0.035, y + 0.01, 1.54, 1.56, brassM, 'cupboard-wand-hook');
+    panG(r[2] - 0.075, y - 0.01, r[2] - 0.065, y + 0.01, 1.56, 1.6, brassM, 'cupboard-wand-hook-tip'); });
   var taps = [['hall-cupboard-bucket', ub ? ub.at[0] : r[0] + 0.6, ub ? ub.at[1] : r[1] + 0.4, 0.17, 0.36], ['hall-cupboard-bottle', sx, 64.3, 0.1, 0.24],
               ['hall-cupboard-tin', sx, 64.08, 0.08, 0.09]].map(function (t) {
     var m = new THREE.Mesh(new THREE.BoxGeometry(t[3] * 2, t[4], t[3] * 2), new THREE.MeshBasicMaterial({ visible: false }));
