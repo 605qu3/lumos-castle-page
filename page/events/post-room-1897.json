@@ -1,0 +1,86 @@
+{
+ "chain": "post-room-1897",
+ "about": "The post room of 1897 as a game (Godric's 1 on req 2657, req 2312's third room, Post it back): a letter he writes is set in the outgoing slot, the pigeonholes sort it with the rest and a tawny owl carries it off the sill, and the slot reads empty on his next visit. Four records, private to him. Tap id (outgoing slot) waits on the page; the letter's writing is the Reader's and Interaction's.",
+ "first_visit": [],
+ "room": [],
+ "records": [
+  {
+   "id": "post-room-1897.sets-the-letter",
+   "tier": "fixed",
+   "source": "device",
+   "leans": [],
+   "weight": 1,
+   "moment": "tap outgoing slot",
+   "when": [
+    "era = 1890s",
+    "place = post room",
+    "letter_out = none"
+   ],
+   "show": [
+    "he writes a few lines, folds the letter and sets it in the outgoing slot, a brass-lipped slot at the end of the pigeonholes; it drops with a small papery sound, and nothing glows"
+   ],
+   "starts": [
+    "set letter_out = set"
+   ],
+   "canon": "Godric's 1 on req 2657 (1 November 2026, 4.55 pm; req 2312, the ground floor as a game, third room); the post room's pigeonholes and the owls that carry post (PS ch5 L1778, the owls in the Hall at post time; owl post is the castle's ordinary mail); the outgoing slot and the sill's tawny are ours; private to him (FDP-25), nothing scored, no count; the writing of the letter is the Reader's and Interaction's, tap id (outgoing slot) waits on the page"
+  },
+  {
+   "id": "post-room-1897.slot-keeps-it",
+   "tier": "fixed",
+   "source": "device",
+   "leans": [],
+   "weight": 1,
+   "moment": "tap outgoing slot",
+   "when": [
+    "era = 1890s",
+    "place = post room",
+    "letter_out = set"
+   ],
+   "show": [
+    "the slot holds his letter, a corner showing; the pigeonholes shuffle their own letters beside it and make no fuss"
+   ],
+   "starts": [],
+   "canon": "Godric's 1 on req 2657 (1 November 2026, 4.55 pm; req 2312, the ground floor as a game, third room); the post room's pigeonholes and the owls that carry post (PS ch5 L1778, the owls in the Hall at post time; owl post is the castle's ordinary mail); the outgoing slot and the sill's tawny are ours; private to him (FDP-25), nothing scored, no count; the writing of the letter is the Reader's and Interaction's, tap id (outgoing slot) waits on the page"
+  },
+  {
+   "id": "post-room-1897.sorted-and-carried",
+   "tier": "fixed",
+   "source": "device",
+   "leans": [],
+   "weight": 1,
+   "moment": "wait 5-20 s",
+   "when": [
+    "era = 1890s",
+    "place = post room",
+    "letter_out = set"
+   ],
+   "show": [
+    "the pigeonholes sort his letter in with the rest, a tawny owl drops onto the sill, takes the bundle in its beak and is gone over the lawn"
+   ],
+   "starts": [
+    "set letter_out = gone"
+   ],
+   "canon": "Godric's 1 on req 2657 (1 November 2026, 4.55 pm; req 2312, the ground floor as a game, third room); the post room's pigeonholes and the owls that carry post (PS ch5 L1778, the owls in the Hall at post time; owl post is the castle's ordinary mail); the outgoing slot and the sill's tawny are ours; private to him (FDP-25), nothing scored, no count; the writing of the letter is the Reader's and Interaction's, tap id (outgoing slot) waits on the page"
+  },
+  {
+   "id": "post-room-1897.slot-empty",
+   "tier": "fixed",
+   "source": "device",
+   "leans": [],
+   "weight": 1,
+   "moment": "arrive",
+   "when": [
+    "era = 1890s",
+    "place = post room",
+    "letter_out = gone"
+   ],
+   "show": [
+    "the outgoing slot stands empty, its brass lip bright; on the sill a single tawny feather, and the pigeonholes sorting on as ever"
+   ],
+   "starts": [
+    "set letter_out = none"
+   ],
+   "canon": "Godric's 1 on req 2657 (1 November 2026, 4.55 pm; req 2312, the ground floor as a game, third room); the post room's pigeonholes and the owls that carry post (PS ch5 L1778, the owls in the Hall at post time; owl post is the castle's ordinary mail); the outgoing slot and the sill's tawny are ours; private to him (FDP-25), nothing scored, no count; the writing of the letter is the Reader's and Interaction's, tap id (outgoing slot) waits on the page"
+  }
+ ]
+}
