@@ -650,7 +650,7 @@
       "moment": "tap snare",
       "when": [
         "place = greenhouse set",
-        "year = 1",
+        "story year = 1",
         "lessons = on",
         "hour < 13",
         "time != night",
@@ -739,7 +739,7 @@
       "moment": "quiet 4-8 s",
       "when": [
         "place = greenhouse set",
-        "year = 1",
+        "story year = 1",
         "lessons = on",
         "hour < 13",
         "time != night",
@@ -782,7 +782,7 @@
       "moment": "tap slate",
       "when": [
         "place = greenhouse set",
-        "year = 1",
+        "story year = 1",
         "lessons = on",
         "hour < 13",
         "time != night",

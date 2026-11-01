@@ -385,7 +385,7 @@
       "when": [
         "place = trophy room",
         "era = 1890s",
-        "year = 1"
+        "story year = 1"
       ],
       "show": [
         "on the Head Boys' board, at the foot below the older names, two fresh in gilt: Crispin Ferrars, Head Boy, and Octavia Vane, Head Girl"
@@ -396,7 +396,7 @@
       "when": [
         "place = trophy room",
         "era = 1890s",
-        "year >= 2"
+        "story year >= 2"
       ],
       "show": [
         "on the Head Boys' board, at the foot, a new name still bright in gilt: Albus Dumbledore, Head Boy; above it, Crispin Ferrars and Octavia Vane, a year dimmer"
