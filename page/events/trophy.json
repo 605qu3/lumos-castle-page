@@ -380,6 +380,28 @@
         "mysterious lights shining from inside every suit of armour, the whole gallery lit from inside its visors"
       ],
       "canon": "Magic's req 761 (docs/magic/rooms.md, The armour gallery; Interiors' docs/interiors/armour-gallery.md, req 763, 8085ec63, cited), every year: \"mysterious lights shone from inside every suit of armour\" (PoA 11 L17727, read in the canon tool, 20 October 2026), every year, their light their own"
+    },
+    {
+      "when": [
+        "place = trophy room",
+        "era = 1890s",
+        "year = 1"
+      ],
+      "show": [
+        "on the Head Boys' board, at the foot below the older names, two fresh in gilt: Crispin Ferrars, Head Boy, and Octavia Vane, Head Girl"
+      ],
+      "canon": "Magic's req 2285 (5), docs/magic/rooms.md, The trophy room, 1897 (Story's settled 201 and 202, Godric's 2 and 3, 31 October 2026, 2.49 and 3.11 pm): the board's foot in the boys' first year, from September 1897; plain names, none a canon character's or a real person's; the board never explains a name"
+    },
+    {
+      "when": [
+        "place = trophy room",
+        "era = 1890s",
+        "year >= 2"
+      ],
+      "show": [
+        "on the Head Boys' board, at the foot, a new name still bright in gilt: Albus Dumbledore, Head Boy; above it, Crispin Ferrars and Octavia Vane, a year dimmer"
+      ],
+      "canon": "Magic's req 2285 (5), docs/magic/rooms.md, The trophy room, 1897 (Story's settled 201 and 202, Godric's 2 and 3, 31 October 2026, 2.49 and 3.11 pm): from September 1898 Albus Dumbledore's name is the fresh gilt (Head Boy, DH 18 L72179; settled 201), an everyday name on a board a boy may or may not read; nothing explains it"
     }
   ],
   "records": [

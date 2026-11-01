@@ -331,6 +331,55 @@
         "Mr. Grimbleton at a case with his tin and cloth, polishing the silver, his back to the room"
       ],
       "canon": "Magic's req 1368 (3), docs/magic/rooms.md, The trophy room, 1897, and req 692: the built row with the 1897 caretaker (CoS 7 L8902, as Magic read it in the canon tool, 28 October 2026); the mark trophy_polish is the trophy chain's arrive records' own (Tuesday and Friday evenings)"
+    },
+    {
+      "when": [
+        "place = filchs office"
+      ],
+      "show": [
+        "the single oil lamp on its chain gutters when he shuts the door and wants a second tap on its glass before it steadies",
+        "a mop leaning in its bucket by the door, wrung out only half way, sulking, its strings dripping on the flags"
+      ],
+      "canon": "Magic's req 2285, docs/magic/rooms.md, Mr. Grimbleton's Office, 1897 (206): the stillness redrawn; a wizard poor at household charms who pretends to be worse than he is, so seen by a boy the room is clumsy and half works (settled 206, Godric 31 October 2026, 4.27 pm); the lamp is the room's own light, its second tap a hand's, nothing glows; Filch's rule that nothing here moves by magic of its own is struck for him (the books' rows stay era = books)"
+    },
+    {
+      "when": [
+        "place = charms classroom",
+        "lessons = on",
+        "time != night",
+        "date >= 12-04",
+        "date <= 12-11"
+      ],
+      "show": [
+        "the room's candles lifted off the chandelier a hand's breadth to conduct a carol in light, the cracked bust on his desk for the chorus; the candles flare a verse late, the bust sings the wrong verse, two candles drift off and the class Leviosas them back, and Professor Pickett calls it the plan"
+      ],
+      "canon": "Magic's req 2285 (4), docs/magic/rooms.md, Professor Pickett's Charms classroom, 1897 (settled 209, Godric 31 October 2026, 5.04 pm, \"All of those\"): the Carol Chandelier, the main one of the last fortnight (about 4 to 18 December 1897, PoA 10 L17110's timing, Flitwick's habit, ours in Pickett's spirit); only candlelight, nothing glows to say tap me; the verses and the bust's voice are Story's and People's"
+    },
+    {
+      "when": [
+        "place = charms classroom",
+        "lessons = on",
+        "time != night",
+        "date >= 12-12",
+        "date <= 12-15"
+      ],
+      "show": [
+        "a small fall of snow over Professor Pickett's own desk and a few teacups only; it turns to sleet on his gown, and the class keeps a teacup of it"
+      ],
+      "canon": "Magic's req 2285 (4), docs/magic/rooms.md, Professor Pickett's Charms classroom, 1897 (settled 209, Godric 31 October 2026, 5.04 pm, \"All of those\"): the Indoor Snow, another lesson day of the fortnight; nothing falls on anyone or anything else (settled 157)"
+    },
+    {
+      "when": [
+        "place = charms classroom",
+        "lessons = on",
+        "time != night",
+        "date >= 12-16",
+        "date <= 12-18"
+      ],
+      "show": [
+        "three or four small lights come in at the window head, look about the room and leave, and the candles are the candles' again; Professor Pickett watches them go and says it was a good first attempt"
+      ],
+      "canon": "Magic's req 2285 (4), docs/magic/rooms.md, Professor Pickett's Charms classroom, 1897 (settled 209, Godric 31 October 2026, 5.04 pm, \"All of those\"): his failed fairies, a third lesson day, a one-off and never a custom (the fairies as a standing custom stay era = books in charms.json, req 1358); the room is never seen filled with them"
     }
   ],
   "records": [
@@ -1002,6 +1051,92 @@
         "stamp lakestone_six"
       ],
       "canon": "Corridor's req 1312 (Godric's 1 on reqs 1306 to 1309, 27 October 2026), positions by the Architect's answer to req 1311 against model v224; no canon scene staged (d): one find on a sill per floor, a flat grey stone in the sash east of the window seat; a boy who has seen the stone on the floor below finds its pair here. My reading of the find (Interiors' to place; provisional, Godric to confirm)"
+    },
+    {
+      "id": "rooms1897.grimbleton-flick",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "quiet 6-12 s",
+      "when": [
+        "place = filchs office",
+        "grimbleton_flick != yes"
+      ],
+      "show": [
+        "with his back still turned, one flick of Mr. Grimbleton's wand: the lamp steadies at once, the mop drops straight into its bucket and stands, and then he turns round grumbling that nothing in this place ever takes the charm properly"
+      ],
+      "starts": [
+        "set grimbleton_flick = yes"
+      ],
+      "canon": "Magic's req 2285, docs/magic/rooms.md, Mr. Grimbleton's Office, 1897 (206), the quiet-boy flick (offered, taken): a boy still at the door for a moment, the man not yet turned; a gentle find, never a catch, never a danger (FDP-11); he never knows it was seen; once a visit"
+    },
+    {
+      "id": "rooms1897.alcor-shower-crumbs",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "wait 25-50 s",
+      "when": [
+        "place = astronomy tower top",
+        "time = night",
+        "weather = clear",
+        "date >= 11-14",
+        "date <= 11-20",
+        "alcor_crumbs != yes"
+      ],
+      "show": [
+        "Professor Alcor, one hand toward the streaks: \"Those are crumbs. A comet came this way thirty years ago and left them along its road, and every November we walk straight through them.\""
+      ],
+      "starts": [
+        "set alcor_crumbs = yes"
+      ],
+      "canon": "Magic's req 2285, docs/magic/rooms.md, Professor Alcor's Astronomy Tower top, 1897 (208, Story's docs/story/alcor-leonids.md): the first of her three; holds 154's guard (nothing falls on anything or anyone, 157); the words are Story's; timed to the shower's extra streaks (req 1349), the streak records above run in the same nights"
+    },
+    {
+      "id": "rooms1897.alcor-shower-appointment",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "wait 40-80 s",
+      "when": [
+        "place = astronomy tower top",
+        "time = night",
+        "weather = clear",
+        "date >= 11-14",
+        "date <= 11-20",
+        "alcor_crumbs = yes",
+        "alcor_appointment != yes"
+      ],
+      "show": [
+        "Professor Alcor, watching the busiest part of the sky: \"Every thirty-three years or so they come down like snow. I was a girl in 1866 and stood in the cold half the night. They are due again in two years, if the sky keeps its appointments. I am already saving a blanket.\""
+      ],
+      "starts": [
+        "set alcor_appointment = yes"
+      ],
+      "canon": "Magic's req 2285, docs/magic/rooms.md, Professor Alcor's Astronomy Tower top, 1897 (208): the second, her wonder; the shower came in 1799, 1833 and 1866, the return hoped for in 1899, never promised (154's guard)"
+    },
+    {
+      "id": "rooms1897.alcor-shower-nick",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "wait 40-80 s",
+      "when": [
+        "place = astronomy tower top",
+        "time = night",
+        "weather = clear",
+        "date >= 11-14",
+        "date <= 11-20",
+        "alcor_appointment = yes",
+        "alcor_nick != yes"
+      ],
+      "show": [
+        "Professor Alcor, dry: \"Sir Nicholas tells me he has seen them come down like snow every time since 1492, and that each was smaller than the last.\""
+      ],
+      "starts": [
+        "set alcor_nick = yes"
+      ],
+      "canon": "Magic's req 2285, docs/magic/rooms.md, Professor Alcor's Astronomy Tower top, 1897 (208): the third, the ghost's review; Sir Nicholas her old friend, an ordinary one, never a thing about death"
     }
   ]
 }

@@ -278,6 +278,19 @@
         "the four long tables clear, the dishes already sent up through the ceiling"
       ],
       "canon": "Magic's req 944 (docs/magic/rooms.md, *The kitchens' corridor and the kitchens*; Interiors' docs/interiors/kitchens.md, *Occupancy and aftermath*, cited), 22 October 2026: during a meal the dishes have gone up (GoF 21 L28856 \"sent up through the ceiling to their counterparts above\", canon tool)"
+    },
+    {
+      "when": [
+        "place = kitchens",
+        "era = 1890s",
+        "occasion = christmas day",
+        "hour >= 20",
+        "pear_first_night = yes"
+      ],
+      "show": [
+        "on the near table, by the fire, one plate of the feast's leftovers under a cover, still warm, and a stool pulled up to the hearth; nobody is there"
+      ],
+      "canon": "Magic's req 2285 (6), docs/magic/rooms.md, The kitchens' corridor and the kitchens, 1897 (Story's settled 204, Godric's 1 on desk req 2061, 31 October 2026, 3.52 pm; the date is settled 191's, the gate the story's, not a book's): the plate laid for them, the first night the door opens and that night only; the work is done and who does it is left unsaid (the built rule, Kingsley's 16 October ruling); no figure; ours, no book line, since GoF 21's welcome is elves"
     }
   ],
   "records": [
@@ -337,7 +350,8 @@
       "moment": "tap pear",
       "when": [
         "place = kitchens corridor",
-        "year >= 4"
+        "year >= 4",
+        "era = books"
       ],
       "show": [
         "the pear beginning to squirm, chuckling, and suddenly turning into a large green door handle"
@@ -623,6 +637,48 @@
       ],
       "starts": [],
       "canon": "Magic's req 944 (docs/magic/rooms.md, *The kitchens' corridor and the kitchens*; Interiors' docs/interiors/kitchens.md, *Occupancy and aftermath*, cited), 22 October 2026: the silent partner"
+    },
+    {
+      "id": "kitchens.pear-1897-first",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap pear",
+      "when": [
+        "place = kitchens corridor",
+        "era = 1890s",
+        "occasion = christmas day",
+        "hour >= 20",
+        "pear_door != yes"
+      ],
+      "show": [
+        "the pear begins to squirm, chuckling, and suddenly turns into a large green door handle, and the door into the kitchens stands ready"
+      ],
+      "starts": [
+        "set pear_door = yes",
+        "set pear_first_night = yes",
+        "secret fruit-bowl-painting"
+      ],
+      "canon": "Magic's req 2285 (6), docs/magic/rooms.md, The kitchens' corridor and the kitchens, 1897 (Story's settled 204, Godric's 1 on desk req 2061, 31 October 2026, 3.52 pm; the date is settled 191's, the gate the story's, not a book's): the pear's first chuckle is on the 1897 Christmas feast, once the boys have met Professor Marchpane's famous dessert (settled 137, read here as the evening, hour 20 on, since no dessert mark exists yet); GoF 21 L28836 \"began to squirm, chuckling, and suddenly turned into a large green door handle\"; a find with a reason, met by any pupil who walks the corridor that evening, never a gate by books finished"
+    },
+    {
+      "id": "kitchens.pear-1897-after",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap pear",
+      "when": [
+        "place = kitchens corridor",
+        "era = 1890s",
+        "pear_door = yes"
+      ],
+      "show": [
+        "the pear squirms, chuckling, and turns into the green door handle again"
+      ],
+      "starts": [
+        "secret fruit-bowl-painting"
+      ],
+      "canon": "Magic's req 2285 (6), docs/magic/rooms.md, The kitchens' corridor and the kitchens, 1897 (Story's settled 204, Godric's 1 on desk req 2061, 31 October 2026, 3.52 pm; the date is settled 191's, the gate the story's, not a book's): from then on the pear stays a tap away, and shut again the handle is a pear; before the feast a tap does nothing, as the painted still life has it"
     }
   ]
 }
