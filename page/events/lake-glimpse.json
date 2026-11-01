@@ -358,6 +358,65 @@
       "canon": "Magic's castle-wide table 4 (docs/magic/castle-wide-1027.md; req 1273, Godric's yeses of 27 October 2026, 9.50 pm; Events' req 1273): rain on the lake seen from below, the rings of daylight sliding over the floor, additive to the ripples; the squid's shadow stays Story's gate (req 1260)"
     },
     {
+      "id": "lake-glimpse.weed-calm",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "house-weed",
+      "weight": 1,
+      "moment": "arrive",
+      "when": [
+        "place = h82 glass house",
+        "time != night",
+        "windy = no"
+      ],
+      "show": [
+        "the weed along the glass's foot leans slowly one way and slowly back, hardly moving, like hair in a bath"
+      ],
+      "starts": [],
+      "canon": "Godric's note of 31 October 2026, 10.22 pm, via Fawkes (Events' req 2199): the weed along the glass's foot sways with the day's weather, a slow gentle lean on a calm day, stronger and restless in wind, and wildest in a storm on the loch (the water stirs even at the bed); the squid's wash (req 2186, lake-glimpse.squid-shadow) still adds its push on top; one day's weather for the whole castle (req 113), read as weather and windy"
+    },
+    {
+      "id": "lake-glimpse.weed-windy",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "house-weed",
+      "weight": 1,
+      "moment": "arrive",
+      "when": [
+        "place = h82 glass house",
+        "time != night",
+        "windy = yes",
+        "weather != rain"
+      ],
+      "show": [
+        "the weed along the glass's foot sways in long restless sweeps, the whole bed of it leaning and swinging back, as if the loch overhead were being stirred with a spoon"
+      ],
+      "starts": [],
+      "canon": "Godric's note of 31 October 2026, 10.22 pm, via Fawkes (Events' req 2199): the weed along the glass's foot sways with the day's weather, a slow gentle lean on a calm day, stronger and restless in wind, and wildest in a storm on the loch (the water stirs even at the bed); the squid's wash (req 2186, lake-glimpse.squid-shadow) still adds its push on top; one day's weather for the whole castle (req 113), read as weather and windy"
+    },
+    {
+      "id": "lake-glimpse.weed-storm",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "house-weed",
+      "weight": 1,
+      "moment": "arrive",
+      "when": [
+        "place = h82 glass house",
+        "time != night",
+        "windy = yes",
+        "weather = rain"
+      ],
+      "show": [
+        "the weed along the glass's foot thrashes and streams first one way and then the other, hard, the storm on the loch stirring the water even down at the bed"
+      ],
+      "starts": [],
+      "canon": "Godric's note of 31 October 2026, 10.22 pm, via Fawkes (Events' req 2199): the weed along the glass's foot sways with the day's weather, a slow gentle lean on a calm day, stronger and restless in wind, and wildest in a storm on the loch (the water stirs even at the bed); the squid's wash (req 2186, lake-glimpse.squid-shadow) still adds its push on top; one day's weather for the whole castle (req 113), read as weather and windy"
+    },
+    {
       "id": "lake-glimpse.squid-shadow",
       "tier": "fixed",
       "source": "device",

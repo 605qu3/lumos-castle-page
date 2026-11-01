@@ -29,6 +29,193 @@
       ],
       "starts": [],
       "canon": "Godric's woven touch lion-bedsheet-banner (23 October 2026, 7.32 am; the Architect's req 993): the paint charmed to flash different colours (PS 11, B1 ch11 L3801, read in the canon tool, 23 October 2026), still flashing when unrolled; a tap on the roll, the strings word for word to the Architect, nothing written on it; the room is Gryffindor Tower's round storeroom on G (model id drum-room-g, v162), the first book's year on"
+    },
+    {
+      "id": "storeroom.grumble-in",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "arrive",
+      "when": [
+        "place = drum room g",
+        "year >= 1"
+      ],
+      "show": [
+        "from somewhere in the stack a gruff painted voice: \"Oh, look at that. Visitors. Real ones, with legs. Nobody has been in to see us since the last time the ceiling came down.\""
+      ],
+      "one_of": "storeroom-in",
+      "weight": 1,
+      "canon": "Godric's req 2209 (31 October 2026, 10.29 pm, via Fawkes): the shut-away portraits of the Gryffindor storeroom (room 12, model id drum-room-g) have sitters frustrated at being put away; light book humour, 1897, nothing harmed, nobody sad (world-rules, Nothing dies). Sitters are invented, none a book character or a real person. Frames: the living ones are the three the Architect's req 2208 crowd marks: crooked-frame (leans on the settle), facing-wall (turned to the wall) and top-of-stack (highest on the pile)"
+    },
+    {
+      "id": "storeroom.grumble-in-2",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "arrive",
+      "when": [
+        "place = drum room g",
+        "year >= 1"
+      ],
+      "show": [
+        "a painted lady in the crooked frame on the settle tuts: \"Mind the dust, dear. Forty years it has taken us to get it this thick, and I will not have it disturbed.\""
+      ],
+      "one_of": "storeroom-in",
+      "weight": 1,
+      "canon": "Godric's req 2209 (31 October 2026, 10.29 pm, via Fawkes): the shut-away portraits of the Gryffindor storeroom (room 12, model id drum-room-g) have sitters frustrated at being put away; light book humour, 1897, nothing harmed, nobody sad (world-rules, Nothing dies). Sitters are invented, none a book character or a real person. Frames: the living ones are the three the Architect's req 2208 crowd marks: crooked-frame (leans on the settle), facing-wall (turned to the wall) and top-of-stack (highest on the pile)"
+    },
+    {
+      "id": "storeroom.grumble-in-3",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "arrive",
+      "when": [
+        "place = drum room g",
+        "year >= 1"
+      ],
+      "show": [
+        "a painted knight wedged at the top of the stack clears his throat: \"Ahem. Is it the hanging committee? Because I have been very patient, and I would like to say a few words about the draught.\""
+      ],
+      "one_of": "storeroom-in",
+      "weight": 1,
+      "canon": "Godric's req 2209 (31 October 2026, 10.29 pm, via Fawkes): the shut-away portraits of the Gryffindor storeroom (room 12, model id drum-room-g) have sitters frustrated at being put away; light book humour, 1897, nothing harmed, nobody sad (world-rules, Nothing dies). Sitters are invented, none a book character or a real person. Frames: the living ones are the three the Architect's req 2208 crowd marks: crooked-frame (leans on the settle), facing-wall (turned to the wall) and top-of-stack (highest on the pile)"
+    },
+    {
+      "id": "storeroom.view",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "wait 40-200 s",
+      "when": [
+        "place = drum room g",
+        "year >= 1"
+      ],
+      "show": [
+        "the painted knight at the top of the stack sighs at the ceiling: \"All I ask is a window. A little view. One tree. I was painted in front of a very good tree, and I have not seen it since the old Queen was a girl.\""
+      ],
+      "one_of": "storeroom-wait",
+      "weight": 1,
+      "canon": "Godric's req 2209 (31 October 2026, 10.29 pm, via Fawkes): the shut-away portraits of the Gryffindor storeroom (room 12, model id drum-room-g) have sitters frustrated at being put away; light book humour, 1897, nothing harmed, nobody sad (world-rules, Nothing dies). Sitters are invented, none a book character or a real person. Frames: the living ones are the three the Architect's req 2208 crowd marks: crooked-frame (leans on the settle), facing-wall (turned to the wall) and top-of-stack (highest on the pile)"
+    },
+    {
+      "id": "storeroom.wall",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "wait 40-200 s",
+      "when": [
+        "place = drum room g",
+        "year >= 1"
+      ],
+      "show": [
+        "a muffled voice from the frame turned to the wall: \"I can hear you looking. Turn me round and I shall be civil. Leave me like this and I shall go on being a very interesting patch of canvas.\""
+      ],
+      "one_of": "storeroom-wait",
+      "weight": 1,
+      "canon": "Godric's req 2209 (31 October 2026, 10.29 pm, via Fawkes): the shut-away portraits of the Gryffindor storeroom (room 12, model id drum-room-g) have sitters frustrated at being put away; light book humour, 1897, nothing harmed, nobody sad (world-rules, Nothing dies). Sitters are invented, none a book character or a real person. Frames: the living ones are the three the Architect's req 2208 crowd marks: crooked-frame (leans on the settle), facing-wall (turned to the wall) and top-of-stack (highest on the pile)"
+    },
+    {
+      "id": "storeroom.across",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "wait 40-200 s",
+      "when": [
+        "place = drum room g",
+        "year >= 1"
+      ],
+      "show": [
+        "the lady on the settle calls across the room: \"Cuthbert! Are you still facing that wall?\" From the wall, flatly: \"Where else would I be, Hortensia?\" \"Well, you might at least try the other way.\" \"I am a portrait, not a weathervane.\""
+      ],
+      "one_of": "storeroom-wait",
+      "weight": 1,
+      "canon": "Godric's req 2209 (31 October 2026, 10.29 pm, via Fawkes): the shut-away portraits of the Gryffindor storeroom (room 12, model id drum-room-g) have sitters frustrated at being put away; light book humour, 1897, nothing harmed, nobody sad (world-rules, Nothing dies). Sitters are invented, none a book character or a real person. Frames: the living ones are the three the Architect's req 2208 crowd marks: crooked-frame (leans on the settle), facing-wall (turned to the wall) and top-of-stack (highest on the pile)"
+    },
+    {
+      "id": "storeroom.shout",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "wait 40-200 s",
+      "when": [
+        "place = drum room g",
+        "year >= 1"
+      ],
+      "show": [
+        "two frames in the stack begin at once, \"It was MY turn for the corner!\" \"You had the corner in 1854!\" until a third, very tired, says \"Some of us just want to be hung straight\", and all three go quiet and glare"
+      ],
+      "one_of": "storeroom-wait",
+      "weight": 1,
+      "canon": "Godric's req 2209 (31 October 2026, 10.29 pm, via Fawkes): the shut-away portraits of the Gryffindor storeroom (room 12, model id drum-room-g) have sitters frustrated at being put away; light book humour, 1897, nothing harmed, nobody sad (world-rules, Nothing dies). Sitters are invented, none a book character or a real person. Frames: the living ones are the three the Architect's req 2208 crowd marks: crooked-frame (leans on the settle), facing-wall (turned to the wall) and top-of-stack (highest on the pile)"
+    },
+    {
+      "id": "storeroom.crooked",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "wait 40-200 s",
+      "when": [
+        "place = drum room g",
+        "year >= 1"
+      ],
+      "show": [
+        "the crooked frame on the settle swings a little further crooked and a painted voice says, mournfully: \"Is it level? Nobody will tell me if it is level. I have been like this since the Jubilee and I will not be told\""
+      ],
+      "one_of": "storeroom-wait",
+      "weight": 1,
+      "canon": "Godric's req 2209 (31 October 2026, 10.29 pm, via Fawkes): the shut-away portraits of the Gryffindor storeroom (room 12, model id drum-room-g) have sitters frustrated at being put away; light book humour, 1897, nothing harmed, nobody sad (world-rules, Nothing dies). Sitters are invented, none a book character or a real person. Frames: the living ones are the three the Architect's req 2208 crowd marks: crooked-frame (leans on the settle), facing-wall (turned to the wall) and top-of-stack (highest on the pile)"
+    },
+    {
+      "id": "storeroom.ask-hung",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "wait 40-200 s",
+      "when": [
+        "place = drum room g",
+        "year >= 1"
+      ],
+      "show": [
+        "the knight at the top calls down to the boys: \"You there! Yes, you. If you were to put in a word about the Great Hall, anywhere above the third torch, I would be most obliged. I do not mind the draught. I mind the dust.\""
+      ],
+      "one_of": "storeroom-wait",
+      "weight": 1,
+      "canon": "Godric's req 2209 (31 October 2026, 10.29 pm, via Fawkes): the shut-away portraits of the Gryffindor storeroom (room 12, model id drum-room-g) have sitters frustrated at being put away; light book humour, 1897, nothing harmed, nobody sad (world-rules, Nothing dies). Sitters are invented, none a book character or a real person. Frames: the living ones are the three the Architect's req 2208 crowd marks: crooked-frame (leans on the settle), facing-wall (turned to the wall) and top-of-stack (highest on the pile)"
+    },
+    {
+      "id": "storeroom.leave",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "leave",
+      "when": [
+        "been drum room g = yes",
+        "year >= 1"
+      ],
+      "show": [
+        "a chorus of painted voices as the door swings: \"Come back soon!\" \"Not you, Cuthbert, you are facing the wall!\" \"Mind the door, it sticks!\" \"Tell them we were never any trouble!\""
+      ],
+      "one_of": "storeroom-out",
+      "weight": 1,
+      "canon": "Godric's req 2209 (31 October 2026, 10.29 pm, via Fawkes): the shut-away portraits of the Gryffindor storeroom (room 12, model id drum-room-g) have sitters frustrated at being put away; light book humour, 1897, nothing harmed, nobody sad (world-rules, Nothing dies). Sitters are invented, none a book character or a real person. Frames: the living ones are the three the Architect's req 2208 crowd marks: crooked-frame (leans on the settle), facing-wall (turned to the wall) and top-of-stack (highest on the pile)"
+    },
+    {
+      "id": "storeroom.leave-2",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "leave",
+      "when": [
+        "been drum room g = yes",
+        "year >= 1"
+      ],
+      "show": [
+        "the lady on the settle calls after them, quite cheerful again: \"Do remember us at Christmas, dears. Even a holly sprig on the frame would be a kindness.\""
+      ],
+      "one_of": "storeroom-out",
+      "weight": 1,
+      "canon": "Godric's req 2209 (31 October 2026, 10.29 pm, via Fawkes): the shut-away portraits of the Gryffindor storeroom (room 12, model id drum-room-g) have sitters frustrated at being put away; light book humour, 1897, nothing harmed, nobody sad (world-rules, Nothing dies). Sitters are invented, none a book character or a real person. Frames: the living ones are the three the Architect's req 2208 crowd marks: crooked-frame (leans on the settle), facing-wall (turned to the wall) and top-of-stack (highest on the pile)"
     }
   ]
 }
