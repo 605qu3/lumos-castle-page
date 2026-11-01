@@ -5069,15 +5069,15 @@ thingCues[WELL_EYE] = function () { showLines([{ medium: 'seen', sound: WELL_EYE
       var g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(gp, 3));
       g.setAttribute('color', new THREE.Float32BufferAttribute(gc, 3)); g.setIndex(gi); return g;
     }
-    var WU = { value: 0 };
+    var WU = { value: 0 }, WW = { value: 0.3 };   /* WW: the day's wind 0..1 (events.weather().wind), req 2199: calm a slow gentle lean, wind and storm a strong restless sway */
     function wmat(amp) {
       var m = new THREE.MeshBasicMaterial({ vertexColors: true, side: THREE.DoubleSide });
       if (!amp) return m;
       m.onBeforeCompile = function (sh) {
-        sh.uniforms.uT = WU;
-        sh.vertexShader = 'uniform float uT;\n' + sh.vertexShader.replace('#include <project_vertex>',
+        sh.uniforms.uT = WU; sh.uniforms.uW = WW;
+        sh.vertexShader = 'uniform float uT; uniform float uW;\n' + sh.vertexShader.replace('#include <project_vertex>',
           '#include <project_vertex>\n float wph = instanceMatrix[3].x * 1.7 + instanceMatrix[3].z * 2.3;' +
-          ' float wsw = sin(uT * (1.0 + 0.16 * sin(wph * 3.1)) * 1.0472 + wph) * ' + amp.toFixed(3) + ' * position.y * position.y;' +
+          ' float wsw = sin(uT * (1.0 + 0.16 * sin(wph * 3.1)) * 1.0472 * (0.6 + 1.1 * uW) + wph) * ' + amp.toFixed(3) + ' * (0.55 + 2.2 * uW) * position.y * position.y;' +
           ' mvPosition.xyz += (modelViewMatrix * vec4(1.0, 0.0, 0.0, 0.0)).xyz * wsw; gl_Position = projectionMatrix * mvPosition;');
       };
       m.customProgramCacheKey = function () { return 'h82weed' + amp; };
@@ -5141,7 +5141,12 @@ thingCues[WELL_EYE] = function () { showLines([{ medium: 'seen', sound: WELL_EYE
     mesh(ribbon(3, 0.09, 0.02, 0.12, 0x12170a, 0x363a16), wmat(0.05), mat, 'h82-lake-weed');
     mesh(ribbon(6, 0.1, 0.022, 0.3, 0x18240c, 0x40591c), wmat(0.11), fro, 'h82-lake-weed-fronds');
     mesh(ribbon(2, 0.07, 0.012, 0.1, 0x3a5522, 0x86a244), wmat(0.03), tuf, 'h82-lake-weed-ledge');
-    (function tickWeed(now) { WU.value = now / 1000; requestAnimationFrame(tickWeed); })(0);
+    (function tickWeed(now) {
+      WU.value = now / 1000;
+      var wx = typeof events !== 'undefined' && events && events.weather ? events.weather() : null, wv = wx && typeof wx.wind === 'number' ? wx.wind : 0.3;
+      WW.value = Math.max(0, Math.min(1, wv + (wx && wx.sky === 'rain' ? 0.15 : 0)));   /* a storm on the loch stirs the water even at the bed */
+      requestAnimationFrame(tickWeed);
+    })(0);
   })();
   /* the cliff's rock over the house's north end and along the cut's north edge: from the bed (or the barrel's line over
      the stone end) up to the lake's bed there, 8 mm north of the end's face */
