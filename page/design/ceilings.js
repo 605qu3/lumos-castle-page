@@ -384,7 +384,39 @@
       knob(C[0], C[1], beasts[k++ % 4], 0.5, 'bay-' + i);
       [R1p, R2p, T1, T2].forEach(function (p, j) { knob(p[0], p[1], null, 0.18, 'bay-' + i + '-' + j); });
     }
+    fadeToSky(THREE, G, y, top);
     return { group: G, flat: true, springs: H.springs, crown: H.crown, bays: lines.length - 1 };
+  }
+
+  /* req 2580 (Godric, 1 November 2026, 1.31 pm: the vault is to have a transparency gradient, opaque at its springing and
+     fully transparent at the apex, never a cut-off): each vertex of every rib and boss gets aFade, 1 at the springing
+     height y0 easing to 0 at the crown y1 (a smoothstep, so no kink), and a clone of its material multiplies its alpha by
+     it. The springer stones stay solid (the ribs begin inside them). Done once at build, in the vault's own frame */
+  var fadeMats = [];
+  function fadeMat(THREE, m) {
+    for (var i = 0; i < fadeMats.length; i++) if (fadeMats[i][0] === m) return fadeMats[i][1];
+    var c = m.clone(); c.transparent = true;
+    c.onBeforeCompile = function (sh) {
+      sh.vertexShader = 'attribute float aFade;\nvarying float vFade;\n' + sh.vertexShader.replace('#include <begin_vertex>', '#include <begin_vertex>\n  vFade = aFade;');
+      sh.fragmentShader = 'varying float vFade;\n' + sh.fragmentShader.replace('#include <dithering_fragment>', '#include <dithering_fragment>\n  gl_FragColor.a *= vFade;');
+    };
+    c.customProgramCacheKey = function () { return 'vaultfade'; };
+    fadeMats.push([m, c]); return c;
+  }
+  function fadeToSky(THREE, G, y0, y1) {
+    var v = new THREE.Vector3();
+    G.updateMatrixWorld(true);
+    G.traverse(function (o) {
+      if (!o.isMesh || /springer/.test(o.name || '') || !o.geometry || !o.geometry.attributes.position) return;
+      var p = o.geometry.attributes.position, a = new Float32Array(p.count);
+      for (var i = 0; i < p.count; i++) {
+        v.fromBufferAttribute(p, i).applyMatrix4(o.matrixWorld);
+        var t = Math.max(0, Math.min(1, (v.y - y0) / Math.max(0.01, y1 - y0)));
+        a[i] = 1 - t * t * (3 - 2 * t);
+      }
+      o.geometry.setAttribute('aFade', new THREE.BufferAttribute(a, 1));
+      o.material = Array.isArray(o.material) ? o.material.map(function (m) { return fadeMat(THREE, m); }) : fadeMat(THREE, o.material);
+    });
   }
 
   /* an umbrella vault over a round room: ribs from a squat round pillar at the middle (the model's, where the vault
