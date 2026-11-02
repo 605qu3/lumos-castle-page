@@ -5,8 +5,33 @@
    stops 1 cm short of a face it ends against; seams before any shot. */
 window.SHELL_W5A = {
   mats: { tin: 0x8a8a82, amber: 0xb07a1e, blue: 0x23407a, ruby: 0x8a1c22, lavender: 0x6d6585, petals: 0xa89a8e, copper: 0x8a4a2a, steel: 0x8f9296, dust: 0x77706a,
-    deal: 0xa88a5e, mahog: 0x5a2a1e, scarlet: 0x8a1c1c, blanket: 0x7e7262, tartan: 0x6a2a2a, ink: 0x1a1c2a, tallow: 0xe0d4a8 },
+    deal: 0xa88a5e, mahog: 0x5a2a1e, scarlet: 0x8a1c1c, blanket: 0x7e7262, tartan: 0x6a2a2a, ink: 0x1a1c2a, tallow: 0xe0d4a8, flame: 0xffd890 },
   things: {
+    /* G-THINGS tudor-bay-g */
+    /* docs/interiors/ground-floor-voids-1031.md (req 2272): two stone benches either side of the lake window, heather pots on the sill ledge, the roped plate-box crate, boot scrapers at the arch, the rain barrel, the tripod legs on pegs, the unlit lantern; the arch and its walkway kept clear */
+    'tudor-bay-g': { items: [
+      ['b', 101.4, -6.5, 0, 101.7, -6.1, 0.4, 'stone'], ['b', 103.5, -6.5, 0, 103.8, -6.1, 0.4, 'stone'], ['b', 101.4, -6.5, 0.4, 103.8, -6.08, 0.45, 'stone'], ['b', 108.2, -6.5, 0, 108.5, -6.1, 0.4, 'stone'],
+      ['b', 110.3, -6.5, 0, 110.6, -6.1, 0.4, 'stone'], ['b', 108.2, -6.5, 0.4, 110.6, -6.08, 0.45, 'stone'], ['b', 101.2, -6.5, 0.86, 103.8, -6.3, 0.9, 'stone'], ['b', 108.2, -6.5, 0.86, 110.8, -6.3, 0.9, 'stone'],
+      ['y', 101.6, -6.38, 0.1, 0.9, 1.1, 'brick'], ['y', 101.6, -6.38, 0.09, 1.1, 1.18, 'green'], ['y', 102.6, -6.38, 0.1, 0.9, 1.1, 'brick'], ['y', 102.6, -6.38, 0.09, 1.1, 1.18, 'green'],
+      ['y', 108.8, -6.38, 0.1, 0.9, 1.1, 'brick'], ['y', 108.8, -6.38, 0.09, 1.1, 1.18, 'green'], ['y', 109.8, -6.38, 0.1, 0.9, 1.1, 'brick'], ['y', 109.8, -6.38, 0.09, 1.1, 1.18, 'green'],
+      ['b', 101.6, -5.85, 0, 102.1, -5.45, 0.35, 'deal'], ['b', 101.6, -5.7, 0.35, 102.1, -5.65, 0.37, 'rope'], ['b', 102.35, -3.5, 0, 102.65, -3.3, 0.04, 'iron'], ['b', 102.35, -3.5, 0.04, 102.38, -3.3, 0.18, 'iron'],
+      ['b', 102.62, -3.5, 0.04, 102.65, -3.3, 0.18, 'iron'], ['b', 102.35, -3.42, 0.15, 102.65, -3.38, 0.18, 'iron'], ['b', 104.35, -3.5, 0, 104.65, -3.3, 0.04, 'iron'], ['b', 104.35, -3.5, 0.04, 104.38, -3.3, 0.18, 'iron'],
+      ['b', 104.62, -3.5, 0.04, 104.65, -3.3, 0.18, 'iron'], ['b', 104.35, -3.42, 0.15, 104.65, -3.38, 0.18, 'iron'], ['y', 110.3, -3.45, 0.35, 0, 0.9, 'oak'], ['y', 110.3, -3.45, 0.355, 0.2, 0.24, 'iron'],
+      ['y', 110.3, -3.45, 0.355, 0.65, 0.69, 'iron'], ['b', 110.55, -3.1, 0.9, 110.65, -3.0, 2.6, 'iron'], ['b', 110.9, -3.75, 0.3, 111.0, -3.65, 1.5, 'wood'], ['b', 110.88, -3.77, 0.55, 110.92, -3.63, 0.6, 'rope'],
+      ['b', 110.88, -3.77, 1.1, 110.92, -3.63, 1.15, 'rope'], ['y', 106.0, -4.75, 0.01, 3.8, 4.5, 'iron'], ['b', 105.85, -4.9, 3.5, 106.15, -4.6, 3.8, 'iron'], ['b', 105.9, -4.85, 3.53, 106.1, -4.65, 3.77, 'glass']] },
+    /* G-THINGS end tudor-bay-g */
+    /* G-THINGS waiting-chamber */
+    /* docs/interiors/ground-floor-voids-1031.md (req 2272): the deal bench on the west wall south of the door, twelve brass hooks with two forgotten scarves on the south wall, the slow wall clock and the printed notice on the east wall, the umbrella stand north of the door, the worn mat, the unlit lantern; the middle floor kept empty */
+    'waiting-chamber': { items: [
+      ['b', 92.52, 61.25, 0, 92.88, 61.3, 0.41, 'deal'], ['b', 92.52, 64.4, 0, 92.88, 64.45, 0.41, 'deal'], ['b', 92.52, 61.2, 0.41, 92.9, 64.7, 0.45, 'deal'], ['b', 92.5, 61.2, 0.45, 92.55, 64.7, 1.0, 'deal'],
+      ['b', 93.5, 61.0, 1.55, 97.0, 61.06, 1.65, 'oak'], ['b', 93.6, 61.06, 1.57, 93.64, 61.14, 1.62, 'brass'], ['b', 93.9, 61.06, 1.57, 93.94, 61.14, 1.62, 'brass'], ['b', 94.2, 61.06, 1.57, 94.24, 61.14, 1.62, 'brass'],
+      ['b', 94.5, 61.06, 1.57, 94.54, 61.14, 1.62, 'brass'], ['b', 94.8, 61.06, 1.57, 94.84, 61.14, 1.62, 'brass'], ['b', 95.1, 61.06, 1.57, 95.14, 61.14, 1.62, 'brass'], ['b', 95.4, 61.06, 1.57, 95.44, 61.14, 1.62, 'brass'],
+      ['b', 95.7, 61.06, 1.57, 95.74, 61.14, 1.62, 'brass'], ['b', 96.0, 61.06, 1.57, 96.04, 61.14, 1.62, 'brass'], ['b', 96.3, 61.06, 1.57, 96.34, 61.14, 1.62, 'brass'], ['b', 96.6, 61.06, 1.57, 96.64, 61.14, 1.62, 'brass'],
+      ['b', 96.9, 61.06, 1.57, 96.94, 61.14, 1.62, 'brass'], ['b', 94.2, 61.08, 0.95, 94.4, 61.12, 1.58, 'blue'], ['b', 96.3, 61.08, 1.1, 96.5, 61.12, 1.58, 'dark'], ['b', 97.94, 65.3, 1.8, 98.0, 65.7, 2.2, 'oak'],
+      ['b', 97.92, 65.33, 1.83, 97.94, 65.67, 2.17, 'white'], ['b', 97.91, 65.49, 1.99, 97.92, 65.51, 2.15, 'dark'], ['b', 97.91, 65.49, 1.99, 97.92, 65.62, 2.01, 'dark'], ['b', 97.96, 63.25, 1.3, 98.0, 63.75, 1.65, 'oak'],
+      ['b', 97.95, 63.3, 1.34, 97.96, 63.7, 1.61, 'paper'], ['y', 92.8, 67.4, 0.15, 0, 0.7, 'iron'], ['b', 92.76, 67.36, 0.3, 92.81, 67.41, 1.15, 'wood'], ['b', 92.55, 65.55, 0, 93.45, 66.45, 0.025, 'rush'],
+      ['y', 95.25, 67.0, 0.01, 3.8, 4.5, 'iron'], ['b', 95.1, 66.85, 3.5, 95.4, 67.15, 3.8, 'iron'], ['b', 95.15, 66.9, 3.53, 95.35, 67.1, 3.77, 'glass']] },
+    /* G-THINGS end waiting-chamber */
     /* H-THINGS k-hide */
     /* docs/interiors/k-hide.md H56 (req 2164, 2167): a three-legged elm stool facing the way in, a never-lit candle stub in its grease on a ledge in the north wall at 0.45, a grey blanket gone stiff, folded in the west corner; the way in (x 66.6 to 67.4, y 70.3 to 70.9) kept clear */
     'k-hide': { items: [
@@ -3581,6 +3606,4662 @@ window.SHELL_W5A = {
     ['b', 10.2, 66.7, 0.86, 10.45, 66.78, 0.92, 'wood'], ['b', 10.6, 66.58, 0.8, 10.85, 66.76, 0.98, 'wood'], ['b', 10.6, 66.58, 0.97, 10.85, 66.76, 0.99, 'dark'], ['b', 10.56, 69.3, 0.5, 10.572, 69.31, 0.82, 'wood'],
     ['b', 10.62, 69.3, 0.5, 10.632, 69.31, 0.82, 'wood']]);
   /* G-ADDS end elves-linen-room */
+  /* G-ADDS drum-room-g */
+  /* docs/interiors/ground-floor-voids-1031.md (req 2272): house scarves on pegs with one gap, the tea chest of quoits and a broken racquet, the trunk stood on end as a wardrobe with a house tie at its handle */
+  add('drum-room-g', [
+    ['b', 37.19, 0.8, 1.5, 37.25, 3.1, 1.56, 'oak'], ['b', 37.25, 0.95, 1.52, 37.3, 1.0, 1.6, 'iron'], ['b', 37.26, 0.92, 0.85, 37.3, 1.03, 1.52, 'scarlet'], ['b', 37.25, 1.33, 1.52, 37.3, 1.38, 1.6, 'iron'],
+    ['b', 37.26, 1.3, 0.85, 37.3, 1.41, 1.52, 'blue'], ['b', 37.25, 1.71, 1.52, 37.3, 1.76, 1.6, 'iron'], ['b', 37.26, 1.68, 0.85, 37.3, 1.79, 1.52, 'green'], ['b', 37.25, 2.09, 1.52, 37.3, 2.14, 1.6, 'iron'],
+    ['b', 37.25, 2.47, 1.52, 37.3, 2.52, 1.6, 'iron'], ['b', 37.26, 2.44, 0.85, 37.3, 2.55, 1.52, 'amber'], ['b', 37.25, 2.85, 1.52, 37.3, 2.9, 1.6, 'iron'], ['b', 37.26, 2.82, 0.85, 37.3, 2.93, 1.52, 'dark'],
+    ['b', 40.15, 5.5, 0, 40.75, 5.54, 0.55, 'pine'], ['b', 40.15, 6.06, 0, 40.75, 6.1, 0.55, 'pine'], ['b', 40.15, 5.5, 0, 40.19, 6.1, 0.55, 'pine'], ['b', 40.71, 5.5, 0, 40.75, 6.1, 0.55, 'pine'],
+    ['b', 40.19, 5.54, 0, 40.71, 6.06, 0.04, 'pine'], ['y', 40.35, 5.7, 0.1, 0.04, 0.09, 'rope'], ['y', 40.55, 5.88, 0.1, 0.04, 0.09, 'rope'], ['b', 40.23, 5.8, 0.04, 40.65, 5.84, 0.07, 'wood'],
+    ['b', 40.6, 5.8, 0.07, 40.65, 5.84, 0.95, 'wood'], ['b', 45.0, 4.7, 0, 45.5, 5.1, 1.1, 'leather'], ['b', 45.02, 4.69, 0.9, 45.48, 4.71, 0.95, 'iron'], ['b', 45.22, 4.67, 0.55, 45.28, 4.69, 0.9, 'scarlet']]);
+  /* G-ADDS end drum-room-g */
+  /* G-ADDS west-tower-room-g */
+  /* docs/interiors/ground-floor-voids-1031.md (req 2272): the marble slab on trestles with butter and a pat, the hanging scale and milk-book on a post, the ladder-back chair with an apron, the salt crock and ladle of ice */
+  add('west-tower-room-g', [
+    ['b', -2.85, 69.7, 0, -2.8, 70.2, 0.85, 'oak'], ['b', -1.8, 69.7, 0, -1.75, 70.2, 0.85, 'oak'], ['b', -3.0, 69.65, 0.85, -1.65, 70.25, 0.9, 'white'], ['b', -2.6, 69.8, 0.9, -2.3, 70.0, 1.0, 'amber'],
+    ['b', -2.1, 69.85, 0.9, -1.8, 69.95, 0.93, 'wood'], ['y', 1.75, 73.8, 0.03, 0, 1.7, 'iron'], ['b', 1.3, 73.77, 1.6, 2.2, 73.83, 1.64, 'iron'], ['b', 1.3, 73.7, 1.3, 1.4, 73.9, 1.34, 'brass'],
+    ['b', 1.345, 73.79, 1.34, 1.355, 73.81, 1.6, 'iron'], ['b', 2.1, 73.7, 1.3, 2.2, 73.9, 1.34, 'brass'], ['b', 2.145, 73.79, 1.34, 2.155, 73.81, 1.6, 'iron'], ['b', 1.78, 73.74, 1.0, 2.0, 73.78, 1.3, 'slate'],
+    ['t', -2.61, 72.79, -2.19, 73.21, 0.45, 'oak'], ['b', -2.61, 72.79, 0.45, -2.57, 73.21, 0.9, 'oak'], ['b', -2.6, 72.8, 0.45, -2.2, 73.2, 0.49, 'white'], ['y', -3.5, 70.8, 0.12, 0, 0.28, 'stone'],
+    ['b', -3.1, 70.65, 0, -2.8, 70.85, 0.05, 'tin'], ['b', -3.05, 70.7, 0.05, -2.85, 70.8, 0.12, 'glass']]);
+  /* G-ADDS end west-tower-room-g */
+  /* G-ADDS punishments-room */
+  /* docs/interiors/ground-floor-voids-1031.md (req 2272): the rail of grey cloaks tagged NOT MINE on the west wall, three slates with the same sentence in a worse hand under the slit */
+  add('punishments-room', [
+    ['b', 98.5, 63.0, 1.7, 98.56, 65.6, 1.76, 'oak'], ['b', 98.56, 63.15, 1.72, 98.61, 63.2, 1.78, 'iron'], ['b', 98.56, 63.05, 0.7, 98.64, 63.35, 1.72, 'dark'], ['b', 98.64, 63.17, 1.2, 98.66, 63.25, 1.32, 'paper'],
+    ['b', 98.56, 63.65, 1.72, 98.61, 63.7, 1.78, 'iron'], ['b', 98.56, 63.55, 0.7, 98.64, 63.85, 1.72, 'dark'], ['b', 98.64, 63.67, 1.2, 98.66, 63.75, 1.32, 'paper'], ['b', 98.56, 64.15, 1.72, 98.61, 64.2, 1.78, 'iron'],
+    ['b', 98.56, 64.05, 0.7, 98.64, 64.35, 1.72, 'dark'], ['b', 98.64, 64.17, 1.2, 98.66, 64.25, 1.32, 'paper'], ['b', 98.56, 64.65, 1.72, 98.61, 64.7, 1.78, 'iron'], ['b', 98.56, 64.55, 0.7, 98.64, 64.85, 1.72, 'dark'],
+    ['b', 98.64, 64.67, 1.2, 98.66, 64.75, 1.32, 'paper'], ['b', 98.56, 65.15, 1.72, 98.61, 65.2, 1.78, 'iron'], ['b', 98.56, 65.05, 0.7, 98.64, 65.35, 1.72, 'dark'], ['b', 98.64, 65.17, 1.2, 98.66, 65.25, 1.32, 'paper'],
+    ['b', 101.9, 69.9, 0, 102.3, 70.0, 0.3, 'oak'], ['b', 101.93, 69.88, 0.03, 102.27, 69.9, 0.27, 'slate'], ['b', 101.96, 69.87, 0.18, 102.24, 69.88, 0.2, 'white'], ['b', 102.4, 69.9, 0, 102.8, 70.0, 0.3, 'oak'],
+    ['b', 102.43, 69.88, 0.03, 102.77, 69.9, 0.27, 'slate'], ['b', 102.46, 69.87, 0.15, 102.74, 69.88, 0.17, 'white'], ['b', 102.9, 69.9, 0, 103.3, 70.0, 0.3, 'oak'], ['b', 102.93, 69.88, 0.03, 103.27, 69.9, 0.27, 'slate'],
+    ['b', 102.96, 69.87, 0.12, 103.24, 69.88, 0.14, 'white']]);
+  /* G-ADDS end punishments-room */
+  /* G-ADDS store-2-southwest */
+  /* NOW (floor-2-by-purpose-1031.md): still-room-book-1, stool-1, hanging-lantern-1, book-crate-1, short-ladder-1; NOT PLACED for want of a clear spot: luggage-tag-1, luggage-tag-1, luggage-tag-1, folded-curtain-1, folded-linen-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-2.js for collision only */
+  add('store-2-southwest', [
+    ['b', 12.875, 53.84, 1.3, 13.125, 53.9, 1.62, 'books'], ['y', 9.47, 57.8, 0.17, 0.43, 0.47, 'pine'], ['b', 9.55, 57.88, 0, 9.59, 57.92, 0.43, 'pine'], ['b', 9.35, 57.88, 0, 9.39, 57.92, 0.43, 'pine'],
+    ['b', 9.55, 57.68, 0, 9.59, 57.72, 0.43, 'pine'], ['b', 9.35, 57.68, 0, 9.39, 57.72, 0.43, 'pine'], ['b', 9.23, 56.985, 1.77, 9.47, 57.015, 1.8, 'iron'], ['y', 9.45, 57.0, 0.01, 1.72, 1.77, 'iron'],
+    ['y', 9.45, 57.0, 0.05, 1.68, 1.72, 'brass'], ['y', 9.45, 57.0, 0.085, 1.46, 1.68, 'glass'], ['y', 9.45, 57.0, 0.1, 1.41, 1.46, 'brass'], ['b', 9.27, 57.99, 0, 9.69, 58.61, 0.32, 'pine'],
+    ['b', 14.65, 58.175, 0, 14.73, 58.625, 1.6, 'pine']]);
+  /* G-ADDS end store-2-southwest */
+  /* G-ADDS spare-desks-store-2-middle */
+  /* NOW (floor-2-by-purpose-1031.md): trestle-bench-1, sweet-tin-1, rim-lock-1, book-crate-1, folded-linen-1, short-ladder-1; NOT PLACED for want of a clear spot: luggage-tag-1, luggage-tag-1, luggage-tag-1, writing-slate-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-2.js for collision only */
+  add('spare-desks-store-2-middle', [
+    ['b', 93.4, 53.87, 0, 94.8, 54.37, 0.8, 'pine'], ['y', 89.326, 55.64, 0.06, 0.8, 0.88, 'tin'], ['b', 89.24, 55.1, 1.0, 89.3, 55.3, 1.15, 'iron'], ['b', 89.27, 53.89, 0, 89.69, 54.51, 0.32, 'pine'],
+    ['b', 89.277, 55.75, 0.8, 89.637, 56.01, 0.88, 'linen'], ['b', 89.277, 55.75, 0.88, 89.637, 56.01, 0.96, 'linen'], ['b', 89.575, 58.65, 0, 90.025, 58.73, 1.6, 'pine']]);
+  /* G-ADDS end spare-desks-store-2-middle */
+  /* G-ADDS spare-desks-store-2-east */
+  /* NOW (floor-2-by-purpose-1031.md): single-desk-1, folded-curtain-1, trestle-bench-1, rim-lock-1, joint-stool-1, book-crate-1, folded-linen-1, short-ladder-1; NOT PLACED for want of a clear spot: luggage-tag-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-2.js for collision only */
+  add('spare-desks-store-2-east', [
+    ['b', 154.75, 53.87, 0, 155.65, 54.37, 0.75, 'oak'], ['b', 154.777, 55.57, 0.8, 155.137, 55.83, 0.88, 'linen'], ['b', 156.3, 58.23, 0, 157.7, 58.73, 0.8, 'pine'], ['b', 159.95, 54.4, 1.0, 160.01, 54.6, 1.15, 'iron'],
+    ['y', 159.4, 54.07, 0.17, 0.43, 0.47, 'pine'], ['b', 159.48, 54.15, 0, 159.52, 54.19, 0.43, 'pine'], ['b', 159.28, 54.15, 0, 159.32, 54.19, 0.43, 'pine'], ['b', 159.48, 53.95, 0, 159.52, 53.99, 0.43, 'pine'],
+    ['b', 159.28, 53.95, 0, 159.32, 53.99, 0.43, 'pine'], ['b', 154.77, 58.09, 0, 155.19, 58.71, 0.32, 'pine'], ['b', 154.777, 55.87, 0.8, 155.137, 56.13, 0.88, 'linen'], ['b', 154.777, 55.87, 0.88, 155.137, 56.13, 0.96, 'linen'],
+    ['b', 159.9, 58.175, 0, 159.98, 58.625, 1.6, 'pine']]);
+  /* G-ADDS end spare-desks-store-2-east */
+  /* G-ADDS old-textbooks-store-2 */
+  /* NOW (floor-2-by-purpose-1031.md): worktable-1, still-room-book-1, bookcase-1, three-legged-stool-1, hanging-lamp-1, book-crate-1, folded-linen-1, short-ladder-1; NOT PLACED for want of a clear spot: luggage-tag-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-2.js for collision only */
+  add('old-textbooks-store-2', [
+    ['b', 121.8, 53.87, 0, 123.2, 54.57, 0.8, 'deal'], ['b', 123.375, 53.84, 1.3, 123.625, 53.9, 1.62, 'books'], ['b', 118.7, 53.87, 0, 119.7, 54.17, 1.9, 'oak'], ['y', 115.27, 54.6, 0.17, 0.43, 0.47, 'pine'],
+    ['b', 115.35, 54.68, 0, 115.39, 54.72, 0.43, 'pine'], ['b', 115.15, 54.68, 0, 115.19, 54.72, 0.43, 'pine'], ['b', 115.35, 54.48, 0, 115.39, 54.52, 0.43, 'pine'], ['b', 115.15, 54.48, 0, 115.19, 54.52, 0.43, 'pine'],
+    ['b', 132.285, 53.83, 1.77, 132.315, 54.07, 1.8, 'iron'], ['y', 132.3, 54.05, 0.01, 1.72, 1.77, 'iron'], ['y', 132.3, 54.05, 0.05, 1.68, 1.72, 'brass'], ['y', 132.3, 54.05, 0.085, 1.46, 1.68, 'glass'],
+    ['y', 132.3, 54.05, 0.1, 1.41, 1.46, 'brass'], ['b', 135.59, 58.31, 0, 136.21, 58.73, 0.32, 'pine'], ['b', 115.484, 58.424, 0.1, 115.844, 58.684, 0.18, 'linen'], ['b', 115.484, 58.424, 0.18, 115.844, 58.684, 0.26, 'linen'],
+    ['b', 131.575, 53.87, 0, 132.025, 53.95, 1.6, 'pine']]);
+  /* G-ADDS end old-textbooks-store-2 */
+  /* G-ADDS washrooms-2-north */
+  /* NOW (floor-2-by-purpose-1031.md): folded-linen-1, looking-glass-1, waste-basket-1, three-legged-stool-1, washbasin-1; NOT PLACED for want of a clear spot: writing-slate-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-2.js for collision only */
+  add('washrooms-2-north', [
+    ['b', 98.131, 58.227, 0.85, 98.491, 58.488, 0.93, 'linen'], ['b', 98.131, 58.227, 0.93, 98.491, 58.488, 1.01, 'linen'], ['b', 98.25, 53.83, 1.3, 98.75, 53.89, 2.0, 'wood'], ['b', 98.29, 53.89, 1.35, 98.71, 53.895, 1.95, 'glass'],
+    ['y', 98.2, 54.02, 0.15, 0, 0.3, 'wicker'], ['y', 96.47, 54.0, 0.17, 0.43, 0.47, 'pine'], ['b', 96.55, 54.08, 0, 96.59, 54.12, 0.43, 'pine'], ['b', 96.35, 54.08, 0, 96.39, 54.12, 0.43, 'pine'],
+    ['b', 96.55, 53.88, 0, 96.59, 53.92, 0.43, 'pine'], ['b', 96.35, 53.88, 0, 96.39, 53.92, 0.43, 'pine'], ['b', 96.75, 58.33, 0, 97.25, 58.73, 0.85, 'white']]);
+  /* G-ADDS end washrooms-2-north */
+  /* G-ADDS washrooms-2-east */
+  /* NOW (floor-2-by-purpose-1031.md): folded-linen-1, looking-glass-1, waste-basket-1, three-legged-stool-1, washbasin-1; NOT PLACED for want of a clear spot: writing-slate-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-2.js for collision only */
+  add('washrooms-2-east', [
+    ['b', 146.131, 58.227, 0.85, 146.491, 58.488, 0.93, 'linen'], ['b', 146.131, 58.227, 0.93, 146.491, 58.488, 1.01, 'linen'], ['b', 144.23, 53.85, 1.3, 144.29, 54.35, 2.0, 'wood'], ['b', 144.29, 53.89, 1.35, 144.295, 54.31, 1.95, 'glass'],
+    ['y', 144.42, 57.5, 0.15, 0, 0.3, 'wicker'], ['y', 151.53, 54.2, 0.17, 0.43, 0.47, 'pine'], ['b', 151.61, 54.28, 0, 151.65, 54.32, 0.43, 'pine'], ['b', 151.41, 54.28, 0, 151.45, 54.32, 0.43, 'pine'],
+    ['b', 151.61, 54.08, 0, 151.65, 54.12, 0.43, 'pine'], ['b', 151.41, 54.08, 0, 151.45, 54.12, 0.43, 'pine'], ['b', 151.33, 54.45, 0, 151.73, 54.95, 0.85, 'white']]);
+  /* G-ADDS end washrooms-2-east */
+  /* G-ADDS washrooms-2-west */
+  /* NOW (floor-2-by-purpose-1031.md): folded-linen-1, looking-glass-1, waste-basket-1, three-legged-stool-1, washbasin-1; NOT PLACED for want of a clear spot: writing-slate-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-2.js for collision only */
+  add('washrooms-2-west', [
+    ['b', 1.506, 17.228, 0.85, 1.866, 17.488, 0.93, 'linen'], ['b', 1.506, 17.228, 0.93, 1.866, 17.488, 1.01, 'linen'], ['b', -0.02, 17.25, 1.3, 0.04, 17.75, 2.0, 'wood'], ['b', 0.04, 17.29, 1.35, 0.045, 17.71, 1.95, 'glass'],
+    ['y', 0.17, 15.9, 0.15, 0, 0.3, 'wicker'], ['y', 6.53, 16.9, 0.17, 0.43, 0.47, 'pine'], ['b', 6.61, 16.98, 0, 6.65, 17.02, 0.43, 'pine'], ['b', 6.41, 16.98, 0, 6.45, 17.02, 0.43, 'pine'],
+    ['b', 6.61, 16.78, 0, 6.65, 16.82, 0.43, 'pine'], ['b', 6.41, 16.78, 0, 6.45, 16.82, 0.43, 'pine'], ['b', 5.8, 12.27, 0, 6.3, 12.67, 0.85, 'white']]);
+  /* G-ADDS end washrooms-2-west */
+  /* G-ADDS girls-washroom-2 */
+  /* NOW (floor-2-by-purpose-1031.md): folded-linen-1, hall-stand-1, plank-bench-1, hair-ribbon-1, sweet-tin-1, table-jug-1, washbasin-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-2.js for collision only */
+  add('girls-washroom-2', [
+    ['b', 101.171, 63.771, 0.85, 101.531, 64.031, 0.93, 'linen'], ['b', 101.171, 63.771, 0.93, 101.531, 64.031, 1.01, 'linen'], ['y', 112.7, 59.5, 0.22, 0, 0.05, 'wood'], ['y', 112.7, 59.5, 0.03, 0.05, 1.75, 'wood'],
+    ['y', 112.7, 59.5, 0.17, 1.75, 1.77, 'black'], ['y', 112.7, 59.5, 0.1, 1.77, 1.92, 'black'], ['y', 112.7, 59.65, 0.012, 0.05, 0.95, 'wood'], ['y', 112.7, 59.65, 0.04, 0.0, 0.05, 'wood'],
+    ['b', 114.15, 67.15, 0.42, 114.53, 68.45, 0.47, 'pine'], ['b', 114.2, 67.22, 0, 114.5, 67.28, 0.42, 'pine'], ['b', 114.2, 68.32, 0, 114.5, 68.38, 0.42, 'pine'], ['b', 101.164, 64.067, 0.85, 101.284, 64.097, 0.86, 'scarlet'],
+    ['y', 101.224, 64.202, 0.06, 0.85, 0.93, 'tin'], ['y', 101.224, 64.323, 0.05, 0.85, 1.05, 'brick'], ['b', 101.95, 59.27, 0, 102.45, 59.67, 0.85, 'white']]);
+  /* G-ADDS end girls-washroom-2 */
+  /* G-ADDS disused-classroom-2-east */
+  /* NOW (floor-2-by-purpose-1031.md): dip-holder-1, joint-stool-1, folded-linen-1, oak-lectern-1; NOT PLACED for want of a clear spot: writing-slate-1, writing-slate-1, writing-slate-1, writing-slate-1, history-chart-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-2.js for collision only */
+  add('disused-classroom-2-east', [
+    ['y', 143.093, 61.493, 0.025, 0.74, 0.94, 'wood'], ['y', 148.9, 59.47, 0.17, 0.43, 0.47, 'pine'], ['b', 148.98, 59.55, 0, 149.02, 59.59, 0.43, 'pine'], ['b', 148.78, 59.55, 0, 148.82, 59.59, 0.43, 'pine'],
+    ['b', 148.98, 59.35, 0, 149.02, 59.39, 0.43, 'pine'], ['b', 148.78, 59.35, 0, 148.82, 59.39, 0.43, 'pine'], ['b', 143.04, 61.551, 0.74, 143.4, 61.811, 0.82, 'linen'], ['b', 143.04, 61.551, 0.82, 143.4, 61.811, 0.9, 'linen'],
+    ['b', 140.87, 69.6, 0, 141.37, 70.2, 1.2, 'oak']]);
+  /* G-ADDS end disused-classroom-2-east */
+  /* G-ADDS disused-classroom-2-northwest */
+  /* NOW (floor-2-by-purpose-1031.md): blackboard-1, double-desk-1, folded-curtain-1, tortoise-stove-1, hall-stand-1, frayed-hat-1, folded-linen-1, oak-lectern-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-2.js for collision only */
+  add('disused-classroom-2-northwest', [
+    ['b', 15.71, 6.2, 1.0, 15.76, 8.0, 2.0, 'black'], ['b', 11.15, 17.23, 0, 12.45, 17.73, 0.75, 'oak'], ['b', 9.03, 6.826, 0.74, 9.39, 7.086, 0.82, 'linen'], ['b', 7.27, 4.8, 0, 7.87, 5.4, 1.1, 'iron'],
+    ['y', 7.5, 10.1, 0.22, 0, 0.05, 'wood'], ['y', 7.5, 10.1, 0.03, 0.05, 1.75, 'wood'], ['y', 7.5, 10.1, 0.17, 1.75, 1.77, 'black'], ['y', 7.5, 10.1, 0.1, 1.77, 1.92, 'black'],
+    ['y', 7.65, 10.1, 0.012, 0.05, 0.95, 'wood'], ['y', 7.65, 10.1, 0.04, 0.0, 0.05, 'wood'], ['b', 10.25, 3.84, 1.6, 10.55, 4.15, 1.75, 'black'], ['b', 9.45, 6.826, 0.74, 9.81, 7.086, 0.82, 'linen'],
+    ['b', 9.45, 6.826, 0.82, 9.81, 7.086, 0.9, 'linen'], ['b', 7.27, 12.6, 0, 7.77, 13.2, 1.2, 'oak']]);
+  /* G-ADDS end disused-classroom-2-northwest */
+  /* G-ADDS teachers-study-2-southeast */
+  /* NOW (floor-2-by-purpose-1031.md): hall-stand-1, dip-holder-1, trivet-1, blue-cup-1, books-on-table-1, frame-victorian-1, bookcase-1, leather-armchair-1, oil-lamp-1, oak-chair-1, silver-teapot-1; NOT PLACED for want of a clear spot: books-on-table-1, books-on-table-1, books-on-table-1, books-on-table-1, books-on-table-1, books-on-table-1, books-on-table-1, books-on-table-1, books-on-table-1, books-on-table-1, books-on-table-1, books-on-table-1, straightedge-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-2.js for collision only */
+  add('teachers-study-2-southeast', [
+    ['y', 154.0, 17.1, 0.22, 0, 0.05, 'wood'], ['y', 154.0, 17.1, 0.03, 0.05, 1.75, 'wood'], ['y', 154.0, 17.1, 0.17, 1.75, 1.77, 'black'], ['y', 154.0, 17.1, 0.1, 1.77, 1.92, 'black'],
+    ['y', 154.15, 17.1, 0.012, 0.05, 0.95, 'wood'], ['y', 154.15, 17.1, 0.04, 0.0, 0.05, 'wood'], ['y', 153.822, 8.091, 0.025, 0.1, 0.3, 'wood'], ['b', 153.784, 8.172, 0.1, 153.984, 8.372, 0.12, 'iron'],
+    ['y', 153.822, 8.454, 0.04, 0.1, 0.18, 'blue'], ['b', 156.076, 10.073, 0.76, 156.396, 10.293, 0.98, 'books3'], ['b', 156.066, 10.178, 0.86, 156.406, 10.188, 0.87, 'rope'], ['b', 153.75, 6.74, 1.4, 154.25, 6.79, 2.05, 'gilt'],
+    ['b', 159.68, 14.6, 0, 159.98, 15.6, 1.9, 'oak'], ['b', 153.77, 12.5, 0, 154.57, 13.3, 0.95, 'leather'], ['y', 153.822, 8.576, 0.06, 0.1, 0.2, 'brass'], ['y', 153.822, 8.576, 0.045, 0.2, 0.35, 'glass'],
+    ['b', 153.75, 6.77, 0, 154.25, 7.27, 0.9, 'oak'], ['b', 153.784, 8.697, 0.1, 153.984, 8.817, 0.28, 'steel']]);
+  /* G-ADDS end teachers-study-2-southeast */
+  /* G-ADDS teachers-study-2-southwest */
+  /* NOW (floor-2-by-purpose-1031.md): hall-stand-1, dip-holder-1, trivet-1, blue-cup-1, books-on-table-1, frame-victorian-1, bookcase-1, leather-armchair-1, oil-lamp-1, oak-chair-1, silver-teapot-1; NOT PLACED for want of a clear spot: books-on-table-1, books-on-table-1, books-on-table-1, books-on-table-1, books-on-table-1, books-on-table-1, books-on-table-1, books-on-table-1, books-on-table-1, books-on-table-1, books-on-table-1, books-on-table-1, books-on-table-1, books-on-table-1, books-on-table-1, books-on-table-1, books-on-table-1, books-on-table-1, straightedge-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-2.js for collision only */
+  add('teachers-study-2-southwest', [
+    ['y', 8.5, 62.6, 0.22, 0, 0.05, 'wood'], ['y', 8.5, 62.6, 0.03, 0.05, 1.75, 'wood'], ['y', 8.5, 62.6, 0.17, 1.75, 1.77, 'black'], ['y', 8.5, 62.6, 0.1, 1.77, 1.92, 'black'],
+    ['y', 8.65, 62.6, 0.012, 0.05, 0.95, 'wood'], ['y', 8.65, 62.6, 0.04, 0.0, 0.05, 'wood'], ['y', 14.492, 61.291, 0.025, 0.1, 0.3, 'wood'], ['b', 14.454, 61.374, 0.1, 14.654, 61.574, 0.12, 'iron'],
+    ['y', 14.492, 61.657, 0.04, 0.1, 0.18, 'blue'], ['b', 10.476, 64.473, 0.76, 10.796, 64.693, 0.98, 'books3'], ['b', 10.466, 64.578, 0.86, 10.806, 64.588, 0.87, 'rope'], ['b', 9.15, 71.71, 1.4, 9.65, 71.76, 2.05, 'gilt'],
+    ['b', 8.27, 67.5, 0, 8.57, 68.5, 1.9, 'oak'], ['b', 8.27, 62.9, 0, 9.07, 63.7, 0.95, 'leather'], ['y', 14.492, 61.779, 0.06, 0.1, 0.2, 'brass'], ['y', 14.492, 61.779, 0.045, 0.2, 0.35, 'glass'],
+    ['b', 8.27, 68.55, 0, 8.77, 69.05, 0.9, 'oak'], ['b', 14.454, 61.902, 0.1, 14.654, 62.022, 0.28, 'steel']]);
+  /* G-ADDS end teachers-study-2-southwest */
+  /* G-ADDS teachers-study-2-west */
+  /* NOW (floor-2-by-purpose-1031.md): hall-stand-1, dip-holder-1, trivet-1, blue-cup-1, books-on-table-1, frame-victorian-1, bookcase-1, leather-armchair-1, oil-lamp-1, oak-chair-1, silver-teapot-1; NOT PLACED for want of a clear spot: straightedge-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-2.js for collision only */
+  add('teachers-study-2-west', [
+    ['y', 11.9, 25.3, 0.22, 0, 0.05, 'wood'], ['y', 11.9, 25.3, 0.03, 0.05, 1.75, 'wood'], ['y', 11.9, 25.3, 0.17, 1.75, 1.77, 'black'], ['y', 11.9, 25.3, 0.1, 1.77, 1.92, 'black'],
+    ['y', 11.75, 25.3, 0.012, 0.05, 0.95, 'wood'], ['y', 11.75, 25.3, 0.04, 0.0, 0.05, 'wood'], ['y', 3.09, 18.322, 0.025, 0.1, 0.3, 'wood'], ['b', 3.171, 18.284, 0.1, 3.371, 18.484, 0.12, 'iron'],
+    ['y', 3.09, 18.446, 0.04, 0.1, 0.18, 'blue'], ['b', 3.413, 18.274, 0.1, 3.733, 18.494, 0.32, 'books3'], ['b', 3.403, 18.379, 0.2, 3.743, 18.389, 0.21, 'rope'], ['b', 12.11, 21.55, 1.4, 12.16, 22.05, 2.05, 'gilt'],
+    ['b', 0.27, 23.0, 0, 0.57, 24.0, 1.9, 'oak'], ['b', 1.6, 18.27, 0, 2.4, 19.07, 0.95, 'leather'], ['y', 3.815, 18.322, 0.06, 0.1, 0.2, 'brass'], ['y', 3.815, 18.322, 0.045, 0.2, 0.35, 'glass'],
+    ['b', 7.65, 27.9, 0, 8.15, 28.4, 0.9, 'oak'], ['b', 3.775, 18.448, 0.1, 3.975, 18.568, 0.28, 'steel']]);
+  /* G-ADDS end teachers-study-2-west */
+  /* G-ADDS study-room-2-west */
+  /* NOW (floor-2-by-purpose-1031.md): dip-holder-1, pigeon-holes-1, oil-lamp-1, leather-armchair-1, oak-chair-1, silver-teapot-1; NOT PLACED for want of a clear spot: history-chart-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-2.js for collision only */
+  add('study-room-2-west', [
+    ['y', 2.59, 28.992, 0.025, 0.1, 0.3, 'wood'], ['b', 0.24, 34.87, 1.0, 0.5, 36.07, 1.9, 'oak'], ['y', 2.59, 29.116, 0.06, 0.1, 0.2, 'brass'], ['y', 2.59, 29.116, 0.045, 0.2, 0.35, 'glass'],
+    ['b', 0.27, 34.87, 0, 1.07, 35.67, 0.95, 'leather'], ['b', 11.63, 34.92, 0, 12.13, 35.42, 0.9, 'oak'], ['b', 2.67, 28.932, 0.1, 2.87, 29.052, 0.28, 'steel']]);
+  /* G-ADDS end study-room-2-west */
+  /* G-ADDS second-years-study-room */
+  /* NOW (floor-2-by-purpose-1031.md): noticeboard-1, oil-lamp-1, dip-holder-1, chamois-cloth-1, floor-cushion-1; NOT PLACED for want of a clear spot: chamois-cloth-1, chamois-cloth-1, chamois-cloth-1, chamois-cloth-1, chamois-cloth-1, chamois-cloth-1, chamois-cloth-1, chamois-cloth-1, chamois-cloth-1, chamois-cloth-1, chamois-cloth-1, chamois-cloth-1, chamois-cloth-1, chamois-cloth-1, chamois-cloth-1, chamois-cloth-1, chamois-cloth-1, chamois-cloth-1, chamois-cloth-1, chamois-cloth-1, chamois-cloth-1, chamois-cloth-1, chamois-cloth-1, chamois-cloth-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-2.js for collision only */
+  add('second-years-study-room', [
+    ['b', 140.31, 66.8, 1.3, 140.36, 67.8, 2.0, 'pine'], ['y', 128.09, 59.322, 0.06, 0.1, 0.2, 'brass'], ['y', 128.09, 59.322, 0.045, 0.2, 0.35, 'glass'], ['y', 128.09, 59.446, 0.025, 0.1, 0.3, 'wood'],
+    ['b', 128.281, 61.691, 0.76, 128.581, 61.991, 0.77, 'straw'], ['b', 126.97, 60.7, 0, 127.57, 61.3, 0.12, 'scarlet']]);
+  /* G-ADDS end second-years-study-room */
+  /* G-ADDS gobstones-club-room */
+  /* NOW (floor-2-by-purpose-1031.md): hearth-rug-1, trophy-cup-1, pewter-cup-1, plank-bench-1, gobstones-1; NOT PLACED for want of a clear spot: writing-slate-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-2.js for collision only */
+  add('gobstones-club-room', [
+    ['b', 116.87, 14.3, 0, 117.87, 15.7, 0.012, 'tartan'], ['y', 116.997, 8.935, 0.06, 0.45, 0.75, 'gilt'], ['y', 116.997, 9.056, 0.04, 0.45, 0.55, 'steel'], ['b', 128.25, 14.35, 0.42, 128.63, 15.65, 0.47, 'pine'],
+    ['b', 128.3, 14.42, 0, 128.6, 14.48, 0.42, 'pine'], ['b', 128.3, 15.52, 0, 128.6, 15.58, 0.42, 'pine'], ['y', 116.997, 9.176, 0.04, 0.45, 0.49, 'green']]);
+  /* G-ADDS end gobstones-club-room */
+  /* G-ADDS duelling-practice-room-2 */
+  /* NOW (floor-2-by-purpose-1031.md): wall-of-arms-1, tin-bucket-1, plank-bench-1; NOT PLACED for want of a clear spot: folded-linen-1, folded-linen-1, folded-linen-1, folded-linen-1, folded-linen-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-2.js for collision only */
+  add('duelling-practice-room-2', [
+    ['b', 129.14, 8.5, 1.0, 129.25, 9.7, 2.0, 'iron'], ['y', 140.75, 12.6, 0.17, 0, 0.34, 'tin'], ['y', 140.75, 12.6, 0.175, 0.3, 0.34, 'iron'], ['b', 133.95, 17.6, 0.42, 135.25, 17.98, 0.47, 'pine'],
+    ['b', 134.02, 17.65, 0, 134.08, 17.95, 0.42, 'pine'], ['b', 135.12, 17.65, 0, 135.18, 17.95, 0.42, 'pine']]);
+  /* G-ADDS end duelling-practice-room-2 */
+  /* G-ADDS slug-club-dining-room */
+  /* NOW (floor-2-by-purpose-1031.md): damask-napkin-1, salt-box-1, earthenware-dish-1, fire-irons-1, candlestick-1, silver-teapot-1, folded-linen-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-2.js for collision only */
+  add('slug-club-dining-room', [
+    ['b', 93.482, 65.58, 0.76, 93.782, 65.88, 0.77, 'white'], ['b', 93.436, 65.91, 0.76, 93.586, 66.03, 0.88, 'pine'], ['y', 93.572, 66.15, 0.1, 0.76, 0.81, 'brick'], ['b', 89.27, 59.25, 0, 89.57, 59.55, 0.7, 'iron'],
+    ['y', 93.511, 66.33, 0.035, 0.76, 1.01, 'brass'], ['b', 93.593, 66.27, 0.76, 93.793, 66.39, 0.94, 'steel'], ['b', 93.695, 65.9, 0.76, 94.055, 66.16, 0.84, 'linen'], ['b', 93.695, 65.9, 0.84, 94.055, 66.16, 0.92, 'linen']]);
+  /* G-ADDS end slug-club-dining-room */
+  /* G-ADDS map-room */
+  /* NOW (floor-2-by-purpose-1031.md): globe-1, oil-lamp-1; NOT PLACED for want of a clear spot: wooden-compasses-1, straightedge-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-2.js for collision only */
+  add('map-room', [
+    ['y', 115.35, 63.8, 0.2, 0, 0.04, 'wood'], ['y', 115.35, 63.8, 0.03, 0.04, 1.0, 'wood'], ['y', 115.35, 63.8, 0.24, 1.0, 1.45, 'blue'], ['y', 115.35, 63.8, 0.27, 1.25, 1.5, 'linen'],
+    ['y', 120.261, 61.311, 0.06, 0.85, 0.95, 'brass'], ['y', 120.261, 61.311, 0.045, 0.95, 1.1, 'glass']]);
+  /* G-ADDS end map-room */
+  /* G-ADDS defence-office-2-north */
+  /* NOW (floor-2-by-purpose-1031.md): winter-cloak-1, field-glasses-1, still-room-book-1, nest-of-drawers-1; NOT PLACED for want of a clear spot: history-chart-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-2.js for collision only */
+  add('defence-office-2-north', [
+    ['b', 94.65, 3.84, 0.7, 95.15, 3.91, 1.9, 'blue'], ['b', 97.534, 15.477, 0.76, 97.714, 15.557, 0.84, 'brass'], ['b', 104.0, 6.875, 1.3, 104.06, 7.125, 1.62, 'books'], ['b', 103.63, 15.9, 0, 104.03, 16.5, 0.8, 'oak']]);
+  /* G-ADDS end defence-office-2-north */
+  /* G-ADDS teachers-office-2-north */
+  /* NOW (floor-2-by-purpose-1031.md): nest-of-drawers-1, leather-armchair-1, noticeboard-1, silver-teapot-1, blue-cup-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-2.js for collision only */
+  add('teachers-office-2-north', [
+    ['b', 104.57, 6.5, 0, 104.97, 7.1, 0.8, 'oak'], ['b', 109.5, 17.18, 0, 110.3, 17.98, 0.95, 'leather'], ['b', 104.54, 4.8, 1.3, 104.59, 5.8, 2.0, 'pine'], ['b', 109.824, 15.457, 0.76, 110.024, 15.577, 0.94, 'steel'],
+    ['y', 109.862, 15.65, 0.04, 0.76, 0.84, 'blue']]);
+  /* G-ADDS end teachers-office-2-north */
+  /* G-ADDS staff-bedroom-2-east */
+  /* NOW (floor-2-by-purpose-1031.md): candlestick-1, bookcase-1, looking-glass-1, iron-bedstead-1, washbasin-1, nest-of-drawers-1, school-trunk-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-2.js for collision only */
+  add('staff-bedroom-2-east', [
+    ['y', 155.911, 36.742, 0.035, 0.76, 1.01, 'brass'], ['b', 148.17, 29.9, 0, 148.47, 30.9, 1.9, 'oak'], ['b', 158.55, 37.21, 1.3, 159.05, 37.27, 2.0, 'wood'], ['b', 158.59, 37.205, 1.35, 159.01, 37.21, 1.95, 'glass'],
+    ['b', 148.17, 33.4, 0, 149.12, 35.4, 0.55, 'iron'], ['b', 148.17, 36.15, 0, 148.57, 36.65, 0.85, 'white'], ['b', 151.1, 29.87, 0, 151.7, 30.27, 0.8, 'oak'], ['b', 153.75, 29.87, 0, 154.65, 30.35, 0.42, 'leather'],
+    ['b', 153.74, 29.87, 0.42, 154.66, 30.37, 0.5, 'wood'], ['b', 153.875, 29.87, 0, 153.925, 30.37, 0.5, 'iron'], ['b', 154.475, 29.87, 0, 154.525, 30.37, 0.5, 'iron'], ['b', 154.03, 30.35, 0.1, 154.37, 30.39, 0.4, 'cloth']]);
+  /* G-ADDS end staff-bedroom-2-east */
+  /* G-ADDS staff-bedroom-2-west */
+  /* NOW (floor-2-by-purpose-1031.md): hearth-rug-1, school-trunk-1, oil-lamp-1, ward-screen-1, iron-bedstead-1, washbasin-1, nest-of-drawers-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-2.js for collision only */
+  add('staff-bedroom-2-west', [
+    ['b', 0.27, 44.03, 0, 1.27, 45.43, 0.012, 'tartan'], ['b', 0.25, 39.6, 0, 1.15, 40.08, 0.42, 'leather'], ['b', 0.24, 39.6, 0.42, 1.16, 40.1, 0.5, 'wood'], ['b', 0.375, 39.6, 0, 0.425, 40.1, 0.5, 'iron'],
+    ['b', 0.975, 39.6, 0, 1.025, 40.1, 0.5, 'iron'], ['b', 0.53, 40.08, 0.1, 0.87, 40.12, 0.4, 'cloth'], ['y', 8.461, 39.712, 0.06, 0.76, 0.86, 'brass'], ['y', 8.461, 39.712, 0.045, 0.86, 1.01, 'glass'],
+    ['b', 4.9, 49.68, 0, 6.3, 49.73, 1.7, 'wood'], ['b', 11.18, 40.43, 0, 12.13, 42.43, 0.55, 'iron'], ['b', 2.75, 39.6, 0, 3.25, 40.0, 0.85, 'white'], ['b', 0.27, 45.53, 0, 0.67, 46.13, 0.8, 'oak']]);
+  /* G-ADDS end staff-bedroom-2-west */
+  /* G-ADDS staff-bedrooms-2-east */
+  /* NOW (floor-2-by-purpose-1031.md): looking-glass-1, gown-worn-1, iron-bedstead-1, washbasin-1, nest-of-drawers-1, school-trunk-1; stand-in gap, no emitter: desk-chair-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-2.js for collision only */
+  add('staff-bedrooms-2-east', [
+    ['b', 150.45, 3.83, 1.3, 150.95, 3.89, 2.0, 'wood'], ['b', 150.49, 3.89, 1.35, 150.91, 3.895, 1.95, 'glass'], ['b', 144.25, 3.84, 0.7, 144.75, 3.91, 2.0, 'black'], ['b', 148.2, 3.87, 0, 150.2, 4.82, 0.55, 'iron'],
+    ['b', 152.83, 12.15, 0, 153.23, 12.65, 0.85, 'white'], ['b', 141.47, 5.4, 0, 141.87, 6.0, 0.8, 'oak'], ['b', 152.75, 9.55, 0, 153.23, 10.45, 0.42, 'leather'], ['b', 152.73, 9.54, 0.42, 153.23, 10.46, 0.5, 'wood'],
+    ['b', 152.73, 9.675, 0, 153.23, 9.725, 0.5, 'iron'], ['b', 152.73, 10.275, 0, 153.23, 10.325, 0.5, 'iron'], ['b', 152.71, 9.83, 0.1, 152.75, 10.17, 0.4, 'cloth']]);
+  /* G-ADDS end staff-bedrooms-2-east */
+  /* G-ADDS elves-linen-room-2 */
+  /* NOW (floor-2-by-purpose-1031.md): trestle-bench-1, log-basket-1, trivet-1, pulley-airer-1, folded-linen-1, linen-press-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-2.js for collision only */
+  add('elves-linen-room-2', [
+    ['b', 153.8, 49.23, 0, 155.2, 49.73, 0.8, 'pine'], ['b', 155.25, 49.33, 0, 155.75, 49.73, 0.4, 'wicker'], ['b', 159.561, 45.2, 0.4, 159.761, 45.4, 0.42, 'iron'], ['b', 151.6, 49.65, 2.2, 153.6, 49.76, 2.3, 'wood'],
+    ['b', 159.547, 45.41, 0.4, 159.907, 45.67, 0.48, 'linen'], ['b', 159.547, 45.41, 0.48, 159.907, 45.67, 0.56, 'linen'], ['b', 148.0, 49.18, 0, 149.0, 49.73, 1.8, 'pine']]);
+  /* G-ADDS end elves-linen-room-2 */
+  /* G-ADDS broom-cupboard-2-middle */
+  /* NOW (floor-2-by-purpose-1031.md): wooden-pail-1, scrubbing-brush-1, feather-duster-1; NOT PLACED for want of a clear spot: sweet-tin-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-2.js for collision only */
+  add('broom-cupboard-2-middle', [
+    ['y', 80.4, 58.56, 0.15, 0, 0.3, 'wood'], ['y', 80.4, 58.56, 0.155, 0.08, 0.1, 'iron'], ['y', 80.4, 58.56, 0.155, 0.2, 0.22, 'iron'], ['b', 73.3, 58.69, 1.2, 73.5, 58.76, 1.3, 'wood'],
+    ['b', 81.26, 53.84, 1.2, 81.34, 53.89, 1.65, 'straw']]);
+  /* G-ADDS end broom-cupboard-2-middle */
+  /* G-ADDS broom-cupboard-2-west */
+  /* NOW (floor-2-by-purpose-1031.md): brush-and-pan-1, tin-bucket-1, leather-apron-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-2.js for collision only */
+  add('broom-cupboard-2-west', [
+    ['b', 6.69, 57.65, 0.6, 6.76, 57.95, 0.95, 'wood'], ['y', 6.55, 55.4, 0.17, 0, 0.34, 'tin'], ['y', 6.55, 55.4, 0.175, 0.3, 0.34, 'iron'], ['b', -0.01, 55.9, 0.8, 0.04, 56.3, 1.6, 'leather']]);
+  /* G-ADDS end broom-cupboard-2-west */
+  /* G-ADDS cleaning-cupboard-2 */
+  /* NOW (floor-2-by-purpose-1031.md): wooden-pail-1; NOT PLACED for want of a clear spot: sweet-tin-1, sweet-tin-1, sweet-tin-1, folded-linen-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-2.js for collision only */
+  add('cleaning-cupboard-2', [
+    ['y', 107.6, 58.56, 0.15, 0, 0.3, 'wood'], ['y', 107.6, 58.56, 0.155, 0.08, 0.1, 'iron'], ['y', 107.6, 58.56, 0.155, 0.2, 0.22, 'iron']]);
+  /* G-ADDS end cleaning-cupboard-2 */
+  /* G-ADDS linen-cupboard-2 */
+  /* NOW (floor-2-by-purpose-1031.md): linen-press-1, wool-blanket-1, hessian-sack-1, herb-bunch-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-2.js for collision only */
+  add('linen-cupboard-2', [
+    ['b', 68.67, 65.8, 0, 69.22, 66.8, 1.8, 'pine'], ['b', 68.874, 71.577, 0.1, 69.374, 71.977, 0.22, 'tartan'], ['b', 71.13, 69.53, 0, 71.53, 69.87, 0.5, 'rush'], ['b', 71.21, 69.58, 0.5, 71.47, 69.82, 0.56, 'rush'],
+    ['b', 71.25, 69.61, 0.56, 71.45, 69.79, 0.6, 'straw'], ['b', 68.64, 59.91, 1.6, 68.75, 60.09, 1.9, 'green']]);
+  /* G-ADDS end linen-cupboard-2 */
+  /* G-ADDS lamp-candle-cupboard-2 */
+  /* NOW (floor-2-by-purpose-1031.md): stoneware-crock-1, shears-1, match-1, stool-1, oil-lamp-1, stearin-candle-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-2.js for collision only */
+  add('lamp-candle-cupboard-2', [
+    ['y', 143.4, 54.07, 0.2, 0, 0.45, 'brick'], ['b', 141.107, 58.36, 0.4, 141.307, 58.4, 0.415, 'iron'], ['b', 141.119, 58.447, 0.4, 141.169, 58.457, 0.41, 'pine'], ['y', 143.53, 54.5, 0.17, 0.43, 0.47, 'pine'],
+    ['b', 143.61, 54.58, 0, 143.65, 54.62, 0.43, 'pine'], ['b', 143.41, 54.58, 0, 143.45, 54.62, 0.43, 'pine'], ['b', 143.61, 54.38, 0, 143.65, 54.42, 0.43, 'pine'], ['b', 143.41, 54.38, 0, 143.45, 54.42, 0.43, 'pine'],
+    ['y', 141.144, 58.596, 0.06, 0.4, 0.5, 'brass'], ['y', 141.144, 58.596, 0.045, 0.5, 0.65, 'glass'], ['y', 141.08, 58.452, 0.02, 0.4, 0.55, 'white']]);
+  /* G-ADDS end lamp-candle-cupboard-2 */
+  /* G-ADDS drum-back-study-2 */
+  /* NOW (floor-2-by-purpose-1031.md): reading-desk-1, hearth-rug-1, copper-kettle-1, trivet-1, short-ladder-1, hanging-lantern-1, school-trunk-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-2.js for collision only */
+  add('drum-back-study-2', [
+    ['b', 40.4, 13.48, 0, 41.0, 13.98, 1.1, 'oak'], ['b', 43.1, 12.98, 0, 44.5, 13.98, 0.012, 'tartan'], ['y', 36.621, 9.433, 0.1, 0.76, 0.98, 'copper'], ['b', 36.521, 9.6, 0.76, 36.721, 9.8, 0.78, 'iron'],
+    ['b', 35.57, 12.375, 0, 35.65, 12.825, 1.6, 'pine'], ['b', 44.985, 8.93, 1.77, 45.015, 9.17, 1.8, 'iron'], ['y', 45.0, 9.15, 0.01, 1.72, 1.77, 'iron'], ['y', 45.0, 9.15, 0.05, 1.68, 1.72, 'brass'],
+    ['y', 45.0, 9.15, 0.085, 1.46, 1.68, 'glass'], ['y', 45.0, 9.15, 0.1, 1.41, 1.46, 'brass'], ['b', 35.57, 8.95, 0, 36.05, 9.85, 0.42, 'leather'], ['b', 35.57, 8.94, 0.42, 36.07, 9.86, 0.5, 'wood'],
+    ['b', 35.57, 9.075, 0, 36.07, 9.125, 0.5, 'iron'], ['b', 35.57, 9.675, 0, 36.07, 9.725, 0.5, 'iron'], ['b', 36.05, 9.23, 0.1, 36.09, 9.57, 0.4, 'cloth']]);
+  /* G-ADDS end drum-back-study-2 */
+  /* G-ADDS lake-workroom-2-west */
+  /* NOW (floor-2-by-purpose-1031.md): dip-holder-1, stool-1, short-ladder-1, hanging-lantern-1, school-trunk-1; NOT PLACED for want of a clear spot: history-chart-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-2.js for collision only */
+  add('lake-workroom-2-west', [
+    ['y', 8.36, 1.114, 0.025, 0.8, 1.0, 'wood'], ['y', 12.1, 0.82, 0.17, 0.43, 0.47, 'pine'], ['b', 12.18, 0.9, 0, 12.22, 0.94, 0.43, 'pine'], ['b', 11.98, 0.9, 0, 12.02, 0.94, 0.43, 'pine'],
+    ['b', 12.18, 0.7, 0, 12.22, 0.74, 0.43, 'pine'], ['b', 11.98, 0.7, 0, 12.02, 0.74, 0.43, 'pine'], ['b', 9.175, 0.62, 0, 9.625, 0.7, 1.6, 'pine'], ['b', 12.885, 0.58, 1.77, 12.915, 0.82, 1.8, 'iron'],
+    ['y', 12.9, 0.8, 0.01, 1.72, 1.77, 'iron'], ['y', 12.9, 0.8, 0.05, 1.68, 1.72, 'brass'], ['y', 12.9, 0.8, 0.085, 1.46, 1.68, 'glass'], ['y', 12.9, 0.8, 0.1, 1.41, 1.46, 'brass'],
+    ['b', 7.25, 0.62, 0, 8.15, 1.1, 0.42, 'leather'], ['b', 7.24, 0.62, 0.42, 8.16, 1.12, 0.5, 'wood'], ['b', 7.375, 0.62, 0, 7.425, 1.12, 0.5, 'iron'], ['b', 7.975, 0.62, 0, 8.025, 1.12, 0.5, 'iron'],
+    ['b', 7.53, 1.1, 0.1, 7.87, 1.14, 0.4, 'cloth']]);
+  /* G-ADDS end lake-workroom-2-west */
+  /* G-ADDS ravenclaw-tower-room-2 */
+  /* NOW (floor-2-by-purpose-1031.md): book-crate-1, joint-stool-1, torch-bracket-1, short-ladder-1, hanging-lantern-1, school-trunk-1; NOT PLACED for want of a clear spot: writing-slate-1, history-chart-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-2.js for collision only */
+  add('ravenclaw-tower-room-2', [
+    ['b', -1.647, 32.697, 0, -1.227, 33.317, 0.32, 'pine'], ['y', -0.938, 35.075, 0.17, 0.43, 0.47, 'pine'], ['b', -0.858, 35.155, 0, -0.818, 35.195, 0.43, 'pine'], ['b', -1.058, 35.155, 0, -1.018, 35.195, 0.43, 'pine'],
+    ['b', -0.858, 34.955, 0, -0.818, 34.995, 0.43, 'pine'], ['b', -1.058, 34.955, 0, -1.018, 34.995, 0.43, 'pine'], ['y', -13.192, 37.786, 0.03, 1.77, 1.8, 'iron'], ['y', -13.133, 37.747, 0.02, 1.77, 1.8, 'iron'],
+    ['y', -13.05, 37.691, 0.01, 1.72, 1.77, 'iron'], ['y', -13.05, 37.691, 0.05, 1.68, 1.72, 'brass'], ['y', -13.05, 37.691, 0.085, 1.46, 1.68, 'glass'], ['y', -13.05, 37.691, 0.1, 1.41, 1.46, 'brass'],
+    ['b', -1.098, 31.273, 0, -1.018, 31.723, 1.6, 'pine'], ['y', -10.986, 28.108, 0.03, 1.77, 1.8, 'iron'], ['y', -10.948, 28.167, 0.02, 1.77, 1.8, 'iron'], ['y', -10.892, 28.25, 0.01, 1.72, 1.77, 'iron'],
+    ['y', -10.892, 28.25, 0.05, 1.68, 1.72, 'brass'], ['y', -10.892, 28.25, 0.085, 1.46, 1.68, 'glass'], ['y', -10.892, 28.25, 0.1, 1.41, 1.46, 'brass'], ['b', -1.543, 33.381, 0, -1.063, 34.281, 0.42, 'leather'],
+    ['b', -1.563, 33.371, 0.42, -1.063, 34.291, 0.5, 'wood'], ['b', -1.563, 33.506, 0, -1.063, 33.556, 0.5, 'iron'], ['b', -1.563, 34.106, 0, -1.063, 34.156, 0.5, 'iron'], ['b', -1.583, 33.661, 0.1, -1.543, 34.001, 0.4, 'cloth']]);
+  /* G-ADDS end ravenclaw-tower-room-2 */
+  /* G-ADDS headmasters-tower-room-2 */
+  /* NOW (floor-2-by-purpose-1031.md): book-crate-1, leather-armchair-1, folded-linen-1, torch-bracket-1, short-ladder-1, hanging-lantern-1, school-trunk-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-2.js for collision only */
+  add('headmasters-tower-room-2', [
+    ['b', 161.711, 40.647, 0, 162.131, 41.267, 0.32, 'pine'], ['b', 162.201, 40.459, 0, 163.001, 41.259, 0.95, 'leather'], ['b', 169.689, 39.87, 0.75, 170.049, 40.13, 0.83, 'linen'], ['b', 169.689, 39.87, 0.83, 170.049, 40.13, 0.91, 'linen'],
+    ['y', 162.234, 37.746, 0.03, 1.77, 1.8, 'iron'], ['y', 162.293, 37.785, 0.02, 1.77, 1.8, 'iron'], ['y', 162.376, 37.84, 0.01, 1.72, 1.77, 'iron'], ['y', 162.376, 37.84, 0.05, 1.68, 1.72, 'brass'],
+    ['y', 162.376, 37.84, 0.085, 1.46, 1.68, 'glass'], ['y', 162.376, 37.84, 0.1, 1.41, 1.46, 'brass'], ['b', 166.144, 44.327, 0, 166.594, 44.407, 1.6, 'pine'], ['y', 169.566, 42.554, 0.03, 1.77, 1.8, 'iron'],
+    ['y', 169.507, 42.515, 0.02, 1.77, 1.8, 'iron'], ['y', 169.424, 42.459, 0.01, 1.72, 1.77, 'iron'], ['y', 169.424, 42.459, 0.05, 1.68, 1.72, 'brass'], ['y', 169.424, 42.459, 0.085, 1.46, 1.68, 'glass'],
+    ['y', 169.424, 42.459, 0.1, 1.41, 1.46, 'brass'], ['b', 162.046, 39.471, 0, 162.526, 40.371, 0.42, 'leather'], ['b', 162.046, 39.461, 0.42, 162.546, 40.381, 0.5, 'wood'], ['b', 162.046, 39.596, 0, 162.546, 39.646, 0.5, 'iron'],
+    ['b', 162.046, 40.196, 0, 162.546, 40.246, 0.5, 'iron'], ['b', 162.526, 39.751, 0.1, 162.566, 40.091, 0.4, 'cloth']]);
+  /* G-ADDS end headmasters-tower-room-2 */
+  /* G-ADDS lake-corridor-2-east */
+  /* NOW (floor-2-by-purpose-1031.md): stair-runner-1, umbrella-1, torch-bracket-1, books-on-table-1, plank-bench-1, chair-squab-1, hearth-rug-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-2.js for collision only */
+  add('lake-corridor-2-east', [
+    ['b', 118.15, 1.58, 0, 119.15, 3.58, 0.01, 'scarlet'], ['b', 113.42, 3.54, 0.8, 113.48, 3.61, 1.7, 'black'], ['b', 141.135, 0.58, 1.77, 141.165, 0.82, 1.8, 'iron'], ['y', 141.15, 0.8, 0.01, 1.72, 1.77, 'iron'],
+    ['y', 141.15, 0.8, 0.05, 1.68, 1.72, 'brass'], ['y', 141.15, 0.8, 0.085, 1.46, 1.68, 'glass'], ['y', 141.15, 0.8, 0.1, 1.41, 1.46, 'brass'], ['b', 97.472, 0.71, 0.45, 97.792, 0.93, 0.67, 'books3'],
+    ['b', 97.462, 0.815, 0.55, 97.802, 0.825, 0.56, 'rope'], ['b', 119.4, 0.62, 0.42, 120.7, 1.0, 0.47, 'pine'], ['b', 119.47, 0.65, 0, 119.53, 0.95, 0.42, 'pine'], ['b', 120.57, 0.65, 0, 120.63, 0.95, 0.42, 'pine'],
+    ['b', 109.35, 0.62, 0, 109.95, 1.22, 0.95, 'leather'], ['b', 119.25, 2.58, 0, 120.65, 3.58, 0.012, 'tartan']]);
+  /* G-ADDS end lake-corridor-2-east */
+  /* G-ADDS mcgonagalls-office */
+  /* NOW (floor-1-by-purpose-1031.md): writing-desk-1, oak-chair-1, bookcase-1, hearth-rug-1, fire-irons-1, sweet-tin-1, silver-teapot-1, squab-cushion-1, library-ladder-1, oak-lectern-1; stand-in gap, no emitter: lodge-pigeonholes-1; sited by tools/architect-now.py, plain stand-ins; read back from None for collision only */
+  add('mcgonagalls-office', [
+    ['b', 154.034, 71.87, 0, 154.584, 72.87, 0.78, 'oak'], ['b', 156.48, 70.87, 0, 156.98, 71.37, 0.9, 'oak'], ['b', 156.68, 72.78, 0, 156.98, 73.78, 1.9, 'oak'], ['b', 153.27, 70.38, 0, 154.67, 71.38, 0.012, 'tartan'],
+    ['b', 154.606, 74.426, 0, 154.906, 74.726, 0.7, 'iron'], ['y', 154.125, 71.963, 0.06, 0.78, 0.86, 'tin'], ['b', 154.087, 72.091, 0.78, 154.286, 72.211, 0.96, 'steel'], ['b', 154.048, 72.264, 0.78, 154.448, 72.664, 0.86, 'scarlet'],
+    ['b', 152.05, 66.52, 0, 152.55, 66.62, 2.4, 'oak'], ['b', 152.02, 68.52, 0, 152.52, 69.12, 1.2, 'oak']]);
+  /* G-ADDS end mcgonagalls-office */
+  /* G-ADDS hospital-wing */
+  /* NOW (floor-1-by-purpose-1031.md): ward-screen-1, ward-chair-1, bedside-cupboard-1, medicine-glass-1, washbasin-1, noticeboard-1, iron-bedstead-1, linen-press-1, herb-bunch-1; stand-in gap, no emitter: hospital-wing, hospital-ward-1, medicine-spoon-1, roller-blind-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-1.js for collision only */
+  add('hospital-wing', [
+    ['b', 151.45, 25.02, 0, 152.85, 25.07, 1.7, 'wood'], ['b', 151.42, 31.8, 0, 151.92, 32.3, 0.9, 'oak'], ['b', 151.42, 29.25, 0, 151.82, 29.65, 0.7, 'oak'], ['y', 152.804, 28.974, 0.025, 0.45, 0.55, 'glass'],
+    ['b', 156.1, 44.58, 0, 156.6, 44.98, 0.85, 'white'], ['b', 158.35, 24.99, 1.3, 159.35, 25.04, 2.0, 'pine'], ['b', 154.05, 44.03, 0, 156.05, 44.98, 0.55, 'iron'], ['b', 152.95, 25.02, 0, 153.95, 25.57, 1.8, 'pine'],
+    ['b', 159.3, 27.06, 1.6, 159.41, 27.24, 1.9, 'green']]);
+  /* G-ADDS end hospital-wing */
+  /* G-ADDS pomfrey-office */
+  /* NOW (floor-1-by-purpose-1031.md): writing-desk-1, still-room-book-1, oak-chair-1, copper-kettle-1, cased-medal-1, iron-bedstead-1, wool-blanket-1, washbasin-1, wardrobe-1, plaid-shawl-1, linen-press-1, herb-bunch-1; sited by tools/architect-now.py, plain stand-ins; read back from None for collision only */
+  add('pomfrey-office', [
+    ['b', 158.83, 47.15, 0, 159.38, 48.15, 0.78, 'oak'], ['b', 159.025, 45.39, 1.3, 159.275, 45.45, 1.62, 'books'], ['b', 158.8, 48.88, 0, 159.3, 49.38, 0.9, 'oak'], ['y', 158.983, 47.305, 0.1, 0.78, 1.0, 'copper'],
+    ['b', 158.861, 47.443, 0.78, 158.981, 47.543, 0.82, 'gilt'], ['b', 155.42, 45.45, 0, 156.37, 47.45, 0.55, 'iron'], ['b', 158.855, 47.607, 0.78, 159.355, 48.007, 0.9, 'tartan'], ['b', 158.98, 48.2, 0, 159.38, 48.7, 0.85, 'white'],
+    ['b', 156.3, 48.83, 0, 157.4, 49.38, 1.9, 'oak'], ['b', 156.5, 45.39, 0.9, 157.0, 45.45, 1.5, 'tartan'], ['b', 158.83, 45.95, 0, 159.38, 46.95, 1.8, 'pine'], ['b', 159.3, 48.56, 1.6, 159.41, 48.74, 1.9, 'green']]);
+  /* G-ADDS end pomfrey-office */
+  /* G-ADDS pomfrey-bedroom */
+  /* NOW (floor-1-by-purpose-1031.md): writing-desk-1, still-room-book-1, oak-chair-1, copper-kettle-1, cased-medal-1, iron-bedstead-1, wool-blanket-1, washbasin-1, wardrobe-1, plaid-shawl-1, linen-press-1, herb-bunch-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-1.js for collision only */
+  add('pomfrey-bedroom', [
+    ['b', 148.15, 45.52, 0, 149.15, 46.07, 0.78, 'oak'], ['b', 149.725, 49.45, 1.3, 149.975, 49.51, 1.62, 'books'], ['b', 154.0, 45.52, 0, 154.5, 46.02, 0.9, 'oak'], ['y', 151.272, 45.695, 0.1, 0.76, 0.98, 'copper'],
+    ['b', 151.151, 45.833, 0.76, 151.271, 45.932, 0.8, 'gilt'], ['b', 152.15, 48.03, 0, 154.15, 48.98, 0.55, 'iron'], ['b', 151.389, 45.557, 0.76, 151.889, 45.958, 0.88, 'tartan'], ['b', 148.12, 46.1, 0, 148.52, 46.6, 0.85, 'white'],
+    ['b', 152.4, 45.52, 0, 153.5, 46.07, 1.9, 'oak'], ['b', 154.85, 46.2, 0.9, 154.91, 46.7, 1.5, 'tartan'], ['b', 149.25, 45.52, 0, 150.25, 46.07, 1.8, 'pine'], ['b', 152.16, 45.49, 1.6, 152.34, 45.6, 1.9, 'green']]);
+  /* G-ADDS end pomfrey-bedroom */
+  /* G-ADDS hospital-dispensary */
+  /* NOW (floor-1-by-purpose-1031.md): medicine-cabinet-1, still-room-book-1, rim-lock-1, iron-bedstead-1, washbasin-1, linen-press-1, herb-bunch-1; NOT PLACED for want of a clear spot: labelled-bottle-1, beam-balance-1, mortar-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-1.js for collision only */
+  add('hospital-dispensary', [
+    ['b', 148.09, 25.25, 1.2, 148.3, 25.85, 2.0, 'white'], ['b', 148.09, 25.925, 1.3, 148.15, 26.175, 1.62, 'books'], ['b', 148.09, 31.75, 1.0, 148.15, 31.95, 1.15, 'iron'], ['b', 149.93, 28.55, 0, 150.88, 30.55, 0.55, 'iron'],
+    ['b', 150.48, 30.6, 0, 150.88, 31.1, 0.85, 'white'], ['b', 150.33, 31.15, 0, 150.88, 32.15, 1.8, 'pine'], ['b', 148.09, 26.36, 1.6, 148.2, 26.54, 1.9, 'green']]);
+  /* G-ADDS end hospital-dispensary */
+  /* G-ADDS hospital-linen */
+  /* NOW (floor-1-by-purpose-1031.md): linen-press-1, folded-linen-1, pulley-airer-1, iron-bedstead-1, washbasin-1, herb-bunch-1; NOT PLACED for want of a clear spot: wool-blanket-1, wool-blanket-1, wool-blanket-1, wool-blanket-1, wool-blanket-1, wool-blanket-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-1.js for collision only */
+  add('hospital-linen', [
+    ['b', 150.33, 35.55, 0, 150.88, 36.55, 1.8, 'pine'], ['b', 148.127, 35.521, 0.4, 148.487, 35.781, 0.48, 'linen'], ['b', 148.127, 35.521, 0.48, 148.487, 35.781, 0.56, 'linen'], ['b', 148.09, 35.15, 2.2, 148.2, 37.15, 2.3, 'wood'],
+    ['b', 149.93, 37.15, 0, 150.88, 39.15, 0.55, 'iron'], ['b', 148.12, 40.7, 0, 148.52, 41.2, 0.85, 'white'], ['b', 150.8, 36.66, 1.6, 150.91, 36.84, 1.9, 'green']]);
+  /* G-ADDS end hospital-linen */
+  /* G-ADDS west-linen-room */
+  /* NOW (floor-1-by-purpose-1031.md): linen-press-1, folded-linen-1, wool-blanket-1, pulley-airer-1, iron-bedstead-1, washbasin-1, herb-bunch-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-1.js for collision only */
+  add('west-linen-room', [
+    ['b', 14.18, 56.2, 0, 14.73, 57.2, 1.8, 'pine'], ['b', 9.681, 58.281, 0.4, 10.041, 58.541, 0.48, 'linen'], ['b', 9.681, 58.281, 0.48, 10.041, 58.541, 0.56, 'linen'], ['b', 10.094, 58.277, 0.4, 10.594, 58.677, 0.52, 'tartan'],
+    ['b', 14.65, 55.6, 2.2, 14.76, 57.6, 2.3, 'wood'], ['b', 9.27, 53.9, 0, 10.22, 55.9, 0.55, 'iron'], ['b', 12.85, 53.87, 0, 13.35, 54.27, 0.85, 'white'], ['b', 9.24, 53.91, 1.6, 9.35, 54.09, 1.9, 'green']]);
+  /* G-ADDS end west-linen-room */
+  /* G-ADDS linen-cupboard-1 */
+  /* NOW (floor-1-by-purpose-1031.md): linen-press-1, folded-linen-1, wool-blanket-1, pulley-airer-1, iron-bedstead-1, washbasin-1, herb-bunch-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-1.js for collision only */
+  add('linen-cupboard-1', [
+    ['b', 132.2, 58.18, 0, 133.2, 58.73, 1.8, 'pine'], ['b', 124.281, 58.281, 0.4, 124.641, 58.541, 0.48, 'linen'], ['b', 124.281, 58.281, 0.48, 124.641, 58.541, 0.56, 'linen'], ['b', 124.694, 58.277, 0.4, 125.194, 58.677, 0.52, 'tartan'],
+    ['b', 126.5, 53.84, 2.2, 128.5, 53.95, 2.3, 'wood'], ['b', 129.3, 57.78, 0, 131.3, 58.73, 0.55, 'iron'], ['b', 134.25, 53.87, 0, 134.75, 54.27, 0.85, 'white'], ['b', 126.61, 53.84, 1.6, 126.79, 53.95, 1.9, 'green']]);
+  /* G-ADDS end linen-cupboard-1 */
+  /* G-ADDS quiet-rooms */
+  /* NOW (floor-1-by-purpose-1031.md): iron-bedstead-1, ward-screen-1, table-jug-1, side-table-1, ward-chair-1, washbasin-1, linen-press-1, herb-bunch-1; stand-in gap, no emitter: roller-blind-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-1.js for collision only */
+  add('quiet-rooms', [
+    ['b', 7.3, 16.78, 0, 9.3, 17.73, 0.55, 'iron'], ['b', 7.3, 3.87, 0, 8.7, 3.92, 1.7, 'wood'], ['y', 19.844, 5.504, 0.05, 0.45, 0.65, 'brick'], ['b', 20.72, 16.65, 0, 21.12, 17.15, 0.65, 'oak'],
+    ['b', 15.35, 3.87, 0, 15.85, 4.37, 0.9, 'oak'], ['b', 15.35, 17.33, 0, 15.85, 17.73, 0.85, 'white'], ['b', 20.57, 5.6, 0, 21.12, 6.6, 1.8, 'pine'], ['b', 7.24, 10.71, 1.6, 7.35, 10.89, 1.9, 'green']]);
+  /* G-ADDS end quiet-rooms */
+  /* G-ADDS staff-library */
+  /* NOW (floor-1-by-purpose-1031.md): bookcase-1, library-ladder-1, reading-desk-1, leather-armchair-1, oil-lamp-1, oak-lectern-1; stand-in gap, no emitter: lodge-pigeonholes-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-1.js for collision only */
+  add('staff-library', [
+    ['b', 153.77, 14.1, 0, 154.07, 15.1, 1.9, 'oak'], ['b', 153.77, 13.15, 0, 153.87, 13.65, 2.4, 'oak'], ['b', 153.77, 7.4, 0, 154.27, 8.0, 1.1, 'oak'], ['b', 153.77, 8.1, 0, 154.57, 8.9, 0.95, 'leather'],
+    ['y', 158.192, 17.492, 0.06, 0.1, 0.2, 'brass'], ['y', 158.192, 17.492, 0.045, 0.2, 0.35, 'glass'], ['b', 153.77, 9.0, 0, 154.27, 9.6, 1.2, 'oak']]);
+  /* G-ADDS end staff-library */
+  /* G-ADDS teachers-study-1 */
+  /* NOW (floor-1-by-purpose-1031.md): writing-desk-1, oak-chair-1, pigeon-holes-1, joined-table-1, still-room-book-1, folded-curtain-1, writing-desk-1, library-ladder-1, oak-lectern-1; stand-in gap, no emitter: lodge-pigeonholes-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-1.js for collision only */
+  add('teachers-study-1', [
+    ['b', 11.6, 59.27, 0, 12.6, 59.82, 0.78, 'oak'], ['b', 8.67, 66.15, 0, 9.17, 66.65, 0.9, 'oak'], ['b', 12.5, 59.24, 1.0, 13.7, 59.5, 1.9, 'oak'], ['b', 8.67, 66.75, 0, 9.47, 68.25, 0.78, 'oak'],
+    ['b', 14.5, 60.875, 1.3, 14.56, 61.125, 1.62, 'books'], ['b', 12.02, 63.844, 0.76, 12.38, 64.104, 0.84, 'linen'], ['b', 12.0, 69.18, 0, 13.0, 69.73, 0.78, 'oak'], ['b', 8.67, 68.35, 0, 8.77, 68.85, 2.4, 'oak'],
+    ['b', 13.1, 69.23, 0, 13.7, 69.73, 1.2, 'oak']]);
+  /* G-ADDS end teachers-study-1 */
+  /* G-ADDS deputy-heads-records-room */
+  /* NOW (floor-1-by-purpose-1031.md): writing-desk-1, oak-chair-1, pigeon-holes-1, joined-table-1, still-room-book-1, folded-curtain-1, writing-desk-1, library-ladder-1, oak-lectern-1; stand-in gap, no emitter: lodge-pigeonholes-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-1.js for collision only */
+  add('deputy-heads-records-room', [
+    ['b', 11.58, 42.63, 0, 12.13, 43.63, 0.78, 'oak'], ['b', 11.35, 49.23, 0, 11.85, 49.73, 0.9, 'oak'], ['b', 0.24, 44.63, 1.0, 0.5, 45.83, 1.9, 'oak'], ['b', 7.55, 48.93, 0, 9.05, 49.73, 0.78, 'oak'],
+    ['b', 0.24, 40.705, 1.3, 0.3, 40.955, 1.62, 'books'], ['b', 11.614, 42.655, 0.78, 11.974, 42.915, 0.86, 'linen'], ['b', 11.58, 45.53, 0, 12.13, 46.53, 0.78, 'oak'], ['b', 0.25, 39.6, 0, 0.75, 39.7, 2.4, 'oak'],
+    ['b', 11.63, 47.03, 0, 12.13, 47.63, 1.2, 'oak']]);
+  /* G-ADDS end deputy-heads-records-room */
+  /* G-ADDS history-teachers-study */
+  /* NOW (floor-1-by-purpose-1031.md): writing-desk-1, oak-chair-1, pigeon-holes-1, joined-table-1, still-room-book-1, folded-curtain-1, writing-desk-1, library-ladder-1, oak-lectern-1; stand-in gap, no emitter: lodge-pigeonholes-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-1.js for collision only */
+  add('history-teachers-study', [
+    ['b', 124.3, 17.43, 0, 125.3, 17.98, 0.78, 'oak'], ['b', 120.27, 16.25, 0, 120.77, 16.75, 0.9, 'oak'], ['b', 126.3, 17.75, 1.0, 127.5, 18.01, 1.9, 'oak'], ['b', 120.27, 3.85, 0, 121.07, 5.35, 0.78, 'oak'],
+    ['b', 123.875, 3.84, 1.3, 124.125, 3.9, 1.62, 'books'], ['b', 128.39, 10.269, 0.76, 128.75, 10.529, 0.84, 'linen'], ['b', 125.4, 17.43, 0, 126.4, 17.98, 0.78, 'oak'], ['b', 120.27, 16.85, 0, 120.37, 17.35, 2.4, 'oak'],
+    ['b', 128.0, 3.87, 0, 128.6, 4.37, 1.2, 'oak']]);
+  /* G-ADDS end history-teachers-study */
+  /* G-ADDS transfiguration-classroom */
+  /* NOW (floor-1-by-purpose-1031.md): match-1, needle-card-1, blackboard-1, herbarium-cabinet-1, worktable-1, match-1, needle-card-1, sweet-tin-1, library-ladder-1, oak-lectern-1; stand-in gap, no emitter: lodge-pigeonholes-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-1.js for collision only */
+  add('transfiguration-classroom', [
+    ['b', 141.379, 70.135, 0.45, 141.429, 70.145, 0.46, 'pine'], ['b', 141.354, 70.199, 0.45, 141.454, 70.209, 0.59, 'paper'], ['b', 139.59, 68.45, 1.0, 139.64, 70.25, 2.0, 'black'], ['b', 139.62, 70.3, 0, 140.02, 71.2, 1.3, 'oak'],
+    ['b', 139.62, 63.45, 0, 140.32, 64.85, 0.8, 'deal'], ['b', 141.379, 70.263, 0.45, 141.429, 70.273, 0.46, 'pine'], ['b', 141.354, 70.327, 0.45, 141.454, 70.337, 0.59, 'paper'], ['y', 141.532, 70.204, 0.06, 0.45, 0.53, 'tin'],
+    ['b', 139.6, 71.28, 0, 140.1, 71.38, 2.4, 'oak'], ['b', 145.65, 70.88, 0, 146.25, 71.38, 1.2, 'oak']]);
+  /* G-ADDS end transfiguration-classroom */
+  /* G-ADDS newt-transfiguration-classroom */
+  /* NOW (floor-1-by-purpose-1031.md): joined-table-1, blackboard-1, sideboard-1, mineral-specimen-1, library-ladder-1, oak-lectern-1; stand-in gap, no emitter: lodge-pigeonholes-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-1.js for collision only */
+  add('newt-transfiguration-classroom', [
+    ['b', 92.25, 71.18, 0, 93.75, 71.98, 0.78, 'oak'], ['b', 103.71, 63.1, 1.0, 103.76, 64.9, 2.0, 'black'], ['b', 92.27, 64.2, 0, 92.77, 65.6, 0.9, 'oak'], ['y', 93.654, 61.854, 0.05, 0.45, 0.53, 'stone'],
+    ['b', 92.27, 65.65, 0, 92.37, 66.15, 2.4, 'oak'], ['b', 103.23, 59.3, 0, 103.73, 59.9, 1.2, 'oak']]);
+  /* G-ADDS end newt-transfiguration-classroom */
+  /* G-ADDS transfiguration-store */
+  /* NOW (floor-1-by-purpose-1031.md): slatted-staging-1, hooped-bucket-1, hessian-sack-1, earthenware-dish-1, iron-bedstead-1, washbasin-1, boarded-chest-1, library-ladder-1, oak-lectern-1; stand-in gap, no emitter: lodge-pigeonholes-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-1.js for collision only */
+  add('transfiguration-store', [
+    ['b', 157.32, 67.48, 0, 157.82, 68.88, 0.8, 'pine'], ['y', 157.5, 67.22, 0.17, 0, 0.34, 'tin'], ['y', 157.5, 67.22, 0.175, 0.3, 0.34, 'iron'], ['b', 159.71, 66.023, 0, 160.05, 66.423, 0.5, 'rush'],
+    ['b', 159.76, 66.083, 0.5, 160.0, 66.343, 0.56, 'rush'], ['b', 159.79, 66.103, 0.56, 159.97, 66.303, 0.6, 'straw'], ['y', 157.456, 69.151, 0.1, 0.5, 0.55, 'brick'], ['b', 164.206, 72.824, 0, 165.156, 74.824, 0.55, 'iron'],
+    ['b', 158.23, 66.21, 0, 158.73, 66.61, 0.85, 'white'], ['b', 165.441, 70.979, 0, 165.941, 71.879, 0.5, 'pine'], ['b', 161.123, 77.713, 0, 161.623, 77.813, 2.4, 'oak'], ['b', 160.299, 66.056, 0, 160.899, 66.556, 1.2, 'oak']]);
+  /* G-ADDS end transfiguration-store */
+  /* G-ADDS transfiguration-beast-store */
+  /* NOW (floor-1-by-purpose-1031.md): slatted-staging-1, hooped-bucket-1, hessian-sack-1, earthenware-dish-1, iron-bedstead-1, washbasin-1, boarded-chest-1, library-ladder-1, oak-lectern-1; stand-in gap, no emitter: lodge-pigeonholes-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-1.js for collision only */
+  add('transfiguration-beast-store', [
+    ['b', 140.17, 3.87, 0, 141.57, 4.37, 0.8, 'pine'], ['y', 138.87, 4.05, 0.17, 0, 0.34, 'tin'], ['y', 138.87, 4.05, 0.175, 0.3, 0.34, 'iron'], ['b', 133.7, 17.58, 0, 134.04, 17.98, 0.5, 'rush'],
+    ['b', 133.75, 17.66, 0.5, 133.99, 17.92, 0.56, 'rush'], ['b', 133.78, 17.7, 0.56, 133.96, 17.9, 0.6, 'straw'], ['y', 140.322, 4.026, 0.1, 0.8, 0.85, 'brick'], ['b', 136.37, 17.03, 0, 138.37, 17.98, 0.55, 'iron'],
+    ['b', 137.62, 3.87, 0, 138.12, 4.27, 0.85, 'white'], ['b', 131.42, 3.87, 0, 132.32, 4.37, 0.5, 'pine'], ['b', 131.44, 7.35, 0, 131.54, 7.85, 2.4, 'oak'], ['b', 131.44, 12.6, 0, 131.94, 13.2, 1.2, 'oak']]);
+  /* G-ADDS end transfiguration-beast-store */
+  /* G-ADDS transfiguration-teachers-rooms */
+  /* NOW (floor-1-by-purpose-1031.md): slatted-staging-1, hooped-bucket-1, hessian-sack-1, earthenware-dish-1, iron-bedstead-1, washbasin-1, boarded-chest-1, library-ladder-1, oak-lectern-1; stand-in gap, no emitter: lodge-pigeonholes-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-1.js for collision only */
+  add('transfiguration-teachers-rooms', [
+    ['b', 152.73, 9.6, 0, 153.23, 11.0, 0.8, 'pine'], ['y', 151.53, 17.55, 0.17, 0, 0.34, 'tin'], ['y', 151.53, 17.55, 0.175, 0.3, 0.34, 'iron'], ['b', 152.83, 6.23, 0, 153.23, 6.57, 0.5, 'rush'],
+    ['b', 152.91, 6.28, 0.5, 153.17, 6.52, 0.56, 'rush'], ['b', 152.95, 6.31, 0.56, 153.15, 6.49, 0.6, 'straw'], ['y', 149.776, 4.063, 0.1, 0.7, 0.75, 'brick'], ['b', 142.6, 10.9, 0, 143.55, 12.9, 0.55, 'iron'],
+    ['b', 142.6, 15.05, 0, 143.0, 15.55, 0.85, 'white'], ['b', 142.6, 3.85, 0, 143.1, 4.75, 0.5, 'pine'], ['b', 146.28, 3.87, 0, 146.78, 3.97, 2.4, 'oak'], ['b', 142.6, 13.0, 0, 143.1, 13.6, 1.2, 'oak']]);
+  /* G-ADDS end transfiguration-teachers-rooms */
+  /* G-ADDS history-of-magic-classroom */
+  /* NOW (floor-1-by-purpose-1031.md): plank-bench-1, oak-lectern-1, longcase-clock-1, plank-bench-1, oak-lectern-1, globe-1, library-ladder-1; NOT PLACED for want of a clear spot: history-chart-1, history-chart-1, history-chart-1, history-chart-1; stand-in gap, no emitter: lodge-pigeonholes-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-1.js for collision only */
+  add('history-of-magic-classroom', [
+    ['b', 134.6, 65.3, 0.42, 134.98, 66.6, 0.47, 'pine'], ['b', 134.65, 65.37, 0, 134.95, 65.43, 0.42, 'pine'], ['b', 134.65, 66.47, 0, 134.95, 66.53, 0.42, 'pine'], ['b', 130.85, 63.42, 0, 131.45, 63.92, 1.2, 'oak'],
+    ['b', 124.02, 65.3, 0, 124.32, 65.8, 2.0, 'oak'], ['b', 134.6, 66.7, 0.42, 134.98, 68.0, 0.47, 'pine'], ['b', 134.65, 66.77, 0, 134.95, 66.83, 0.42, 'pine'], ['b', 134.65, 67.87, 0, 134.95, 67.93, 0.42, 'pine'],
+    ['b', 130.85, 70.88, 0, 131.45, 71.38, 1.2, 'oak'], ['y', 124.95, 71.1, 0.2, 0, 0.04, 'wood'], ['y', 124.95, 71.1, 0.03, 0.04, 1.0, 'wood'], ['y', 124.95, 71.1, 0.24, 1.0, 1.45, 'blue'],
+    ['y', 124.95, 71.1, 0.27, 1.25, 1.5, 'linen'], ['b', 134.88, 64.1, 0, 134.98, 64.6, 2.4, 'oak']]);
+  /* G-ADDS end history-of-magic-classroom */
+  /* G-ADDS chandelier-classroom */
+  /* NOW (floor-1-by-purpose-1031.md): single-desk-1, masters-desk-1, blackboard-1, folded-curtain-1, double-desk-1, library-ladder-1, oak-lectern-1; NOT PLACED for want of a clear spot: folded-curtain-1, folded-curtain-1, folded-curtain-1, folded-curtain-1, folded-curtain-1, folded-curtain-1, folded-curtain-1, folded-curtain-1, folded-curtain-1, folded-curtain-1; stand-in gap, no emitter: ring-chandelier-1, lodge-pigeonholes-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-1.js for collision only */
+  add('chandelier-classroom', [
+    ['b', 8.25, 27.9, 0, 9.15, 28.4, 0.75, 'oak'], ['b', 3.6, 27.7, 0, 5.0, 28.4, 0.95, 'oak'], ['b', 2.0, 18.24, 1.0, 3.8, 18.29, 2.0, 'black'], ['b', 2.5, 22.679, 0.76, 2.86, 22.939, 0.84, 'linen'],
+    ['b', 3.65, 18.27, 0, 4.95, 18.77, 0.75, 'oak'], ['b', 1.75, 28.3, 0, 2.25, 28.4, 2.4, 'oak'], ['b', 11.63, 26.7, 0, 12.13, 27.3, 1.2, 'oak']]);
+  /* G-ADDS end chandelier-classroom */
+  /* G-ADDS old-textbooks-store */
+  /* NOW (floor-1-by-purpose-1031.md): book-crate-1, bookcase-1, iron-bedstead-1, pigeon-holes-1, rim-lock-1, hall-stand-1, snap-cards-1; NOT PLACED for want of a clear spot: luggage-tag-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-1.js for collision only */
+  add('old-textbooks-store', [
+    ['b', 147.99, 20.91, 0, 148.61, 21.33, 0.32, 'pine'], ['b', 158.2, 18.27, 0, 159.2, 18.57, 1.9, 'oak'], ['b', 148.7, 20.38, 0, 150.7, 21.33, 0.55, 'iron'], ['b', 150.3, 21.1, 1.0, 151.5, 21.36, 1.9, 'oak'],
+    ['b', 148.6, 18.24, 1.0, 148.8, 18.3, 1.15, 'iron'], ['y', 153.4, 18.5, 0.22, 0, 0.05, 'wood'], ['y', 153.4, 18.5, 0.03, 0.05, 1.75, 'wood'], ['y', 153.4, 18.5, 0.17, 1.75, 1.77, 'black'],
+    ['y', 153.4, 18.5, 0.1, 1.77, 1.92, 'black'], ['y', 153.4, 18.65, 0.012, 0.05, 0.95, 'wood'], ['y', 153.4, 18.65, 0.04, 0.0, 0.05, 'wood'], ['b', 155.022, 20.96, 0.8, 155.123, 21.03, 0.81, 'paper']]);
+  /* G-ADDS end old-textbooks-store */
+  /* G-ADDS room-over-caretakers-office */
+  /* NOW (floor-1-by-purpose-1031.md): book-crate-1, bookcase-1, iron-bedstead-1, pigeon-holes-1, rim-lock-1, hall-stand-1, snap-cards-1; NOT PLACED for want of a clear spot: luggage-tag-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-1.js for collision only */
+  add('room-over-caretakers-office', [
+    ['b', 104.27, 67.89, 0, 104.69, 68.51, 0.32, 'pine'], ['b', 110.9, 62.27, 0, 111.9, 62.57, 1.9, 'oak'], ['b', 112.0, 62.27, 0, 114.0, 63.22, 0.55, 'iron'], ['b', 117.5, 66.9, 1.0, 117.76, 68.1, 1.9, 'oak'],
+    ['b', 112.3, 69.7, 1.0, 112.5, 69.76, 1.15, 'iron'], ['y', 108.9, 62.5, 0.22, 0, 0.05, 'wood'], ['y', 108.9, 62.5, 0.03, 0.05, 1.75, 'wood'], ['y', 108.9, 62.5, 0.17, 1.75, 1.77, 'black'],
+    ['y', 108.9, 62.5, 0.1, 1.77, 1.92, 'black'], ['y', 108.9, 62.65, 0.012, 0.05, 0.95, 'wood'], ['y', 108.9, 62.65, 0.04, 0.0, 0.05, 'wood'], ['b', 110.562, 63.776, 0.76, 110.662, 63.846, 0.77, 'paper']]);
+  /* G-ADDS end room-over-caretakers-office */
+  /* G-ADDS caretakers-slip-room-1 */
+  /* NOW (floor-1-by-purpose-1031.md): book-crate-1, bookcase-1, iron-bedstead-1, pigeon-holes-1, rim-lock-1, hall-stand-1; NOT PLACED for want of a clear spot: luggage-tag-1, snap-cards-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-1.js for collision only */
+  add('caretakers-slip-room-1', [
+    ['b', 110.89, 59.27, 0, 111.51, 59.69, 0.32, 'pine'], ['b', 104.27, 60.2, 0, 104.57, 61.2, 1.9, 'oak'], ['b', 111.5, 60.78, 0, 113.5, 61.73, 0.55, 'iron'], ['b', 104.3, 61.5, 1.0, 105.5, 61.76, 1.9, 'oak'],
+    ['b', 117.7, 60.2, 1.0, 117.76, 60.4, 1.15, 'iron'], ['y', 117.5, 60.3, 0.22, 0, 0.05, 'wood'], ['y', 117.5, 60.3, 0.03, 0.05, 1.75, 'wood'], ['y', 117.5, 60.3, 0.17, 1.75, 1.77, 'black'],
+    ['y', 117.5, 60.3, 0.1, 1.77, 1.92, 'black'], ['y', 117.35, 60.3, 0.012, 0.05, 0.95, 'wood'], ['y', 117.35, 60.3, 0.04, 0.0, 0.05, 'wood']]);
+  /* G-ADDS end caretakers-slip-room-1 */
+  /* G-ADDS caretakers-long-cupboard-1 */
+  /* NOW (floor-1-by-purpose-1031.md): book-crate-1, bookcase-1, iron-bedstead-1, pigeon-holes-1, rim-lock-1, hall-stand-1; NOT PLACED for want of a clear spot: luggage-tag-1, snap-cards-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-1.js for collision only */
+  add('caretakers-long-cupboard-1', [
+    ['b', 114.39, 71.56, 0, 115.01, 71.98, 0.32, 'pine'], ['b', 105.3, 70.27, 0, 106.3, 70.57, 1.9, 'oak'], ['b', 106.4, 70.27, 0, 108.4, 71.22, 0.55, 'iron'], ['b', 112.0, 71.75, 1.0, 113.2, 72.01, 1.9, 'oak'],
+    ['b', 108.5, 70.24, 1.0, 108.7, 70.3, 1.15, 'iron'], ['y', 112.6, 70.5, 0.22, 0, 0.05, 'wood'], ['y', 112.6, 70.5, 0.03, 0.05, 1.75, 'wood'], ['y', 112.6, 70.5, 0.17, 1.75, 1.77, 'black'],
+    ['y', 112.6, 70.5, 0.1, 1.77, 1.92, 'black'], ['y', 112.6, 70.65, 0.012, 0.05, 0.95, 'wood'], ['y', 112.6, 70.65, 0.04, 0.0, 0.05, 'wood']]);
+  /* G-ADDS end caretakers-long-cupboard-1 */
+  /* G-ADDS spare-desks-store-1 */
+  /* NOW (floor-1-by-purpose-1031.md): double-desk-1, mop-1, brush-and-pan-1, tin-bucket-1, stoneware-crock-1, book-crate-1; NOT PLACED for want of a clear spot: luggage-tag-1, house-banner-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-1.js for collision only */
+  add('spare-desks-store-1', [
+    ['b', 118.85, 71.48, 0, 120.15, 71.98, 0.75, 'oak'], ['b', 119.35, 59.24, 0.3, 119.45, 59.35, 1.5, 'wood'], ['b', 118.24, 60.75, 0.6, 118.31, 61.05, 0.95, 'wood'], ['y', 118.45, 59.9, 0.17, 0, 0.34, 'tin'],
+    ['y', 118.45, 59.9, 0.175, 0.3, 0.34, 'iron'], ['y', 118.5, 59.47, 0.2, 0, 0.45, 'brick'], ['b', 119.49, 59.27, 0, 120.11, 59.69, 0.32, 'pine']]);
+  /* G-ADDS end spare-desks-store-1 */
+  /* G-ADDS store-1-west */
+  /* NOW (floor-1-by-purpose-1031.md): double-desk-1, mop-1, brush-and-pan-1, tin-bucket-1, stoneware-crock-1, book-crate-1; NOT PLACED for want of a clear spot: luggage-tag-1, house-banner-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-1.js for collision only */
+  add('store-1-west', [
+    ['b', 6.23, 57.35, 0, 6.73, 58.65, 0.75, 'oak'], ['b', 1.4, 53.84, 0.3, 1.5, 53.95, 1.5, 'wood'], ['b', 5.5, 53.84, 0.6, 5.8, 53.91, 0.95, 'wood'], ['y', 6.55, 55.2, 0.17, 0, 0.34, 'tin'],
+    ['y', 6.55, 55.2, 0.175, 0.3, 0.34, 'iron'], ['y', 4.45, 54.07, 0.2, 0, 0.45, 'brick'], ['b', 4.74, 53.87, 0, 5.36, 54.29, 0.32, 'pine']]);
+  /* G-ADDS end store-1-west */
+  /* G-ADDS cleaning-cupboard-1 */
+  /* NOW (floor-1-by-purpose-1031.md): double-desk-1, mop-1, brush-and-pan-1, tin-bucket-1, stoneware-crock-1, book-crate-1; NOT PLACED for want of a clear spot: luggage-tag-1, house-banner-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-1.js for collision only */
+  add('cleaning-cupboard-1', [
+    ['b', 139.47, 57.15, 0, 139.97, 58.45, 0.75, 'oak'], ['b', 139.44, 54.65, 0.3, 139.55, 54.75, 1.5, 'wood'], ['b', 143.69, 54.45, 0.6, 143.76, 54.75, 0.95, 'wood'], ['y', 143.55, 57.4, 0.17, 0, 0.34, 'tin'],
+    ['y', 143.55, 57.4, 0.175, 0.3, 0.34, 'iron'], ['y', 143.53, 58.4, 0.2, 0, 0.45, 'brick'], ['b', 142.59, 53.87, 0, 143.21, 54.29, 0.32, 'pine']]);
+  /* G-ADDS end cleaning-cupboard-1 */
+  /* G-ADDS broom-cupboard-1 */
+  /* NOW (floor-1-by-purpose-1031.md): double-desk-1, mop-1, brush-and-pan-1, tin-bucket-1, stoneware-crock-1, book-crate-1; NOT PLACED for want of a clear spot: luggage-tag-1, house-banner-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-1.js for collision only */
+  add('broom-cupboard-1', [
+    ['b', 118.55, 58.23, 0, 119.85, 58.73, 0.75, 'oak'], ['b', 121.25, 54.95, 0.3, 121.36, 55.05, 1.5, 'wood'], ['b', 118.65, 53.84, 0.6, 118.95, 53.91, 0.95, 'wood'], ['y', 104.45, 54.0, 0.17, 0, 0.34, 'tin'],
+    ['y', 104.45, 54.0, 0.175, 0.3, 0.34, 'iron'], ['y', 120.1, 58.53, 0.2, 0, 0.45, 'brick'], ['b', 117.59, 53.87, 0, 118.21, 54.29, 0.32, 'pine']]);
+  /* G-ADDS end broom-cupboard-1 */
+  /* G-ADDS gryffindor-tower-storeroom */
+  /* NOW (floor-1-by-purpose-1031.md): double-desk-1, mop-1, brush-and-pan-1, tin-bucket-1, stoneware-crock-1, book-crate-1; NOT PLACED for want of a clear spot: luggage-tag-1, house-banner-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-1.js for collision only */
+  add('gryffindor-tower-storeroom', [
+    ['b', 47.83, 15.7, 0, 48.33, 17.0, 0.75, 'oak'], ['b', 36.04, 15.7, 0.3, 36.15, 15.8, 1.5, 'wood'], ['b', 44.35, 11.59, 0.6, 44.65, 11.66, 0.95, 'wood'], ['y', 47.0, 11.8, 0.17, 0, 0.34, 'tin'],
+    ['y', 47.0, 11.8, 0.175, 0.3, 0.34, 'iron'], ['y', 48.13, 17.25, 0.2, 0, 0.45, 'brick'], ['b', 36.09, 11.62, 0, 36.71, 12.04, 0.32, 'pine']]);
+  /* G-ADDS end gryffindor-tower-storeroom */
+  /* G-ADDS washrooms-1-gate */
+  /* NOW (floor-1-by-purpose-1031.md): washbasin-1, washbasin-1, washbasin-1, washbasin-1, table-jug-1, folded-linen-1, looking-glass-1, wooden-pail-1, boot-mat-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-1.js for collision only */
+  add('washrooms-1-gate', [
+    ['b', 102.85, 58.33, 0, 103.35, 58.73, 0.85, 'white'], ['b', 96.27, 57.15, 0, 96.67, 57.65, 0.85, 'white'], ['b', 96.27, 58.15, 0, 96.67, 58.65, 0.85, 'white'], ['b', 102.15, 53.87, 0, 102.65, 54.27, 0.85, 'white'],
+    ['y', 103.294, 54.34, 0.05, 0.85, 1.05, 'brick'], ['b', 103.241, 54.452, 0.85, 103.601, 54.712, 0.93, 'linen'], ['b', 103.241, 54.452, 0.93, 103.601, 54.712, 1.01, 'linen'], ['b', 101.15, 58.71, 1.3, 101.65, 58.77, 2.0, 'wood'],
+    ['b', 101.19, 58.705, 1.35, 101.61, 58.71, 1.95, 'glass'], ['y', 102.9, 54.04, 0.15, 0, 0.3, 'wood'], ['y', 102.9, 54.04, 0.155, 0.08, 0.1, 'iron'], ['y', 102.9, 54.04, 0.155, 0.2, 0.22, 'iron'],
+    ['b', 96.25, 53.87, 0, 96.95, 54.32, 0.02, 'rush']]);
+  /* G-ADDS end washrooms-1-gate */
+  /* G-ADDS washrooms-1-east */
+  /* NOW (floor-1-by-purpose-1031.md): washbasin-1, washbasin-1, washbasin-1, washbasin-1, table-jug-1, folded-linen-1, looking-glass-1, wooden-pail-1, boot-mat-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-1.js for collision only */
+  add('washrooms-1-east', [
+    ['b', 144.27, 57.15, 0, 144.67, 57.65, 0.85, 'white'], ['b', 149.65, 53.87, 0, 150.15, 54.27, 0.85, 'white'], ['b', 145.35, 53.87, 0, 145.85, 54.27, 0.85, 'white'], ['b', 151.33, 57.55, 0, 151.73, 58.05, 0.85, 'white'],
+    ['y', 146.34, 58.294, 0.05, 0.85, 1.05, 'brick'], ['b', 146.281, 58.355, 0.85, 146.641, 58.615, 0.93, 'linen'], ['b', 146.281, 58.355, 0.93, 146.641, 58.615, 1.01, 'linen'], ['b', 151.71, 54.15, 1.3, 151.77, 54.65, 2.0, 'wood'],
+    ['b', 151.705, 54.19, 1.35, 151.71, 54.61, 1.95, 'glass'], ['y', 150.3, 58.56, 0.15, 0, 0.3, 'wood'], ['y', 150.3, 58.56, 0.155, 0.08, 0.1, 'iron'], ['y', 150.3, 58.56, 0.155, 0.2, 0.22, 'iron'],
+    ['b', 150.25, 53.87, 0, 150.95, 54.32, 0.02, 'rush']]);
+  /* G-ADDS end washrooms-1-east */
+  /* G-ADDS washrooms-1-south-west */
+  /* NOW (floor-1-by-purpose-1031.md): washbasin-1, washbasin-1, washbasin-1, washbasin-1, table-jug-1, folded-linen-1, looking-glass-1, wooden-pail-1, boot-mat-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-1.js for collision only */
+  add('washrooms-1-south-west', [
+    ['b', 6.33, 15.95, 0, 6.73, 16.45, 0.85, 'white'], ['b', 0.02, 16.15, 0, 0.42, 16.65, 0.85, 'white'], ['b', 1.9, 12.27, 0, 2.4, 12.67, 0.85, 'white'], ['b', 5.1, 12.27, 0, 5.6, 12.67, 0.85, 'white'],
+    ['y', 1.715, 17.294, 0.05, 0.85, 1.05, 'brick'], ['b', 1.656, 17.355, 0.85, 2.016, 17.615, 0.93, 'linen'], ['b', 1.656, 17.355, 0.93, 2.016, 17.615, 1.01, 'linen'], ['b', -0.02, 12.25, 1.3, 0.04, 12.75, 2.0, 'wood'],
+    ['b', 0.04, 12.29, 1.35, 0.045, 12.71, 1.95, 'glass'], ['y', 5.65, 17.56, 0.15, 0, 0.3, 'wood'], ['y', 5.65, 17.56, 0.155, 0.08, 0.1, 'iron'], ['y', 5.65, 17.56, 0.155, 0.2, 0.22, 'iron'],
+    ['b', 6.0, 17.28, 0, 6.7, 17.73, 0.02, 'rush']]);
+  /* G-ADDS end washrooms-1-south-west */
+  /* G-ADDS ravenclaw-tower-room-1 */
+  /* NOW (floor-1-by-purpose-1031.md): school-trunk-1, stool-1, boarded-chest-1, pulley-block-1, hanging-lantern-1, tin-bucket-1, snuffer-pole-1, stearin-candle-1; NOT PLACED for want of a clear spot: luggage-tag-1, 1 hung item(s) that floated on the curve; stand-in gap, no emitter: preserve-pot-1, stockpots-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-1.js for collision only */
+  add('ravenclaw-tower-room-1', [
+    ['b', -1.135, 32.484, 0, -0.655, 33.384, 0.42, 'leather'], ['b', -1.155, 32.474, 0.42, -0.655, 33.394, 0.5, 'wood'], ['b', -1.155, 32.609, 0, -0.655, 32.659, 0.5, 'iron'], ['b', -1.155, 33.209, 0, -0.655, 33.259, 0.5, 'iron'],
+    ['b', -1.175, 32.764, 0.1, -1.135, 33.104, 0.4, 'cloth'], ['y', -14.139, 32.663, 0.17, 0.43, 0.47, 'pine'], ['b', -14.059, 32.743, 0, -14.019, 32.783, 0.43, 'pine'], ['b', -14.259, 32.743, 0, -14.219, 32.783, 0.43, 'pine'],
+    ['b', -14.059, 32.543, 0, -14.019, 32.583, 0.43, 'pine'], ['b', -14.259, 32.543, 0, -14.219, 32.583, 0.43, 'pine'], ['b', -9.016, 27.155, 0, -8.116, 27.655, 0.5, 'pine'], ['b', -14.375, 35.206, 2.0, -14.265, 35.406, 2.3, 'iron'],
+    ['y', -10.546, 27.863, 0.03, 1.77, 1.8, 'iron'], ['y', -10.519, 27.928, 0.02, 1.77, 1.8, 'iron'], ['y', -10.481, 28.02, 0.01, 1.72, 1.77, 'iron'], ['y', -10.481, 28.02, 0.05, 1.68, 1.72, 'brass'],
+    ['y', -10.481, 28.02, 0.085, 1.46, 1.68, 'glass'], ['y', -10.481, 28.02, 0.1, 1.41, 1.46, 'brass'], ['y', -1.474, 31.13, 0.17, 0, 0.34, 'tin'], ['y', -1.474, 31.13, 0.175, 0.3, 0.34, 'iron'],
+    ['y', -1.619, 35.799, 0.02, 0.7, 0.85, 'white']]);
+  /* G-ADDS end ravenclaw-tower-room-1 */
+  /* G-ADDS dumbledores-tower-room-1 */
+  /* NOW (floor-1-by-purpose-1031.md): school-trunk-1, stool-1, boarded-chest-1, pulley-block-1, hanging-lantern-1, tin-bucket-1, snuffer-pole-1, stearin-candle-1; NOT PLACED for want of a clear spot: luggage-tag-1, 1 hung item(s) that floated on the curve; stand-in gap, no emitter: preserve-pot-1, stockpots-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-1.js for collision only */
+  add('dumbledores-tower-room-1', [
+    ['b', 165.768, 43.914, 0, 166.668, 44.394, 0.42, 'leather'], ['b', 165.758, 43.894, 0.42, 166.678, 44.394, 0.5, 'wood'], ['b', 165.893, 43.894, 0, 165.943, 44.394, 0.5, 'iron'], ['b', 166.493, 43.894, 0, 166.543, 44.394, 0.5, 'iron'],
+    ['b', 166.048, 43.874, 0.1, 166.388, 43.914, 0.4, 'cloth'], ['y', 163.71, 43.591, 0.17, 0.43, 0.47, 'pine'], ['b', 163.79, 43.671, 0, 163.83, 43.711, 0.43, 'pine'], ['b', 163.59, 43.671, 0, 163.63, 43.711, 0.43, 'pine'],
+    ['b', 163.79, 43.471, 0, 163.83, 43.511, 0.43, 'pine'], ['b', 163.59, 43.471, 0, 163.63, 43.511, 0.43, 'pine'], ['b', 161.606, 40.128, 0, 162.106, 41.028, 0.5, 'pine'], ['b', 170.314, 39.082, 2.0, 170.424, 39.282, 2.3, 'iron'],
+    ['y', 167.033, 35.683, 0.03, 1.77, 1.8, 'iron'], ['y', 167.006, 35.747, 0.02, 1.77, 1.8, 'iron'], ['y', 166.968, 35.84, 0.01, 1.72, 1.77, 'iron'], ['y', 166.968, 35.84, 0.05, 1.68, 1.72, 'brass'],
+    ['y', 166.968, 35.84, 0.085, 1.46, 1.68, 'glass'], ['y', 166.968, 35.84, 0.1, 1.41, 1.46, 'brass'], ['y', 165.498, 44.214, 0.17, 0, 0.34, 'tin'], ['y', 165.498, 44.214, 0.175, 0.3, 0.34, 'iron'],
+    ['y', 170.004, 39.53, 0.02, 0.4, 0.55, 'white']]);
+  /* G-ADDS end dumbledores-tower-room-1 */
+  /* G-ADDS gate-north-store-1 */
+  /* NOW (floor-1-by-purpose-1031.md): school-trunk-1, stool-1, boarded-chest-1, pulley-block-1, hanging-lantern-1, tin-bucket-1, snuffer-pole-1, stearin-candle-1; NOT PLACED for want of a clear spot: luggage-tag-1, 1 hung item(s) that floated on the curve; stand-in gap, no emitter: preserve-pot-1, stockpots-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-1.js for collision only */
+  add('gate-north-store-1', [
+    ['b', 75.52, 80.889, 0, 76.0, 81.789, 0.42, 'leather'], ['b', 75.52, 80.879, 0.42, 76.02, 81.799, 0.5, 'wood'], ['b', 75.52, 81.014, 0, 76.02, 81.064, 0.5, 'iron'], ['b', 75.52, 81.614, 0, 76.02, 81.664, 0.5, 'iron'],
+    ['b', 76.0, 81.169, 0.1, 76.04, 81.509, 0.4, 'cloth'], ['y', 83.6, 80.72, 0.17, 0.43, 0.47, 'pine'], ['b', 83.68, 80.8, 0, 83.72, 80.84, 0.43, 'pine'], ['b', 83.48, 80.8, 0, 83.52, 80.84, 0.43, 'pine'],
+    ['b', 83.68, 80.6, 0, 83.72, 80.64, 0.43, 'pine'], ['b', 83.48, 80.6, 0, 83.52, 80.64, 0.43, 'pine'], ['b', 83.98, 80.47, 0, 84.48, 81.37, 0.5, 'pine'], ['b', 75.49, 80.999, 2.0, 75.6, 81.199, 2.3, 'iron'],
+    ['y', 76.22, 82.248, 0.03, 1.77, 1.8, 'iron'], ['y', 76.261, 82.192, 0.02, 1.77, 1.8, 'iron'], ['y', 76.32, 82.111, 0.01, 1.72, 1.77, 'iron'], ['y', 76.32, 82.111, 0.05, 1.68, 1.72, 'brass'],
+    ['y', 76.32, 82.111, 0.085, 1.46, 1.68, 'glass'], ['y', 76.32, 82.111, 0.1, 1.41, 1.46, 'brass'], ['y', 81.923, 83.013, 0.17, 0, 0.34, 'tin'], ['y', 81.923, 83.013, 0.175, 0.3, 0.34, 'iron'],
+    ['y', 76.85, 82.26, 0.02, 0.65, 0.8, 'white']]);
+  /* G-ADDS end gate-north-store-1 */
+  /* G-ADDS portcullis-room */
+  /* NOW (floor-1-by-purpose-1031.md): school-trunk-1, stool-1, boarded-chest-1, pulley-block-1, hanging-lantern-1, tin-bucket-1, snuffer-pole-1, stearin-candle-1; NOT PLACED for want of a clear spot: luggage-tag-1; stand-in gap, no emitter: preserve-pot-1, stockpots-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-1.js for collision only */
+  add('portcullis-room', [
+    ['b', 78.7, 79.5, 0, 79.6, 79.98, 0.42, 'leather'], ['b', 78.69, 79.48, 0.42, 79.61, 79.98, 0.5, 'wood'], ['b', 78.825, 79.48, 0, 78.875, 79.98, 0.5, 'iron'], ['b', 79.425, 79.48, 0, 79.475, 79.98, 0.5, 'iron'],
+    ['b', 78.98, 79.46, 0.1, 79.32, 79.5, 0.4, 'cloth'], ['y', 85.58, 76.75, 0.17, 0.43, 0.47, 'pine'], ['b', 85.66, 76.83, 0, 85.7, 76.87, 0.43, 'pine'], ['b', 85.46, 76.83, 0, 85.5, 76.87, 0.43, 'pine'],
+    ['b', 85.66, 76.63, 0, 85.7, 76.67, 0.43, 'pine'], ['b', 85.46, 76.63, 0, 85.5, 76.67, 0.43, 'pine'], ['b', 82.0, 74.02, 0, 82.9, 74.52, 0.5, 'pine'], ['b', 74.19, 74.55, 2.0, 74.3, 74.75, 2.3, 'iron'],
+    ['b', 74.18, 74.135, 1.77, 74.42, 74.165, 1.8, 'iron'], ['y', 74.4, 74.15, 0.01, 1.72, 1.77, 'iron'], ['y', 74.4, 74.15, 0.05, 1.68, 1.72, 'brass'], ['y', 74.4, 74.15, 0.085, 1.46, 1.68, 'glass'],
+    ['y', 74.4, 74.15, 0.1, 1.41, 1.46, 'brass'], ['y', 74.4, 74.15, 0.17, 0, 0.34, 'tin'], ['y', 74.4, 74.15, 0.175, 0.3, 0.34, 'iron'], ['b', 84.425, 79.95, 0.2, 84.475, 80.01, 1.8, 'wood'],
+    ['y', 79.18, 76.93, 0.02, 1.05, 1.2, 'white']]);
+  /* G-ADDS end portcullis-room */
+  /* G-ADDS first-floor-corridor */
+  /* NOW (floor-1-by-purpose-1031.md): plank-bench-1, umbrella-1, noticeboard-1, longcase-clock-1, chair-squab-1; NOT PLACED for want of a clear spot: stair-runner-1, hearth-rug-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-1.js for collision only */
+  add('first-floor-corridor', [
+    ['b', 130.6, 52.6, 0.42, 131.9, 52.98, 0.47, 'pine'], ['b', 130.67, 52.65, 0, 130.73, 52.95, 0.42, 'pine'], ['b', 131.77, 52.65, 0, 131.83, 52.95, 0.42, 'pine'], ['b', 128.62, 52.94, 0.8, 128.68, 53.01, 1.7, 'black'],
+    ['b', 93.15, 49.99, 1.3, 94.15, 50.04, 2.0, 'pine'], ['b', 154.0, 50.02, 0, 154.5, 50.32, 2.0, 'oak'], ['b', 125.55, 52.38, 0, 126.15, 52.98, 0.95, 'leather']]);
+  /* G-ADDS end first-floor-corridor */
+  /* G-ADDS east-first-floor-corridor */
+  /* NOW (floor-1-by-purpose-1031.md): plank-bench-1, umbrella-1, noticeboard-1, longcase-clock-1, chair-squab-1, hearth-rug-1; NOT PLACED for want of a clear spot: stair-runner-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-1.js for collision only */
+  add('east-first-floor-corridor', [
+    ['b', 144.62, 31.0, 0.42, 145.0, 32.3, 0.47, 'pine'], ['b', 144.65, 31.07, 0, 144.95, 31.13, 0.42, 'pine'], ['b', 144.65, 32.17, 0, 144.95, 32.23, 0.42, 'pine'], ['b', 147.54, 30.32, 0.8, 147.61, 30.38, 1.7, 'black'],
+    ['b', 147.56, 36.65, 1.3, 147.61, 37.65, 2.0, 'pine'], ['b', 144.62, 21.6, 0, 144.92, 22.1, 2.0, 'oak'], ['b', 146.98, 32.45, 0, 147.58, 33.05, 0.95, 'leather'], ['b', 144.62, 39.75, 0, 145.62, 41.15, 0.012, 'tartan']]);
+  /* G-ADDS end east-first-floor-corridor */
+  /* G-ADDS west-range-corridor-1 */
+  /* NOW (floor-1-by-purpose-1031.md): plank-bench-1, umbrella-1, noticeboard-1, longcase-clock-1, chair-squab-1; NOT PLACED for want of a clear spot: stair-runner-1, hearth-rug-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-1.js for collision only */
+  add('west-range-corridor-1', [
+    ['b', 12.67, 27.15, 0.42, 13.05, 28.45, 0.47, 'pine'], ['b', 12.7, 27.22, 0, 13.0, 27.28, 0.42, 'pine'], ['b', 12.7, 28.32, 0, 13.0, 28.38, 0.42, 'pine'], ['b', 15.09, 19.47, 0.8, 15.16, 19.53, 1.7, 'black'],
+    ['b', 15.11, 43.6, 1.3, 15.16, 44.6, 2.0, 'pine'], ['b', 12.67, 43.25, 0, 12.97, 43.75, 2.0, 'oak'], ['b', 14.53, 33.7, 0, 15.13, 34.3, 0.95, 'leather']]);
+  /* G-ADDS end west-range-corridor-1 */
+  /* G-ADDS west-cross-corridor-1 */
+  /* NOW (floor-1-by-purpose-1031.md): plank-bench-1, umbrella-1, noticeboard-1, longcase-clock-1, chair-squab-1; NOT PLACED for want of a clear spot: stair-runner-1, hearth-rug-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-1.js for collision only */
+  add('west-cross-corridor-1', [
+    ['b', 0.0, 50.87, 0.42, 1.3, 51.25, 0.47, 'pine'], ['b', 0.07, 50.9, 0, 0.13, 51.2, 0.42, 'pine'], ['b', 1.17, 50.9, 0, 1.23, 51.2, 0.42, 'pine'], ['b', 4.82, 53.29, 0.8, 4.88, 53.36, 1.7, 'black'],
+    ['b', 6.35, 50.84, 1.3, 7.35, 50.89, 2.0, 'pine'], ['b', 12.9, 53.03, 0, 13.4, 53.33, 2.0, 'oak'], ['b', 0.02, 52.6, 0, 0.62, 53.2, 0.95, 'leather']]);
+  /* G-ADDS end west-cross-corridor-1 */
+  /* G-ADDS back-stair-corridor-1 */
+  /* NOW (floor-1-by-purpose-1031.md): plank-bench-1, umbrella-1, noticeboard-1, longcase-clock-1, chair-squab-1, hearth-rug-1; NOT PLACED for want of a clear spot: stair-runner-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-1.js for collision only */
+  add('back-stair-corridor-1', [
+    ['b', 65.85, 50.87, 0.42, 67.15, 51.25, 0.47, 'pine'], ['b', 65.92, 50.9, 0, 65.98, 51.2, 0.42, 'pine'], ['b', 67.02, 50.9, 0, 67.08, 51.2, 0.42, 'pine'], ['b', 67.37, 50.84, 0.8, 67.43, 50.91, 1.7, 'black'],
+    ['b', 65.64, 50.9, 1.3, 65.69, 51.9, 2.0, 'pine'], ['b', 65.67, 51.95, 0, 65.97, 52.45, 2.0, 'oak'], ['b', 65.67, 51.3, 0, 66.27, 51.9, 0.95, 'leather'], ['b', 66.53, 51.3, 0, 67.53, 52.7, 0.012, 'tartan']]);
+  /* G-ADDS end back-stair-corridor-1 */
+  /* G-ADDS lake-tower-1 */
+  /* NOW (floor-1-by-purpose-1031.md): stool-1, joined-table-1, telescope-stand-1, box-settle-1, squab-cushion-1, plank-bench-1, chair-squab-1, hearth-rug-1, umbrella-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-1.js for collision only */
+  add('lake-tower-1', [
+    ['y', 133.958, -1.886, 0.17, 0.43, 0.47, 'pine'], ['b', 134.038, -1.806, 0, 134.078, -1.766, 0.43, 'pine'], ['b', 133.838, -1.806, 0, 133.878, -1.766, 0.43, 'pine'], ['b', 134.038, -2.006, 0, 134.078, -1.966, 0.43, 'pine'],
+    ['b', 133.838, -2.006, 0, 133.878, -1.966, 0.43, 'pine'], ['b', 131.35, -0.82, 0, 132.85, -0.02, 0.78, 'oak'], ['b', 128.35, -0.32, 0, 128.65, -0.02, 1.3, 'brass'], ['b', 125.941, -6.209, 0, 126.441, -4.709, 0.9, 'oak'],
+    ['b', 133.333, -5.268, 0.9, 133.733, -4.868, 0.98, 'scarlet'], ['b', 132.981, -2.211, 0.42, 133.361, -0.911, 0.47, 'pine'], ['b', 133.031, -2.141, 0, 133.331, -2.081, 0.42, 'pine'], ['b', 133.031, -1.041, 0, 133.331, -0.981, 0.42, 'pine'],
+    ['b', 127.72, -0.62, 0, 128.32, -0.02, 0.95, 'leather'], ['b', 126.744, -2.113, 0, 127.744, -0.713, 0.012, 'tartan'], ['b', 125.33, -5.22, 0.8, 125.4, -5.16, 1.7, 'black']]);
+  /* G-ADDS end lake-tower-1 */
+  /* G-ADDS tudor-bay-1 */
+  /* NOW (floor-1-by-purpose-1031.md): stool-1, joined-table-1, telescope-stand-1, box-settle-1, squab-cushion-1, plank-bench-1, chair-squab-1, hearth-rug-1, umbrella-1; NOT PLACED for want of a clear spot: squab-cushion-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-1.js for collision only */
+  add('tudor-bay-1', [
+    ['y', 101.22, -5.55, 0.17, 0.43, 0.47, 'pine'], ['b', 101.3, -5.47, 0, 101.34, -5.43, 0.43, 'pine'], ['b', 101.1, -5.47, 0, 101.14, -5.43, 0.43, 'pine'], ['b', 101.3, -5.67, 0, 101.34, -5.63, 0.43, 'pine'],
+    ['b', 101.1, -5.67, 0, 101.14, -5.63, 0.43, 'pine'], ['b', 105.5, -6.48, 0, 107.0, -5.68, 0.78, 'oak'], ['b', 106.6, -3.32, 0, 106.9, -3.02, 1.3, 'brass'], ['b', 107.3, -6.48, 0, 108.8, -5.98, 0.9, 'oak'],
+    ['b', 101.218, -5.93, 0.78, 101.618, -5.53, 0.86, 'scarlet'], ['b', 109.4, -3.4, 0.42, 110.7, -3.02, 0.47, 'pine'], ['b', 109.47, -3.35, 0, 109.53, -3.05, 0.42, 'pine'], ['b', 110.57, -3.35, 0, 110.63, -3.05, 0.42, 'pine'],
+    ['b', 101.55, -3.62, 0, 102.15, -3.02, 0.95, 'leather'], ['b', 108.85, -6.48, 0, 110.25, -5.48, 0.012, 'tartan'], ['b', 103.42, -6.51, 0.8, 103.48, -6.44, 1.7, 'black']]);
+  /* G-ADDS end tudor-bay-1 */
+  /* G-ADDS exam-papers-archive */
+  /* NOW (floor-1-by-purpose-1031.md): pigeon-holes-1, joined-table-1, stool-1, still-room-book-1, library-ladder-1, oak-lectern-1; stand-in gap, no emitter: lodge-pigeonholes-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-1.js for collision only */
+  add('exam-papers-archive', [
+    ['b', 60.25, 17.75, 1.0, 61.45, 18.01, 1.9, 'oak'], ['b', 66.93, 3.88, 0, 67.73, 5.38, 0.78, 'oak'], ['y', 49.07, 13.74, 0.17, 0.43, 0.47, 'pine'], ['b', 49.15, 13.82, 0, 49.19, 13.86, 0.43, 'pine'],
+    ['b', 48.95, 13.82, 0, 48.99, 13.86, 0.43, 'pine'], ['b', 49.15, 13.62, 0, 49.19, 13.66, 0.43, 'pine'], ['b', 48.95, 13.62, 0, 48.99, 13.66, 0.43, 'pine'], ['b', 67.7, 4.745, 1.3, 67.76, 4.995, 1.62, 'books'],
+    ['b', 67.63, 9.78, 0, 67.73, 10.28, 2.4, 'oak'], ['b', 63.72, 3.87, 0, 64.32, 4.37, 1.2, 'oak']]);
+  /* G-ADDS end exam-papers-archive */
+  /* G-ADDS dungeon-corridor */
+  /* NOW (floor-b-by-purpose-1031.md): stair-runner-1, torch-bracket-1, plank-bench-1, boot-mat-1, noticeboard-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-B.js for collision only */
+  add('dungeon-corridor', [
+    ['b', 81.55, 12.98, 0, 82.55, 14.98, 0.01, 'scarlet'], ['b', 68.935, 14.78, 1.77, 68.965, 15.02, 1.8, 'iron'], ['y', 68.95, 14.8, 0.01, 1.72, 1.77, 'iron'], ['y', 68.95, 14.8, 0.05, 1.68, 1.72, 'brass'],
+    ['y', 68.95, 14.8, 0.085, 1.46, 1.68, 'glass'], ['y', 68.95, 14.8, 0.1, 1.41, 1.46, 'brass'], ['b', 93.9, 12.02, 0.42, 95.2, 12.4, 0.47, 'pine'], ['b', 93.97, 12.05, 0, 94.03, 12.35, 0.42, 'pine'],
+    ['b', 95.07, 12.05, 0, 95.13, 12.35, 0.42, 'pine'], ['b', 86.2, 14.53, 0, 86.9, 14.98, 0.02, 'rush'], ['b', 21.65, 11.99, 1.3, 22.65, 12.04, 2.0, 'pine']]);
+  /* G-ADDS end dungeon-corridor */
+  /* G-ADDS potions-dungeon */
+  /* NOW (floor-b-by-purpose-1031.md): stone-sink-1, scrubbing-brush-1, tin-bucket-1, leather-apron-1, blackboard-1, stoneware-crock-1; NOT PLACED for want of a clear spot: labelled-bottle-1, specimen-jar-1, beam-balance-1; sited by tools/architect-now.py, plain stand-ins; read back from None for collision only */
+  add('potions-dungeon', [
+    ['b', 25.48, 18.35, 0, 25.98, 19.15, 0.3, 'stone'], ['b', 15.99, 26.45, 1.2, 16.06, 26.65, 1.3, 'wood'], ['y', 22.55, 31.2, 0.17, 0, 0.34, 'tin'], ['y', 22.55, 31.2, 0.175, 0.3, 0.34, 'iron'],
+    ['b', 25.96, 23.15, 0.8, 26.01, 23.55, 1.6, 'leather'], ['b', 25.96, 26.55, 1.0, 26.01, 28.35, 2.0, 'black'], ['y', 16.22, 15.65, 0.2, 0, 0.45, 'brick']]);
+  /* G-ADDS end potions-dungeon */
+  /* G-ADDS snape-office */
+  /* NOW (floor-b-by-purpose-1031.md): writing-desk-1, dip-holder-1, medicine-cabinet-1, oak-chair-1, still-room-book-1; stand-in gap, no emitter: brazier-1, parcel-1; sited by tools/architect-now.py, plain stand-ins; read back from None for collision only */
+  add('snape-office', [
+    ['b', 24.02, 7.65, 0, 24.57, 8.65, 0.78, 'oak'], ['y', 24.111, 7.743, 0.025, 0.78, 0.98, 'wood'], ['b', 24.05, 7.59, 1.2, 24.65, 7.8, 2.0, 'white'], ['b', 27.8, 11.08, 0, 28.3, 11.58, 0.9, 'oak'],
+    ['b', 28.125, 7.59, 1.3, 28.375, 7.65, 1.62, 'books']]);
+  /* G-ADDS end snape-office */
+  /* G-ADDS potions-classroom-b */
+  /* NOW (floor-b-by-purpose-1031.md): masters-desk-1, globe-1, bookcase-1; NOT PLACED for want of a clear spot: history-chart-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-B.js for collision only */
+  add('potions-classroom-b', [
+    ['b', 0.02, 34.5, 0, 0.72, 35.9, 0.95, 'oak'], ['y', 7.25, 45.45, 0.2, 0, 0.04, 'wood'], ['y', 7.25, 45.45, 0.03, 0.04, 1.0, 'wood'], ['y', 7.25, 45.45, 0.24, 1.0, 1.45, 'blue'],
+    ['y', 7.25, 45.45, 0.27, 1.25, 1.5, 'linen'], ['b', 0.02, 37.7, 0, 0.32, 38.7, 1.9, 'oak']]);
+  /* G-ADDS end potions-classroom-b */
+  /* G-ADDS potions-dungeon-newt */
+  /* NOW (floor-b-by-purpose-1031.md): trestle-bench-1, ladle-1, mortar-1, books-on-table-1, three-legged-stool-1, water-butt-1, copper-funnel-1, blackboard-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-B.js for collision only */
+  add('potions-dungeon-newt', [
+    ['b', 2.05, 45.8, 0, 3.45, 46.3, 0.8, 'pine'], ['b', 3.7, 45.77, 1.4, 3.8, 45.82, 1.75, 'iron'], ['y', 1.29, 47.095, 0.06, 0.85, 0.95, 'steel'], ['b', 1.25, 47.178, 0.85, 1.57, 47.398, 1.07, 'books3'],
+    ['b', 1.24, 47.283, 0.95, 1.58, 47.293, 0.96, 'rope'], ['y', 4.45, 46.0, 0.17, 0.43, 0.47, 'pine'], ['b', 4.53, 46.08, 0, 4.57, 46.12, 0.43, 'pine'], ['b', 4.33, 46.08, 0, 4.37, 46.12, 0.43, 'pine'],
+    ['b', 4.53, 45.88, 0, 4.57, 45.92, 0.43, 'pine'], ['b', 4.33, 45.88, 0, 4.37, 45.92, 0.43, 'pine'], ['y', 7.25, 46.15, 0.35, 0, 0.9, 'oak'], ['y', 1.29, 47.482, 0.06, 0.85, 1.0, 'copper'],
+    ['b', 8.25, 45.77, 1.0, 10.05, 45.82, 2.0, 'black']]);
+  /* G-ADDS end potions-dungeon-newt */
+  /* G-ADDS potions-link-corridor */
+  /* NOW (floor-b-by-purpose-1031.md): hall-stand-1, boot-mat-1, plank-bench-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-B.js for collision only */
+  add('potions-link-corridor', [
+    ['y', 14.9, 18.5, 0.22, 0, 0.05, 'wood'], ['y', 14.9, 18.5, 0.03, 0.05, 1.75, 'wood'], ['y', 14.9, 18.5, 0.17, 1.75, 1.77, 'black'], ['y', 14.9, 18.5, 0.1, 1.77, 1.92, 'black'],
+    ['y', 14.75, 18.5, 0.012, 0.05, 0.95, 'wood'], ['y', 14.75, 18.5, 0.04, 0.0, 0.05, 'wood'], ['b', 14.68, 20.25, 0, 15.13, 20.95, 0.02, 'rush'], ['b', 14.75, 20.95, 0.42, 15.13, 22.25, 0.47, 'pine'],
+    ['b', 14.8, 21.02, 0, 15.1, 21.08, 0.42, 'pine'], ['b', 14.8, 22.12, 0, 15.1, 22.18, 0.42, 'pine']]);
+  /* G-ADDS end potions-link-corridor */
+  /* G-ADDS potions-ingredients-store */
+  /* NOW (floor-b-by-purpose-1031.md): specimen-jar-1, labelled-bottle-1, herb-bunch-1, beam-balance-1, stool-1, still-room-book-1, rim-lock-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-B.js for collision only */
+  add('potions-ingredients-store', [
+    ['y', 15.502, 15.892, 0.05, 0.5, 0.7, 'glass'], ['y', 15.502, 16.015, 0.035, 0.5, 0.7, 'green'], ['b', 7.24, 11.01, 1.6, 7.35, 11.19, 1.9, 'green'], ['b', 15.425, 16.088, 0.5, 15.725, 16.188, 0.85, 'brass'],
+    ['y', 7.47, 10.8, 0.17, 0.43, 0.47, 'pine'], ['b', 7.55, 10.88, 0, 7.59, 10.92, 0.43, 'pine'], ['b', 7.35, 10.88, 0, 7.39, 10.92, 0.43, 'pine'], ['b', 7.55, 10.68, 0, 7.59, 10.72, 0.43, 'pine'],
+    ['b', 7.35, 10.68, 0, 7.39, 10.72, 0.43, 'pine'], ['b', 9.075, 3.84, 1.3, 9.325, 3.9, 1.62, 'books'], ['b', 8.1, 17.7, 1.0, 8.3, 17.76, 1.15, 'iron']]);
+  /* G-ADDS end potions-ingredients-store */
+  /* G-ADDS kitchens */
+  /* NOW (floor-b-by-purpose-1031.md): kitchen-dresser-1, chopping-block-1, ladle-1, pulley-airer-1, worktable-1; NOT PLACED for want of a clear spot: salt-box-1; stand-in gap, no emitter: spit-fire-1, kitchen-hearth-1, bread-cupboard-1, stockpots-1, skimmer-1; sited by tools/architect-now.py, plain stand-ins; read back from None for collision only */
+  add('kitchens', [
+    ['b', 54.75, 51.52, 0, 56.15, 52.02, 1.9, 'pine'], ['y', 61.15, 69.28, 0.2, 0, 0.45, 'oak'], ['b', 21.9, 69.46, 1.4, 22.0, 69.51, 1.75, 'iron'], ['b', 64.9, 63.55, 2.2, 65.01, 65.55, 2.3, 'wood'],
+    ['b', 50.15, 68.78, 0, 51.55, 69.48, 0.8, 'deal']]);
+  /* G-ADDS end kitchens */
+  /* G-ADDS kitchens-corridor */
+  /* NOW (floor-b-by-purpose-1031.md): plank-bench-1, boot-mat-1, worktable-1; stand-in gap, no emitter: wooden-sledge-1, stockpots-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-B.js for collision only */
+  add('kitchens-corridor', [
+    ['b', 60.0, 48.52, 0.42, 61.3, 48.9, 0.47, 'pine'], ['b', 60.07, 48.55, 0, 60.13, 48.85, 0.42, 'pine'], ['b', 61.17, 48.55, 0, 61.23, 48.85, 0.42, 'pine'], ['b', 49.9, 51.03, 0, 50.6, 51.48, 0.02, 'rush'],
+    ['b', 57.35, 50.78, 0, 58.75, 51.48, 0.8, 'deal']]);
+  /* G-ADDS end kitchens-corridor */
+  /* G-ADDS barrel-nook-b */
+  /* NOW (floor-b-by-purpose-1031.md): oak-cask-1, magazine-barrels-1; NOT PLACED for want of a clear spot: knife-1; sited by tools/architect-now.py, plain stand-ins; read back from None for collision only */
+  add('barrel-nook-b', [
+    ['y', 57.85, 48.13, 0.35, 0, 0.85, 'oak'], ['y', 57.85, 48.13, 0.357, 0.12, 0.15, 'iron'], ['y', 57.85, 48.13, 0.357, 0.42, 0.45, 'iron'], ['y', 57.85, 48.13, 0.357, 0.72, 0.75, 'iron'],
+    ['y', 56.65, 47.87, 0.35, 0, 0.85, 'oak'], ['y', 56.65, 47.87, 0.357, 0.12, 0.15, 'iron'], ['y', 56.65, 47.87, 0.357, 0.42, 0.45, 'iron'], ['y', 56.65, 47.87, 0.357, 0.72, 0.75, 'iron']]);
+  /* G-ADDS end barrel-nook-b */
+  /* G-ADDS hufflepuff-basement-corridor */
+  /* NOW (floor-b-by-purpose-1031.md): plank-bench-1, boot-mat-1, torch-bracket-1, earthenware-dish-1, frame-worn-gilt-1; NOT PLACED for want of a clear spot: writing-slate-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-B.js for collision only */
+  add('hufflepuff-basement-corridor', [
+    ['b', 31.45, 46.52, 0.42, 32.75, 46.9, 0.47, 'pine'], ['b', 31.52, 46.55, 0, 31.58, 46.85, 0.42, 'pine'], ['b', 32.62, 46.55, 0, 32.68, 46.85, 0.42, 'pine'], ['b', 38.35, 46.52, 0, 39.05, 46.97, 0.02, 'rush'],
+    ['b', 15.985, 48.98, 1.77, 16.015, 49.22, 1.8, 'iron'], ['y', 16.0, 49.0, 0.01, 1.72, 1.77, 'iron'], ['y', 16.0, 49.0, 0.05, 1.68, 1.72, 'brass'], ['y', 16.0, 49.0, 0.085, 1.46, 1.68, 'glass'],
+    ['y', 16.0, 49.0, 0.1, 1.41, 1.46, 'brass'], ['y', 18.171, 46.683, 0.1, 0.7, 0.75, 'brick'], ['b', 18.25, 49.16, 1.4, 18.75, 49.21, 2.05, 'gilt']]);
+  /* G-ADDS end hufflepuff-basement-corridor */
+  /* G-ADDS house-elves-quarters */
+  /* NOW (floor-b-by-purpose-1031.md): iron-bedstead-1, folded-linen-1, leather-apron-1, hall-stand-1, school-trunk-1, iron-bound-chest-1; NOT PLACED for want of a clear spot: wool-blanket-1, wool-blanket-1, wool-blanket-1, wool-blanket-1, wool-blanket-1; stand-in gap, no emitter: school-trunk-open-1, iron-shield-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-B.js for collision only */
+  add('house-elves-quarters', [
+    ['b', 67.4, 50.87, 0, 69.4, 51.82, 0.55, 'iron'], ['b', 71.535, 51.086, 0.56, 71.895, 51.346, 0.64, 'linen'], ['b', 71.535, 51.086, 0.64, 71.895, 51.346, 0.72, 'linen'], ['b', 70.5, 50.84, 0.8, 70.9, 50.89, 1.6, 'leather'],
+    ['y', 72.5, 52.0, 0.22, 0, 0.05, 'wood'], ['y', 72.5, 52.0, 0.03, 0.05, 1.75, 'wood'], ['y', 72.5, 52.0, 0.17, 1.75, 1.77, 'black'], ['y', 72.5, 52.0, 0.1, 1.77, 1.92, 'black'],
+    ['y', 72.35, 52.0, 0.012, 0.05, 0.95, 'wood'], ['y', 72.35, 52.0, 0.04, 0.0, 0.05, 'wood'], ['b', 67.37, 55.65, 0, 67.85, 56.55, 0.42, 'leather'], ['b', 67.37, 55.64, 0.42, 67.87, 56.56, 0.5, 'wood'],
+    ['b', 67.37, 55.775, 0, 67.87, 55.825, 0.5, 'iron'], ['b', 67.37, 56.375, 0, 67.87, 56.425, 0.5, 'iron'], ['b', 67.85, 55.93, 0.1, 67.89, 56.27, 0.4, 'cloth'], ['b', 67.37, 51.85, 0, 67.87, 52.75, 0.55, 'iron']]);
+  /* G-ADDS end house-elves-quarters */
+  /* G-ADDS scullery */
+  /* NOW (floor-b-by-purpose-1031.md): stone-sink-1, slatted-staging-1, scrubbing-brush-1, copper-kettle-1, wooden-pail-1, pulley-airer-1, worktable-1; NOT PLACED for want of a clear spot: copper-kettle-1; stand-in gap, no emitter: stockpots-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-B.js for collision only */
+  add('scullery', [
+    ['b', 73.42, 56.73, 0, 74.22, 57.23, 0.3, 'stone'], ['b', 77.82, 56.73, 0, 79.22, 57.23, 0.8, 'pine'], ['b', 74.72, 50.59, 1.2, 74.92, 50.66, 1.3, 'wood'], ['y', 78.584, 50.765, 0.1, 0.85, 1.07, 'copper'],
+    ['y', 80.39, 57.05, 0.15, 0, 0.3, 'wood'], ['y', 80.39, 57.05, 0.155, 0.08, 0.1, 'iron'], ['y', 80.39, 57.05, 0.155, 0.2, 0.22, 'iron'], ['b', 74.32, 50.59, 2.2, 76.32, 50.7, 2.3, 'wood'],
+    ['b', 73.19, 50.65, 0, 73.89, 52.05, 0.8, 'deal']]);
+  /* G-ADDS end scullery */
+  /* G-ADDS feast-cold-room */
+  /* NOW (floor-b-by-purpose-1031.md): slatted-staging-1, hooped-bucket-1, stoneware-crock-1, folded-linen-1, worktable-1; stand-in gap, no emitter: ice-tongs-1, stockpots-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-B.js for collision only */
+  add('feast-cold-room', [
+    ['b', 87.98, 54.85, 0, 88.48, 56.25, 0.8, 'pine'], ['y', 88.3, 56.75, 0.17, 0, 0.34, 'tin'], ['y', 88.3, 56.75, 0.175, 0.3, 0.34, 'iron'], ['y', 86.13, 50.82, 0.2, 0, 0.45, 'brick'],
+    ['b', 81.119, 53.223, 0.75, 81.479, 53.483, 0.83, 'linen'], ['b', 81.119, 53.223, 0.83, 81.479, 53.483, 0.91, 'linen'], ['b', 81.1, 50.65, 0, 81.8, 52.05, 0.8, 'deal']]);
+  /* G-ADDS end feast-cold-room */
+  /* G-ADDS kitchen-stores */
+  /* NOW (floor-b-by-purpose-1031.md): hessian-sack-1, stoneware-crock-1, slatted-staging-1, beam-balance-1, worktable-1; stand-in gap, no emitter: stockpots-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-B.js for collision only */
+  add('kitchen-stores', [
+    ['b', 89.02, 54.88, 0, 89.42, 55.22, 0.5, 'rush'], ['b', 89.08, 54.93, 0.5, 89.34, 55.17, 0.56, 'rush'], ['b', 89.1, 54.96, 0.56, 89.3, 55.14, 0.6, 'straw'], ['y', 94.85, 57.03, 0.2, 0, 0.45, 'brick'],
+    ['b', 90.25, 50.62, 0, 91.65, 51.12, 0.8, 'pine'], ['b', 94.535, 50.648, 0.4, 94.835, 50.748, 0.75, 'brass'], ['b', 89.02, 55.85, 0, 89.72, 57.25, 0.8, 'deal']]);
+  /* G-ADDS end kitchen-stores */
+  /* G-ADDS brewing-cellar */
+  /* NOW (floor-b-by-purpose-1031.md): oak-cask-1, copper-funnel-1, labelled-bottle-1, hooped-bucket-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-B.js for collision only */
+  add('brewing-cellar', [
+    ['y', 103.67, 56.88, 0.35, 0, 0.85, 'oak'], ['y', 103.67, 56.88, 0.357, 0.12, 0.15, 'iron'], ['y', 103.67, 56.88, 0.357, 0.42, 0.45, 'iron'], ['y', 103.67, 56.88, 0.357, 0.72, 0.75, 'iron'],
+    ['y', 101.391, 50.71, 0.06, 0.5, 0.65, 'copper'], ['y', 101.513, 50.71, 0.035, 0.5, 0.7, 'green'], ['y', 102.27, 57.05, 0.17, 0, 0.34, 'tin'], ['y', 102.27, 57.05, 0.175, 0.3, 0.34, 'iron']]);
+  /* G-ADDS end brewing-cellar */
+  /* G-ADDS butterbeer-cellar */
+  /* NOW (floor-b-by-purpose-1031.md): book-crate-1, labelled-bottle-1, oak-cask-1, copper-funnel-1, enamel-mug-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-B.js for collision only */
+  add('butterbeer-cellar', [
+    ['b', 108.27, 50.62, 0, 108.89, 51.04, 0.32, 'pine'], ['y', 112.002, 52.611, 0.035, 0.5, 0.7, 'green'], ['y', 105.2, 55.25, 0.35, 0, 0.85, 'oak'], ['y', 105.2, 55.25, 0.357, 0.12, 0.15, 'iron'],
+    ['y', 105.2, 55.25, 0.357, 0.42, 0.45, 'iron'], ['y', 105.2, 55.25, 0.357, 0.72, 0.75, 'iron'], ['y', 112.002, 52.733, 0.06, 0.5, 0.65, 'copper'], ['y', 112.002, 52.855, 0.04, 0.5, 0.59, 'white']]);
+  /* G-ADDS end butterbeer-cellar */
+  /* G-ADDS caretakers-confiscations-store */
+  /* NOW (floor-b-by-purpose-1031.md): pigeon-holes-1, still-room-book-1, iron-bound-chest-1, snap-cards-1, sweet-tin-1, tabor-1; NOT PLACED for want of a clear spot: luggage-tag-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-B.js for collision only */
+  add('caretakers-confiscations-store', [
+    ['b', 115.5, 50.59, 1.0, 116.7, 50.85, 1.9, 'oak'], ['b', 120.12, 50.725, 1.3, 120.18, 50.975, 1.62, 'books'], ['b', 118.95, 56.73, 0, 119.85, 57.23, 0.55, 'iron'], ['b', 112.793, 54.256, 0.76, 112.893, 54.326, 0.77, 'paper'],
+    ['y', 112.843, 54.413, 0.06, 0.76, 0.84, 'tin'], ['y', 113.4, 50.77, 0.15, 0, 0.2, 'leather']]);
+  /* G-ADDS end caretakers-confiscations-store */
+  /* G-ADDS spare-cauldrons-store */
+  /* NOW (floor-b-by-purpose-1031.md): cauldron-1, wheelbarrow-1, scrubbing-brush-1, school-trunk-1, iron-bound-chest-1; stand-in gap, no emitter: school-trunk-open-1, iron-shield-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-B.js for collision only */
+  add('spare-cauldrons-store', [
+    ['y', 127.52, 56.93, 0.3, 0, 0.5, 'iron'], ['b', 120.69, 50.6, 0, 121.24, 51.7, 0.5, 'wood'], ['b', 127.02, 50.59, 1.2, 127.22, 50.66, 1.3, 'wood'], ['b', 127.58, 55.2, 0, 128.06, 56.1, 0.42, 'leather'],
+    ['b', 127.56, 55.19, 0.42, 128.06, 56.11, 0.5, 'wood'], ['b', 127.56, 55.325, 0, 128.06, 55.375, 0.5, 'iron'], ['b', 127.56, 55.925, 0, 128.06, 55.975, 0.5, 'iron'], ['b', 127.54, 55.48, 0.1, 127.58, 55.82, 0.4, 'cloth'],
+    ['b', 121.07, 56.73, 0, 121.97, 57.23, 0.55, 'iron']]);
+  /* G-ADDS end spare-cauldrons-store */
+  /* G-ADDS quill-ink-store */
+  /* NOW (floor-b-by-purpose-1031.md): stoneware-crock-1, dip-holder-1, reading-desk-1; stand-in gap, no emitter: parcel-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-B.js for collision only */
+  add('quill-ink-store', [
+    ['y', 133.73, 50.82, 0.2, 0, 0.45, 'brick'], ['y', 128.69, 51.042, 0.025, 0.5, 0.7, 'wood'], ['b', 134.03, 50.62, 0, 134.63, 51.12, 1.1, 'oak']]);
+  /* G-ADDS end quill-ink-store */
+  /* G-ADDS candle-store */
+  /* NOW (floor-b-by-purpose-1031.md): stearin-candle-1, book-crate-1, candle-mould-1, snuffer-pole-1, oil-lamp-1, hessian-sack-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-B.js for collision only */
+  add('candle-store', [
+    ['y', 149.53, 53.45, 0.02, 0.4, 0.55, 'white'], ['b', 144.44, 53.19, 0, 144.86, 53.81, 0.32, 'pine'], ['b', 149.548, 53.523, 0.4, 149.648, 53.623, 0.6, 'tin'], ['b', 144.41, 56.675, 0.2, 144.47, 56.725, 1.8, 'wood'],
+    ['y', 149.598, 53.696, 0.06, 0.4, 0.5, 'brass'], ['y', 149.598, 53.696, 0.045, 0.5, 0.65, 'glass'], ['b', 145.4, 56.83, 0, 145.74, 57.23, 0.5, 'rush'], ['b', 145.45, 56.91, 0.5, 145.69, 57.17, 0.56, 'rush'],
+    ['b', 145.48, 56.95, 0.56, 145.66, 57.15, 0.6, 'straw']]);
+  /* G-ADDS end candle-store */
+  /* G-ADDS spare-robes-store */
+  /* NOW (floor-b-by-purpose-1031.md): gown-1, school-dress-1, college-scarf-1, worktable-1, needle-card-1, cheval-glass-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-B.js for collision only */
+  add('spare-robes-store', [
+    ['b', 158.43, 50.84, 0.7, 158.93, 50.91, 1.9, 'black'], ['b', 152.32, 55.65, 0.8, 152.39, 56.15, 1.8, 'blue'], ['b', 159.96, 55.64, 0.9, 160.01, 55.76, 1.8, 'scarlet'], ['b', 158.18, 56.53, 0, 159.58, 57.23, 0.8, 'deal'],
+    ['b', 159.543, 53.225, 1.6, 159.643, 53.235, 1.74, 'paper'], ['b', 152.35, 56.25, 0, 152.75, 56.95, 1.6, 'oak']]);
+  /* G-ADDS end spare-robes-store */
+  /* G-ADDS laundry */
+  /* NOW (floor-b-by-purpose-1031.md): copper-kettle-1, nipping-press-1, pulley-airer-1, log-basket-1, trivet-1, linen-press-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-B.js for collision only */
+  add('laundry', [
+    ['y', 13.65, 51.009, 0.1, 0.7, 0.92, 'copper'], ['b', 10.5, 50.87, 0, 11.1, 51.27, 0.5, 'iron'], ['b', 7.74, 53.4, 2.2, 7.85, 55.4, 2.3, 'wood'], ['b', 12.55, 56.33, 0, 13.05, 56.73, 0.4, 'wicker'],
+    ['b', 13.55, 51.168, 0.7, 13.75, 51.368, 0.72, 'iron'], ['b', 11.0, 56.18, 0, 12.0, 56.73, 1.8, 'pine']]);
+  /* G-ADDS end laundry */
+  /* G-ADDS bakery-ovens */
+  /* NOW (floor-b-by-purpose-1031.md): oven-door-1, stone-trough-1, hessian-sack-1, slatted-staging-1, worktable-1; stand-in gap, no emitter: stockpots-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-B.js for collision only */
+  add('bakery-ovens', [
+    ['b', 2.1, 57.15, 0.5, 2.6, 57.26, 1.0, 'iron'], ['b', 6.73, 56.0, 0, 7.23, 57.2, 0.4, 'stone'], ['b', 6.83, 54.43, 0, 7.23, 54.77, 0.5, 'rush'], ['b', 6.91, 54.48, 0.5, 7.17, 54.72, 0.56, 'rush'],
+    ['b', 6.95, 54.51, 0.56, 7.15, 54.69, 0.6, 'straw'], ['b', 0.02, 55.7, 0, 0.52, 57.1, 0.8, 'pine'], ['b', 0.05, 50.87, 0, 1.45, 51.57, 0.8, 'deal']]);
+  /* G-ADDS end bakery-ovens */
+  /* G-ADDS service-store-b */
+  /* NOW (floor-b-by-purpose-1031.md): kitchen-dresser-1, nest-of-drawers-1, damask-napkin-1, boarded-chest-1, worktable-1; stand-in gap, no emitter: stockpots-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-B.js for collision only */
+  add('service-store-b', [
+    ['b', 75.7, 60.77, 0, 77.1, 61.27, 1.9, 'pine'], ['b', 87.33, 65.2, 0, 87.73, 65.8, 0.8, 'oak'], ['b', 72.66, 68.56, 0.8, 72.96, 68.86, 0.81, 'white'], ['b', 72.27, 65.25, 0, 72.77, 66.15, 0.5, 'pine'],
+    ['b', 77.7, 60.77, 0, 79.1, 61.47, 0.8, 'deal']]);
+  /* G-ADDS end service-store-b */
+  /* G-ADDS broom-cupboard */
+  /* NOW (floor-b-by-purpose-1031.md): mop-1, feather-duster-1, tin-bucket-1, brush-and-pan-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-B.js for collision only */
+  add('broom-cupboard', [
+    ['b', 68.24, 71.75, 0.3, 68.35, 71.85, 1.5, 'wood'], ['b', 68.36, 71.96, 1.2, 68.44, 72.01, 1.65, 'straw'], ['y', 68.45, 62.2, 0.17, 0, 0.34, 'tin'], ['y', 68.45, 62.2, 0.175, 0.3, 0.34, 'iron'],
+    ['b', 69.15, 71.94, 0.6, 69.45, 72.01, 0.95, 'wood']]);
+  /* G-ADDS end broom-cupboard */
+  /* G-ADDS coal-and-log-store */
+  /* NOW (floor-b-by-purpose-1031.md): log-stack-1, log-basket-1, tin-bucket-1, wheelbarrow-1, chopping-block-1, oil-lamp-1, hessian-sack-1; NOT PLACED for want of a clear spot: hatchet-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-B.js for collision only */
+  add('coal-and-log-store', [
+    ['b', 95.9, 60.77, 0, 96.9, 61.17, 0.8, 'wood'], ['b', 88.65, 60.77, 0, 89.15, 61.17, 0.4, 'wicker'], ['y', 94.3, 71.8, 0.17, 0, 0.34, 'tin'], ['y', 94.3, 71.8, 0.175, 0.3, 0.34, 'iron'],
+    ['b', 88.27, 64.25, 0, 88.82, 65.35, 0.5, 'wood'], ['y', 97.4, 71.78, 0.2, 0, 0.45, 'oak'], ['y', 89.992, 70.691, 0.06, 0.6, 0.7, 'brass'], ['y', 89.992, 70.691, 0.045, 0.7, 0.85, 'glass'],
+    ['b', 91.53, 71.58, 0, 91.87, 71.98, 0.5, 'rush'], ['b', 91.58, 71.66, 0.5, 91.82, 71.92, 0.56, 'rush'], ['b', 91.61, 71.7, 0.56, 91.79, 71.9, 0.6, 'straw']]);
+  /* G-ADDS end coal-and-log-store */
+  /* G-ADDS banner-and-linen-store */
+  /* NOW (floor-b-by-purpose-1031.md): linen-press-1, damask-napkin-1, trestle-bench-1, pulley-airer-1; NOT PLACED for want of a clear spot: house-banner-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-B.js for collision only */
+  add('banner-and-linen-store', [
+    ['b', 124.6, 71.43, 0, 125.6, 71.98, 1.8, 'pine'], ['b', 115.765, 60.765, 0.76, 116.065, 61.065, 0.77, 'white'], ['b', 125.93, 68.0, 0, 126.43, 69.4, 0.8, 'pine'], ['b', 122.7, 60.74, 2.2, 124.7, 60.85, 2.3, 'wood']]);
+  /* G-ADDS end banner-and-linen-store */
+  /* G-ADDS christmas-decorations-store */
+  /* NOW (floor-b-by-purpose-1031.md): glass-bauble-1, book-crate-1, tree-stand-1, snowman-1, oil-lamp-1, hessian-sack-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-B.js for collision only */
+  add('christmas-decorations-store', [
+    ['y', 139.048, 70.142, 0.04, 0.9, 0.98, 'glass'], ['b', 131.29, 60.77, 0, 131.91, 61.19, 0.32, 'pine'], ['b', 126.97, 61.3, 0, 127.37, 61.7, 1.0, 'green'], ['y', 137.5, 71.73, 0.25, 0, 0.9, 'white'],
+    ['y', 139.048, 70.265, 0.06, 0.9, 1.0, 'brass'], ['y', 139.048, 70.265, 0.045, 1.0, 1.15, 'glass'], ['b', 135.43, 71.58, 0, 135.77, 71.98, 0.5, 'rush'], ['b', 135.48, 71.66, 0.5, 135.72, 71.92, 0.56, 'rush'],
+    ['b', 135.51, 71.7, 0.56, 135.69, 71.9, 0.6, 'straw']]);
+  /* G-ADDS end christmas-decorations-store */
+  /* G-ADDS detention-dungeon */
+  /* NOW (floor-b-by-purpose-1031.md): single-desk-1, joint-stool-1, scrubbing-brush-1, tin-bucket-1, longcase-clock-1, plank-bench-1, frame-worn-gilt-1; NOT PLACED for want of a clear spot: writing-slate-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-B.js for collision only */
+  add('detention-dungeon', [
+    ['b', 101.17, 64.25, 0, 101.67, 65.15, 0.75, 'oak'], ['y', 112.6, 60.97, 0.17, 0.43, 0.47, 'pine'], ['b', 112.68, 61.05, 0, 112.72, 61.09, 0.43, 'pine'], ['b', 112.48, 61.05, 0, 112.52, 61.09, 0.43, 'pine'],
+    ['b', 112.68, 60.85, 0, 112.72, 60.89, 0.43, 'pine'], ['b', 112.48, 60.85, 0, 112.52, 60.89, 0.43, 'pine'], ['b', 101.7, 60.74, 1.2, 101.9, 60.81, 1.3, 'wood'], ['y', 113.35, 61.6, 0.17, 0, 0.34, 'tin'],
+    ['y', 113.35, 61.6, 0.175, 0.3, 0.34, 'iron'], ['b', 101.17, 69.85, 0, 101.47, 70.35, 2.0, 'oak'], ['b', 101.17, 65.25, 0.42, 101.55, 66.55, 0.47, 'pine'], ['b', 101.2, 65.32, 0, 101.5, 65.38, 0.42, 'pine'],
+    ['b', 101.2, 66.42, 0, 101.5, 66.48, 0.42, 'pine'], ['b', 112.85, 71.96, 1.4, 113.35, 72.01, 2.05, 'gilt']]);
+  /* G-ADDS end detention-dungeon */
+  /* G-ADDS prefects-patrol-room */
+  /* NOW (floor-b-by-purpose-1031.md): joined-table-1, oak-chair-1, noticeboard-1, hanging-lantern-1, copper-kettle-1, plank-bench-1, frame-worn-gilt-1; NOT PLACED for want of a clear spot: writing-slate-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-B.js for collision only */
+  add('prefects-patrol-room', [
+    ['b', 147.05, 60.77, 0, 148.55, 61.57, 0.78, 'oak'], ['b', 139.87, 65.65, 0, 140.37, 66.15, 0.9, 'oak'], ['b', 141.5, 60.74, 1.3, 142.5, 60.79, 2.0, 'pine'], ['b', 152.28, 60.985, 1.77, 152.52, 61.015, 1.8, 'iron'],
+    ['y', 152.3, 61.0, 0.01, 1.72, 1.77, 'iron'], ['y', 152.3, 61.0, 0.05, 1.68, 1.72, 'brass'], ['y', 152.3, 61.0, 0.085, 1.46, 1.68, 'glass'], ['y', 152.3, 61.0, 0.1, 1.41, 1.46, 'brass'],
+    ['y', 140.35, 71.81, 0.1, 0.6, 0.82, 'copper'], ['b', 139.87, 68.05, 0.42, 140.25, 69.35, 0.47, 'pine'], ['b', 139.9, 68.12, 0, 140.2, 68.18, 0.42, 'pine'], ['b', 139.9, 69.22, 0, 140.2, 69.28, 0.42, 'pine'],
+    ['b', 139.84, 60.95, 1.4, 139.89, 61.45, 2.05, 'gilt']]);
+  /* G-ADDS end prefects-patrol-room */
+  /* G-ADDS portraits-store */
+  /* NOW (floor-b-by-purpose-1031.md): frame-worn-gilt-1, frame-victorian-1, painting-back-1, trestle-bench-1, plank-bench-1; NOT PLACED for want of a clear spot: folded-curtain-1, writing-slate-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-B.js for collision only */
+  add('portraits-store', [
+    ['b', 159.96, 48.08, 1.4, 160.01, 48.58, 2.05, 'gilt'], ['b', 159.96, 40.78, 1.4, 160.01, 41.28, 2.05, 'gilt'], ['b', 147.85, 39.6, 0, 148.55, 39.64, 0.9, 'dark'], ['b', 159.48, 39.63, 0, 159.98, 41.03, 0.8, 'pine'],
+    ['b', 154.05, 49.35, 0.42, 155.35, 49.73, 0.47, 'pine'], ['b', 154.12, 49.4, 0, 154.18, 49.7, 0.42, 'pine'], ['b', 155.22, 49.4, 0, 155.28, 49.7, 0.42, 'pine']]);
+  /* G-ADDS end portraits-store */
+  /* G-ADDS peeves-chalk-den */
+  /* NOW (floor-b-by-purpose-1031.md): blackboard-1, cheval-glass-1, plank-bench-1, frame-worn-gilt-1; NOT PLACED for want of a clear spot: writing-slate-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-B.js for collision only */
+  add('peeves-chalk-den', [
+    ['b', 150.6, 18.24, 1.0, 152.4, 18.29, 2.0, 'black'], ['b', 150.65, 28.0, 0, 151.35, 28.4, 1.6, 'oak'], ['b', 159.6, 18.95, 0.42, 159.98, 20.25, 0.47, 'pine'], ['b', 159.65, 19.02, 0, 159.95, 19.08, 0.42, 'pine'],
+    ['b', 159.65, 20.12, 0, 159.95, 20.18, 0.42, 'pine'], ['b', 159.25, 28.38, 1.4, 159.75, 28.43, 2.05, 'gilt']]);
+  /* G-ADDS end peeves-chalk-den */
+  /* G-ADDS spell-practice-room */
+  /* NOW (floor-b-by-purpose-1031.md): floor-cushion-1, wall-of-arms-1, feather-duster-1, feather-duster-1, plank-bench-1, frame-worn-gilt-1; NOT PLACED for want of a clear spot: writing-slate-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-B.js for collision only */
+  add('spell-practice-room', [
+    ['b', 155.4, 28.94, 0, 156.0, 29.54, 0.12, 'scarlet'], ['b', 154.1, 28.91, 1.0, 155.3, 29.02, 2.0, 'iron'], ['b', 153.96, 28.91, 1.2, 154.04, 28.96, 1.65, 'straw'], ['b', 153.96, 39.04, 1.2, 154.04, 39.09, 1.65, 'straw'],
+    ['b', 159.6, 30.12, 0.42, 159.98, 31.42, 0.47, 'pine'], ['b', 159.65, 30.19, 0, 159.95, 30.25, 0.42, 'pine'], ['b', 159.65, 31.29, 0, 159.95, 31.35, 0.42, 'pine'], ['b', 152.35, 28.91, 1.4, 152.85, 28.96, 2.05, 'gilt']]);
+  /* G-ADDS end spell-practice-room */
+  /* G-ADDS wizard-chess-room */
+  /* NOW (floor-b-by-purpose-1031.md): joined-table-1, mantel-clock-1, plank-bench-1, honours-board-1, bookcase-1, frame-worn-gilt-1; NOT PLACED for want of a clear spot: writing-slate-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-B.js for collision only */
+  add('wizard-chess-room', [
+    ['b', 131.44, 4.65, 0, 132.24, 6.15, 0.78, 'oak'], ['b', 134.09, 7.556, 0.76, 134.29, 7.656, 1.01, 'brass'], ['b', 131.44, 6.85, 0.42, 131.82, 8.15, 0.47, 'pine'], ['b', 131.47, 6.92, 0, 131.77, 6.98, 0.42, 'pine'],
+    ['b', 131.47, 8.02, 0, 131.77, 8.08, 0.42, 'pine'], ['b', 131.41, 8.4, 1.2, 131.46, 9.6, 2.1, 'oak'], ['b', 131.44, 16.1, 0, 131.74, 17.1, 1.9, 'oak'], ['b', 142.04, 14.65, 1.4, 142.09, 15.15, 2.05, 'gilt']]);
+  /* G-ADDS end wizard-chess-room */
+  /* G-ADDS dungeon-bench-store */
+  /* NOW (floor-b-by-purpose-1031.md): double-desk-1, single-desk-1, trestle-bench-1, sweet-tin-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-B.js for collision only */
+  add('dungeon-bench-store', [
+    ['b', 129.55, 3.87, 0, 130.85, 4.37, 0.75, 'oak'], ['b', 120.27, 13.15, 0, 120.77, 14.05, 0.75, 'oak'], ['b', 128.8, 17.48, 0, 130.2, 17.98, 0.8, 'pine'], ['y', 120.343, 5.593, 0.06, 0.76, 0.84, 'tin']]);
+  /* G-ADDS end dungeon-bench-store */
+  /* G-ADDS armour-spare-parts-store */
+  /* NOW (floor-b-by-purpose-1031.md): close-helmet-1, breastplate-1, chamois-cloth-1, pike-rack-1, school-trunk-1, iron-bound-chest-1; stand-in gap, no emitter: gauntlets-1, school-trunk-open-1, iron-shield-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-B.js for collision only */
+  add('armour-spare-parts-store', [
+    ['y', 147.451, 17.315, 0.1, 0.76, 1.04, 'steel'], ['b', 151.705, 17.43, 0, 152.155, 17.73, 0.7, 'steel'], ['b', 147.362, 17.435, 0.76, 147.662, 17.735, 0.77, 'straw'], ['b', 143.4, 3.87, 0, 143.46, 3.95, 1.7, 'wood'],
+    ['b', 144.8, 3.87, 0, 144.86, 3.95, 1.7, 'wood'], ['b', 143.38, 3.87, 0.5, 144.88, 3.95, 0.55, 'wood'], ['b', 143.38, 3.87, 1.4, 144.88, 3.95, 1.45, 'wood'], ['y', 143.68, 4.05, 0.025, 0.05, 1.7, 'wood'],
+    ['y', 143.68, 4.05, 0.075, 1.5, 1.75, 'rush'], ['y', 143.98, 4.05, 0.025, 0.05, 1.7, 'wood'], ['y', 143.98, 4.05, 0.075, 1.5, 1.75, 'rush'], ['y', 144.28, 4.05, 0.025, 0.05, 1.7, 'wood'],
+    ['y', 144.28, 4.05, 0.075, 1.5, 1.75, 'rush'], ['y', 144.58, 4.05, 0.025, 0.05, 1.7, 'wood'], ['y', 144.58, 4.05, 0.075, 1.5, 1.75, 'rush'], ['b', 142.6, 8.55, 0, 143.08, 9.45, 0.42, 'leather'],
+    ['b', 142.6, 8.54, 0.42, 143.1, 9.46, 0.5, 'wood'], ['b', 142.6, 8.675, 0, 143.1, 8.725, 0.5, 'iron'], ['b', 142.6, 9.275, 0, 143.1, 9.325, 0.5, 'iron'], ['b', 143.08, 8.83, 0.1, 143.12, 9.17, 0.4, 'cloth'],
+    ['b', 143.48, 17.23, 0, 144.38, 17.73, 0.55, 'iron']]);
+  /* G-ADDS end armour-spare-parts-store */
+  /* G-ADDS east-corner-store-b */
+  /* NOW (floor-b-by-purpose-1031.md): boarded-chest-1, book-crate-1, folded-curtain-1, school-trunk-1, iron-bound-chest-1; stand-in gap, no emitter: school-trunk-open-1, iron-shield-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-B.js for collision only */
+  add('east-corner-store-b', [
+    ['b', 153.77, 8.9, 0, 154.27, 9.8, 0.5, 'pine'], ['b', 158.09, 6.52, 0, 158.71, 6.94, 0.32, 'pine'], ['b', 155.452, 6.53, 0.8, 155.812, 6.79, 0.88, 'linen'], ['b', 158.25, 17.25, 0, 159.15, 17.73, 0.42, 'leather'],
+    ['b', 158.24, 17.23, 0.42, 159.16, 17.73, 0.5, 'wood'], ['b', 158.375, 17.23, 0, 158.425, 17.73, 0.5, 'iron'], ['b', 158.975, 17.23, 0, 159.025, 17.73, 0.5, 'iron'], ['b', 158.53, 17.21, 0.1, 158.87, 17.25, 0.4, 'cloth'],
+    ['b', 153.77, 7.6, 0, 154.27, 8.5, 0.55, 'iron']]);
+  /* G-ADDS end east-corner-store-b */
+  /* G-ADDS ghosts-gathering-room */
+  /* NOW (floor-b-by-purpose-1031.md): hall-chair-1, folded-curtain-1, looking-glass-1, hearth-rug-1, plank-bench-1, frame-worn-gilt-1; NOT PLACED for want of a clear spot: writing-slate-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-B.js for collision only */
+  add('ghosts-gathering-room', [
+    ['b', 139.1, 50.62, 0, 139.6, 51.12, 0.95, 'oak'], ['b', 139.139, 50.646, 0.95, 139.499, 50.906, 1.03, 'linen'], ['b', 141.9, 57.21, 1.3, 142.4, 57.27, 2.0, 'wood'], ['b', 141.94, 57.205, 1.35, 142.36, 57.21, 1.95, 'glass'],
+    ['b', 136.52, 53.15, 0, 137.52, 54.55, 0.012, 'tartan'], ['b', 136.5, 50.62, 0.42, 137.8, 51.0, 0.47, 'pine'], ['b', 136.57, 50.65, 0, 136.63, 50.95, 0.42, 'pine'], ['b', 137.67, 50.65, 0, 137.73, 50.95, 0.42, 'pine'],
+    ['b', 136.49, 50.6, 1.4, 136.54, 51.1, 2.05, 'gilt']]);
+  /* G-ADDS end ghosts-gathering-room */
+  /* G-ADDS spare-desks-store-b */
+  /* NOW (floor-b-by-purpose-1031.md): stool-1, school-trunk-1, iron-bound-chest-1; NOT PLACED for want of a clear spot: luggage-tag-1; stand-in gap, no emitter: school-trunk-open-1, iron-shield-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-B.js for collision only */
+  add('spare-desks-store-b', [
+    ['y', 10.35, 71.78, 0.17, 0.43, 0.47, 'pine'], ['b', 10.43, 71.86, 0, 10.47, 71.9, 0.43, 'pine'], ['b', 10.23, 71.86, 0, 10.27, 71.9, 0.43, 'pine'], ['b', 10.43, 71.66, 0, 10.47, 71.7, 0.43, 'pine'],
+    ['b', 10.23, 71.66, 0, 10.27, 71.7, 0.43, 'pine'], ['b', 10.25, 64.75, 0, 10.73, 65.65, 0.42, 'leather'], ['b', 10.23, 64.74, 0.42, 10.73, 65.66, 0.5, 'wood'], ['b', 10.23, 64.875, 0, 10.73, 64.925, 0.5, 'iron'],
+    ['b', 10.23, 65.475, 0, 10.73, 65.525, 0.5, 'iron'], ['b', 10.21, 65.03, 0.1, 10.25, 65.37, 0.4, 'cloth'], ['b', 10.23, 62.25, 0, 10.73, 63.15, 0.55, 'iron']]);
+  /* G-ADDS end spare-desks-store-b */
+  /* G-ADDS service-corridor-b */
+  /* NOW (floor-b-by-purpose-1031.md): stair-runner-1, torch-bracket-1, stool-1, school-trunk-1, iron-bound-chest-1; stand-in gap, no emitter: wooden-sledge-1, school-trunk-open-1, iron-shield-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-B.js for collision only */
+  add('service-corridor-b', [
+    ['b', 151.5, 57.77, 0, 152.5, 59.77, 0.01, 'scarlet'], ['b', 77.185, 60.03, 1.77, 77.215, 60.27, 1.8, 'iron'], ['y', 77.2, 60.05, 0.01, 1.72, 1.77, 'iron'], ['y', 77.2, 60.05, 0.05, 1.68, 1.72, 'brass'],
+    ['y', 77.2, 60.05, 0.085, 1.46, 1.68, 'glass'], ['y', 77.2, 60.05, 0.1, 1.41, 1.46, 'brass'], ['y', 141.5, 57.97, 0.17, 0.43, 0.47, 'pine'], ['b', 141.58, 58.05, 0, 141.62, 58.09, 0.43, 'pine'],
+    ['b', 141.38, 58.05, 0, 141.42, 58.09, 0.43, 'pine'], ['b', 141.58, 57.85, 0, 141.62, 57.89, 0.43, 'pine'], ['b', 141.38, 57.85, 0, 141.42, 57.89, 0.43, 'pine'], ['b', 137.55, 59.75, 0, 138.45, 60.23, 0.42, 'leather'],
+    ['b', 137.54, 59.73, 0.42, 138.46, 60.23, 0.5, 'wood'], ['b', 137.675, 59.73, 0, 137.725, 60.23, 0.5, 'iron'], ['b', 138.275, 59.73, 0, 138.325, 60.23, 0.5, 'iron'], ['b', 137.83, 59.71, 0.1, 138.17, 59.75, 0.4, 'cloth'],
+    ['b', 128.75, 59.73, 0, 129.65, 60.23, 0.55, 'iron']]);
+  /* G-ADDS end service-corridor-b */
+  /* G-ADDS east-wing-corridor-b */
+  /* NOW (floor-b-by-purpose-1031.md): torch-bracket-1, stair-runner-1, plank-bench-1, school-trunk-1, iron-bound-chest-1; stand-in gap, no emitter: school-trunk-open-1, iron-shield-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-B.js for collision only */
+  add('east-wing-corridor-b', [
+    ['b', 147.13, 19.285, 1.77, 147.37, 19.315, 1.8, 'iron'], ['y', 147.15, 19.3, 0.01, 1.72, 1.77, 'iron'], ['y', 147.15, 19.3, 0.05, 1.68, 1.72, 'brass'], ['y', 147.15, 19.3, 0.085, 1.46, 1.68, 'glass'],
+    ['y', 147.15, 19.3, 0.1, 1.41, 1.46, 'brass'], ['b', 144.62, 46.5, 0, 146.62, 47.5, 0.01, 'scarlet'], ['b', 144.62, 39.45, 0.42, 145.0, 40.75, 0.47, 'pine'], ['b', 144.65, 39.52, 0, 144.95, 39.58, 0.42, 'pine'],
+    ['b', 144.65, 40.62, 0, 144.95, 40.68, 0.42, 'pine'], ['b', 144.62, 18.45, 0, 145.1, 19.35, 0.42, 'leather'], ['b', 144.62, 18.44, 0.42, 145.12, 19.36, 0.5, 'wood'], ['b', 144.62, 18.575, 0, 145.12, 18.625, 0.5, 'iron'],
+    ['b', 144.62, 19.175, 0, 145.12, 19.225, 0.5, 'iron'], ['b', 145.1, 18.73, 0.1, 145.14, 19.07, 0.4, 'cloth'], ['b', 144.62, 43.15, 0, 145.12, 44.05, 0.55, 'iron']]);
+  /* G-ADDS end east-wing-corridor-b */
+  /* G-ADDS west-stair-corridor-b */
+  /* NOW (floor-b-by-purpose-1031.md): torch-bracket-1, boot-mat-1, school-trunk-1, iron-bound-chest-1; stand-in gap, no emitter: school-trunk-open-1, iron-shield-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-B.js for collision only */
+  add('west-stair-corridor-b', [
+    ['b', 5.435, 60.03, 1.77, 5.465, 60.27, 1.8, 'iron'], ['y', 5.45, 60.05, 0.01, 1.72, 1.77, 'iron'], ['y', 5.45, 60.05, 0.05, 1.68, 1.72, 'brass'], ['y', 5.45, 60.05, 0.085, 1.46, 1.68, 'glass'],
+    ['y', 5.45, 60.05, 0.1, 1.41, 1.46, 'brass'], ['b', 7.4, 57.77, 0, 8.1, 58.22, 0.02, 'rush'], ['b', 7.2, 59.75, 0, 8.1, 60.23, 0.42, 'leather'], ['b', 7.19, 59.73, 0.42, 8.11, 60.23, 0.5, 'wood'],
+    ['b', 7.325, 59.73, 0, 7.375, 60.23, 0.5, 'iron'], ['b', 7.925, 59.73, 0, 7.975, 60.23, 0.5, 'iron'], ['b', 7.48, 59.71, 0.1, 7.82, 59.75, 0.4, 'cloth'], ['b', 0.02, 59.15, 0, 0.52, 60.05, 0.55, 'iron']]);
+  /* G-ADDS end west-stair-corridor-b */
+  /* G-ADDS lake-corridor-b-east */
+  /* NOW (floor-b-by-purpose-1031.md): plank-bench-1, umbrella-1, school-trunk-1, iron-bound-chest-1; NOT PLACED for want of a clear spot: books-on-table-1; stand-in gap, no emitter: school-trunk-open-1, iron-shield-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-B.js for collision only */
+  add('lake-corridor-b-east', [
+    ['b', 150.4, 3.2, 0.42, 151.7, 3.58, 0.47, 'pine'], ['b', 150.47, 3.25, 0, 150.53, 3.55, 0.42, 'pine'], ['b', 151.57, 3.25, 0, 151.63, 3.55, 0.42, 'pine'], ['b', 144.92, 0.59, 0.8, 144.98, 0.66, 1.7, 'black'],
+    ['b', 99.5, 3.1, 0, 100.4, 3.58, 0.42, 'leather'], ['b', 99.49, 3.08, 0.42, 100.41, 3.58, 0.5, 'wood'], ['b', 99.625, 3.08, 0, 99.675, 3.58, 0.5, 'iron'], ['b', 100.225, 3.08, 0, 100.275, 3.58, 0.5, 'iron'],
+    ['b', 99.78, 3.06, 0.1, 100.12, 3.1, 0.4, 'cloth'], ['b', 144.3, 3.08, 0, 145.2, 3.58, 0.55, 'iron']]);
+  /* G-ADDS end lake-corridor-b-east */
+  /* G-ADDS lake-corridor-b-keep */
+  /* NOW (floor-b-by-purpose-1031.md): plank-bench-1, umbrella-1, school-trunk-1, iron-bound-chest-1; NOT PLACED for want of a clear spot: books-on-table-1; stand-in gap, no emitter: school-trunk-open-1, iron-shield-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-B.js for collision only */
+  add('lake-corridor-b-keep', [
+    ['b', 55.0, 0.62, 0.42, 56.3, 1.0, 0.47, 'pine'], ['b', 55.07, 0.65, 0, 55.13, 0.95, 0.42, 'pine'], ['b', 56.17, 0.65, 0, 56.23, 0.95, 0.42, 'pine'], ['b', 48.59, 2.22, 0.8, 48.66, 2.28, 1.7, 'black'],
+    ['b', 60.0, 3.1, 0, 60.9, 3.58, 0.42, 'leather'], ['b', 59.99, 3.08, 0.42, 60.91, 3.58, 0.5, 'wood'], ['b', 60.125, 3.08, 0, 60.175, 3.58, 0.5, 'iron'], ['b', 60.725, 3.08, 0, 60.775, 3.58, 0.5, 'iron'],
+    ['b', 60.28, 3.06, 0.1, 60.62, 3.1, 0.4, 'cloth'], ['b', 55.5, 3.08, 0, 56.4, 3.58, 0.55, 'iron']]);
+  /* G-ADDS end lake-corridor-b-keep */
+  /* G-ADDS lake-corridor-b-west */
+  /* NOW (floor-b-by-purpose-1031.md): plank-bench-1, umbrella-1, school-trunk-1, iron-bound-chest-1; NOT PLACED for want of a clear spot: books-on-table-1; stand-in gap, no emitter: school-trunk-open-1, iron-shield-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-B.js for collision only */
+  add('lake-corridor-b-west', [
+    ['b', 28.9, 3.2, 0.42, 30.2, 3.58, 0.47, 'pine'], ['b', 28.97, 3.25, 0, 29.03, 3.55, 0.42, 'pine'], ['b', 30.07, 3.25, 0, 30.13, 3.55, 0.42, 'pine'], ['b', 11.22, 0.59, 0.8, 11.28, 0.66, 1.7, 'black'],
+    ['b', 7.0, 0.62, 0, 7.9, 1.1, 0.42, 'leather'], ['b', 6.99, 0.62, 0.42, 7.91, 1.12, 0.5, 'wood'], ['b', 7.125, 0.62, 0, 7.175, 1.12, 0.5, 'iron'], ['b', 7.725, 0.62, 0, 7.775, 1.12, 0.5, 'iron'],
+    ['b', 7.28, 1.1, 0.1, 7.62, 1.14, 0.4, 'cloth'], ['b', 32.0, 0.62, 0, 32.9, 1.12, 0.55, 'iron']]);
+  /* G-ADDS end lake-corridor-b-west */
+  /* G-ADDS boat-and-lamp-store */
+  /* NOW (floor-b-by-purpose-1031.md): pike-rack-1, pulley-block-1, hanging-lantern-1, tin-bucket-1, oil-lamp-1, hessian-sack-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-B.js for collision only */
+  add('boat-and-lamp-store', [
+    ['b', 48.72, 7.02, 0, 48.8, 7.08, 1.7, 'wood'], ['b', 48.72, 8.42, 0, 48.8, 8.48, 1.7, 'wood'], ['b', 48.72, 7.0, 0.5, 48.8, 8.5, 0.55, 'wood'], ['b', 48.72, 7.0, 1.4, 48.8, 8.5, 1.45, 'wood'],
+    ['y', 48.9, 7.3, 0.025, 0.05, 1.7, 'wood'], ['y', 48.9, 7.3, 0.075, 1.5, 1.75, 'rush'], ['y', 48.9, 7.6, 0.025, 0.05, 1.7, 'wood'], ['y', 48.9, 7.6, 0.075, 1.5, 1.75, 'rush'],
+    ['y', 48.9, 7.9, 0.025, 0.05, 1.7, 'wood'], ['y', 48.9, 7.9, 0.075, 1.5, 1.75, 'rush'], ['y', 48.9, 8.2, 0.025, 0.05, 1.7, 'wood'], ['y', 48.9, 8.2, 0.075, 1.5, 1.75, 'rush'],
+    ['b', 53.35, 11.4, 2.0, 53.55, 11.51, 2.3, 'iron'], ['b', 57.18, 10.135, 1.77, 57.42, 10.165, 1.8, 'iron'], ['y', 57.2, 10.15, 0.01, 1.72, 1.77, 'iron'], ['y', 57.2, 10.15, 0.05, 1.68, 1.72, 'brass'],
+    ['y', 57.2, 10.15, 0.085, 1.46, 1.68, 'glass'], ['y', 57.2, 10.15, 0.1, 1.41, 1.46, 'brass'], ['y', 53.85, 4.3, 0.17, 0, 0.34, 'tin'], ['y', 53.85, 4.3, 0.175, 0.3, 0.34, 'iron'],
+    ['y', 54.182, 4.19, 0.06, 1.4, 1.5, 'brass'], ['y', 54.182, 4.19, 0.045, 1.5, 1.65, 'glass'], ['b', 56.98, 8.88, 0, 57.38, 9.22, 0.5, 'rush'], ['b', 57.06, 8.93, 0.5, 57.32, 9.17, 0.56, 'rush'],
+    ['b', 57.1, 8.96, 0.56, 57.3, 9.14, 0.6, 'straw']]);
+  /* G-ADDS end boat-and-lamp-store */
+  /* G-ADDS trunk-room */
+  /* NOW (floor-b-by-purpose-1031.md): school-trunk-1, wheelbarrow-1, iron-bound-chest-1; NOT PLACED for want of a clear spot: luggage-tag-1; stand-in gap, no emitter: school-trunk-open-1, iron-shield-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-B.js for collision only */
+  add('trunk-room', [
+    ['b', 57.92, 9.6, 0, 58.4, 10.5, 0.42, 'leather'], ['b', 57.92, 9.59, 0.42, 58.42, 10.51, 0.5, 'wood'], ['b', 57.92, 9.725, 0, 58.42, 9.775, 0.5, 'iron'], ['b', 57.92, 10.325, 0, 58.42, 10.375, 0.5, 'iron'],
+    ['b', 58.4, 9.88, 0.1, 58.44, 10.22, 0.4, 'cloth'], ['b', 58.0, 10.93, 0, 59.1, 11.48, 0.5, 'wood'], ['b', 66.98, 9.9, 0, 67.48, 10.8, 0.55, 'iron']]);
+  /* G-ADDS end trunk-room */
+  /* G-ADDS drum-back-store-b */
+  /* NOW (floor-b-by-purpose-1031.md): hessian-sack-1, hooped-bucket-1, school-trunk-1, iron-bound-chest-1; stand-in gap, no emitter: school-trunk-open-1, iron-shield-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-B.js for collision only */
+  add('drum-back-store-b', [
+    ['b', 47.78, 5.02, 0, 48.18, 5.36, 0.5, 'rush'], ['b', 47.86, 5.07, 0.5, 48.12, 5.31, 0.56, 'rush'], ['b', 47.9, 5.1, 0.56, 48.1, 5.28, 0.6, 'straw'], ['y', 34.7, 10.48, 0.17, 0, 0.34, 'tin'],
+    ['y', 34.7, 10.48, 0.175, 0.3, 0.34, 'iron'], ['b', 34.52, 9.31, 0, 35.0, 10.21, 0.42, 'leather'], ['b', 34.52, 9.3, 0.42, 35.02, 10.22, 0.5, 'wood'], ['b', 34.52, 9.435, 0, 35.02, 9.485, 0.5, 'iron'],
+    ['b', 34.52, 10.035, 0, 35.02, 10.085, 0.5, 'iron'], ['b', 35.0, 9.59, 0.1, 35.04, 9.93, 0.4, 'cloth'], ['b', 34.52, 8.35, 0, 35.02, 9.25, 0.55, 'iron']]);
+  /* G-ADDS end drum-back-store-b */
+  /* G-ADDS hall-undercroft */
+  /* NOW (floor-b-by-purpose-1031.md): oak-cask-1, trestle-bench-1, hanging-lantern-1, school-trunk-1, iron-bound-chest-1; NOT PLACED for want of a clear spot: labelled-bottle-1; stand-in gap, no emitter: school-trunk-open-1, iron-shield-1; sited by tools/architect-now.py, plain stand-ins; read back from None for collision only */
+  add('hall-undercroft', [
+    ['y', 114.55, 4.47, 0.35, 0, 0.85, 'oak'], ['y', 114.55, 4.47, 0.357, 0.12, 0.15, 'iron'], ['y', 114.55, 4.47, 0.357, 0.42, 0.45, 'iron'], ['y', 114.55, 4.47, 0.357, 0.72, 0.75, 'iron'],
+    ['b', 98.45, 4.12, 0, 99.85, 4.62, 0.8, 'pine'], ['b', 101.435, 4.08, 1.77, 101.465, 4.32, 1.8, 'iron'], ['y', 101.45, 4.3, 0.01, 1.72, 1.77, 'iron'], ['y', 101.45, 4.3, 0.05, 1.68, 1.72, 'brass'],
+    ['y', 101.45, 4.3, 0.085, 1.46, 1.68, 'glass'], ['y', 101.45, 4.3, 0.1, 1.41, 1.46, 'brass'], ['b', 96.9, 11.0, 0, 97.8, 11.48, 0.42, 'leather'], ['b', 96.89, 10.98, 0.42, 97.81, 11.48, 0.5, 'wood'],
+    ['b', 97.025, 10.98, 0, 97.075, 11.48, 0.5, 'iron'], ['b', 97.625, 10.98, 0, 97.675, 11.48, 0.5, 'iron'], ['b', 97.18, 10.96, 0.1, 97.52, 11.0, 0.4, 'cloth'], ['b', 115.7, 4.12, 0, 116.6, 4.62, 0.55, 'iron']]);
+  /* G-ADDS end hall-undercroft */
+  /* G-ADDS roomier-dungeon */
+  /* NOW (floor-b-by-purpose-1031.md): plank-bench-1, hanging-lantern-1, school-trunk-1, iron-bound-chest-1; stand-in gap, no emitter: school-trunk-open-1, iron-shield-1; sited by tools/architect-now.py, plain stand-ins; read back from None for collision only */
+  add('roomier-dungeon', [
+    ['b', 16.02, 9.59, 0.42, 16.4, 10.89, 0.47, 'pine'], ['b', 16.05, 9.66, 0, 16.35, 9.72, 0.42, 'pine'], ['b', 16.05, 10.76, 0, 16.35, 10.82, 0.42, 'pine'], ['y', 16.03, 10.72, 0.03, 1.77, 1.8, 'iron'],
+    ['y', 16.1, 10.72, 0.02, 1.77, 1.8, 'iron'], ['y', 16.2, 10.72, 0.01, 1.72, 1.77, 'iron'], ['y', 16.2, 10.72, 0.05, 1.68, 1.72, 'brass'], ['y', 16.2, 10.72, 0.085, 1.46, 1.68, 'glass'],
+    ['y', 16.2, 10.72, 0.1, 1.41, 1.46, 'brass'], ['b', 23.0, 9.71, 0, 23.48, 10.61, 0.42, 'leather'], ['b', 22.98, 9.7, 0.42, 23.48, 10.62, 0.5, 'wood'], ['b', 22.98, 9.835, 0, 23.48, 9.885, 0.5, 'iron'],
+    ['b', 22.98, 10.435, 0, 23.48, 10.485, 0.5, 'iron'], ['b', 22.96, 9.99, 0.1, 23.0, 10.33, 0.4, 'cloth'], ['b', 22.98, 8.51, 0, 23.48, 9.41, 0.55, 'iron']]);
+  /* G-ADDS end roomier-dungeon */
+  /* G-ADDS slytherin-common-room */
+  /* NOW (floor-b-by-purpose-1031.md): joined-table-1, bookcase-1, plank-bench-1, frame-worn-gilt-1; NOT PLACED for want of a clear spot: house-banner-1, writing-slate-1; stand-in gap, no emitter: trophy-case-1, house-scarf-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-B.js for collision only */
+  add('slytherin-common-room', [
+    ['b', 71.18, -22.2, 0, 71.98, -20.7, 0.78, 'oak'], ['b', 40.15, -11.32, 0, 41.15, -11.02, 1.9, 'oak'], ['b', 49.9, -22.98, 0.42, 51.2, -22.6, 0.47, 'pine'], ['b', 49.97, -22.95, 0, 50.03, -22.65, 0.42, 'pine'],
+    ['b', 51.07, -22.95, 0, 51.13, -22.65, 0.42, 'pine'], ['b', 69.6, -11.04, 1.4, 70.1, -10.99, 2.05, 'gilt']]);
+  /* G-ADDS end slytherin-common-room */
+  /* G-ADDS lake-tower-b */
+  /* NOW (floor-b-by-purpose-1031.md): pulley-block-1, school-trunk-1, iron-bound-chest-1; stand-in gap, no emitter: school-trunk-open-1, iron-shield-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-B.js for collision only */
+  add('lake-tower-b', [
+    ['b', 125.33, -4.33, 2.0, 125.44, -4.13, 2.3, 'iron'], ['b', 127.45, -0.5, 0, 128.35, -0.02, 0.42, 'leather'], ['b', 127.44, -0.52, 0.42, 128.36, -0.02, 0.5, 'wood'], ['b', 127.575, -0.52, 0, 127.625, -0.02, 0.5, 'iron'],
+    ['b', 128.175, -0.52, 0, 128.225, -0.02, 0.5, 'iron'], ['b', 127.73, -0.54, 0.1, 128.07, -0.5, 0.4, 'cloth'], ['b', 132.01, -0.52, 0, 132.91, -0.02, 0.55, 'iron']]);
+  /* G-ADDS end lake-tower-b */
+  /* G-ADDS gun-casemate */
+  /* NOW (floor-b-by-purpose-1031.md): leather-bucket-1, oak-cask-1, school-trunk-1, iron-bound-chest-1; stand-in gap, no emitter: school-trunk-open-1, iron-shield-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-B.js for collision only */
+  add('gun-casemate', [
+    ['y', 156.395, -5.626, 0.15, 0, 0.32, 'leather'], ['y', 156.395, -5.626, 0.155, 0.28, 0.32, 'iron'], ['y', 161.345, -6.735, 0.35, 0, 0.85, 'oak'], ['y', 161.345, -6.735, 0.357, 0.12, 0.15, 'iron'],
+    ['y', 161.345, -6.735, 0.357, 0.42, 0.45, 'iron'], ['y', 161.345, -6.735, 0.357, 0.72, 0.75, 'iron'], ['b', 152.061, -3.21, 0, 152.541, -2.31, 0.42, 'leather'], ['b', 152.061, -3.22, 0.42, 152.561, -2.3, 0.5, 'wood'],
+    ['b', 152.061, -3.085, 0, 152.561, -3.035, 0.5, 'iron'], ['b', 152.061, -2.485, 0, 152.561, -2.435, 0.5, 'iron'], ['b', 152.541, -2.93, 0.1, 152.581, -2.59, 0.4, 'cloth'], ['b', 169.438, -4.7, 0, 169.938, -3.8, 0.55, 'iron']]);
+  /* G-ADDS end gun-casemate */
+  /* G-ADDS washrooms-sw */
+  /* NOW (floor-b-by-purpose-1031.md): washbasin-1, washbasin-1, washbasin-1, washbasin-1, folded-linen-1, looking-glass-1, wooden-pail-1, school-trunk-1, iron-bound-chest-1; stand-in gap, no emitter: school-trunk-open-1, iron-shield-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-B.js for collision only */
+  add('washrooms-sw', [
+    ['b', 4.3, 12.27, 0, 4.8, 12.67, 0.85, 'white'], ['b', 5.0, 17.33, 0, 5.5, 17.73, 0.85, 'white'], ['b', 4.9, 12.27, 0, 5.4, 12.67, 0.85, 'white'], ['b', 4.3, 17.33, 0, 4.8, 17.73, 0.85, 'white'],
+    ['b', 0.145, 12.257, 0.85, 0.505, 12.518, 0.93, 'linen'], ['b', 0.145, 12.257, 0.93, 0.505, 12.518, 1.01, 'linen'], ['b', 4.8, 17.71, 1.3, 5.3, 17.77, 2.0, 'wood'], ['b', 4.84, 17.705, 1.35, 5.26, 17.71, 1.95, 'glass'],
+    ['y', 6.56, 16.6, 0.15, 0, 0.3, 'wood'], ['y', 6.56, 16.6, 0.155, 0.08, 0.1, 'iron'], ['y', 6.56, 16.6, 0.155, 0.2, 0.22, 'iron'], ['b', 5.5, 12.27, 0, 6.4, 12.75, 0.42, 'leather'],
+    ['b', 5.49, 12.27, 0.42, 6.41, 12.77, 0.5, 'wood'], ['b', 5.625, 12.27, 0, 5.675, 12.77, 0.5, 'iron'], ['b', 6.225, 12.27, 0, 6.275, 12.77, 0.5, 'iron'], ['b', 5.78, 12.75, 0.1, 6.12, 12.79, 0.4, 'cloth'],
+    ['b', 0.02, 13.25, 0, 0.52, 14.15, 0.55, 'iron']]);
+  /* G-ADDS end washrooms-sw */
+  /* G-ADDS armour-repair-room-3 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): trestle-bench-1, worktable-1, stool-1, oil-lamp-1, short-ladder-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-3.js for collision only */
+  add('armour-repair-room-3', [
+    ['b', 29.49, 3.87, 0, 30.89, 4.37, 0.8, 'pine'], ['b', 22.09, 3.87, 0, 23.49, 4.57, 0.8, 'deal'], ['y', 32.32, 5.3, 0.17, 0.43, 0.47, 'pine'], ['b', 32.4, 5.38, 0, 32.44, 5.42, 0.43, 'pine'],
+    ['b', 32.2, 5.38, 0, 32.24, 5.42, 0.43, 'pine'], ['b', 32.4, 5.18, 0, 32.44, 5.22, 0.43, 'pine'], ['b', 32.2, 5.18, 0, 32.24, 5.22, 0.43, 'pine'], ['y', 21.782, 6.611, 0.06, 0.85, 0.95, 'brass'],
+    ['y', 21.782, 6.611, 0.045, 0.95, 1.1, 'glass'], ['b', 25.265, 3.87, 0, 25.715, 3.95, 1.6, 'pine']]);
+  /* G-ADDS end armour-repair-room-3 */
+  /* G-ADDS astronomy-stair-foot-3 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): plank-bench-1, stair-runner-1; NOT PLACED for want of a clear spot: oil-lamp-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-3.js for collision only */
+  add('astronomy-stair-foot-3', [
+    ['b', 82.27, 59.25, 0.42, 82.65, 60.55, 0.47, 'pine'], ['b', 82.3, 59.32, 0, 82.6, 59.38, 0.42, 'pine'], ['b', 82.3, 60.42, 0, 82.6, 60.48, 0.42, 'pine'], ['b', 82.3, 66.73, 0, 83.3, 68.73, 0.01, 'scarlet']]);
+  /* G-ADDS end astronomy-stair-foot-3 */
+  /* G-ADDS broom-cupboard-3-east */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): book-crate-1, hessian-sack-1, hanging-lantern-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-3.js for collision only */
+  add('broom-cupboard-3-east', [
+    ['b', 140.29, 53.87, 0, 140.91, 54.29, 0.32, 'pine'], ['b', 139.47, 54.23, 0, 139.87, 54.57, 0.5, 'rush'], ['b', 139.53, 54.28, 0.5, 139.79, 54.52, 0.56, 'rush'], ['b', 139.55, 54.31, 0.56, 139.75, 54.49, 0.6, 'straw'],
+    ['b', 140.785, 53.83, 1.77, 140.815, 54.07, 1.8, 'iron'], ['y', 140.8, 54.05, 0.01, 1.72, 1.77, 'iron'], ['y', 140.8, 54.05, 0.05, 1.68, 1.72, 'brass'], ['y', 140.8, 54.05, 0.085, 1.46, 1.68, 'glass'],
+    ['y', 140.8, 54.05, 0.1, 1.41, 1.46, 'brass']]);
+  /* G-ADDS end broom-cupboard-3-east */
+  /* G-ADDS broom-cupboard-3-middle */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): school-trunk-1, short-ladder-1; NOT PLACED for want of a clear spot: folded-linen-1, luggage-tag-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-3.js for collision only */
+  add('broom-cupboard-3-middle', [
+    ['b', 79.45, 53.87, 0, 80.35, 54.35, 0.42, 'leather'], ['b', 79.44, 53.87, 0.42, 80.36, 54.37, 0.5, 'wood'], ['b', 79.575, 53.87, 0, 79.625, 54.37, 0.5, 'iron'], ['b', 80.175, 53.87, 0, 80.225, 54.37, 0.5, 'iron'],
+    ['b', 79.73, 54.35, 0.1, 80.07, 54.39, 0.4, 'cloth'], ['b', 80.475, 57.45, 0, 80.925, 57.53, 1.6, 'pine']]);
+  /* G-ADDS end broom-cupboard-3-middle */
+  /* G-ADDS charms-classroom-3-west */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): masters-desk-1, blackboard-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-3.js for collision only */
+  add('charms-classroom-3-west', [
+    ['b', 124.8, 59.67, 0, 126.2, 60.37, 0.95, 'oak'], ['b', 129.3, 59.64, 1.0, 131.1, 59.69, 2.0, 'black']]);
+  /* G-ADDS end charms-classroom-3-west */
+  /* G-ADDS charms-store-3 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): plank-bench-1, iron-bound-chest-1, oil-lamp-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-3.js for collision only */
+  add('charms-store-3', [
+    ['b', 112.85, 59.67, 0.42, 114.15, 60.05, 0.47, 'pine'], ['b', 112.92, 59.7, 0, 112.98, 60.0, 0.42, 'pine'], ['b', 114.02, 59.7, 0, 114.08, 60.0, 0.42, 'pine'], ['b', 119.23, 66.75, 0, 119.73, 67.65, 0.55, 'iron'],
+    ['y', 112.932, 62.29, 0.06, 0.1, 0.2, 'brass'], ['y', 112.932, 62.29, 0.045, 0.2, 0.35, 'glass']]);
+  /* G-ADDS end charms-store-3 */
+  /* G-ADDS cleaning-cupboard-3-lobby */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): hall-chair-1, hearth-rug-1, stool-1, oil-lamp-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-3.js for collision only */
+  add('cleaning-cupboard-3-lobby', [
+    ['b', 71.03, 69.15, 0, 71.53, 69.65, 0.95, 'oak'], ['b', 68.67, 61.8, 0, 69.67, 63.2, 0.012, 'tartan'], ['y', 70.8, 71.83, 0.17, 0.43, 0.47, 'pine'], ['b', 70.88, 71.91, 0, 70.92, 71.95, 0.43, 'pine'],
+    ['b', 70.68, 71.91, 0, 70.72, 71.95, 0.43, 'pine'], ['b', 70.88, 71.71, 0, 70.92, 71.75, 0.43, 'pine'], ['b', 70.68, 71.71, 0, 70.72, 71.75, 0.43, 'pine'], ['y', 71.123, 69.243, 0.06, 0.95, 1.05, 'brass'],
+    ['y', 71.123, 69.243, 0.045, 1.05, 1.2, 'glass']]);
+  /* G-ADDS end cleaning-cupboard-3-lobby */
+  /* G-ADDS cleaning-cupboard-3-west */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): book-crate-1, hessian-sack-1, hanging-lantern-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-3.js for collision only */
+  add('cleaning-cupboard-3-west', [
+    ['b', 0.02, 55.29, 0, 0.44, 55.91, 0.32, 'pine'], ['b', 4.33, 55.03, 0, 4.73, 55.37, 0.5, 'rush'], ['b', 4.41, 55.08, 0.5, 4.67, 55.32, 0.56, 'rush'], ['b', 4.45, 55.11, 0.56, 4.65, 55.29, 0.6, 'straw'],
+    ['b', 0.335, 53.83, 1.77, 0.365, 54.07, 1.8, 'iron'], ['y', 0.35, 54.05, 0.01, 1.72, 1.77, 'iron'], ['y', 0.35, 54.05, 0.05, 1.68, 1.72, 'brass'], ['y', 0.35, 54.05, 0.085, 1.46, 1.68, 'glass'],
+    ['y', 0.35, 54.05, 0.1, 1.41, 1.46, 'brass']]);
+  /* G-ADDS end cleaning-cupboard-3-west */
+  /* G-ADDS defence-practice-room-3 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): masters-desk-1, blackboard-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-3.js for collision only */
+  add('defence-practice-room-3', [
+    ['b', 24.27, 65.1, 0, 24.97, 66.5, 0.95, 'oak'], ['b', 24.24, 59.3, 1.0, 24.29, 61.1, 2.0, 'black']]);
+  /* G-ADDS end defence-practice-room-3 */
+  /* G-ADDS defence-teachers-bedroom-3 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): iron-bedstead-1, school-trunk-1, washbasin-1, nest-of-drawers-1, candlestick-1, hearth-rug-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-3.js for collision only */
+  add('defence-teachers-bedroom-3', [
+    ['b', 99.08, 62.6, 0, 100.03, 64.6, 0.55, 'iron'], ['b', 98.85, 59.27, 0, 99.75, 59.75, 0.42, 'leather'], ['b', 98.84, 59.27, 0.42, 99.76, 59.77, 0.5, 'wood'], ['b', 98.975, 59.27, 0, 99.025, 59.77, 0.5, 'iron'],
+    ['b', 99.575, 59.27, 0, 99.625, 59.77, 0.5, 'iron'], ['b', 99.13, 59.75, 0.1, 99.47, 59.79, 0.4, 'cloth'], ['b', 99.63, 69.75, 0, 100.03, 70.25, 0.85, 'white'], ['b', 88.27, 64.6, 0, 88.67, 65.2, 0.8, 'oak'],
+    ['y', 88.382, 61.961, 0.035, 0.76, 1.01, 'brass'], ['b', 88.27, 59.3, 0, 89.27, 60.7, 0.012, 'tartan']]);
+  /* G-ADDS end defence-teachers-bedroom-3 */
+  /* G-ADDS disused-classroom-3-lake */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): masters-desk-1, blackboard-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-3.js for collision only */
+  add('disused-classroom-3-lake', [
+    ['b', 140.41, 5.0, 0, 141.11, 6.4, 0.95, 'oak'], ['b', 129.5, 11.2, 1.0, 129.55, 13.0, 2.0, 'black']]);
+  /* G-ADDS end disused-classroom-3-lake */
+  /* G-ADDS east-corridor-3-north */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): chair-squab-1; NOT PLACED for want of a clear spot: stair-runner-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-3.js for collision only */
+  add('east-corridor-3-north', [
+    ['b', 144.87, 20.0, 0, 145.47, 20.6, 0.95, 'leather']]);
+  /* G-ADDS end east-corridor-3-north */
+  /* G-ADDS elves-linen-room-3-east */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): linen-press-1, folded-linen-1, short-ladder-1, worktable-1, oil-lamp-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-3.js for collision only */
+  add('elves-linen-room-3-east', [
+    ['b', 153.77, 13.1, 0, 154.32, 14.1, 1.8, 'pine'], ['b', 159.491, 13.17, 0.4, 159.851, 13.43, 0.48, 'linen'], ['b', 159.491, 13.17, 0.48, 159.851, 13.43, 0.56, 'linen'], ['b', 156.775, 6.77, 0, 157.225, 6.85, 1.6, 'pine'],
+    ['b', 153.77, 8.3, 0, 154.47, 9.7, 0.8, 'deal'], ['y', 159.544, 13.54, 0.06, 0.4, 0.5, 'brass'], ['y', 159.544, 13.54, 0.045, 0.5, 0.65, 'glass']]);
+  /* G-ADDS end elves-linen-room-3-east */
+  /* G-ADDS elves-linen-room-3-middle */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): scrubbing-brush-1, hooped-bucket-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-3.js for collision only */
+  add('elves-linen-room-3-middle', [
+    ['b', 111.29, 57.2, 1.2, 111.36, 57.4, 1.3, 'wood'], ['y', 104.45, 55.4, 0.17, 0, 0.34, 'tin'], ['y', 104.45, 55.4, 0.175, 0.3, 0.34, 'iron']]);
+  /* G-ADDS end elves-linen-room-3-middle */
+  /* G-ADDS gryffindor-storeroom-3 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): school-trunk-1, short-ladder-1; NOT PLACED for want of a clear spot: folded-linen-1, folded-linen-1, luggage-tag-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-3.js for collision only */
+  add('gryffindor-storeroom-3', [
+    ['b', 39.45, 17.5, 0, 40.35, 17.98, 0.42, 'leather'], ['b', 39.44, 17.48, 0.42, 40.36, 17.98, 0.5, 'wood'], ['b', 39.575, 17.48, 0, 39.625, 17.98, 0.5, 'iron'], ['b', 40.175, 17.48, 0, 40.225, 17.98, 0.5, 'iron'],
+    ['b', 39.73, 17.46, 0.1, 40.07, 17.5, 0.4, 'cloth'], ['b', 48.25, 17.425, 0, 48.33, 17.875, 1.6, 'pine']]);
+  /* G-ADDS end gryffindor-storeroom-3 */
+  /* G-ADDS lake-corridor-3-mid */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): umbrella-1; NOT PLACED for want of a clear spot: hearth-rug-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-3.js for collision only */
+  add('lake-corridor-3-mid', [
+    ['b', 56.06, 0.84, 0.8, 56.12, 0.91, 1.7, 'black']]);
+  /* G-ADDS end lake-corridor-3-mid */
+  /* G-ADDS lake-corridor-3-west */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): plank-bench-1, boot-mat-1, noticeboard-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-3.js for collision only */
+  add('lake-corridor-3-west', [
+    ['b', 7.25, 2.95, 0.42, 8.55, 3.33, 0.47, 'pine'], ['b', 7.32, 3.0, 0, 7.38, 3.3, 0.42, 'pine'], ['b', 8.42, 3.0, 0, 8.48, 3.3, 0.42, 'pine'], ['b', 23.75, 2.88, 0, 24.45, 3.33, 0.02, 'rush'],
+    ['b', 21.2, 0.84, 1.3, 22.2, 0.89, 2.0, 'pine']]);
+  /* G-ADDS end lake-corridor-3-west */
+  /* G-ADDS lamp-candle-cupboard-3 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): plank-bench-1, iron-bound-chest-1, oil-lamp-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-3.js for collision only */
+  add('lamp-candle-cupboard-3', [
+    ['b', 29.55, 54.17, 0.42, 30.85, 54.55, 0.47, 'pine'], ['b', 29.62, 54.2, 0, 29.68, 54.5, 0.42, 'pine'], ['b', 30.72, 54.2, 0, 30.78, 54.5, 0.42, 'pine'], ['b', 38.55, 54.17, 0, 39.45, 54.67, 0.55, 'iron'],
+    ['y', 25.74, 57.252, 0.06, 0.5, 0.6, 'brass'], ['y', 25.74, 57.252, 0.045, 0.6, 0.75, 'glass']]);
+  /* G-ADDS end lamp-candle-cupboard-3 */
+  /* G-ADDS linen-cupboard-3-east */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): hall-chair-1, hearth-rug-1, stool-1, oil-lamp-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-3.js for collision only */
+  add('linen-cupboard-3-east', [
+    ['b', 158.25, 58.23, 0, 158.75, 58.73, 0.95, 'oak'], ['b', 158.98, 57.3, 0, 159.98, 58.7, 0.012, 'tartan'], ['y', 154.97, 57.7, 0.17, 0.43, 0.47, 'pine'], ['b', 155.05, 57.78, 0, 155.09, 57.82, 0.43, 'pine'],
+    ['b', 154.85, 57.78, 0, 154.89, 57.82, 0.43, 'pine'], ['b', 155.05, 57.58, 0, 155.09, 57.62, 0.43, 'pine'], ['b', 154.85, 57.58, 0, 154.89, 57.62, 0.43, 'pine'], ['y', 156.49, 53.926, 0.06, 0.4, 0.5, 'brass'],
+    ['y', 156.49, 53.926, 0.045, 0.5, 0.65, 'glass']]);
+  /* G-ADDS end linen-cupboard-3-east */
+  /* G-ADDS linen-cupboard-3-west */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): book-crate-1, hessian-sack-1, hanging-lantern-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-3.js for collision only */
+  add('linen-cupboard-3-west', [
+    ['b', 64.29, 54.17, 0, 64.91, 54.59, 0.32, 'pine'], ['b', 51.07, 55.13, 0, 51.47, 55.47, 0.5, 'rush'], ['b', 51.13, 55.18, 0.5, 51.39, 55.42, 0.56, 'rush'], ['b', 51.15, 55.21, 0.56, 51.35, 55.39, 0.6, 'straw'],
+    ['b', 56.185, 57.33, 1.77, 56.215, 57.57, 1.8, 'iron'], ['y', 56.2, 57.35, 0.01, 1.72, 1.77, 'iron'], ['y', 56.2, 57.35, 0.05, 1.68, 1.72, 'brass'], ['y', 56.2, 57.35, 0.085, 1.46, 1.68, 'glass'],
+    ['y', 56.2, 57.35, 0.1, 1.41, 1.46, 'brass']]);
+  /* G-ADDS end linen-cupboard-3-west */
+  /* G-ADDS north-corridor-3-link */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): chair-squab-1; NOT PLACED for want of a clear spot: stair-runner-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-3.js for collision only */
+  add('north-corridor-3-link', [
+    ['b', 75.6, 52.73, 0, 76.2, 53.33, 0.95, 'leather']]);
+  /* G-ADDS end north-corridor-3-link */
+  /* G-ADDS passage-3-charms */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): umbrella-1, hearth-rug-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-3.js for collision only */
+  add('passage-3-charms', [
+    ['b', 111.84, 54.37, 0.8, 111.91, 54.43, 1.7, 'black'], ['b', 111.87, 54.4, 0, 112.87, 55.8, 0.012, 'tartan']]);
+  /* G-ADDS end passage-3-charms */
+  /* G-ADDS passage-3-middle */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): plank-bench-1, boot-mat-1, noticeboard-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-3.js for collision only */
+  add('passage-3-middle', [
+    ['b', 70.27, 54.65, 0.42, 70.65, 55.95, 0.47, 'pine'], ['b', 70.3, 54.72, 0, 70.6, 54.78, 0.42, 'pine'], ['b', 70.3, 55.82, 0, 70.6, 55.88, 0.42, 'pine'], ['b', 71.38, 55.75, 0, 71.83, 56.45, 0.02, 'rush'],
+    ['b', 70.24, 54.6, 1.3, 70.29, 55.6, 2.0, 'pine']]);
+  /* G-ADDS end passage-3-middle */
+  /* G-ADDS passage-3-study */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): chair-squab-1; NOT PLACED for want of a clear spot: stair-runner-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-3.js for collision only */
+  add('passage-3-study', [
+    ['b', 87.27, 54.6, 0, 87.87, 55.2, 0.95, 'leather']]);
+  /* G-ADDS end passage-3-study */
+  /* G-ADDS passage-3-west */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): umbrella-1, hearth-rug-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-3.js for collision only */
+  add('passage-3-west', [
+    ['b', 23.24, 54.97, 0.8, 23.31, 55.03, 1.7, 'black'], ['b', 23.27, 54.9, 0, 24.27, 56.3, 0.012, 'tartan']]);
+  /* G-ADDS end passage-3-west */
+  /* G-ADDS right-hand-corridor-3 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): plank-bench-1, boot-mat-1, noticeboard-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-3.js for collision only */
+  add('right-hand-corridor-3', [
+    ['b', 151.6, 49.35, 0.42, 152.9, 49.73, 0.47, 'pine'], ['b', 151.67, 49.4, 0, 151.73, 49.7, 0.42, 'pine'], ['b', 152.77, 49.4, 0, 152.83, 49.7, 0.42, 'pine'], ['b', 149.7, 22.27, 0, 150.4, 22.72, 0.02, 'rush'],
+    ['b', 153.15, 22.24, 1.3, 154.15, 22.29, 2.0, 'pine']]);
+  /* G-ADDS end right-hand-corridor-3 */
+  /* G-ADDS room-beside-trophy-room-3 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): school-trunk-1, folded-linen-1, short-ladder-1; NOT PLACED for want of a clear spot: luggage-tag-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-3.js for collision only */
+  add('room-beside-trophy-room-3', [
+    ['b', 11.85, 59.27, 0, 12.75, 59.75, 0.42, 'leather'], ['b', 11.84, 59.27, 0.42, 12.76, 59.77, 0.5, 'wood'], ['b', 11.975, 59.27, 0, 12.025, 59.77, 0.5, 'iron'], ['b', 12.575, 59.27, 0, 12.625, 59.77, 0.5, 'iron'],
+    ['b', 12.13, 59.75, 0.1, 12.47, 59.79, 0.4, 'cloth'], ['b', 16.953, 62.29, 0.8, 17.313, 62.55, 0.88, 'linen'], ['b', 16.953, 62.29, 0.88, 17.313, 62.55, 0.96, 'linen'], ['b', 21.075, 59.27, 0, 21.525, 59.35, 1.6, 'pine']]);
+  /* G-ADDS end room-beside-trophy-room-3 */
+  /* G-ADDS service-passage-3-lobby */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): chair-squab-1; NOT PLACED for want of a clear spot: stair-runner-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-3.js for collision only */
+  add('service-passage-3-lobby', [
+    ['b', 69.23, 55.3, 0, 69.83, 55.9, 0.95, 'leather']]);
+  /* G-ADDS end service-passage-3-lobby */
+  /* G-ADDS spare-desks-store-3-middle */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): plank-bench-1, iron-bound-chest-1, oil-lamp-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-3.js for collision only */
+  add('spare-desks-store-3-middle', [
+    ['b', 89.27, 54.55, 0.42, 89.65, 55.85, 0.47, 'pine'], ['b', 89.3, 54.62, 0, 89.6, 54.68, 0.42, 'pine'], ['b', 89.3, 55.72, 0, 89.6, 55.78, 0.42, 'pine'], ['b', 94.35, 53.87, 0, 95.25, 54.37, 0.55, 'iron'],
+    ['y', 94.34, 53.945, 0.06, 0.76, 0.86, 'brass'], ['y', 94.34, 53.945, 0.045, 0.86, 1.01, 'glass']]);
+  /* G-ADDS end spare-desks-store-3-middle */
+  /* G-ADDS spare-desks-store-3-west */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): hall-chair-1, hearth-rug-1, stool-1, oil-lamp-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-3.js for collision only */
+  add('spare-desks-store-3-west', [
+    ['b', 11.67, 54.15, 0, 12.17, 54.65, 0.95, 'oak'], ['b', 18.1, 56.53, 0, 19.5, 57.53, 0.012, 'tartan'], ['y', 21.6, 54.37, 0.17, 0.43, 0.47, 'pine'], ['b', 21.68, 54.45, 0, 21.72, 54.49, 0.43, 'pine'],
+    ['b', 21.48, 54.45, 0, 21.52, 54.49, 0.43, 'pine'], ['b', 21.68, 54.25, 0, 21.72, 54.29, 0.43, 'pine'], ['b', 21.48, 54.25, 0, 21.52, 54.29, 0.43, 'pine'], ['y', 21.343, 54.245, 0.06, 0.76, 0.86, 'brass'],
+    ['y', 21.343, 54.245, 0.045, 0.86, 1.01, 'glass']]);
+  /* G-ADDS end spare-desks-store-3-west */
+  /* G-ADDS staff-bedroom-3-lake */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): iron-bedstead-1, washbasin-1, iron-bound-chest-1, candlestick-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-3.js for collision only */
+  add('staff-bedroom-3-lake', [
+    ['b', 115.92, 11.6, 0, 116.87, 13.6, 0.55, 'iron'], ['b', 105.29, 15.15, 0, 105.69, 15.65, 0.85, 'white'], ['b', 116.37, 13.85, 0, 116.87, 14.75, 0.55, 'iron'], ['y', 105.403, 6.561, 0.035, 0.76, 1.01, 'brass']]);
+  /* G-ADDS end staff-bedroom-3-lake */
+  /* G-ADDS staff-bedrooms-3-lake */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): iron-bedstead-1, low-easy-chair-1, hearth-rug-1, nest-of-drawers-1, oil-lamp-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-3.js for collision only */
+  add('staff-bedrooms-3-lake', [
+    ['b', 57.79, 17.03, 0, 59.79, 17.98, 0.55, 'iron'], ['b', 67.03, 5.25, 0, 67.73, 5.95, 0.75, 'leather'], ['b', 59.29, 3.87, 0, 60.69, 4.87, 0.012, 'tartan'], ['b', 67.33, 14.0, 0, 67.73, 14.6, 0.8, 'oak'],
+    ['y', 51.972, 6.561, 0.06, 0.76, 0.86, 'brass'], ['y', 51.972, 6.561, 0.045, 0.86, 1.01, 'glass']]);
+  /* G-ADDS end staff-bedrooms-3-lake */
+  /* G-ADDS store-3-east */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): book-crate-1, hessian-sack-1, hanging-lantern-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-3.js for collision only */
+  add('store-3-east', [
+    ['b', 133.59, 57.11, 0, 134.21, 57.53, 0.32, 'pine'], ['b', 118.33, 57.13, 0, 118.67, 57.53, 0.5, 'rush'], ['b', 118.38, 57.21, 0.5, 118.62, 57.47, 0.56, 'rush'], ['b', 118.41, 57.25, 0.56, 118.59, 57.45, 0.6, 'straw'],
+    ['b', 129.485, 53.83, 1.77, 129.515, 54.07, 1.8, 'iron'], ['y', 129.5, 54.05, 0.01, 1.72, 1.77, 'iron'], ['y', 129.5, 54.05, 0.05, 1.68, 1.72, 'brass'], ['y', 129.5, 54.05, 0.085, 1.46, 1.68, 'glass'],
+    ['y', 129.5, 54.05, 0.1, 1.41, 1.46, 'brass']]);
+  /* G-ADDS end store-3-east */
+  /* G-ADDS study-room-3-lake */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): writing-desk-1, dip-holder-1, leather-armchair-1, oil-lamp-1, fire-irons-1, bookcase-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-3.js for collision only */
+  add('study-room-3-lake', [
+    ['b', 124.24, 3.87, 0, 125.24, 4.42, 0.78, 'oak'], ['y', 122.763, 9.036, 0.025, 0.76, 0.96, 'wood'], ['b', 117.41, 6.9, 0, 118.21, 7.7, 0.95, 'leather'], ['y', 122.763, 9.158, 0.06, 0.76, 0.86, 'brass'],
+    ['y', 122.763, 9.158, 0.045, 0.86, 1.01, 'glass'], ['b', 128.69, 11.75, 0, 128.99, 12.05, 0.7, 'iron'], ['b', 123.94, 17.68, 0, 124.94, 17.98, 1.9, 'oak']]);
+  /* G-ADDS end study-room-3-lake */
+  /* G-ADDS swivelling-staircase-room-3 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): plank-bench-1, hall-chair-1, hearth-rug-1, candlestick-1, snuffer-pole-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-3.js for collision only */
+  add('swivelling-staircase-room-3', [
+    ['b', 50.67, 63.75, 0.42, 51.05, 65.05, 0.47, 'pine'], ['b', 50.7, 63.82, 0, 51.0, 63.88, 0.42, 'pine'], ['b', 50.7, 64.92, 0, 51.0, 64.98, 0.42, 'pine'], ['b', 54.25, 59.27, 0, 54.75, 59.77, 0.95, 'oak'],
+    ['b', 64.73, 59.5, 0, 65.73, 60.9, 0.012, 'tartan'], ['y', 54.343, 59.363, 0.035, 0.95, 1.2, 'brass'], ['b', 65.7, 64.775, 0.2, 65.76, 64.825, 1.8, 'wood']]);
+  /* G-ADDS end swivelling-staircase-room-3 */
+  /* G-ADDS teachers-study-3-east */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): writing-desk-1, oak-chair-1, bookcase-1, silver-teapot-1, log-basket-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-3.js for collision only */
+  add('teachers-study-3-east', [
+    ['b', 149.2, 18.27, 0, 150.2, 18.82, 0.78, 'oak'], ['b', 147.87, 21.15, 0, 148.37, 21.65, 0.9, 'oak'], ['b', 147.87, 18.3, 0, 148.17, 19.3, 1.9, 'oak'], ['b', 157.533, 19.602, 0.76, 157.733, 19.722, 0.94, 'steel'],
+    ['b', 152.35, 21.83, 0, 152.85, 22.23, 0.4, 'wicker']]);
+  /* G-ADDS end teachers-study-3-east */
+  /* G-ADDS teachers-study-3-lake-east */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): writing-desk-1, oak-chair-1, hearth-rug-1, oil-lamp-1, silver-teapot-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-3.js for collision only */
+  add('teachers-study-3-lake-east', [
+    ['b', 141.65, 9.9, 0, 142.2, 10.9, 0.78, 'oak'], ['b', 141.65, 4.95, 0, 142.15, 5.45, 0.9, 'oak'], ['b', 141.65, 7.6, 0, 142.65, 9.0, 0.012, 'tartan'], ['y', 146.852, 15.267, 0.06, 0.76, 0.86, 'brass'],
+    ['y', 146.852, 15.267, 0.045, 0.86, 1.01, 'glass'], ['b', 146.814, 15.34, 0.76, 147.014, 15.46, 0.94, 'steel']]);
+  /* G-ADDS end teachers-study-3-lake-east */
+  /* G-ADDS teachers-study-3-north */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): writing-desk-1, dip-holder-1, leather-armchair-1, oil-lamp-1, fire-irons-1, bookcase-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-3.js for collision only */
+  add('teachers-study-3-north', [
+    ['b', 108.1, 59.27, 0, 109.1, 59.82, 0.78, 'oak'], ['y', 105.862, 69.267, 0.025, 0.76, 0.96, 'wood'], ['b', 111.53, 70.8, 0, 112.33, 71.6, 0.95, 'leather'], ['y', 105.862, 69.4, 0.06, 0.76, 0.86, 'brass'],
+    ['y', 105.862, 69.4, 0.045, 0.86, 1.01, 'glass'], ['b', 102.65, 59.27, 0, 102.95, 59.57, 0.7, 'iron'], ['b', 112.03, 61.4, 0, 112.33, 62.4, 1.9, 'oak']]);
+  /* G-ADDS end teachers-study-3-north */
+  /* G-ADDS third-years-study-room-3 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): writing-desk-1, oak-chair-1, bookcase-1, silver-teapot-1, log-basket-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-3.js for collision only */
+  add('third-years-study-room-3', [
+    ['b', 104.2, 8.3, 0, 104.75, 9.3, 0.78, 'oak'], ['b', 104.25, 13.65, 0, 104.75, 14.15, 0.9, 'oak'], ['b', 97.4, 17.68, 0, 98.4, 17.98, 1.9, 'oak'], ['b', 98.485, 8.976, 0.76, 98.685, 9.096, 0.94, 'steel'],
+    ['b', 94.95, 3.87, 0, 95.45, 4.27, 0.4, 'wicker']]);
+  /* G-ADDS end third-years-study-room-3 */
+  /* G-ADDS trophy-polishing-room-3 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): trestle-bench-1, worktable-1, stool-1, oil-lamp-1, short-ladder-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-3.js for collision only */
+  add('trophy-polishing-room-3', [
+    ['b', 7.27, 9.0, 0, 7.77, 10.4, 0.8, 'pine'], ['b', 20.42, 4.3, 0, 21.12, 5.7, 0.8, 'deal'], ['y', 14.4, 17.53, 0.17, 0.43, 0.47, 'pine'], ['b', 14.48, 17.61, 0, 14.52, 17.65, 0.43, 'pine'],
+    ['b', 14.28, 17.61, 0, 14.32, 17.65, 0.43, 'pine'], ['b', 14.48, 17.41, 0, 14.52, 17.45, 0.43, 'pine'], ['b', 14.28, 17.41, 0, 14.32, 17.45, 0.43, 'pine'], ['y', 11.91, 10.112, 0.06, 0.85, 0.95, 'brass'],
+    ['y', 11.91, 10.112, 0.045, 0.95, 1.1, 'glass'], ['b', 21.04, 14.475, 0, 21.12, 14.925, 1.6, 'pine']]);
+  /* G-ADDS end trophy-polishing-room-3 */
+  /* G-ADDS washrooms-3-east */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): washbasin-1, plank-bench-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-3.js for collision only */
+  add('washrooms-3-east', [
+    ['b', 148.13, 56.55, 0, 148.53, 57.05, 0.85, 'white'], ['b', 144.25, 53.87, 0.42, 145.55, 54.25, 0.47, 'pine'], ['b', 144.32, 53.9, 0, 144.38, 54.2, 0.42, 'pine'], ['b', 145.42, 53.9, 0, 145.48, 54.2, 0.42, 'pine']]);
+  /* G-ADDS end washrooms-3-east */
+  /* G-ADDS washrooms-3-middle */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): washbasin-1, plank-bench-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-3.js for collision only */
+  add('washrooms-3-middle', [
+    ['b', 103.33, 54.15, 0, 103.73, 54.65, 0.85, 'white'], ['b', 96.27, 53.85, 0.42, 96.65, 55.15, 0.47, 'pine'], ['b', 96.3, 53.92, 0, 96.6, 53.98, 0.42, 'pine'], ['b', 96.3, 55.02, 0, 96.6, 55.08, 0.42, 'pine']]);
+  /* G-ADDS end washrooms-3-middle */
+  /* G-ADDS washrooms-3-trophy */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): washbasin-1, plank-bench-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-3.js for collision only */
+  add('washrooms-3-trophy', [
+    ['b', 5.2, 17.33, 0, 5.7, 17.73, 0.85, 'white'], ['b', 0.0, 17.35, 0.42, 1.3, 17.73, 0.47, 'pine'], ['b', 0.07, 17.4, 0, 0.13, 17.7, 0.42, 'pine'], ['b', 1.17, 17.4, 0, 1.23, 17.7, 0.42, 'pine']]);
+  /* G-ADDS end washrooms-3-trophy */
+  /* G-ADDS west-cross-corridor-3 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): umbrella-1, hearth-rug-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-3.js for collision only */
+  add('west-cross-corridor-3', [
+    ['b', 11.64, 52.97, 0.8, 11.71, 53.03, 1.7, 'black'], ['b', 12.2, 52.33, 0, 13.6, 53.33, 0.012, 'tartan']]);
+  /* G-ADDS end west-cross-corridor-3 */
+  /* G-ADDS west-cross-corridor-3-end */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): plank-bench-1, boot-mat-1, noticeboard-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-3.js for collision only */
+  add('west-cross-corridor-3-end', [
+    ['b', 0.02, 50.85, 0.42, 0.4, 52.15, 0.47, 'pine'], ['b', 0.05, 50.92, 0, 0.35, 50.98, 0.42, 'pine'], ['b', 0.05, 52.02, 0, 0.35, 52.08, 0.42, 'pine'], ['b', 0.02, 51.05, 0, 0.47, 51.75, 0.02, 'rush'],
+    ['b', 0.75, 50.84, 1.3, 1.75, 50.89, 2.0, 'pine']]);
+  /* G-ADDS end west-cross-corridor-3-end */
+  /* G-ADDS west-wing-corridor-3 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): chair-squab-1, stair-runner-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-3.js for collision only */
+  add('west-wing-corridor-3', [
+    ['b', 14.53, 46.4, 0, 15.13, 47.0, 0.95, 'leather'], ['b', 12.67, 47.1, 0, 14.67, 48.1, 0.01, 'scarlet']]);
+  /* G-ADDS end west-wing-corridor-3 */
+  /* G-ADDS drum-bend-3-west */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): umbrella-1, hearth-rug-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-3.js for collision only */
+  add('drum-bend-3-west', [
+    ['b', 35.48, 5.47, 0.8, 35.55, 5.53, 1.7, 'black'], ['b', 33.06, 5.3, 0, 34.06, 6.7, 0.012, 'tartan']]);
+  /* G-ADDS end drum-bend-3-west */
+  /* G-ADDS drum-bend-3 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): plank-bench-1, boot-mat-1, noticeboard-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-3.js for collision only */
+  add('drum-bend-3', [
+    ['b', 37.84, 10.95, 0.42, 39.14, 11.33, 0.47, 'pine'], ['b', 37.91, 11.0, 0, 37.97, 11.3, 0.42, 'pine'], ['b', 39.01, 11.0, 0, 39.07, 11.3, 0.42, 'pine'], ['b', 37.94, 8.62, 0, 38.64, 9.07, 0.02, 'rush'],
+    ['b', 45.29, 11.31, 1.3, 46.29, 11.36, 2.0, 'pine']]);
+  /* G-ADDS end drum-bend-3 */
+  /* G-ADDS drum-bend-3-east */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): chair-squab-1, stair-runner-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-3.js for collision only */
+  add('drum-bend-3-east', [
+    ['b', 50.69, 10.73, 0, 51.29, 11.33, 0.95, 'leather'], ['b', 48.86, 5.3, 0, 50.86, 6.3, 0.01, 'scarlet']]);
+  /* G-ADDS end drum-bend-3-east */
+  /* G-ADDS charms-preparation-room-3 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): trestle-bench-1, worktable-1, stool-1, oil-lamp-1, short-ladder-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-3.js for collision only */
+  add('charms-preparation-room-3', [
+    ['b', 123.35, 70.32, 0, 124.75, 70.82, 0.8, 'pine'], ['b', 124.85, 70.32, 0, 126.25, 71.02, 0.8, 'deal'], ['y', 131.35, 70.52, 0.17, 0.43, 0.47, 'pine'], ['b', 131.43, 70.6, 0, 131.47, 70.64, 0.43, 'pine'],
+    ['b', 131.23, 70.6, 0, 131.27, 70.64, 0.43, 'pine'], ['b', 131.43, 70.4, 0, 131.47, 70.44, 0.43, 'pine'], ['b', 131.23, 70.4, 0, 131.27, 70.44, 0.43, 'pine'], ['y', 121.091, 73.142, 0.06, 0.1, 0.2, 'brass'],
+    ['y', 121.091, 73.142, 0.045, 0.2, 0.35, 'glass'], ['b', 136.6, 72.025, 0, 136.68, 72.475, 1.6, 'pine']]);
+  /* G-ADDS end charms-preparation-room-3 */
+  /* G-ADDS armour-repair-room-3-nook */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): oil-lamp-1; NOT PLACED for want of a clear spot: trestle-bench-1, worktable-1, stool-1, short-ladder-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-3.js for collision only */
+  add('armour-repair-room-3-nook', [
+    ['y', 35.327, 13.111, 0.06, 0.45, 0.55, 'brass'], ['y', 35.327, 13.111, 0.045, 0.55, 0.7, 'glass']]);
+  /* G-ADDS end armour-repair-room-3-nook */
+  /* G-ADDS staff-bedrooms-3-lake-nook */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): candlestick-1; NOT PLACED for want of a clear spot: iron-bedstead-1, school-trunk-1, washbasin-1, nest-of-drawers-1, hearth-rug-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-3.js for collision only */
+  add('staff-bedrooms-3-lake-nook', [
+    ['y', 50.141, 17.702, 0.035, 0.85, 1.1, 'brass']]);
+  /* G-ADDS end staff-bedrooms-3-lake-nook */
+  /* G-ADDS ravenclaw-tower-room-3 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): school-trunk-1, folded-linen-1, short-ladder-1; NOT PLACED for want of a clear spot: folded-linen-1, folded-linen-1, folded-linen-1, folded-linen-1, folded-linen-1, folded-linen-1, folded-linen-1, folded-linen-1, folded-linen-1, folded-linen-1, folded-linen-1, folded-linen-1, folded-linen-1, folded-linen-1, folded-linen-1, folded-linen-1, folded-linen-1, folded-linen-1, luggage-tag-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-3.js for collision only */
+  add('ravenclaw-tower-room-3', [
+    ['b', -1.572, 33.864, 0, -1.092, 34.764, 0.42, 'leather'], ['b', -1.592, 33.854, 0.42, -1.092, 34.774, 0.5, 'wood'], ['b', -1.592, 33.989, 0, -1.092, 34.039, 0.5, 'iron'], ['b', -1.592, 34.589, 0, -1.092, 34.639, 0.5, 'iron'],
+    ['b', -1.612, 34.144, 0.1, -1.572, 34.484, 0.4, 'cloth'], ['b', -7.962, 40.555, 0.35, -7.602, 40.815, 0.43, 'linen'], ['b', -7.962, 40.555, 0.43, -7.602, 40.815, 0.51, 'linen'], ['b', -6.725, 27.219, 0, -6.275, 27.299, 1.6, 'pine']]);
+  /* G-ADDS end ravenclaw-tower-room-3 */
+  /* G-ADDS headmasters-tower-room-3 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): plank-bench-1, iron-bound-chest-1, oil-lamp-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-3.js for collision only */
+  add('headmasters-tower-room-3', [
+    ['b', 163.394, 36.621, 0.42, 164.694, 37.001, 0.47, 'pine'], ['b', 163.464, 36.651, 0, 163.524, 36.951, 0.42, 'pine'], ['b', 164.564, 36.651, 0, 164.624, 36.951, 0.42, 'pine'], ['b', 162.224, 40.527, 0, 162.724, 41.427, 0.55, 'iron'],
+    ['y', 165.593, 44.194, 0.06, 0.35, 0.45, 'brass'], ['y', 165.593, 44.194, 0.045, 0.45, 0.6, 'glass']]);
+  /* G-ADDS end headmasters-tower-room-3 */
+  /* G-ADDS west-pole-shaft-3 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): umbrella-1, hearth-rug-1; sited by tools/architect-now.py, plain stand-ins; read back from None for collision only */
+  add('west-pole-shaft-3', [
+    ['b', -4.38, 22.69, 0.8, -4.32, 22.76, 1.7, 'black'], ['b', -2.55, 22.72, 0, -1.15, 23.72, 0.012, 'tartan']]);
+  /* G-ADDS end west-pole-shaft-3 */
+  /* G-ADDS west-dumbwaiter-shaft-3 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): plank-bench-1, boot-mat-1, noticeboard-1; sited by tools/architect-now.py, plain stand-ins; read back from None for collision only */
+  add('west-dumbwaiter-shaft-3', [
+    ['b', -4.38, 43.4, 0.42, -4.0, 44.7, 0.47, 'pine'], ['b', -4.35, 43.47, 0, -4.05, 43.53, 0.42, 'pine'], ['b', -4.35, 44.57, 0, -4.05, 44.63, 0.42, 'pine'], ['b', -4.38, 42.7, 0, -3.93, 43.4, 0.02, 'rush'],
+    ['b', -0.04, 41.85, 1.3, 0.01, 42.85, 2.0, 'pine']]);
+  /* G-ADDS end west-dumbwaiter-shaft-3 */
+  /* G-ADDS loop-gallery-stair-3 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): chair-squab-1; NOT PLACED for want of a clear spot: stair-runner-1; sited by tools/architect-now.py, plain stand-ins; read back from None for collision only */
+  add('loop-gallery-stair-3', [
+    ['b', 100.02, -1.55, 0, 100.62, -0.95, 0.95, 'leather']]);
+  /* G-ADDS end loop-gallery-stair-3 */
+  /* G-ADDS loop-gallery-3 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): umbrella-1, hearth-rug-1; sited by tools/architect-now.py, plain stand-ins; read back from None for collision only */
+  add('loop-gallery-3', [
+    ['b', 116.02, 0.14, 0.8, 116.08, 0.21, 1.7, 'black'], ['b', 108.85, -2.68, 0, 110.25, -1.68, 0.012, 'tartan']]);
+  /* G-ADDS end loop-gallery-3 */
+  /* G-ADDS stair-lantern-3 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): plank-bench-1, boot-mat-1; NOT PLACED for want of a clear spot: noticeboard-1; sited by tools/architect-now.py, plain stand-ins; read back from None for collision only */
+  add('stair-lantern-3', [
+    ['b', 70.567, 84.531, 0.42, 70.947, 85.831, 0.47, 'pine'], ['b', 70.597, 84.601, 0, 70.897, 84.661, 0.42, 'pine'], ['b', 70.597, 85.701, 0, 70.897, 85.761, 0.42, 'pine'], ['b', 69.455, 83.492, 0, 69.905, 84.192, 0.02, 'rush']]);
+  /* G-ADDS end stair-lantern-3 */
+  /* G-ADDS newspaper-room-4 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): windsor-chair-1, library-ladder-1, oil-lamp-1, bookcase-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-4.js for collision only */
+  add('newspaper-room-4', [
+    ['b', 58.14, 17.48, 0, 58.64, 17.98, 0.95, 'oak'], ['b', 51.86, 9.05, 0, 51.96, 9.55, 2.4, 'oak'], ['y', 58.706, 10.539, 0.06, 0.76, 0.86, 'brass'], ['y', 58.706, 10.539, 0.045, 0.86, 1.01, 'glass'],
+    ['b', 58.69, 17.68, 0, 59.69, 17.98, 1.9, 'oak']]);
+  /* G-ADDS end newspaper-room-4 */
+  /* G-ADDS elves-linen-room-4-lake */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): linen-press-1, folded-linen-1, short-ladder-1, worktable-1, oil-lamp-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-4.js for collision only */
+  add('elves-linen-room-4-lake', [
+    ['b', 31.97, 10.4, 0, 32.52, 11.4, 1.8, 'pine'], ['b', 22.073, 17.531, 0.4, 22.433, 17.791, 0.48, 'linen'], ['b', 22.073, 17.531, 0.48, 22.433, 17.791, 0.56, 'linen'], ['b', 21.66, 13.675, 0, 21.74, 14.125, 1.6, 'pine'],
+    ['b', 21.69, 3.87, 0, 23.09, 4.57, 0.8, 'deal'], ['y', 22.131, 17.924, 0.06, 0.4, 0.5, 'brass'], ['y', 22.131, 17.924, 0.045, 0.5, 0.65, 'glass']]);
+  /* G-ADDS end elves-linen-room-4-lake */
+  /* G-ADDS staff-bedroom-4-lake-west */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): iron-bedstead-1, school-trunk-1, washbasin-1, nest-of-drawers-1, candlestick-1, hearth-rug-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-4.js for collision only */
+  add('staff-bedroom-4-lake-west', [
+    ['b', 16.1, 16.78, 0, 18.1, 17.73, 0.55, 'iron'], ['b', 19.75, 17.25, 0, 20.65, 17.73, 0.42, 'leather'], ['b', 19.74, 17.23, 0.42, 20.66, 17.73, 0.5, 'wood'], ['b', 19.875, 17.23, 0, 19.925, 17.73, 0.5, 'iron'],
+    ['b', 20.475, 17.23, 0, 20.525, 17.73, 0.5, 'iron'], ['b', 20.03, 17.21, 0.1, 20.37, 17.25, 0.4, 'cloth'], ['b', 7.27, 6.25, 0, 7.67, 6.75, 0.85, 'white'], ['b', 20.72, 16.7, 0, 21.12, 17.3, 0.8, 'oak'],
+    ['y', 7.382, 11.411, 0.035, 0.76, 1.01, 'brass'], ['b', 7.3, 3.87, 0, 8.7, 4.87, 0.012, 'tartan']]);
+  /* G-ADDS end staff-bedroom-4-lake-west */
+  /* G-ADDS landscape-painting-corridor-4 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): plank-bench-1, hearth-rug-1, frame-worn-gilt-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-4.js for collision only */
+  add('landscape-painting-corridor-4', [
+    ['b', 104.37, 14.05, 0.42, 104.75, 15.35, 0.47, 'pine'], ['b', 104.42, 14.12, 0, 104.72, 14.18, 0.42, 'pine'], ['b', 104.42, 15.22, 0, 104.72, 15.28, 0.42, 'pine'], ['b', 93.17, 14.9, 0, 94.17, 16.3, 0.012, 'tartan'],
+    ['b', 104.73, 11.15, 1.4, 104.78, 11.65, 2.05, 'gilt']]);
+  /* G-ADDS end landscape-painting-corridor-4 */
+  /* G-ADDS disused-classroom-4-lake-east */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): masters-desk-1, blackboard-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-4.js for collision only */
+  add('disused-classroom-4-lake-east', [
+    ['b', 135.26, 17.28, 0, 136.66, 17.98, 0.95, 'oak'], ['b', 129.86, 3.84, 1.0, 131.66, 3.89, 2.0, 'black']]);
+  /* G-ADDS end disused-classroom-4-lake-east */
+  /* G-ADDS study-room-4-lake-east */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): writing-desk-1, dip-holder-1, leather-armchair-1, oil-lamp-1, fire-irons-1, bookcase-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-4.js for collision only */
+  add('study-room-4-lake-east', [
+    ['b', 152.68, 9.7, 0, 153.23, 10.7, 0.78, 'oak'], ['y', 147.002, 8.911, 0.025, 0.76, 0.96, 'wood'], ['b', 142.88, 3.87, 0, 143.68, 4.67, 0.95, 'leather'], ['y', 147.002, 9.033, 0.06, 0.76, 0.86, 'brass'],
+    ['y', 147.002, 9.033, 0.045, 0.86, 1.01, 'glass'], ['b', 141.65, 9.65, 0, 141.95, 9.95, 0.7, 'iron'], ['b', 148.98, 3.87, 0, 149.98, 4.17, 1.9, 'oak']]);
+  /* G-ADDS end study-room-4-lake-east */
+  /* G-ADDS revision-rooms-4 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): writing-desk-1, oak-chair-1, bookcase-1, silver-teapot-1, log-basket-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-4.js for collision only */
+  add('revision-rooms-4', [
+    ['b', 105.29, 6.0, 0, 105.84, 7.0, 0.78, 'oak'], ['b', 115.07, 3.87, 0, 115.57, 4.37, 0.9, 'oak'], ['b', 114.32, 17.68, 0, 115.32, 17.98, 1.9, 'oak'], ['b', 109.15, 8.148, 0.76, 109.35, 8.268, 0.94, 'steel'],
+    ['b', 116.47, 5.15, 0, 116.87, 5.65, 0.4, 'wicker']]);
+  /* G-ADDS end revision-rooms-4 */
+  /* G-ADDS muggle-studies-collection-4 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): plank-bench-1, hearth-rug-1, frame-worn-gilt-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-4.js for collision only */
+  add('muggle-studies-collection-4', [
+    ['b', 117.41, 4.75, 0.42, 117.79, 6.05, 0.47, 'pine'], ['b', 117.44, 4.82, 0, 117.74, 4.88, 0.42, 'pine'], ['b', 117.44, 5.92, 0, 117.74, 5.98, 0.42, 'pine'], ['b', 121.54, 16.98, 0, 122.94, 17.98, 0.012, 'tartan'],
+    ['b', 120.79, 3.84, 1.4, 121.29, 3.89, 2.05, 'gilt']]);
+  /* G-ADDS end muggle-studies-collection-4 */
+  /* G-ADDS herbology-library-4 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): windsor-chair-1, library-ladder-1, oil-lamp-1, bookcase-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-4.js for collision only */
+  add('herbology-library-4', [
+    ['b', 90.85, 59.27, 0, 91.35, 59.77, 0.95, 'oak'], ['b', 88.75, 59.27, 0, 89.25, 59.37, 2.4, 'oak'], ['y', 88.74, 71.742, 0.06, 0.1, 0.2, 'brass'], ['y', 88.74, 71.742, 0.045, 0.2, 0.35, 'glass'],
+    ['b', 88.27, 65.0, 0, 88.57, 66.0, 1.9, 'oak']]);
+  /* G-ADDS end herbology-library-4 */
+  /* G-ADDS staff-bedroom-4-north-east */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): iron-bedstead-1, washbasin-1, iron-bound-chest-1, candlestick-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-4.js for collision only */
+  add('staff-bedroom-4-north-east', [
+    ['b', 119.9, 70.78, 0, 121.9, 71.73, 0.55, 'iron'], ['b', 124.95, 59.27, 0, 125.45, 59.67, 0.85, 'white'], ['b', 121.05, 59.27, 0, 121.95, 59.77, 0.55, 'iron'], ['y', 114.182, 67.411, 0.035, 0.76, 1.01, 'brass']]);
+  /* G-ADDS end staff-bedroom-4-north-east */
+  /* G-ADDS study-room-4-north-east */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): writing-desk-1, oak-chair-1, hearth-rug-1, oil-lamp-1, silver-teapot-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-4.js for collision only */
+  add('study-room-4-north-east', [
+    ['b', 139.9, 59.27, 0, 140.9, 59.82, 0.78, 'oak'], ['b', 151.73, 68.15, 0, 152.23, 68.65, 0.9, 'oak'], ['b', 151.23, 62.7, 0, 152.23, 64.1, 0.012, 'tartan'], ['y', 145.613, 63.735, 0.06, 0.76, 0.86, 'brass'],
+    ['y', 145.613, 63.735, 0.045, 0.86, 1.01, 'glass'], ['b', 145.575, 63.855, 0.76, 145.775, 63.975, 0.94, 'steel']]);
+  /* G-ADDS end study-room-4-north-east */
+  /* G-ADDS staff-bedrooms-4-north */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): iron-bedstead-1, low-easy-chair-1, hearth-rug-1, nest-of-drawers-1, oil-lamp-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-4.js for collision only */
+  add('staff-bedrooms-4-north', [
+    ['b', 112.58, 60.0, 0, 113.53, 62.0, 0.55, 'iron'], ['b', 112.83, 67.65, 0, 113.53, 68.35, 0.75, 'leather'], ['b', 101.2, 59.27, 0, 102.6, 60.27, 0.012, 'tartan'], ['b', 101.17, 61.2, 0, 101.57, 61.8, 0.8, 'oak'],
+    ['y', 101.282, 67.411, 0.06, 0.76, 0.86, 'brass'], ['y', 101.282, 67.411, 0.045, 0.86, 1.01, 'glass']]);
+  /* G-ADDS end staff-bedrooms-4-north */
+  /* G-ADDS teachers-study-4-north */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): writing-desk-1, dip-holder-1, leather-armchair-1, oil-lamp-1, fire-irons-1, bookcase-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-4.js for collision only */
+  add('teachers-study-4-north', [
+    ['b', 126.97, 70.1, 0, 127.52, 71.1, 0.78, 'oak'], ['y', 132.562, 69.267, 0.025, 0.76, 0.96, 'wood'], ['b', 126.97, 63.3, 0, 127.77, 64.1, 0.95, 'leather'], ['y', 132.562, 69.4, 0.06, 0.76, 0.86, 'brass'],
+    ['y', 132.562, 69.4, 0.045, 0.86, 1.01, 'glass'], ['b', 139.03, 68.75, 0, 139.33, 69.05, 0.7, 'iron'], ['b', 139.03, 61.0, 0, 139.33, 62.0, 1.9, 'oak']]);
+  /* G-ADDS end teachers-study-4-north */
+  /* G-ADDS disused-classroom-4-east */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): masters-desk-1, blackboard-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-4.js for collision only */
+  add('disused-classroom-4-east', [
+    ['b', 147.9, 39.6, 0, 149.3, 40.3, 0.95, 'oak'], ['b', 147.9, 39.57, 1.0, 149.7, 39.62, 2.0, 'black']]);
+  /* G-ADDS end disused-classroom-4-east */
+  /* G-ADDS runes-store-4 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): book-crate-1, hessian-sack-1, hanging-lantern-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-4.js for collision only */
+  add('runes-store-4', [
+    ['b', 5.59, 49.31, 0, 6.21, 49.73, 0.32, 'pine'], ['b', 0.27, 43.96, 0, 0.67, 44.3, 0.5, 'rush'], ['b', 0.33, 44.01, 0.5, 0.59, 44.25, 0.56, 'rush'], ['b', 0.35, 44.04, 0.56, 0.55, 44.22, 0.6, 'straw'],
+    ['b', 4.485, 39.56, 1.77, 4.515, 39.8, 1.8, 'iron'], ['y', 4.5, 39.78, 0.01, 1.72, 1.77, 'iron'], ['y', 4.5, 39.78, 0.05, 1.68, 1.72, 'brass'], ['y', 4.5, 39.78, 0.085, 1.46, 1.68, 'glass'],
+    ['y', 4.5, 39.78, 0.1, 1.41, 1.46, 'brass']]);
+  /* G-ADDS end runes-store-4 */
+  /* G-ADDS elves-linen-room-4-east */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): scrubbing-brush-1, hooped-bucket-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-4.js for collision only */
+  add('elves-linen-room-4-east', [
+    ['b', 149.1, 18.24, 1.2, 149.3, 18.31, 1.3, 'wood'], ['y', 153.2, 18.45, 0.17, 0, 0.34, 'tin'], ['y', 153.2, 18.45, 0.175, 0.3, 0.34, 'iron']]);
+  /* G-ADDS end elves-linen-room-4-east */
+  /* G-ADDS staff-bedroom-4-east */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): iron-bedstead-1, school-trunk-1, washbasin-1, nest-of-drawers-1, candlestick-1, hearth-rug-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-4.js for collision only */
+  add('staff-bedroom-4-east', [
+    ['b', 159.03, 30.47, 0, 159.98, 32.47, 0.55, 'iron'], ['b', 147.85, 38.58, 0, 148.75, 39.06, 0.42, 'leather'], ['b', 147.84, 38.56, 0.42, 148.76, 39.06, 0.5, 'wood'], ['b', 147.975, 38.56, 0, 148.025, 39.06, 0.5, 'iron'],
+    ['b', 148.575, 38.56, 0, 148.625, 39.06, 0.5, 'iron'], ['b', 148.13, 38.54, 0.1, 148.47, 38.58, 0.4, 'cloth'], ['b', 147.87, 31.32, 0, 148.27, 31.82, 0.85, 'white'], ['b', 159.58, 34.37, 0, 159.98, 34.97, 0.8, 'oak'],
+    ['y', 150.561, 38.572, 0.035, 0.76, 1.01, 'brass'], ['b', 156.2, 38.06, 0, 157.6, 39.06, 0.012, 'tartan']]);
+  /* G-ADDS end staff-bedroom-4-east */
+  /* G-ADDS runes-teachers-study-4 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): writing-desk-1, oak-chair-1, bookcase-1, silver-teapot-1, log-basket-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-4.js for collision only */
+  add('runes-teachers-study-4', [
+    ['b', 4.5, 18.27, 0, 5.5, 18.82, 0.78, 'oak'], ['b', 11.05, 18.27, 0, 11.55, 18.77, 0.9, 'oak'], ['b', 6.3, 18.27, 0, 7.3, 18.57, 1.9, 'oak'], ['b', 2.22, 22.687, 0.76, 2.42, 22.807, 0.94, 'steel'],
+    ['b', 11.73, 19.45, 0, 12.13, 19.95, 0.4, 'wicker']]);
+  /* G-ADDS end runes-teachers-study-4 */
+  /* G-ADDS fourth-floor-washroom */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): washbasin-1, plank-bench-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-4.js for collision only */
+  add('fourth-floor-washroom', [
+    ['b', 11.73, 30.52, 0, 12.13, 31.02, 0.85, 'white'], ['b', 3.75, 28.94, 0.42, 5.05, 29.32, 0.47, 'pine'], ['b', 3.82, 28.97, 0, 3.88, 29.27, 0.42, 'pine'], ['b', 4.92, 28.97, 0, 4.98, 29.27, 0.42, 'pine']]);
+  /* G-ADDS end fourth-floor-washroom */
+  /* G-ADDS cleaning-cupboard-4 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): school-trunk-1, folded-linen-1, short-ladder-1; NOT PLACED for want of a clear spot: luggage-tag-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-4.js for collision only */
+  add('cleaning-cupboard-4', [
+    ['b', 132.85, 53.87, 0, 133.75, 54.35, 0.42, 'leather'], ['b', 132.84, 53.87, 0.42, 133.76, 54.37, 0.5, 'wood'], ['b', 132.975, 53.87, 0, 133.025, 54.37, 0.5, 'iron'], ['b', 133.575, 53.87, 0, 133.625, 54.37, 0.5, 'iron'],
+    ['b', 133.13, 54.35, 0.1, 133.47, 54.39, 0.4, 'cloth'], ['b', 115.485, 53.861, 0.4, 115.845, 54.121, 0.48, 'linen'], ['b', 115.485, 53.861, 0.48, 115.845, 54.121, 0.56, 'linen'], ['b', 130.775, 57.45, 0, 131.225, 57.53, 1.6, 'pine']]);
+  /* G-ADDS end cleaning-cupboard-4 */
+  /* G-ADDS unused-classroom-4-mirror */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): masters-desk-1, blackboard-1; sited by tools/architect-now.py, plain stand-ins; read back from None for collision only */
+  add('unused-classroom-4-mirror', [
+    ['b', 83.13, 54.1, 0, 83.83, 55.5, 0.95, 'oak'], ['b', 78.9, 53.84, 1.0, 80.7, 53.89, 2.0, 'black']]);
+  /* G-ADDS end unused-classroom-4-mirror */
+  /* G-ADDS broom-cupboard-4-middle */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): plank-bench-1, iron-bound-chest-1; NOT PLACED for want of a clear spot: oil-lamp-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-4.js for collision only */
+  add('broom-cupboard-4-middle', [
+    ['b', 83.87, 53.85, 0.42, 84.25, 55.15, 0.47, 'pine'], ['b', 83.9, 53.92, 0, 84.2, 53.98, 0.42, 'pine'], ['b', 83.9, 55.02, 0, 84.2, 55.08, 0.42, 'pine'], ['b', 86.33, 54.85, 0, 86.83, 55.75, 0.55, 'iron']]);
+  /* G-ADDS end broom-cupboard-4-middle */
+  /* G-ADDS gryffindor-storeroom-4 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): hall-chair-1, hearth-rug-1, stool-1, oil-lamp-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-4.js for collision only */
+  add('gryffindor-storeroom-4', [
+    ['b', 37.95, 11.62, 0, 38.45, 12.12, 0.95, 'oak'], ['b', 43.1, 11.62, 0, 44.5, 12.62, 0.012, 'tartan'], ['y', 48.2, 11.82, 0.17, 0.43, 0.47, 'pine'], ['b', 48.28, 11.9, 0, 48.32, 11.94, 0.43, 'pine'],
+    ['b', 48.08, 11.9, 0, 48.12, 11.94, 0.43, 'pine'], ['b', 48.28, 11.7, 0, 48.32, 11.74, 0.43, 'pine'], ['b', 48.08, 11.7, 0, 48.12, 11.74, 0.43, 'pine'], ['y', 46.148, 17.645, 0.06, 0.8, 0.9, 'brass'],
+    ['y', 46.148, 17.645, 0.045, 0.9, 1.05, 'glass']]);
+  /* G-ADDS end gryffindor-storeroom-4 */
+  /* G-ADDS teachers-study-4-lake-east */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): writing-desk-1, oak-chair-1, hearth-rug-1, oil-lamp-1, silver-teapot-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-4.js for collision only */
+  add('teachers-study-4-lake-east', [
+    ['b', 153.77, 9.8, 0, 154.32, 10.8, 0.78, 'oak'], ['b', 153.77, 6.75, 0, 154.27, 7.25, 0.9, 'oak'], ['b', 153.77, 16.1, 0, 154.77, 17.5, 0.012, 'tartan'], ['y', 157.517, 11.662, 0.06, 0.76, 0.86, 'brass'],
+    ['y', 157.517, 11.662, 0.045, 0.86, 1.01, 'glass'], ['b', 157.483, 11.788, 0.76, 157.683, 11.908, 0.94, 'steel']]);
+  /* G-ADDS end teachers-study-4-lake-east */
+  /* G-ADDS old-textbooks-store-4 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): book-crate-1, hessian-sack-1, hanging-lantern-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-4.js for collision only */
+  add('old-textbooks-store-4', [
+    ['b', 32.46, 54.59, 0, 32.88, 55.21, 0.32, 'pine'], ['b', 32.48, 58.33, 0, 32.88, 58.67, 0.5, 'rush'], ['b', 32.56, 58.38, 0.5, 32.82, 58.62, 0.56, 'rush'], ['b', 32.6, 58.41, 0.56, 32.8, 58.59, 0.6, 'straw'],
+    ['b', 29.885, 58.53, 1.77, 29.915, 58.77, 1.8, 'iron'], ['y', 29.9, 58.55, 0.01, 1.72, 1.77, 'iron'], ['y', 29.9, 58.55, 0.05, 1.68, 1.72, 'brass'], ['y', 29.9, 58.55, 0.085, 1.46, 1.68, 'glass'],
+    ['y', 29.9, 58.55, 0.1, 1.41, 1.46, 'brass']]);
+  /* G-ADDS end old-textbooks-store-4 */
+  /* G-ADDS store-4-west */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): school-trunk-1, folded-linen-1, short-ladder-1; NOT PLACED for want of a clear spot: luggage-tag-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-4.js for collision only */
+  add('store-4-west', [
+    ['b', 9.45, 53.87, 0, 10.35, 54.35, 0.42, 'leather'], ['b', 9.44, 53.87, 0.42, 10.36, 54.37, 0.5, 'wood'], ['b', 9.575, 53.87, 0, 9.625, 54.37, 0.5, 'iron'], ['b', 10.175, 53.87, 0, 10.225, 54.37, 0.5, 'iron'],
+    ['b', 9.73, 54.35, 0.1, 10.07, 54.39, 0.4, 'cloth'], ['b', 8.68, 58.33, 0.8, 9.04, 58.59, 0.88, 'linen'], ['b', 8.68, 58.33, 0.88, 9.04, 58.59, 0.96, 'linen'], ['b', 17.675, 53.87, 0, 18.125, 53.95, 1.6, 'pine']]);
+  /* G-ADDS end store-4-west */
+  /* G-ADDS astronomy-stair-foot-4 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): plank-bench-1, stair-runner-1; NOT PLACED for want of a clear spot: oil-lamp-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-4.js for collision only */
+  add('astronomy-stair-foot-4', [
+    ['b', 82.27, 59.25, 0.42, 82.65, 60.55, 0.47, 'pine'], ['b', 82.3, 59.32, 0, 82.6, 59.38, 0.42, 'pine'], ['b', 82.3, 60.42, 0, 82.6, 60.48, 0.42, 'pine'], ['b', 85.1, 66.73, 0, 86.1, 68.73, 0.01, 'scarlet']]);
+  /* G-ADDS end astronomy-stair-foot-4 */
+  /* G-ADDS linen-cupboard-4 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): plank-bench-1, iron-bound-chest-1, oil-lamp-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-4.js for collision only */
+  add('linen-cupboard-4', [
+    ['b', 104.27, 54.75, 0.42, 104.65, 56.05, 0.47, 'pine'], ['b', 104.3, 54.82, 0, 104.6, 54.88, 0.42, 'pine'], ['b', 104.3, 55.92, 0, 104.6, 55.98, 0.42, 'pine'], ['b', 112.13, 54.35, 0, 112.63, 55.25, 0.55, 'iron'],
+    ['y', 109.841, 57.146, 0.06, 0.4, 0.5, 'brass'], ['y', 109.841, 57.146, 0.045, 0.5, 0.65, 'glass']]);
+  /* G-ADDS end linen-cupboard-4 */
+  /* G-ADDS washrooms-4-west */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): washbasin-1, plank-bench-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-4.js for collision only */
+  add('washrooms-4-west', [
+    ['b', 6.33, 16.55, 0, 6.73, 17.05, 0.85, 'white'], ['b', 4.5, 12.27, 0.42, 5.8, 12.65, 0.47, 'pine'], ['b', 4.57, 12.3, 0, 4.63, 12.6, 0.42, 'pine'], ['b', 5.67, 12.3, 0, 5.73, 12.6, 0.42, 'pine']]);
+  /* G-ADDS end washrooms-4-west */
+  /* G-ADDS spare-desks-store-4-middle */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): hall-chair-1, hearth-rug-1, stool-1, oil-lamp-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-4.js for collision only */
+  add('spare-desks-store-4-middle', [
+    ['b', 89.27, 56.55, 0, 89.77, 57.05, 0.95, 'oak'], ['b', 89.27, 54.4, 0, 90.27, 55.8, 0.012, 'tartan'], ['y', 95.63, 55.4, 0.17, 0.43, 0.47, 'pine'], ['b', 95.71, 55.48, 0, 95.75, 55.52, 0.43, 'pine'],
+    ['b', 95.51, 55.48, 0, 95.55, 55.52, 0.43, 'pine'], ['b', 95.71, 55.28, 0, 95.75, 55.32, 0.43, 'pine'], ['b', 95.51, 55.28, 0, 95.55, 55.32, 0.43, 'pine'], ['y', 93.94, 57.195, 0.06, 0.76, 0.86, 'brass'],
+    ['y', 93.94, 57.195, 0.045, 0.86, 1.01, 'glass']]);
+  /* G-ADDS end spare-desks-store-4-middle */
+  /* G-ADDS washrooms-4-north */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): washbasin-1, plank-bench-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-4.js for collision only */
+  add('washrooms-4-north', [
+    ['b', 98.65, 57.33, 0, 99.15, 57.73, 0.85, 'white'], ['b', 96.35, 53.87, 0.42, 97.65, 54.25, 0.47, 'pine'], ['b', 96.42, 53.9, 0, 96.48, 54.2, 0.42, 'pine'], ['b', 97.52, 53.9, 0, 97.58, 54.2, 0.42, 'pine']]);
+  /* G-ADDS end washrooms-4-north */
+  /* G-ADDS washrooms-4-east */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): washbasin-1, plank-bench-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-4.js for collision only */
+  add('washrooms-4-east', [
+    ['b', 148.85, 57.33, 0, 149.35, 57.73, 0.85, 'white'], ['b', 150.25, 53.87, 0.42, 151.55, 54.25, 0.47, 'pine'], ['b', 150.32, 53.9, 0, 150.38, 54.2, 0.42, 'pine'], ['b', 151.42, 53.9, 0, 151.48, 54.2, 0.42, 'pine']]);
+  /* G-ADDS end washrooms-4-east */
+  /* G-ADDS broom-cupboard-4-west */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): book-crate-1, hessian-sack-1, hanging-lantern-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-4.js for collision only */
+  add('broom-cupboard-4-west', [
+    ['b', 4.64, 53.87, 0, 5.26, 54.29, 0.32, 'pine'], ['b', 0.68, 53.87, 0, 1.02, 54.27, 0.5, 'rush'], ['b', 0.73, 53.93, 0.5, 0.97, 54.19, 0.56, 'rush'], ['b', 0.76, 53.95, 0.56, 0.94, 54.15, 0.6, 'straw'],
+    ['b', 4.335, 53.83, 1.77, 4.365, 54.07, 1.8, 'iron'], ['y', 4.35, 54.05, 0.01, 1.72, 1.77, 'iron'], ['y', 4.35, 54.05, 0.05, 1.68, 1.72, 'brass'], ['y', 4.35, 54.05, 0.085, 1.46, 1.68, 'glass'],
+    ['y', 4.35, 54.05, 0.1, 1.41, 1.46, 'brass']]);
+  /* G-ADDS end broom-cupboard-4-west */
+  /* G-ADDS spare-desks-store-4-east */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): school-trunk-1, folded-linen-1, short-ladder-1; NOT PLACED for want of a clear spot: luggage-tag-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-4.js for collision only */
+  add('spare-desks-store-4-east', [
+    ['b', 157.95, 57.05, 0, 158.85, 57.53, 0.42, 'leather'], ['b', 157.94, 57.03, 0.42, 158.86, 57.53, 0.5, 'wood'], ['b', 158.075, 57.03, 0, 158.125, 57.53, 0.5, 'iron'], ['b', 158.675, 57.03, 0, 158.725, 57.53, 0.5, 'iron'],
+    ['b', 158.23, 57.01, 0.1, 158.57, 57.05, 0.4, 'cloth'], ['b', 155.19, 57.13, 0.76, 155.55, 57.39, 0.84, 'linen'], ['b', 155.19, 57.13, 0.84, 155.55, 57.39, 0.92, 'linen'], ['b', 158.675, 53.87, 0, 159.125, 53.95, 1.6, 'pine']]);
+  /* G-ADDS end spare-desks-store-4-east */
+  /* G-ADDS lamp-candle-cupboard-4 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): plank-bench-1, iron-bound-chest-1, oil-lamp-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-4.js for collision only */
+  add('lamp-candle-cupboard-4', [
+    ['b', 143.45, 53.85, 0.42, 143.83, 55.15, 0.47, 'pine'], ['b', 143.5, 53.92, 0, 143.8, 53.98, 0.42, 'pine'], ['b', 143.5, 55.02, 0, 143.8, 55.08, 0.42, 'pine'], ['b', 140.87, 53.85, 0, 141.37, 54.75, 0.55, 'iron'],
+    ['y', 140.932, 55.641, 0.06, 0.5, 0.6, 'brass'], ['y', 140.932, 55.641, 0.045, 0.6, 0.75, 'glass']]);
+  /* G-ADDS end lamp-candle-cupboard-4 */
+  /* G-ADDS passage-4-east */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): chair-squab-1, stair-runner-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-4.js for collision only */
+  add('passage-4-east', [
+    ['b', 152.27, 54.5, 0, 152.87, 55.1, 0.95, 'leather'], ['b', 152.27, 55.2, 0, 154.27, 56.2, 0.01, 'scarlet']]);
+  /* G-ADDS end passage-4-east */
+  /* G-ADDS passage-4-west */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): umbrella-1, hearth-rug-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-4.js for collision only */
+  add('passage-4-west', [
+    ['b', 6.24, 54.47, 0.8, 6.31, 54.53, 1.7, 'black'], ['b', 6.27, 54.5, 0, 7.27, 55.9, 0.012, 'tartan']]);
+  /* G-ADDS end passage-4-west */
+  /* G-ADDS passage-4-gate */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): plank-bench-1, boot-mat-1, noticeboard-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-4.js for collision only */
+  add('passage-4-gate', [
+    ['b', 88.45, 55.15, 0.42, 88.83, 56.45, 0.47, 'pine'], ['b', 88.5, 55.22, 0, 88.8, 55.28, 0.42, 'pine'], ['b', 88.5, 56.32, 0, 88.8, 56.38, 0.42, 'pine'], ['b', 87.27, 56.05, 0, 87.72, 56.75, 0.02, 'rush'],
+    ['b', 87.24, 55.0, 1.3, 87.29, 56.0, 2.0, 'pine']]);
+  /* G-ADDS end passage-4-gate */
+  /* G-ADDS passage-4-middle */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): chair-squab-1; NOT PLACED for want of a clear spot: stair-runner-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-4.js for collision only */
+  add('passage-4-middle', [
+    ['b', 113.07, 55.9, 0, 113.67, 56.5, 0.95, 'leather']]);
+  /* G-ADDS end passage-4-middle */
+  /* G-ADDS passage-4-study */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): umbrella-1, hearth-rug-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-4.js for collision only */
+  add('passage-4-study', [
+    ['b', 138.84, 54.47, 0.8, 138.91, 54.53, 1.7, 'black'], ['b', 138.87, 54.5, 0, 139.87, 55.9, 0.012, 'tartan']]);
+  /* G-ADDS end passage-4-study */
+  /* G-ADDS north-range-corridor-4 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): plank-bench-1, boot-mat-1, noticeboard-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-4.js for collision only */
+  add('north-range-corridor-4', [
+    ['b', 156.35, 50.87, 0.42, 157.65, 51.25, 0.47, 'pine'], ['b', 156.42, 50.9, 0, 156.48, 51.2, 0.42, 'pine'], ['b', 157.52, 50.9, 0, 157.58, 51.2, 0.42, 'pine'], ['b', 153.05, 50.87, 0, 153.75, 51.32, 0.02, 'rush'],
+    ['b', 74.3, 53.31, 1.3, 75.3, 53.36, 2.0, 'pine']]);
+  /* G-ADDS end north-range-corridor-4 */
+  /* G-ADDS west-wing-corridor-4 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): chair-squab-1; NOT PLACED for want of a clear spot: stair-runner-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-4.js for collision only */
+  add('west-wing-corridor-4', [
+    ['b', 12.67, 18.9, 0, 13.27, 19.5, 0.95, 'leather']]);
+  /* G-ADDS end west-wing-corridor-4 */
+  /* G-ADDS east-wing-corridor-4 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): umbrella-1; NOT PLACED for want of a clear spot: hearth-rug-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-4.js for collision only */
+  add('east-wing-corridor-4', [
+    ['b', 144.84, 23.47, 0.8, 144.91, 23.53, 1.7, 'black']]);
+  /* G-ADDS end east-wing-corridor-4 */
+  /* G-ADDS lake-corridor-4-west */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): plank-bench-1, boot-mat-1, noticeboard-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-4.js for collision only */
+  add('lake-corridor-4-west', [
+    ['b', 11.95, 2.95, 0.42, 13.25, 3.33, 0.47, 'pine'], ['b', 12.02, 3.0, 0, 12.08, 3.3, 0.42, 'pine'], ['b', 13.12, 3.0, 0, 13.18, 3.3, 0.42, 'pine'], ['b', 32.85, 0.87, 0, 33.55, 1.32, 0.02, 'rush'],
+    ['b', 15.8, 0.84, 1.3, 16.8, 0.89, 2.0, 'pine']]);
+  /* G-ADDS end lake-corridor-4-west */
+  /* G-ADDS lake-corridor-4-keep */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): chair-squab-1; NOT PLACED for want of a clear spot: stair-runner-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-4.js for collision only */
+  add('lake-corridor-4-keep', [
+    ['b', 63.29, 0.87, 0, 63.89, 1.47, 0.95, 'leather']]);
+  /* G-ADDS end lake-corridor-4-keep */
+  /* G-ADDS west-corridor-4-south */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): umbrella-1; NOT PLACED for want of a clear spot: hearth-rug-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-4.js for collision only */
+  add('west-corridor-4-south', [
+    ['b', 5.42, 50.84, 0.8, 5.48, 50.91, 1.7, 'black']]);
+  /* G-ADDS end west-corridor-4-south */
+  /* G-ADDS muggle-props-store-4 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): hall-chair-1, hearth-rug-1, stool-1, oil-lamp-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-4.js for collision only */
+  add('muggle-props-store-4', [
+    ['b', 10.7, 62.38, 0, 11.2, 62.88, 0.95, 'oak'], ['b', 11.25, 61.88, 0, 12.65, 62.88, 0.012, 'tartan'], ['y', 8.72, 60.9, 0.17, 0.43, 0.47, 'pine'], ['b', 8.8, 60.98, 0, 8.84, 61.02, 0.43, 'pine'],
+    ['b', 8.6, 60.98, 0, 8.64, 61.02, 0.43, 'pine'], ['b', 8.8, 60.78, 0, 8.84, 60.82, 0.43, 'pine'], ['b', 8.6, 60.78, 0, 8.64, 60.82, 0.43, 'pine'], ['y', 18.098, 59.345, 0.06, 0.8, 0.9, 'brass'],
+    ['y', 18.098, 59.345, 0.045, 0.9, 1.05, 'glass']]);
+  /* G-ADDS end muggle-props-store-4 */
+  /* G-ADDS runes-dictionary-room-4 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): windsor-chair-1, library-ladder-1, oil-lamp-1, bookcase-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-4.js for collision only */
+  add('runes-dictionary-room-4', [
+    ['b', 23.2, 62.38, 0, 23.7, 62.88, 0.95, 'oak'], ['b', 24.3, 59.27, 0, 24.8, 59.37, 2.4, 'oak'], ['y', 29.541, 59.322, 0.06, 0.1, 0.2, 'brass'], ['y', 29.541, 59.322, 0.045, 0.2, 0.35, 'glass'],
+    ['b', 30.05, 62.58, 0, 31.05, 62.88, 1.9, 'oak']]);
+  /* G-ADDS end runes-dictionary-room-4 */
+  /* G-ADDS library-returns-store-4 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): book-crate-1, hessian-sack-1, hanging-lantern-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-4.js for collision only */
+  add('library-returns-store-4', [
+    ['b', 74.27, 69.27, 0, 74.89, 69.69, 0.32, 'pine'], ['b', 73.515, 71.43, 0, 73.855, 71.83, 0.5, 'rush'], ['b', 73.565, 71.51, 0.5, 73.805, 71.77, 0.56, 'rush'], ['b', 73.595, 71.55, 0.56, 73.775, 71.75, 0.6, 'straw'],
+    ['y', 76.5, 69.28, 0.03, 1.77, 1.8, 'iron'], ['y', 76.5, 69.35, 0.02, 1.77, 1.8, 'iron'], ['y', 76.5, 69.45, 0.01, 1.72, 1.77, 'iron'], ['y', 76.5, 69.45, 0.05, 1.68, 1.72, 'brass'],
+    ['y', 76.5, 69.45, 0.085, 1.46, 1.68, 'glass'], ['y', 76.5, 69.45, 0.1, 1.41, 1.46, 'brass']]);
+  /* G-ADDS end library-returns-store-4 */
+  /* G-ADDS library-returns-store-4-east */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): school-trunk-1, short-ladder-1; NOT PLACED for want of a clear spot: folded-linen-1, luggage-tag-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-4.js for collision only */
+  add('library-returns-store-4-east', [
+    ['b', 86.074, 69.27, 0, 86.974, 69.75, 0.42, 'leather'], ['b', 86.064, 69.27, 0.42, 86.984, 69.77, 0.5, 'wood'], ['b', 86.199, 69.27, 0, 86.249, 69.77, 0.5, 'iron'], ['b', 86.799, 69.27, 0, 86.849, 69.77, 0.5, 'iron'],
+    ['b', 86.354, 69.75, 0.1, 86.694, 69.79, 0.4, 'cloth'], ['b', 82.219, 69.27, 0, 82.669, 69.35, 1.6, 'pine']]);
+  /* G-ADDS end library-returns-store-4-east */
+  /* G-ADDS library-returns-desk-4 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): windsor-chair-1, library-ladder-1, oil-lamp-1, bookcase-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-4.js for collision only */
+  add('library-returns-desk-4', [
+    ['b', 67.1, 68.52, 0, 67.6, 69.02, 0.95, 'oak'], ['b', 65.52, 71.1, 0, 65.62, 71.6, 2.4, 'oak'], ['y', 67.011, 70.915, 0.06, 0.8, 0.9, 'brass'], ['y', 67.011, 70.915, 0.045, 0.9, 1.05, 'glass'],
+    ['b', 68.75, 71.53, 0, 69.75, 71.83, 1.9, 'oak']]);
+  /* G-ADDS end library-returns-desk-4 */
+  /* G-ADDS tudor-bay-4 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): writing-desk-1, dip-holder-1, leather-armchair-1, oil-lamp-1, fire-irons-1, bookcase-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-4.js for collision only */
+  add('tudor-bay-4', [
+    ['b', 107.55, -3.57, 0, 108.55, -3.02, 0.78, 'oak'], ['y', 110.742, -6.309, 0.025, 0.1, 0.3, 'wood'], ['b', 105.15, -3.82, 0, 105.95, -3.02, 0.95, 'leather'], ['y', 110.742, -6.188, 0.06, 0.1, 0.2, 'brass'],
+    ['y', 110.742, -6.188, 0.045, 0.2, 0.35, 'glass'], ['b', 109.3, -3.32, 0, 109.6, -3.02, 0.7, 'iron'], ['b', 109.65, -3.32, 0, 110.65, -3.02, 1.9, 'oak']]);
+  /* G-ADDS end tudor-bay-4 */
+  /* G-ADDS tudor-bay-4-cushion-store */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): plank-bench-1, iron-bound-chest-1, oil-lamp-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-4.js for collision only */
+  add('tudor-bay-4-cushion-store', [
+    ['b', 96.02, -2.1, 0.42, 96.4, -0.8, 0.47, 'pine'], ['b', 96.05, -2.03, 0, 96.35, -1.97, 0.42, 'pine'], ['b', 96.05, -0.93, 0, 96.35, -0.87, 0.42, 'pine'], ['b', 99.48, -1.5, 0, 99.98, -0.6, 0.55, 'iron'],
+    ['y', 96.19, -2.53, 0.06, 0.5, 0.6, 'brass'], ['y', 96.19, -2.53, 0.045, 0.6, 0.75, 'glass']]);
+  /* G-ADDS end tudor-bay-4-cushion-store */
+  /* G-ADDS lake-wall-lamp-store-4 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): hall-chair-1, hearth-rug-1, stool-1, oil-lamp-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-4.js for collision only */
+  add('lake-wall-lamp-store-4', [
+    ['b', 115.5, -0.42, 0, 116.0, 0.08, 0.95, 'oak'], ['b', 112.05, -0.92, 0, 113.45, 0.08, 0.012, 'tartan'], ['y', 117.55, -0.12, 0.17, 0.43, 0.47, 'pine'], ['b', 117.63, -0.04, 0, 117.67, 0.0, 0.43, 'pine'],
+    ['b', 117.43, -0.04, 0, 117.47, 0.0, 0.43, 'pine'], ['b', 117.63, -0.24, 0, 117.67, -0.2, 0.43, 'pine'], ['b', 117.43, -0.24, 0, 117.47, -0.2, 0.43, 'pine'], ['y', 111.79, -2.53, 0.06, 0.5, 0.6, 'brass'],
+    ['y', 111.79, -2.53, 0.045, 0.6, 0.75, 'glass']]);
+  /* G-ADDS end lake-wall-lamp-store-4 */
+  /* G-ADDS ravenclaw-room-4 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): book-crate-1, hessian-sack-1, hanging-lantern-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-4.js for collision only */
+  add('ravenclaw-room-4', [
+    ['b', -9.046, 40.314, 0, -8.426, 40.734, 0.32, 'pine'], ['b', -1.277, 32.034, 0, -0.877, 32.374, 0.5, 'rush'], ['b', -1.197, 32.084, 0.5, -0.937, 32.324, 0.56, 'rush'], ['b', -1.157, 32.114, 0.56, -0.957, 32.294, 0.6, 'straw'],
+    ['y', -11.286, 28.308, 0.03, 1.77, 1.8, 'iron'], ['y', -11.247, 28.367, 0.02, 1.77, 1.8, 'iron'], ['y', -11.191, 28.45, 0.01, 1.72, 1.77, 'iron'], ['y', -11.191, 28.45, 0.05, 1.68, 1.72, 'brass'],
+    ['y', -11.191, 28.45, 0.085, 1.46, 1.68, 'glass'], ['y', -11.191, 28.45, 0.1, 1.41, 1.46, 'brass']]);
+  /* G-ADDS end ravenclaw-room-4 */
+  /* G-ADDS headmasters-room-4 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): school-trunk-1, folded-linen-1, short-ladder-1; NOT PLACED for want of a clear spot: luggage-tag-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-4.js for collision only */
+  add('headmasters-room-4', [
+    ['b', 168.242, 37.112, 0, 169.142, 37.592, 0.42, 'leather'], ['b', 168.232, 37.112, 0.42, 169.152, 37.612, 0.5, 'wood'], ['b', 168.367, 37.112, 0, 168.417, 37.612, 0.5, 'iron'], ['b', 168.967, 37.112, 0, 169.017, 37.612, 0.5, 'iron'],
+    ['b', 168.522, 37.592, 0.1, 168.862, 37.632, 0.4, 'cloth'], ['b', 162.091, 38.169, 0.7, 162.451, 38.429, 0.78, 'linen'], ['b', 162.091, 38.169, 0.78, 162.451, 38.429, 0.86, 'linen'], ['b', 166.261, 44.303, 0, 166.711, 44.383, 1.6, 'pine']]);
+  /* G-ADDS end headmasters-room-4 */
+  /* G-ADDS lake-tower-4 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): plank-bench-1, iron-bound-chest-1, oil-lamp-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-4.js for collision only */
+  add('lake-tower-4', [
+    ['b', 130.85, -0.4, 0.42, 132.15, -0.02, 0.47, 'pine'], ['b', 130.92, -0.35, 0, 130.98, -0.05, 0.42, 'pine'], ['b', 132.02, -0.35, 0, 132.08, -0.05, 0.42, 'pine'], ['b', 134.14, -4.58, 0, 134.64, -3.68, 0.55, 'iron'],
+    ['y', 127.496, -0.512, 0.06, 0.7, 0.8, 'brass'], ['y', 127.496, -0.512, 0.045, 0.8, 0.95, 'glass']]);
+  /* G-ADDS end lake-tower-4 */
+  /* G-ADDS drum-bend-4-west */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): chair-squab-1, stair-runner-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-4.js for collision only */
+  add('drum-bend-4-west', [
+    ['b', 33.06, 8.9, 0, 33.66, 9.5, 0.95, 'leather'], ['b', 33.06, 5.6, 0, 35.06, 6.6, 0.01, 'scarlet']]);
+  /* G-ADDS end drum-bend-4-west */
+  /* G-ADDS drum-bend-4 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): umbrella-1; NOT PLACED for want of a clear spot: hearth-rug-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-4.js for collision only */
+  add('drum-bend-4', [
+    ['b', 37.36, 11.29, 0.8, 37.42, 11.36, 1.7, 'black']]);
+  /* G-ADDS end drum-bend-4 */
+  /* G-ADDS drum-bend-4-east */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): plank-bench-1, boot-mat-1, noticeboard-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-4.js for collision only */
+  add('drum-bend-4-east', [
+    ['b', 48.86, 5.25, 0.42, 49.24, 6.55, 0.47, 'pine'], ['b', 48.89, 5.32, 0, 49.19, 5.38, 0.42, 'pine'], ['b', 48.89, 6.42, 0, 49.19, 6.48, 0.42, 'pine'], ['b', 50.87, 5.75, 0, 51.32, 6.45, 0.02, 'rush'],
+    ['b', 51.3, 7.5, 1.3, 51.35, 8.5, 2.0, 'pine']]);
+  /* G-ADDS end drum-bend-4-east */
+  /* G-ADDS elves-linen-room-4-lake-nook */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): oil-lamp-1; NOT PLACED for want of a clear spot: linen-press-1, folded-linen-1, folded-linen-1, folded-linen-1, folded-linen-1, folded-linen-1, folded-linen-1, short-ladder-1, worktable-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-4.js for collision only */
+  add('elves-linen-room-4-lake-nook', [
+    ['y', 35.242, 16.241, 0.06, 0.3, 0.4, 'brass'], ['y', 35.242, 16.241, 0.045, 0.4, 0.55, 'glass']]);
+  /* G-ADDS end elves-linen-room-4-lake-nook */
+  /* G-ADDS east-lift-shaft-4 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): chair-squab-1, stair-runner-1; sited by tools/architect-now.py, plain stand-ins; read back from None for collision only */
+  add('east-lift-shaft-4', [
+    ['b', 163.15, 34.88, 0, 163.75, 35.48, 0.95, 'leather'], ['b', 161.88, 32.45, 0, 163.88, 33.45, 0.01, 'scarlet']]);
+  /* G-ADDS end east-lift-shaft-4 */
+  /* G-ADDS west-pole-shaft-4 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): umbrella-1, hearth-rug-1; sited by tools/architect-now.py, plain stand-ins; read back from None for collision only */
+  add('west-pole-shaft-4', [
+    ['b', 0.14, 26.92, 0.8, 0.21, 26.98, 1.7, 'black'], ['b', -4.38, 22.75, 0, -3.38, 24.15, 0.012, 'tartan']]);
+  /* G-ADDS end west-pole-shaft-4 */
+  /* G-ADDS west-dumbwaiter-shaft-4 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): plank-bench-1, boot-mat-1, noticeboard-1; sited by tools/architect-now.py, plain stand-ins; read back from None for collision only */
+  add('west-dumbwaiter-shaft-4', [
+    ['b', -4.38, 41.0, 0.42, -4.0, 42.3, 0.47, 'pine'], ['b', -4.35, 41.07, 0, -4.05, 41.13, 0.42, 'pine'], ['b', -4.35, 42.17, 0, -4.05, 42.23, 0.42, 'pine'], ['b', -0.27, 41.6, 0, 0.18, 42.3, 0.02, 'rush'],
+    ['b', -4.41, 41.65, 1.3, -4.36, 42.65, 2.0, 'pine']]);
+  /* G-ADDS end west-dumbwaiter-shaft-4 */
+  /* G-ADDS loop-gallery-stair-4 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): chair-squab-1, stair-runner-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-4.js for collision only */
+  add('loop-gallery-stair-4', [
+    ['b', 101.28, -1.95, 0, 101.88, -1.35, 0.95, 'leather'], ['b', 100.05, -2.68, 0, 101.05, -0.68, 0.01, 'scarlet']]);
+  /* G-ADDS end loop-gallery-stair-4 */
+  /* G-ADDS loop-gallery-4 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): umbrella-1, hearth-rug-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-4.js for collision only */
+  add('loop-gallery-4', [
+    ['b', 110.62, -2.61, 0.8, 110.68, -2.54, 1.7, 'black'], ['b', 109.25, -2.58, 0, 110.65, -1.58, 0.012, 'tartan']]);
+  /* G-ADDS end loop-gallery-4 */
+  /* G-ADDS east-wing-5 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): plank-bench-1, hall-chair-1, hearth-rug-1, candlestick-1, snuffer-pole-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-5.js for collision only */
+  add('east-wing-5', [
+    ['b', 144.02, 36.75, 0.42, 144.4, 38.05, 0.47, 'pine'], ['b', 144.05, 36.82, 0, 144.35, 36.88, 0.42, 'pine'], ['b', 144.05, 37.92, 0, 144.35, 37.98, 0.42, 'pine'], ['b', 154.4, 49.23, 0, 154.9, 49.73, 0.95, 'oak'],
+    ['b', 144.02, 25.0, 0, 145.02, 26.4, 0.012, 'tartan'], ['y', 154.493, 49.323, 0.035, 0.95, 1.2, 'brass'], ['b', 159.95, 25.975, 0.2, 160.01, 26.025, 1.8, 'wood']]);
+  /* G-ADDS end east-wing-5 */
+  /* G-ADDS head-boy-girl-study-5 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): writing-desk-1, dip-holder-1, leather-armchair-1, oil-lamp-1, fire-irons-1, bookcase-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-5.js for collision only */
+  add('head-boy-girl-study-5', [
+    ['b', 51.87, 6.7, 0, 52.42, 7.7, 0.78, 'oak'], ['y', 56.711, 10.138, 0.025, 0.76, 0.96, 'wood'], ['b', 51.9, 3.87, 0, 52.7, 4.67, 0.95, 'leather'], ['y', 56.711, 10.263, 0.06, 0.76, 0.86, 'brass'],
+    ['y', 56.711, 10.263, 0.045, 0.86, 1.01, 'glass'], ['b', 62.25, 3.87, 0, 62.55, 4.17, 0.7, 'iron'], ['b', 54.1, 3.87, 0, 55.1, 4.17, 1.9, 'oak']]);
+  /* G-ADDS end head-boy-girl-study-5 */
+  /* G-ADDS prefects-bathroom */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): washbasin-1, plank-bench-1; sited by tools/architect-now.py, plain stand-ins; read back from None for collision only */
+  add('prefects-bathroom', [
+    ['b', 0.27, 31.85, 0, 0.67, 32.35, 0.85, 'white'], ['b', 0.27, 35.15, 0.42, 0.65, 36.45, 0.47, 'pine'], ['b', 0.3, 35.22, 0, 0.6, 35.28, 0.42, 'pine'], ['b', 0.3, 36.32, 0, 0.6, 36.38, 0.42, 'pine']]);
+  /* G-ADDS end prefects-bathroom */
+  /* G-ADDS dormitory-linen-store-5 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): book-crate-1, hessian-sack-1, hanging-lantern-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-5.js for collision only */
+  add('dormitory-linen-store-5', [
+    ['b', 22.36, 7.69, 0, 22.78, 8.31, 0.32, 'pine'], ['b', 30.52, 4.27, 0, 30.86, 4.67, 0.5, 'rush'], ['b', 30.57, 4.33, 0.5, 30.81, 4.59, 0.56, 'rush'], ['b', 30.6, 4.35, 0.56, 30.78, 4.55, 0.6, 'straw'],
+    ['b', 22.875, 4.23, 1.77, 22.905, 4.47, 1.8, 'iron'], ['y', 22.89, 4.45, 0.01, 1.72, 1.77, 'iron'], ['y', 22.89, 4.45, 0.05, 1.68, 1.72, 'brass'], ['y', 22.89, 4.45, 0.085, 1.46, 1.68, 'glass'],
+    ['y', 22.89, 4.45, 0.1, 1.41, 1.46, 'brass']]);
+  /* G-ADDS end dormitory-linen-store-5 */
+  /* G-ADDS staff-bedroom-5-west */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): iron-bedstead-1, school-trunk-1, washbasin-1, nest-of-drawers-1, candlestick-1, hearth-rug-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-5.js for collision only */
+  add('staff-bedroom-5-west', [
+    ['b', 10.27, 14.2, 0, 11.22, 16.2, 0.55, 'iron'], ['b', 10.27, 3.85, 0, 10.75, 4.75, 0.42, 'leather'], ['b', 10.27, 3.84, 0.42, 10.77, 4.76, 0.5, 'wood'], ['b', 10.27, 3.975, 0, 10.77, 4.025, 0.5, 'iron'],
+    ['b', 10.27, 4.575, 0, 10.77, 4.625, 0.5, 'iron'], ['b', 10.75, 4.13, 0.1, 10.79, 4.47, 0.4, 'cloth'], ['b', 10.27, 5.25, 0, 10.67, 5.75, 0.85, 'white'], ['b', 14.8, 17.33, 0, 15.4, 17.73, 0.8, 'oak'],
+    ['y', 10.383, 6.561, 0.035, 0.76, 1.01, 'brass'], ['b', 19.33, 14.2, 0, 20.33, 15.6, 0.012, 'tartan']]);
+  /* G-ADDS end staff-bedroom-5-west */
+  /* G-ADDS music-room-5 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): writing-desk-1, oak-chair-1, bookcase-1, silver-teapot-1, log-basket-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-5.js for collision only */
+  add('music-room-5', [
+    ['b', 116.87, 12.2, 0, 117.42, 13.2, 0.78, 'oak'], ['b', 116.87, 8.35, 0, 117.37, 8.85, 0.9, 'oak'], ['b', 127.0, 17.68, 0, 128.0, 17.98, 1.9, 'oak'], ['b', 120.82, 10.376, 0.78, 121.02, 10.496, 0.96, 'steel'],
+    ['b', 118.65, 3.87, 0, 119.15, 4.27, 0.4, 'wicker']]);
+  /* G-ADDS end music-room-5 */
+  /* G-ADDS disused-classroom-5-east */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): masters-desk-1, blackboard-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-5.js for collision only */
+  add('disused-classroom-5-east', [
+    ['b', 150.0, 3.87, 0, 151.4, 4.57, 0.95, 'oak'], ['b', 141.44, 3.9, 1.0, 141.49, 5.7, 2.0, 'black']]);
+  /* G-ADDS end disused-classroom-5-east */
+  /* G-ADDS armour-corridor-5 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): plank-bench-1, hearth-rug-1, frame-worn-gilt-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-5.js for collision only */
+  add('armour-corridor-5', [
+    ['b', 103.65, 14.25, 0.42, 104.03, 15.55, 0.47, 'pine'], ['b', 103.7, 14.32, 0, 104.0, 14.38, 0.42, 'pine'], ['b', 103.7, 15.42, 0, 104.0, 15.48, 0.42, 'pine'], ['b', 103.03, 5.7, 0, 104.03, 7.1, 0.012, 'tartan'],
+    ['b', 97.95, 17.96, 1.4, 98.45, 18.01, 2.05, 'gilt']]);
+  /* G-ADDS end armour-corridor-5 */
+  /* G-ADDS owl-examiners-rooms-5 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): writing-desk-1, oak-chair-1, hearth-rug-1, oil-lamp-1, silver-teapot-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-5.js for collision only */
+  add('owl-examiners-rooms-5', [
+    ['b', 110.7, 17.43, 0, 111.7, 17.98, 0.78, 'oak'], ['b', 104.57, 15.35, 0, 105.07, 15.85, 0.9, 'oak'], ['b', 115.33, 7.7, 0, 116.33, 9.1, 0.012, 'tartan'], ['y', 108.361, 10.436, 0.06, 0.78, 0.88, 'brass'],
+    ['y', 108.361, 10.436, 0.045, 0.88, 1.03, 'glass'], ['b', 108.321, 10.559, 0.78, 108.521, 10.679, 0.96, 'steel']]);
+  /* G-ADDS end owl-examiners-rooms-5 */
+  /* G-ADDS staff-bedrooms-5-east */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): iron-bedstead-1, washbasin-1, iron-bound-chest-1, candlestick-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-5.js for collision only */
+  add('staff-bedrooms-5-east', [
+    ['b', 131.1, 3.87, 0, 133.1, 4.82, 0.55, 'iron'], ['b', 129.17, 14.35, 0, 129.57, 14.85, 0.85, 'white'], ['b', 140.43, 14.35, 0, 140.93, 15.25, 0.55, 'iron'], ['y', 129.282, 6.561, 0.035, 0.76, 1.01, 'brass']]);
+  /* G-ADDS end staff-bedrooms-5-east */
+  /* G-ADDS star-chart-room-5 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): writing-desk-1, dip-holder-1, leather-armchair-1, oil-lamp-1, fire-irons-1, bookcase-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-5.js for collision only */
+  add('star-chart-room-5', [
+    ['b', 89.27, 61.9, 0, 89.82, 62.9, 0.78, 'oak'], ['y', 94.56, 64.336, 0.025, 0.78, 0.98, 'wood'], ['b', 95.8, 71.18, 0, 96.6, 71.98, 0.95, 'leather'], ['y', 94.56, 64.457, 0.06, 0.78, 0.88, 'brass'],
+    ['y', 94.56, 64.457, 0.045, 0.88, 1.03, 'glass'], ['b', 96.25, 59.27, 0, 96.55, 59.57, 0.7, 'iron'], ['b', 89.27, 66.9, 0, 89.57, 67.9, 1.9, 'oak']]);
+  /* G-ADDS end star-chart-room-5 */
+  /* G-ADDS staff-bedroom-5-east */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): iron-bedstead-1, low-easy-chair-1, hearth-rug-1, nest-of-drawers-1, oil-lamp-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-5.js for collision only */
+  add('staff-bedroom-5-east', [
+    ['b', 123.0, 59.27, 0, 125.0, 60.22, 0.55, 'iron'], ['b', 113.07, 63.95, 0, 113.77, 64.65, 0.75, 'leather'], ['b', 113.07, 68.9, 0, 114.07, 70.3, 0.012, 'tartan'], ['b', 113.07, 63.2, 0, 113.47, 63.8, 0.8, 'oak'],
+    ['y', 115.761, 71.492, 0.06, 0.76, 0.86, 'brass'], ['y', 115.761, 71.492, 0.045, 0.86, 1.01, 'glass']]);
+  /* G-ADDS end staff-bedroom-5-east */
+  /* G-ADDS teachers-study-5-east */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): writing-desk-1, oak-chair-1, bookcase-1, silver-teapot-1, log-basket-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-5.js for collision only */
+  add('teachers-study-5-east', [
+    ['b', 151.68, 64.5, 0, 152.23, 65.5, 0.78, 'oak'], ['b', 141.55, 71.48, 0, 142.05, 71.98, 0.9, 'oak'], ['b', 138.87, 61.5, 0, 139.17, 62.5, 1.9, 'oak'], ['b', 149.733, 64.977, 0.76, 149.933, 65.097, 0.94, 'steel'],
+    ['b', 140.45, 59.27, 0, 140.95, 59.67, 0.4, 'wicker']]);
+  /* G-ADDS end teachers-study-5-east */
+  /* G-ADDS house-points-ledgers-5 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): school-trunk-1, folded-linen-1, short-ladder-1; NOT PLACED for want of a clear spot: luggage-tag-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-5.js for collision only */
+  add('house-points-ledgers-5', [
+    ['b', 101.17, 66.45, 0, 101.65, 67.35, 0.42, 'leather'], ['b', 101.17, 66.44, 0.42, 101.67, 67.36, 0.5, 'wood'], ['b', 101.17, 66.575, 0, 101.67, 66.625, 0.5, 'iron'], ['b', 101.17, 67.175, 0, 101.67, 67.225, 0.5, 'iron'],
+    ['b', 101.65, 66.73, 0.1, 101.69, 67.07, 0.4, 'cloth'], ['b', 106.511, 64.641, 0.76, 106.871, 64.901, 0.84, 'linen'], ['b', 106.511, 64.641, 0.84, 106.871, 64.901, 0.92, 'linen'], ['b', 108.275, 71.65, 0, 108.725, 71.73, 1.6, 'pine']]);
+  /* G-ADDS end house-points-ledgers-5 */
+  /* G-ADDS study-room-5 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): writing-desk-1, oak-chair-1, hearth-rug-1, oil-lamp-1, silver-teapot-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-5.js for collision only */
+  add('study-room-5', [
+    ['b', 135.9, 71.43, 0, 136.9, 71.98, 0.78, 'oak'], ['b', 135.65, 59.27, 0, 136.15, 59.77, 0.9, 'oak'], ['b', 126.97, 66.4, 0, 127.97, 67.8, 0.012, 'tartan'], ['y', 130.761, 65.188, 0.06, 0.76, 0.86, 'brass'],
+    ['y', 130.761, 65.188, 0.045, 0.86, 1.01, 'glass'], ['b', 130.722, 65.315, 0.76, 130.922, 65.435, 0.94, 'steel']]);
+  /* G-ADDS end study-room-5 */
+  /* G-ADDS teachers-study-5-southwest */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): writing-desk-1, dip-holder-1, leather-armchair-1, oil-lamp-1, fire-irons-1, bookcase-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-5.js for collision only */
+  add('teachers-study-5-southwest', [
+    ['b', 32.18, 65.4, 0, 32.73, 66.4, 0.78, 'oak'], ['y', 26.162, 69.517, 0.025, 0.76, 0.96, 'wood'], ['b', 20.77, 60.4, 0, 21.57, 61.2, 0.95, 'leather'], ['y', 26.162, 69.65, 0.06, 0.76, 0.86, 'brass'],
+    ['y', 26.162, 69.65, 0.045, 0.86, 1.01, 'glass'], ['b', 32.05, 71.68, 0, 32.35, 71.98, 0.7, 'iron'], ['b', 32.43, 67.4, 0, 32.73, 68.4, 1.9, 'oak']]);
+  /* G-ADDS end teachers-study-5-southwest */
+  /* G-ADDS disused-classroom-5-west */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): masters-desk-1, blackboard-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-5.js for collision only */
+  add('disused-classroom-5-west', [
+    ['b', 15.1, 71.28, 0, 16.5, 71.98, 0.95, 'oak'], ['b', 13.8, 71.96, 1.0, 15.6, 72.01, 2.0, 'black']]);
+  /* G-ADDS end disused-classroom-5-west */
+  /* G-ADDS store-5-east */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): plank-bench-1, iron-bound-chest-1, oil-lamp-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-5.js for collision only */
+  add('store-5-east', [
+    ['b', 124.45, 53.87, 0.42, 125.75, 54.25, 0.47, 'pine'], ['b', 124.52, 53.9, 0, 124.58, 54.2, 0.42, 'pine'], ['b', 125.62, 53.9, 0, 125.68, 54.2, 0.42, 'pine'], ['b', 115.07, 54.35, 0, 115.57, 55.25, 0.55, 'iron'],
+    ['y', 115.547, 57.195, 0.06, 0.8, 0.9, 'brass'], ['y', 115.547, 57.195, 0.045, 0.9, 1.05, 'glass']]);
+  /* G-ADDS end store-5-east */
+  /* G-ADDS teachers-study-5-west */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): writing-desk-1, oak-chair-1, bookcase-1, silver-teapot-1, log-basket-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-5.js for collision only */
+  add('teachers-study-5-west', [
+    ['b', 11.58, 45.9, 0, 12.13, 46.9, 0.78, 'oak'], ['b', 1.05, 49.23, 0, 1.55, 49.73, 0.9, 'oak'], ['b', 4.2, 49.43, 0, 5.2, 49.73, 1.9, 'oak'], ['b', 2.22, 44.352, 0.76, 2.42, 44.472, 0.94, 'steel'],
+    ['b', 11.73, 47.15, 0, 12.13, 47.65, 0.4, 'wicker']]);
+  /* G-ADDS end teachers-study-5-west */
+  /* G-ADDS elves-linen-room-5 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): linen-press-1, folded-linen-1, short-ladder-1, worktable-1, oil-lamp-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-5.js for collision only */
+  add('elves-linen-room-5', [
+    ['b', 12.7, 53.87, 0, 13.7, 54.42, 1.8, 'pine'], ['b', 9.68, 58.281, 0.4, 10.04, 58.541, 0.48, 'linen'], ['b', 9.68, 58.281, 0.48, 10.04, 58.541, 0.56, 'linen'], ['b', 16.175, 58.65, 0, 16.625, 58.73, 1.6, 'pine'],
+    ['b', 27.0, 58.03, 0, 28.4, 58.73, 0.8, 'deal'], ['y', 9.74, 58.674, 0.06, 0.4, 0.5, 'brass'], ['y', 9.74, 58.674, 0.045, 0.5, 0.65, 'glass']]);
+  /* G-ADDS end elves-linen-room-5 */
+  /* G-ADDS teachers-study-5-middle */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): writing-desk-1, oak-chair-1, hearth-rug-1, oil-lamp-1, silver-teapot-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-5.js for collision only */
+  add('teachers-study-5-middle', [
+    ['b', 78.1, 59.27, 0, 79.1, 59.82, 0.78, 'oak'], ['b', 73.95, 68.23, 0, 74.45, 68.73, 0.9, 'oak'], ['b', 76.1, 67.73, 0, 77.5, 68.73, 0.012, 'tartan'], ['y', 79.267, 63.412, 0.06, 0.76, 0.86, 'brass'],
+    ['y', 79.267, 63.412, 0.045, 0.86, 1.01, 'glass'], ['b', 79.233, 63.538, 0.76, 79.433, 63.658, 0.94, 'steel']]);
+  /* G-ADDS end teachers-study-5-middle */
+  /* G-ADDS prefects-common-room */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): low-easy-chair-1, leather-armchair-1, hearth-rug-1, fire-irons-1, oil-lamp-1, silver-teapot-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-5.js for collision only */
+  add('prefects-common-room', [
+    ['b', 11.43, 19.95, 0, 12.13, 20.65, 0.75, 'leather'], ['b', 11.33, 22.9, 0, 12.13, 23.7, 0.95, 'leather'], ['b', 7.5, 18.27, 0, 8.9, 19.27, 0.012, 'tartan'], ['b', 7.45, 25.43, 0, 7.75, 25.73, 0.7, 'iron'],
+    ['y', 5.912, 21.714, 0.06, 0.55, 0.65, 'brass'], ['y', 5.912, 21.714, 0.045, 0.65, 0.8, 'glass'], ['b', 5.875, 21.845, 0.55, 6.075, 21.965, 0.73, 'steel']]);
+  /* G-ADDS end prefects-common-room */
+  /* G-ADDS gryffindor-storeroom-5 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): hall-chair-1, hearth-rug-1, stool-1, oil-lamp-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-5.js for collision only */
+  add('gryffindor-storeroom-5', [
+    ['b', 36.07, 16.9, 0, 36.57, 17.4, 0.95, 'oak'], ['b', 36.07, 12.15, 0, 37.07, 13.55, 0.012, 'tartan'], ['y', 43.3, 11.82, 0.17, 0.43, 0.47, 'pine'], ['b', 43.38, 11.9, 0, 43.42, 11.94, 0.43, 'pine'],
+    ['b', 43.18, 11.9, 0, 43.22, 11.94, 0.43, 'pine'], ['b', 43.38, 11.7, 0, 43.42, 11.74, 0.43, 'pine'], ['b', 43.18, 11.7, 0, 43.22, 11.74, 0.43, 'pine'], ['y', 36.547, 17.645, 0.06, 0.8, 0.9, 'brass'],
+    ['y', 36.547, 17.645, 0.045, 0.9, 1.05, 'glass']]);
+  /* G-ADDS end gryffindor-storeroom-5 */
+  /* G-ADDS linen-cupboard-5 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): book-crate-1, hessian-sack-1, hanging-lantern-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-5.js for collision only */
+  add('linen-cupboard-5', [
+    ['b', 51.59, 53.87, 0, 52.21, 54.29, 0.32, 'pine'], ['b', 57.13, 53.87, 0, 57.47, 54.27, 0.5, 'rush'], ['b', 57.18, 53.93, 0.5, 57.42, 54.19, 0.56, 'rush'], ['b', 57.21, 53.95, 0.56, 57.39, 54.15, 0.6, 'straw'],
+    ['b', 54.985, 53.83, 1.77, 55.015, 54.07, 1.8, 'iron'], ['y', 55.0, 54.05, 0.01, 1.72, 1.77, 'iron'], ['y', 55.0, 54.05, 0.05, 1.68, 1.72, 'brass'], ['y', 55.0, 54.05, 0.085, 1.46, 1.68, 'glass'],
+    ['y', 55.0, 54.05, 0.1, 1.41, 1.46, 'brass']]);
+  /* G-ADDS end linen-cupboard-5 */
+  /* G-ADDS lamp-candle-cupboard-5 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): school-trunk-1, folded-linen-1, short-ladder-1; NOT PLACED for want of a clear spot: luggage-tag-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-5.js for collision only */
+  add('lamp-candle-cupboard-5', [
+    ['b', 33.85, 53.87, 0, 34.75, 54.35, 0.42, 'leather'], ['b', 33.84, 53.87, 0.42, 34.76, 54.37, 0.5, 'wood'], ['b', 33.975, 53.87, 0, 34.025, 54.37, 0.5, 'iron'], ['b', 34.575, 53.87, 0, 34.625, 54.37, 0.5, 'iron'],
+    ['b', 34.13, 54.35, 0.1, 34.47, 54.39, 0.4, 'cloth'], ['b', 35.881, 58.394, 0.5, 36.241, 58.654, 0.58, 'linen'], ['b', 35.881, 58.394, 0.58, 36.241, 58.654, 0.66, 'linen'], ['b', 37.675, 53.87, 0, 38.125, 53.95, 1.6, 'pine']]);
+  /* G-ADDS end lamp-candle-cupboard-5 */
+  /* G-ADDS broom-cupboard-5-middle */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): plank-bench-1, iron-bound-chest-1; NOT PLACED for want of a clear spot: oil-lamp-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-5.js for collision only */
+  add('broom-cupboard-5-middle', [
+    ['b', 80.45, 53.87, 0.42, 81.75, 54.25, 0.47, 'pine'], ['b', 80.52, 53.9, 0, 80.58, 54.2, 0.42, 'pine'], ['b', 81.62, 53.9, 0, 81.68, 54.2, 0.42, 'pine'], ['b', 74.05, 53.87, 0, 74.95, 54.37, 0.55, 'iron']]);
+  /* G-ADDS end broom-cupboard-5-middle */
+  /* G-ADDS teachers-study-5-southeast */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): writing-desk-1, dip-holder-1, leather-armchair-1, oil-lamp-1, fire-irons-1, bookcase-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-5.js for collision only */
+  add('teachers-study-5-southeast', [
+    ['b', 158.9, 6.77, 0, 159.9, 7.32, 0.78, 'oak'], ['y', 157.517, 11.662, 0.025, 0.76, 0.96, 'wood'], ['b', 157.6, 16.93, 0, 158.4, 17.73, 0.95, 'leather'], ['y', 157.517, 11.786, 0.06, 0.76, 0.86, 'brass'],
+    ['y', 157.517, 11.786, 0.045, 0.86, 1.01, 'glass'], ['b', 153.77, 15.45, 0, 154.07, 15.75, 0.7, 'iron'], ['b', 153.77, 6.8, 0, 154.07, 7.8, 1.9, 'oak']]);
+  /* G-ADDS end teachers-study-5-southeast */
+  /* G-ADDS astronomy-stair-foot-5 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): plank-bench-1, stair-runner-1; NOT PLACED for want of a clear spot: oil-lamp-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-5.js for collision only */
+  add('astronomy-stair-foot-5', [
+    ['b', 86.95, 68.35, 0.42, 88.25, 68.73, 0.47, 'pine'], ['b', 87.02, 68.4, 0, 87.08, 68.7, 0.42, 'pine'], ['b', 88.12, 68.4, 0, 88.18, 68.7, 0.42, 'pine'], ['b', 85.5, 66.73, 0, 86.5, 68.73, 0.01, 'scarlet']]);
+  /* G-ADDS end astronomy-stair-foot-5 */
+  /* G-ADDS cleaning-cupboard-5-middle */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): hall-chair-1, hearth-rug-1, stool-1, oil-lamp-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-5.js for collision only */
+  add('cleaning-cupboard-5-middle', [
+    ['b', 70.15, 71.48, 0, 70.65, 71.98, 0.95, 'oak'], ['b', 70.73, 67.0, 0, 71.73, 68.4, 0.012, 'tartan'], ['y', 71.53, 68.6, 0.17, 0.43, 0.47, 'pine'], ['b', 71.61, 68.68, 0, 71.65, 68.72, 0.43, 'pine'],
+    ['b', 71.41, 68.68, 0, 71.45, 68.72, 0.43, 'pine'], ['b', 71.61, 68.48, 0, 71.65, 68.52, 0.43, 'pine'], ['b', 71.41, 68.48, 0, 71.45, 68.52, 0.43, 'pine'], ['y', 70.243, 71.573, 0.06, 0.95, 1.05, 'brass'],
+    ['y', 70.243, 71.573, 0.045, 1.05, 1.2, 'glass']]);
+  /* G-ADDS end cleaning-cupboard-5-middle */
+  /* G-ADDS old-textbooks-store-5 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): book-crate-1, hessian-sack-1, hanging-lantern-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-5.js for collision only */
+  add('old-textbooks-store-5', [
+    ['b', 106.69, 53.87, 0, 107.31, 54.29, 0.32, 'pine'], ['b', 112.03, 53.87, 0, 112.37, 54.27, 0.5, 'rush'], ['b', 112.08, 53.93, 0.5, 112.32, 54.19, 0.56, 'rush'], ['b', 112.11, 53.95, 0.56, 112.29, 54.15, 0.6, 'straw'],
+    ['b', 112.43, 54.985, 1.77, 112.67, 55.015, 1.8, 'iron'], ['y', 112.45, 55.0, 0.01, 1.72, 1.77, 'iron'], ['y', 112.45, 55.0, 0.05, 1.68, 1.72, 'brass'], ['y', 112.45, 55.0, 0.085, 1.46, 1.68, 'glass'],
+    ['y', 112.45, 55.0, 0.1, 1.41, 1.46, 'brass']]);
+  /* G-ADDS end old-textbooks-store-5 */
+  /* G-ADDS washrooms-5-west */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): washbasin-1, plank-bench-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-5.js for collision only */
+  add('washrooms-5-west', [
+    ['b', 0.02, 15.85, 0, 0.42, 16.35, 0.85, 'white'], ['b', 0.0, 12.27, 0.42, 1.3, 12.65, 0.47, 'pine'], ['b', 0.07, 12.3, 0, 0.13, 12.6, 0.42, 'pine'], ['b', 1.17, 12.3, 0, 1.23, 12.6, 0.42, 'pine']]);
+  /* G-ADDS end washrooms-5-west */
+  /* G-ADDS spare-desks-store-5-middle */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): school-trunk-1, folded-linen-1, short-ladder-1; NOT PLACED for want of a clear spot: luggage-tag-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-5.js for collision only */
+  add('spare-desks-store-5-middle', [
+    ['b', 95.35, 56.05, 0, 95.83, 56.95, 0.42, 'leather'], ['b', 95.33, 56.04, 0.42, 95.83, 56.96, 0.5, 'wood'], ['b', 95.33, 56.175, 0, 95.83, 56.225, 0.5, 'iron'], ['b', 95.33, 56.775, 0, 95.83, 56.825, 0.5, 'iron'],
+    ['b', 95.31, 56.33, 0.1, 95.35, 56.67, 0.4, 'cloth'], ['b', 89.69, 57.13, 0.76, 90.05, 57.39, 0.84, 'linen'], ['b', 89.69, 57.13, 0.84, 90.05, 57.39, 0.92, 'linen'], ['b', 89.27, 56.575, 0, 89.35, 57.025, 1.6, 'pine']]);
+  /* G-ADDS end spare-desks-store-5-middle */
+  /* G-ADDS linen-cupboard-5-west */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): plank-bench-1, iron-bound-chest-1, oil-lamp-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-5.js for collision only */
+  add('linen-cupboard-5-west', [
+    ['b', 5.6, 54.45, 0.42, 5.98, 55.75, 0.47, 'pine'], ['b', 5.65, 54.52, 0, 5.95, 54.58, 0.42, 'pine'], ['b', 5.65, 55.62, 0, 5.95, 55.68, 0.42, 'pine'], ['b', 0.02, 55.05, 0, 0.52, 55.95, 0.55, 'iron'],
+    ['y', 0.29, 58.346, 0.06, 0.1, 0.2, 'brass'], ['y', 0.29, 58.346, 0.045, 0.2, 0.35, 'glass']]);
+  /* G-ADDS end linen-cupboard-5-west */
+  /* G-ADDS washrooms-5-north */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): washbasin-1, plank-bench-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-5.js for collision only */
+  add('washrooms-5-north', [
+    ['b', 101.65, 53.87, 0, 102.15, 54.27, 0.85, 'white'], ['b', 96.27, 56.45, 0.42, 96.65, 57.75, 0.47, 'pine'], ['b', 96.3, 56.52, 0, 96.6, 56.58, 0.42, 'pine'], ['b', 96.3, 57.62, 0, 96.6, 57.68, 0.42, 'pine']]);
+  /* G-ADDS end washrooms-5-north */
+  /* G-ADDS washrooms-5-east */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): washbasin-1, plank-bench-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-5.js for collision only */
+  add('washrooms-5-east', [
+    ['b', 145.55, 53.87, 0, 146.05, 54.27, 0.85, 'white'], ['b', 149.65, 53.87, 0.42, 150.95, 54.25, 0.47, 'pine'], ['b', 149.72, 53.9, 0, 149.78, 54.2, 0.42, 'pine'], ['b', 150.82, 53.9, 0, 150.88, 54.2, 0.42, 'pine']]);
+  /* G-ADDS end washrooms-5-east */
+  /* G-ADDS cleaning-cupboard-5-east */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): hall-chair-1, hearth-rug-1, stool-1, oil-lamp-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-5.js for collision only */
+  add('cleaning-cupboard-5-east', [
+    ['b', 155.05, 53.87, 0, 155.55, 54.37, 0.95, 'oak'], ['b', 156.4, 56.53, 0, 157.8, 57.53, 0.012, 'tartan'], ['y', 158.1, 57.33, 0.17, 0.43, 0.47, 'pine'], ['b', 158.18, 57.41, 0, 158.22, 57.45, 0.43, 'pine'],
+    ['b', 157.98, 57.41, 0, 158.02, 57.45, 0.43, 'pine'], ['b', 158.18, 57.21, 0, 158.22, 57.25, 0.43, 'pine'], ['b', 157.98, 57.21, 0, 158.02, 57.25, 0.43, 'pine'], ['y', 155.143, 53.963, 0.06, 0.95, 1.05, 'brass'],
+    ['y', 155.143, 53.963, 0.045, 1.05, 1.2, 'glass']]);
+  /* G-ADDS end cleaning-cupboard-5-east */
+  /* G-ADDS spare-desks-store-5-east */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): book-crate-1, hessian-sack-1, hanging-lantern-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-5.js for collision only */
+  add('spare-desks-store-5-east', [
+    ['b', 140.87, 54.29, 0, 141.29, 54.91, 0.32, 'pine'], ['b', 143.43, 54.73, 0, 143.83, 55.07, 0.5, 'rush'], ['b', 143.51, 54.78, 0.5, 143.77, 55.02, 0.56, 'rush'], ['b', 143.55, 54.81, 0.56, 143.75, 54.99, 0.6, 'straw'],
+    ['b', 140.83, 54.985, 1.77, 141.07, 55.015, 1.8, 'iron'], ['y', 141.05, 55.0, 0.01, 1.72, 1.77, 'iron'], ['y', 141.05, 55.0, 0.05, 1.68, 1.72, 'brass'], ['y', 141.05, 55.0, 0.085, 1.46, 1.68, 'glass'],
+    ['y', 141.05, 55.0, 0.1, 1.41, 1.46, 'brass']]);
+  /* G-ADDS end spare-desks-store-5-east */
+  /* G-ADDS passage-5-east */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): chair-squab-1, stair-runner-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-5.js for collision only */
+  add('passage-5-east', [
+    ['b', 152.27, 54.5, 0, 152.87, 55.1, 0.95, 'leather'], ['b', 152.27, 55.2, 0, 154.27, 56.2, 0.01, 'scarlet']]);
+  /* G-ADDS end passage-5-east */
+  /* G-ADDS service-passage-5-lobby */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): umbrella-1; NOT PLACED for want of a clear spot: hearth-rug-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-5.js for collision only */
+  add('service-passage-5-lobby', [
+    ['b', 69.79, 55.77, 0.8, 69.86, 55.83, 1.7, 'black']]);
+  /* G-ADDS end service-passage-5-lobby */
+  /* G-ADDS passage-5-west */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): plank-bench-1, boot-mat-1, noticeboard-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-5.js for collision only */
+  add('passage-5-west', [
+    ['b', 6.52, 56.55, 0.42, 6.9, 57.85, 0.47, 'pine'], ['b', 6.55, 56.62, 0, 6.85, 56.68, 0.42, 'pine'], ['b', 6.55, 57.72, 0, 6.85, 57.78, 0.42, 'pine'], ['b', 6.52, 54.45, 0, 6.97, 55.15, 0.02, 'rush'],
+    ['b', 6.49, 54.5, 1.3, 6.54, 55.5, 2.0, 'pine']]);
+  /* G-ADDS end passage-5-west */
+  /* G-ADDS passage-5-southwest */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): chair-squab-1; NOT PLACED for want of a clear spot: stair-runner-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-5.js for collision only */
+  add('passage-5-southwest', [
+    ['b', 32.13, 55.6, 0, 32.73, 56.2, 0.95, 'leather']]);
+  /* G-ADDS end passage-5-southwest */
+  /* G-ADDS passage-5-cleaning */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): umbrella-1, hearth-rug-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-5.js for collision only */
+  add('passage-5-cleaning', [
+    ['b', 70.24, 54.47, 0.8, 70.31, 54.53, 1.7, 'black'], ['b', 70.27, 54.5, 0, 71.27, 55.9, 0.012, 'tartan']]);
+  /* G-ADDS end passage-5-cleaning */
+  /* G-ADDS passage-5-astronomy */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): plank-bench-1, boot-mat-1, noticeboard-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-5.js for collision only */
+  add('passage-5-astronomy', [
+    ['b', 87.27, 54.45, 0.42, 87.65, 55.75, 0.47, 'pine'], ['b', 87.3, 54.52, 0, 87.6, 54.58, 0.42, 'pine'], ['b', 87.3, 55.62, 0, 87.6, 55.68, 0.42, 'pine'], ['b', 87.27, 54.85, 0, 87.72, 55.55, 0.02, 'rush'],
+    ['b', 87.24, 54.5, 1.3, 87.29, 55.5, 2.0, 'pine']]);
+  /* G-ADDS end passage-5-astronomy */
+  /* G-ADDS passage-5-middle */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): chair-squab-1; NOT PLACED for want of a clear spot: stair-runner-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-5.js for collision only */
+  add('passage-5-middle', [
+    ['b', 113.07, 54.5, 0, 113.67, 55.1, 0.95, 'leather']]);
+  /* G-ADDS end passage-5-middle */
+  /* G-ADDS passage-5-study */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): umbrella-1, hearth-rug-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-5.js for collision only */
+  add('passage-5-study', [
+    ['b', 138.84, 56.67, 0.8, 138.91, 56.73, 1.7, 'black'], ['b', 138.87, 54.5, 0, 139.87, 55.9, 0.012, 'tartan']]);
+  /* G-ADDS end passage-5-study */
+  /* G-ADDS north-range-corridor-5 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): plank-bench-1, boot-mat-1, noticeboard-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-5.js for collision only */
+  add('north-range-corridor-5', [
+    ['b', 76.2, 52.95, 0.42, 77.5, 53.33, 0.47, 'pine'], ['b', 76.27, 53.0, 0, 76.33, 53.3, 0.42, 'pine'], ['b', 77.37, 53.0, 0, 77.43, 53.3, 0.42, 'pine'], ['b', 14.3, 52.88, 0, 15.0, 53.33, 0.02, 'rush'],
+    ['b', 60.35, 53.31, 1.3, 61.35, 53.36, 2.0, 'pine']]);
+  /* G-ADDS end north-range-corridor-5 */
+  /* G-ADDS west-wing-corridor-5-south */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): chair-squab-1, stair-runner-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-5.js for collision only */
+  add('west-wing-corridor-5-south', [
+    ['b', 12.67, 40.9, 0, 13.27, 41.5, 0.95, 'leather'], ['b', 12.67, 41.6, 0, 14.67, 42.6, 0.01, 'scarlet']]);
+  /* G-ADDS end west-wing-corridor-5-south */
+  /* G-ADDS west-wing-corridor-5-north */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): umbrella-1, hearth-rug-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-5.js for collision only */
+  add('west-wing-corridor-5-north', [
+    ['b', 15.09, 21.97, 0.8, 15.16, 22.03, 1.7, 'black'], ['b', 12.67, 18.9, 0, 13.67, 20.3, 0.012, 'tartan']]);
+  /* G-ADDS end west-wing-corridor-5-north */
+  /* G-ADDS tudor-bay-5 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): writing-desk-1, oak-chair-1, bookcase-1, silver-teapot-1, log-basket-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-5.js for collision only */
+  add('tudor-bay-5', [
+    ['b', 109.45, -3.57, 0, 110.45, -3.02, 0.78, 'oak'], ['b', 106.2, -3.52, 0, 106.7, -3.02, 0.9, 'oak'], ['b', 105.15, -3.32, 0, 106.15, -3.02, 1.9, 'oak'], ['b', 109.505, -3.539, 0.78, 109.705, -3.419, 0.96, 'steel'],
+    ['b', 110.1, -6.48, 0, 110.6, -6.08, 0.4, 'wicker']]);
+  /* G-ADDS end tudor-bay-5 */
+  /* G-ADDS ravenclaw-tower-room-5 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): school-trunk-1, folded-linen-1, short-ladder-1; NOT PLACED for want of a clear spot: luggage-tag-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-5.js for collision only */
+  add('ravenclaw-tower-room-5', [
+    ['b', -2.166, 30.824, 0, -1.686, 31.724, 0.42, 'leather'], ['b', -2.186, 30.814, 0.42, -1.686, 31.734, 0.5, 'wood'], ['b', -2.186, 30.949, 0, -1.686, 30.999, 0.5, 'iron'], ['b', -2.186, 31.549, 0, -1.686, 31.599, 0.5, 'iron'],
+    ['b', -2.206, 31.104, 0.1, -2.166, 31.444, 0.4, 'cloth'], ['b', -8.265, 40.436, 0.64, -7.905, 40.696, 0.72, 'linen'], ['b', -8.265, 40.436, 0.72, -7.905, 40.696, 0.8, 'linen'], ['b', -13.982, 36.277, 0, -13.902, 36.727, 1.6, 'pine']]);
+  /* G-ADDS end ravenclaw-tower-room-5 */
+  /* G-ADDS headmasters-tower-room-5 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): plank-bench-1, iron-bound-chest-1, oil-lamp-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-5.js for collision only */
+  add('headmasters-tower-room-5', [
+    ['b', 163.087, 42.005, 0.42, 163.467, 43.305, 0.47, 'pine'], ['b', 163.117, 42.075, 0, 163.417, 42.135, 0.42, 'pine'], ['b', 163.117, 43.175, 0, 163.417, 43.235, 0.42, 'pine'], ['b', 168.746, 37.394, 0, 169.246, 38.294, 0.55, 'iron'],
+    ['y', 162.379, 37.875, 0.06, 0.7, 0.8, 'brass'], ['y', 162.379, 37.875, 0.045, 0.8, 0.95, 'glass']]);
+  /* G-ADDS end headmasters-tower-room-5 */
+  /* G-ADDS lake-tower-5 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): hall-chair-1, hearth-rug-1, stool-1, oil-lamp-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-5.js for collision only */
+  add('lake-tower-5', [
+    ['b', 128.49, -0.52, 0, 128.99, -0.02, 0.95, 'oak'], ['b', 133.64, -4.59, 0, 134.64, -3.19, 0.012, 'tartan'], ['y', 131.98, -0.22, 0.17, 0.43, 0.47, 'pine'], ['b', 132.06, -0.14, 0, 132.1, -0.1, 0.43, 'pine'],
+    ['b', 131.86, -0.14, 0, 131.9, -0.1, 0.43, 'pine'], ['b', 132.06, -0.34, 0, 132.1, -0.3, 0.43, 'pine'], ['b', 131.86, -0.34, 0, 131.9, -0.3, 0.43, 'pine'], ['y', 127.496, -0.512, 0.06, 0.7, 0.8, 'brass'],
+    ['y', 127.496, -0.512, 0.045, 0.8, 0.95, 'glass']]);
+  /* G-ADDS end lake-tower-5 */
+  /* G-ADDS east-lift-shaft-5 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): chair-squab-1, stair-runner-1; sited by tools/architect-now.py, plain stand-ins; read back from None for collision only */
+  add('east-lift-shaft-5', [
+    ['b', 160.12, 31.45, 0, 160.72, 32.05, 0.95, 'leather'], ['b', 161.25, 33.48, 0, 162.25, 35.48, 0.01, 'scarlet']]);
+  /* G-ADDS end east-lift-shaft-5 */
+  /* G-ADDS west-pole-shaft-5 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): umbrella-1, hearth-rug-1; sited by tools/architect-now.py, plain stand-ins; read back from None for collision only */
+  add('west-pole-shaft-5', [
+    ['b', -3.48, 22.69, 0.8, -3.42, 22.76, 1.7, 'black'], ['b', -4.35, 22.72, 0, -2.95, 23.72, 0.012, 'tartan']]);
+  /* G-ADDS end west-pole-shaft-5 */
+  /* G-ADDS west-dumbwaiter-shaft-5 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): plank-bench-1, boot-mat-1, noticeboard-1; sited by tools/architect-now.py, plain stand-ins; read back from None for collision only */
+  add('west-dumbwaiter-shaft-5', [
+    ['b', -4.38, 41.0, 0.42, -4.0, 42.3, 0.47, 'pine'], ['b', -4.35, 41.07, 0, -4.05, 41.13, 0.42, 'pine'], ['b', -4.35, 42.17, 0, -4.05, 42.23, 0.42, 'pine'], ['b', -4.4, 44.83, 0, -3.7, 45.28, 0.02, 'rush'],
+    ['b', -4.35, 40.99, 1.3, -3.35, 41.04, 2.0, 'pine']]);
+  /* G-ADDS end west-dumbwaiter-shaft-5 */
+  /* G-ADDS loop-gallery-stair-5 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): chair-squab-1; NOT PLACED for want of a clear spot: stair-runner-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-5.js for collision only */
+  add('loop-gallery-stair-5', [
+    ['b', 100.75, -2.68, 0, 101.35, -2.08, 0.95, 'leather']]);
+  /* G-ADDS end loop-gallery-stair-5 */
+  /* G-ADDS loop-gallery-5 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): umbrella-1, hearth-rug-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-5.js for collision only */
+  add('loop-gallery-5', [
+    ['b', 114.62, 0.14, 0.8, 114.68, 0.21, 1.7, 'black'], ['b', 115.95, -2.68, 0, 117.35, -1.68, 0.012, 'tartan']]);
+  /* G-ADDS end loop-gallery-5 */
+  /* G-ADDS clock-room-6 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): trestle-bench-1, worktable-1, stool-1, oil-lamp-1, short-ladder-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-6.js for collision only */
+  add('clock-room-6', [
+    ['b', 59.0, 7.47, 0, 60.4, 7.97, 0.8, 'pine'], ['b', 52.17, 15.3, 0, 52.87, 16.7, 0.8, 'deal'], ['y', 52.37, 14.5, 0.17, 0.43, 0.47, 'pine'], ['b', 52.45, 14.58, 0, 52.49, 14.62, 0.43, 'pine'],
+    ['b', 52.25, 14.58, 0, 52.29, 14.62, 0.43, 'pine'], ['b', 52.45, 14.38, 0, 52.49, 14.42, 0.43, 'pine'], ['b', 52.25, 14.38, 0, 52.29, 14.42, 0.43, 'pine'], ['y', 55.341, 12.862, 0.06, 0.9, 1.0, 'brass'],
+    ['y', 55.341, 12.862, 0.045, 1.0, 1.15, 'glass'], ['b', 58.675, 17.95, 0, 59.125, 18.03, 1.6, 'pine']]);
+  /* G-ADDS end clock-room-6 */
+  /* G-ADDS study-room-6-west */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): writing-desk-1, dip-holder-1, leather-armchair-1, oil-lamp-1, fire-irons-1, bookcase-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-6.js for collision only */
+  add('study-room-6-west', [
+    ['b', 24.27, 59.7, 0, 24.82, 60.7, 0.78, 'oak'], ['y', 26.511, 65.412, 0.025, 0.76, 0.96, 'wood'], ['b', 29.5, 71.23, 0, 30.3, 72.03, 0.95, 'leather'], ['y', 26.511, 65.537, 0.06, 0.76, 0.86, 'brass'],
+    ['y', 26.511, 65.537, 0.045, 0.86, 1.01, 'glass'], ['b', 32.23, 60.75, 0, 32.53, 61.05, 0.7, 'iron'], ['b', 24.27, 67.1, 0, 24.57, 68.1, 1.9, 'oak']]);
+  /* G-ADDS end study-room-6-west */
+  /* G-ADDS staff-bedroom-6-west */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): iron-bedstead-1, school-trunk-1, washbasin-1, nest-of-drawers-1, candlestick-1, hearth-rug-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-6.js for collision only */
+  add('staff-bedroom-6-west', [
+    ['b', 22.78, 61.9, 0, 23.73, 63.9, 0.55, 'iron'], ['b', 9.85, 71.5, 0, 10.75, 71.98, 0.42, 'leather'], ['b', 9.84, 71.48, 0.42, 10.76, 71.98, 0.5, 'wood'], ['b', 9.975, 71.48, 0, 10.025, 71.98, 0.5, 'iron'],
+    ['b', 10.575, 71.48, 0, 10.625, 71.98, 0.5, 'iron'], ['b', 10.13, 71.46, 0.1, 10.47, 71.5, 0.4, 'cloth'], ['b', 8.27, 64.35, 0, 8.67, 64.85, 0.85, 'white'], ['b', 10.5, 59.27, 0, 11.1, 59.67, 0.8, 'oak'],
+    ['y', 10.961, 71.492, 0.035, 0.76, 1.01, 'brass'], ['b', 8.27, 62.4, 0, 9.27, 63.8, 0.012, 'tartan']]);
+  /* G-ADDS end staff-bedroom-6-west */
+  /* G-ADDS staff-bedrooms-6-lake */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): iron-bedstead-1, washbasin-1, iron-bound-chest-1, candlestick-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-6.js for collision only */
+  add('staff-bedrooms-6-lake', [
+    ['b', 117.3, 3.87, 0, 119.3, 4.82, 0.55, 'iron'], ['b', 126.05, 3.87, 0, 126.55, 4.27, 0.85, 'white'], ['b', 128.13, 11.65, 0, 128.63, 12.55, 0.55, 'iron'], ['y', 116.983, 6.561, 0.035, 0.76, 1.01, 'brass']]);
+  /* G-ADDS end staff-bedrooms-6-lake */
+  /* G-ADDS elves-linen-room-6-lake */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): linen-press-1, folded-linen-1, short-ladder-1, worktable-1, oil-lamp-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-6.js for collision only */
+  add('elves-linen-room-6-lake', [
+    ['b', 141.47, 16.2, 0, 142.02, 17.2, 1.8, 'pine'], ['b', 141.881, 17.281, 0.4, 142.241, 17.541, 0.48, 'linen'], ['b', 141.881, 17.281, 0.48, 142.241, 17.541, 0.56, 'linen'], ['b', 141.47, 15.375, 0, 141.55, 15.825, 1.6, 'pine'],
+    ['b', 141.47, 11.4, 0, 142.17, 12.8, 0.8, 'deal'], ['y', 141.94, 17.674, 0.06, 0.4, 0.5, 'brass'], ['y', 141.94, 17.674, 0.045, 0.5, 0.65, 'glass']]);
+  /* G-ADDS end elves-linen-room-6-lake */
+  /* G-ADDS frog-choir-room-6 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): writing-desk-1, oak-chair-1, bookcase-1, silver-teapot-1, log-basket-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-6.js for collision only */
+  add('frog-choir-room-6', [
+    ['b', 103.48, 15.6, 0, 104.03, 16.6, 0.78, 'oak'], ['b', 103.53, 10.35, 0, 104.03, 10.85, 0.9, 'oak'], ['b', 92.5, 17.68, 0, 93.5, 17.98, 1.9, 'oak'], ['b', 97.021, 16.46, 0.45, 97.221, 16.58, 0.63, 'steel'],
+    ['b', 92.27, 14.75, 0, 92.67, 15.25, 0.4, 'wicker']]);
+  /* G-ADDS end frog-choir-room-6 */
+  /* G-ADDS guest-rooms-6 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): iron-bedstead-1, low-easy-chair-1, hearth-rug-1, nest-of-drawers-1, oil-lamp-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-6.js for collision only */
+  add('guest-rooms-6', [
+    ['b', 104.57, 12.9, 0, 105.52, 14.9, 0.55, 'iron'], ['b', 115.63, 14.35, 0, 116.33, 15.05, 0.75, 'leather'], ['b', 104.57, 3.9, 0, 105.57, 5.3, 0.012, 'tartan'], ['b', 113.5, 3.87, 0, 114.1, 4.27, 0.8, 'oak'],
+    ['y', 106.143, 17.602, 0.06, 0.58, 0.68, 'brass'], ['y', 106.143, 17.602, 0.045, 0.68, 0.83, 'glass']]);
+  /* G-ADDS end guest-rooms-6 */
+  /* G-ADDS disused-classroom-6-east */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): masters-desk-1, blackboard-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-6.js for collision only */
+  add('disused-classroom-6-east', [
+    ['b', 137.4, 17.28, 0, 138.8, 17.98, 0.95, 'oak'], ['b', 140.91, 9.4, 1.0, 140.96, 11.2, 2.0, 'black']]);
+  /* G-ADDS end disused-classroom-6-east */
+  /* G-ADDS teachers-study-6-middle */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): writing-desk-1, oak-chair-1, hearth-rug-1, oil-lamp-1, silver-teapot-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-6.js for collision only */
+  add('teachers-study-6-middle', [
+    ['b', 92.1, 71.43, 0, 93.1, 71.98, 0.78, 'oak'], ['b', 95.55, 71.48, 0, 96.05, 71.98, 0.9, 'oak'], ['b', 89.9, 59.27, 0, 91.3, 60.27, 0.012, 'tartan'], ['y', 98.16, 65.037, 0.06, 0.76, 0.86, 'brass'],
+    ['y', 98.16, 65.037, 0.045, 0.86, 1.01, 'glass'], ['b', 98.12, 65.163, 0.76, 98.32, 65.283, 0.94, 'steel']]);
+  /* G-ADDS end teachers-study-6-middle */
+  /* G-ADDS teachers-study-6-east */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): writing-desk-1, dip-holder-1, leather-armchair-1, oil-lamp-1, fire-irons-1, bookcase-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-6.js for collision only */
+  add('teachers-study-6-east', [
+    ['b', 114.07, 66.4, 0, 114.62, 67.4, 0.78, 'oak'], ['y', 123.96, 65.037, 0.025, 0.76, 0.96, 'wood'], ['b', 114.07, 62.6, 0, 114.87, 63.4, 0.95, 'leather'], ['y', 123.96, 65.161, 0.06, 0.76, 0.86, 'brass'],
+    ['y', 123.96, 65.161, 0.045, 0.86, 1.01, 'glass'], ['b', 126.13, 63.55, 0, 126.43, 63.85, 0.7, 'iron'], ['b', 114.07, 70.3, 0, 114.37, 71.3, 1.9, 'oak']]);
+  /* G-ADDS end teachers-study-6-east */
+  /* G-ADDS staff-bedroom-6-east */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): iron-bedstead-1, school-trunk-1, washbasin-1, nest-of-drawers-1, candlestick-1, hearth-rug-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-6.js for collision only */
+  add('staff-bedroom-6-east', [
+    ['b', 151.28, 63.1, 0, 152.23, 65.1, 0.55, 'iron'], ['b', 139.87, 61.05, 0, 140.35, 61.95, 0.42, 'leather'], ['b', 139.87, 61.04, 0.42, 140.37, 61.96, 0.5, 'wood'], ['b', 139.87, 61.175, 0, 140.37, 61.225, 0.5, 'iron'],
+    ['b', 139.87, 61.775, 0, 140.37, 61.825, 0.5, 'iron'], ['b', 140.35, 61.33, 0.1, 140.39, 61.67, 0.4, 'cloth'], ['b', 149.15, 71.58, 0, 149.65, 71.98, 0.85, 'white'], ['b', 140.5, 71.58, 0, 141.1, 71.98, 0.8, 'oak'],
+    ['y', 142.561, 71.492, 0.035, 0.76, 1.01, 'brass'], ['b', 143.4, 59.27, 0, 144.8, 60.27, 0.012, 'tartan']]);
+  /* G-ADDS end staff-bedroom-6-east */
+  /* G-ADDS staff-bedroom-6-middle */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): iron-bedstead-1, washbasin-1, iron-bound-chest-1, candlestick-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-6.js for collision only */
+  add('staff-bedroom-6-middle', [
+    ['b', 106.9, 70.78, 0, 108.9, 71.73, 0.55, 'iron'], ['b', 101.17, 66.35, 0, 101.57, 66.85, 0.85, 'white'], ['b', 113.03, 61.55, 0, 113.53, 62.45, 0.55, 'iron'], ['y', 103.861, 71.242, 0.035, 0.76, 1.01, 'brass']]);
+  /* G-ADDS end staff-bedroom-6-middle */
+  /* G-ADDS disused-classroom-6-middle */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): masters-desk-1, blackboard-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-6.js for collision only */
+  add('disused-classroom-6-middle', [
+    ['b', 126.97, 60.2, 0, 127.67, 61.6, 0.95, 'oak'], ['b', 130.8, 71.96, 1.0, 132.6, 72.01, 2.0, 'black']]);
+  /* G-ADDS end disused-classroom-6-middle */
+  /* G-ADDS elves-linen-room-6-east-wing */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): scrubbing-brush-1, hooped-bucket-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-6.js for collision only */
+  add('elves-linen-room-6-east-wing', [
+    ['b', 147.84, 42.43, 1.2, 147.91, 42.63, 1.3, 'wood'], ['y', 154.0, 39.78, 0.17, 0, 0.34, 'tin'], ['y', 154.0, 39.78, 0.175, 0.3, 0.34, 'iron']]);
+  /* G-ADDS end elves-linen-room-6-east-wing */
+  /* G-ADDS study-room-6-west-wing */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): writing-desk-1, oak-chair-1, bookcase-1, silver-teapot-1, log-basket-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-6.js for collision only */
+  add('study-room-6-west-wing', [
+    ['b', 11.58, 45.53, 0, 12.13, 46.53, 0.78, 'oak'], ['b', 5.05, 49.23, 0, 5.55, 49.73, 0.9, 'oak'], ['b', 0.3, 39.6, 0, 1.3, 39.9, 1.9, 'oak'], ['b', 4.272, 44.167, 0.76, 4.472, 44.288, 0.94, 'steel'],
+    ['b', 11.55, 39.6, 0, 12.05, 40.0, 0.4, 'wicker']]);
+  /* G-ADDS end study-room-6-west-wing */
+  /* G-ADDS staff-bedroom-6-east-wing */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): iron-bedstead-1, low-easy-chair-1, hearth-rug-1, nest-of-drawers-1, oil-lamp-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-6.js for collision only */
+  add('staff-bedroom-6-east-wing', [
+    ['b', 147.87, 18.3, 0, 148.82, 20.3, 0.55, 'iron'], ['b', 159.28, 22.75, 0, 159.98, 23.45, 0.75, 'leather'], ['b', 147.87, 25.8, 0, 148.87, 27.2, 0.012, 'tartan'], ['b', 147.87, 27.3, 0, 148.27, 27.9, 0.8, 'oak'],
+    ['y', 150.561, 27.913, 0.06, 0.76, 0.86, 'brass'], ['y', 150.561, 27.913, 0.045, 0.86, 1.01, 'glass']]);
+  /* G-ADDS end staff-bedroom-6-east-wing */
+  /* G-ADDS teachers-study-6-east-wing */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): writing-desk-1, oak-chair-1, hearth-rug-1, oil-lamp-1, silver-teapot-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-6.js for collision only */
+  add('teachers-study-6-east-wing', [
+    ['b', 153.9, 38.51, 0, 154.9, 39.06, 0.78, 'oak'], ['b', 154.15, 28.94, 0, 154.65, 29.44, 0.9, 'oak'], ['b', 147.87, 30.77, 0, 148.87, 32.17, 0.012, 'tartan'], ['y', 157.517, 33.412, 0.06, 0.76, 0.86, 'brass'],
+    ['y', 157.517, 33.412, 0.045, 0.86, 1.01, 'glass'], ['b', 157.483, 33.538, 0.76, 157.683, 33.658, 0.94, 'steel']]);
+  /* G-ADDS end teachers-study-6-east-wing */
+  /* G-ADDS arithmancy-room-6 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): masters-desk-1, blackboard-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-6.js for collision only */
+  add('arithmancy-room-6', [
+    ['b', 4.1, 27.7, 0, 5.5, 28.4, 0.95, 'oak'], ['b', 0.3, 18.24, 1.0, 2.1, 18.29, 2.0, 'black']]);
+  /* G-ADDS end arithmancy-room-6 */
+  /* G-ADDS disused-classroom-6-west-wing */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): masters-desk-1, blackboard-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-6.js for collision only */
+  add('disused-classroom-6-west-wing', [
+    ['b', 6.2, 38.36, 0, 7.6, 39.06, 0.95, 'oak'], ['b', 12.11, 28.97, 1.0, 12.16, 30.77, 2.0, 'black']]);
+  /* G-ADDS end disused-classroom-6-west-wing */
+  /* G-ADDS arithmancy-chart-store-6 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): book-crate-1, hessian-sack-1, hanging-lantern-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-6.js for collision only */
+  add('arithmancy-chart-store-6', [
+    ['b', 15.11, 11.69, 0, 15.53, 12.31, 0.32, 'pine'], ['b', 15.13, 17.43, 0, 15.53, 17.77, 0.5, 'rush'], ['b', 15.21, 17.48, 0.5, 15.47, 17.72, 0.56, 'rush'], ['b', 15.25, 17.51, 0.56, 15.45, 17.69, 0.6, 'straw'],
+    ['b', 15.33, 11.785, 1.77, 15.57, 11.815, 1.8, 'iron'], ['y', 15.35, 11.8, 0.01, 1.72, 1.77, 'iron'], ['y', 15.35, 11.8, 0.05, 1.68, 1.72, 'brass'], ['y', 15.35, 11.8, 0.085, 1.46, 1.68, 'glass'],
+    ['y', 15.35, 11.8, 0.1, 1.41, 1.46, 'brass']]);
+  /* G-ADDS end arithmancy-chart-store-6 */
+  /* G-ADDS store-6-middle */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): school-trunk-1, folded-linen-1, short-ladder-1; NOT PLACED for want of a clear spot: luggage-tag-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-6.js for collision only */
+  add('store-6-middle', [
+    ['b', 124.55, 53.87, 0, 125.45, 54.35, 0.42, 'leather'], ['b', 124.54, 53.87, 0.42, 125.46, 54.37, 0.5, 'wood'], ['b', 124.675, 53.87, 0, 124.725, 54.37, 0.5, 'iron'], ['b', 125.275, 53.87, 0, 125.325, 54.37, 0.5, 'iron'],
+    ['b', 124.83, 54.35, 0.1, 125.17, 54.39, 0.4, 'cloth'], ['b', 115.502, 57.13, 0.8, 115.863, 57.39, 0.88, 'linen'], ['b', 115.502, 57.13, 0.88, 115.863, 57.39, 0.96, 'linen'], ['b', 127.575, 53.87, 0, 128.025, 53.95, 1.6, 'pine']]);
+  /* G-ADDS end store-6-middle */
+  /* G-ADDS teachers-study-6-astronomy */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): writing-desk-1, dip-holder-1, leather-armchair-1, oil-lamp-1, fire-irons-1, bookcase-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-6.js for collision only */
+  add('teachers-study-6-astronomy', [
+    ['b', 72.27, 64.9, 0, 72.82, 65.9, 0.78, 'oak'], ['y', 79.267, 63.412, 0.025, 0.76, 0.96, 'wood'], ['b', 72.27, 59.3, 0, 73.07, 60.1, 0.95, 'leather'], ['y', 79.267, 63.536, 0.06, 0.76, 0.86, 'brass'],
+    ['y', 79.267, 63.536, 0.045, 0.86, 1.01, 'glass'], ['b', 72.27, 68.15, 0, 72.57, 68.45, 0.7, 'iron'], ['b', 72.27, 66.0, 0, 72.57, 67.0, 1.9, 'oak']]);
+  /* G-ADDS end teachers-study-6-astronomy */
+  /* G-ADDS vectors-study-6 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): writing-desk-1, oak-chair-1, bookcase-1, silver-teapot-1, log-basket-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-6.js for collision only */
+  add('vectors-study-6', [
+    ['b', 30.07, 15.9, 0, 30.62, 16.9, 0.78, 'oak'], ['b', 32.05, 11.97, 0, 32.55, 12.47, 0.9, 'oak'], ['b', 35.23, 15.0, 0, 35.53, 16.0, 1.9, 'oak'], ['b', 32.174, 15.507, 0.76, 32.374, 15.627, 0.94, 'steel'],
+    ['b', 30.07, 13.15, 0, 30.47, 13.65, 0.4, 'wicker']]);
+  /* G-ADDS end vectors-study-6 */
+  /* G-ADDS gryffindor-storeroom-6 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): plank-bench-1, iron-bound-chest-1, oil-lamp-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-6.js for collision only */
+  add('gryffindor-storeroom-6', [
+    ['b', 36.07, 11.6, 0.42, 36.45, 12.9, 0.47, 'pine'], ['b', 36.1, 11.67, 0, 36.4, 11.73, 0.42, 'pine'], ['b', 36.1, 12.77, 0, 36.4, 12.83, 0.42, 'pine'], ['b', 47.83, 12.9, 0, 48.33, 13.8, 0.55, 'iron'],
+    ['y', 36.547, 17.645, 0.06, 0.8, 0.9, 'brass'], ['y', 36.547, 17.645, 0.045, 0.9, 1.05, 'glass']]);
+  /* G-ADDS end gryffindor-storeroom-6 */
+  /* G-ADDS broom-cupboard-6-middle */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): hall-chair-1, hearth-rug-1, stool-1, oil-lamp-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-6.js for collision only */
+  add('broom-cupboard-6-middle', [
+    ['b', 72.27, 54.25, 0, 72.77, 54.75, 0.95, 'oak'], ['b', 85.83, 54.9, 0, 86.83, 56.3, 0.012, 'tartan'], ['y', 83.6, 54.07, 0.17, 0.43, 0.47, 'pine'], ['b', 83.68, 54.15, 0, 83.72, 54.19, 0.43, 'pine'],
+    ['b', 83.48, 54.15, 0, 83.52, 54.19, 0.43, 'pine'], ['b', 83.68, 53.95, 0, 83.72, 53.99, 0.43, 'pine'], ['b', 83.48, 53.95, 0, 83.52, 53.99, 0.43, 'pine'], ['y', 72.363, 54.343, 0.06, 0.95, 1.05, 'brass'],
+    ['y', 72.363, 54.343, 0.045, 1.05, 1.2, 'glass']]);
+  /* G-ADDS end broom-cupboard-6-middle */
+  /* G-ADDS broom-cupboard-6-west */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): book-crate-1, hessian-sack-1, hanging-lantern-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-6.js for collision only */
+  add('broom-cupboard-6-west', [
+    ['b', 24.69, 53.87, 0, 25.31, 54.29, 0.32, 'pine'], ['b', 27.53, 53.87, 0, 27.87, 54.27, 0.5, 'rush'], ['b', 27.58, 53.93, 0.5, 27.82, 54.19, 0.56, 'rush'], ['b', 27.61, 53.95, 0.56, 27.79, 54.15, 0.6, 'straw'],
+    ['b', 28.785, 53.83, 1.77, 28.815, 54.07, 1.8, 'iron'], ['y', 28.8, 54.05, 0.01, 1.72, 1.77, 'iron'], ['y', 28.8, 54.05, 0.05, 1.68, 1.72, 'brass'], ['y', 28.8, 54.05, 0.085, 1.46, 1.68, 'glass'],
+    ['y', 28.8, 54.05, 0.1, 1.41, 1.46, 'brass']]);
+  /* G-ADDS end broom-cupboard-6-west */
+  /* G-ADDS linen-cupboard-6 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): school-trunk-1, folded-linen-1, short-ladder-1; NOT PLACED for want of a clear spot: luggage-tag-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-6.js for collision only */
+  add('linen-cupboard-6', [
+    ['b', 22.75, 53.85, 0, 23.23, 54.75, 0.42, 'leather'], ['b', 22.73, 53.84, 0.42, 23.23, 54.76, 0.5, 'wood'], ['b', 22.73, 53.975, 0, 23.23, 54.025, 0.5, 'iron'], ['b', 22.73, 54.575, 0, 23.23, 54.625, 0.5, 'iron'],
+    ['b', 22.71, 54.13, 0.1, 22.75, 54.47, 0.4, 'cloth'], ['b', 9.481, 57.081, 0.1, 9.841, 57.341, 0.18, 'linen'], ['b', 9.481, 57.081, 0.18, 9.841, 57.341, 0.26, 'linen'], ['b', 9.27, 53.875, 0, 9.35, 54.325, 1.6, 'pine']]);
+  /* G-ADDS end linen-cupboard-6 */
+  /* G-ADDS teachers-study-6-lake-east */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): writing-desk-1, oak-chair-1, hearth-rug-1, oil-lamp-1, silver-teapot-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-6.js for collision only */
+  add('teachers-study-6-lake-east', [
+    ['b', 155.6, 6.77, 0, 156.6, 7.32, 0.78, 'oak'], ['b', 159.48, 7.15, 0, 159.98, 7.65, 0.9, 'oak'], ['b', 158.98, 10.1, 0, 159.98, 11.5, 0.012, 'tartan'], ['y', 157.517, 11.662, 0.06, 0.76, 0.86, 'brass'],
+    ['y', 157.517, 11.662, 0.045, 0.86, 1.01, 'glass'], ['b', 157.483, 11.788, 0.76, 157.683, 11.908, 0.94, 'steel']]);
+  /* G-ADDS end teachers-study-6-lake-east */
+  /* G-ADDS elves-linen-room-6-middle */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): linen-press-1, folded-linen-1, short-ladder-1, worktable-1, oil-lamp-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-6.js for collision only */
+  add('elves-linen-room-6-middle', [
+    ['b', 52.3, 53.87, 0, 53.3, 54.42, 1.8, 'pine'], ['b', 52.68, 57.081, 0.4, 53.04, 57.341, 0.48, 'linen'], ['b', 52.68, 57.081, 0.48, 53.04, 57.341, 0.56, 'linen'], ['b', 61.275, 53.87, 0, 61.725, 53.95, 1.6, 'pine'],
+    ['b', 54.7, 53.87, 0, 56.1, 54.57, 0.8, 'deal'], ['y', 52.74, 57.474, 0.06, 0.4, 0.5, 'brass'], ['y', 52.74, 57.474, 0.045, 0.5, 0.65, 'glass']]);
+  /* G-ADDS end elves-linen-room-6-middle */
+  /* G-ADDS lamp-candle-cupboard-6 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): plank-bench-1, iron-bound-chest-1, oil-lamp-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-6.js for collision only */
+  add('lamp-candle-cupboard-6', [
+    ['b', 46.95, 53.87, 0.42, 48.25, 54.25, 0.47, 'pine'], ['b', 47.02, 53.9, 0, 47.08, 54.2, 0.42, 'pine'], ['b', 48.12, 53.9, 0, 48.18, 54.2, 0.42, 'pine'], ['b', 40.85, 53.87, 0, 41.75, 54.37, 0.55, 'iron'],
+    ['y', 40.54, 57.252, 0.06, 0.4, 0.5, 'brass'], ['y', 40.54, 57.252, 0.045, 0.5, 0.65, 'glass']]);
+  /* G-ADDS end lamp-candle-cupboard-6 */
+  /* G-ADDS astronomy-stair-foot-6 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): plank-bench-1, stair-runner-1; NOT PLACED for want of a clear spot: oil-lamp-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-6.js for collision only */
+  add('astronomy-stair-foot-6', [
+    ['b', 87.35, 60.65, 0.42, 87.73, 61.95, 0.47, 'pine'], ['b', 87.4, 60.72, 0, 87.7, 60.78, 0.42, 'pine'], ['b', 87.4, 61.82, 0, 87.7, 61.88, 0.42, 'pine'], ['b', 82.27, 60.0, 0, 84.27, 61.0, 0.01, 'scarlet']]);
+  /* G-ADDS end astronomy-stair-foot-6 */
+  /* G-ADDS cleaning-cupboard-6-middle */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): hall-chair-1, hearth-rug-1, stool-1, oil-lamp-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-6.js for collision only */
+  add('cleaning-cupboard-6-middle', [
+    ['b', 71.23, 66.35, 0, 71.73, 66.85, 0.95, 'oak'], ['b', 68.27, 64.8, 0, 69.27, 66.2, 0.012, 'tartan'], ['y', 71.2, 71.78, 0.17, 0.43, 0.47, 'pine'], ['b', 71.28, 71.86, 0, 71.32, 71.9, 0.43, 'pine'],
+    ['b', 71.08, 71.86, 0, 71.12, 71.9, 0.43, 'pine'], ['b', 71.28, 71.66, 0, 71.32, 71.7, 0.43, 'pine'], ['b', 71.08, 71.66, 0, 71.12, 71.7, 0.43, 'pine'], ['y', 71.323, 66.443, 0.06, 0.95, 1.05, 'brass'],
+    ['y', 71.323, 66.443, 0.045, 1.05, 1.2, 'glass']]);
+  /* G-ADDS end cleaning-cupboard-6-middle */
+  /* G-ADDS old-textbooks-store-6-middle */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): book-crate-1, hessian-sack-1, hanging-lantern-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-6.js for collision only */
+  add('old-textbooks-store-6-middle', [
+    ['b', 106.89, 53.87, 0, 107.51, 54.29, 0.32, 'pine'], ['b', 109.33, 53.87, 0, 109.67, 54.27, 0.5, 'rush'], ['b', 109.38, 53.93, 0.5, 109.62, 54.19, 0.56, 'rush'], ['b', 109.41, 53.95, 0.56, 109.59, 54.15, 0.6, 'straw'],
+    ['b', 112.43, 56.785, 1.77, 112.67, 56.815, 1.8, 'iron'], ['y', 112.45, 56.8, 0.01, 1.72, 1.77, 'iron'], ['y', 112.45, 56.8, 0.05, 1.68, 1.72, 'brass'], ['y', 112.45, 56.8, 0.085, 1.46, 1.68, 'glass'],
+    ['y', 112.45, 56.8, 0.1, 1.41, 1.46, 'brass']]);
+  /* G-ADDS end old-textbooks-store-6-middle */
+  /* G-ADDS washrooms-6-west */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): washbasin-1, plank-bench-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-6.js for collision only */
+  add('washrooms-6-west', [
+    ['b', 1.5, 12.27, 0, 2.0, 12.67, 0.85, 'white'], ['b', 4.5, 12.27, 0.42, 5.8, 12.65, 0.47, 'pine'], ['b', 4.57, 12.3, 0, 4.63, 12.6, 0.42, 'pine'], ['b', 5.67, 12.3, 0, 5.73, 12.6, 0.42, 'pine']]);
+  /* G-ADDS end washrooms-6-west */
+  /* G-ADDS telescope-store-6 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): school-trunk-1, folded-linen-1, short-ladder-1; NOT PLACED for want of a clear spot: luggage-tag-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-6.js for collision only */
+  add('telescope-store-6', [
+    ['b', 95.35, 55.85, 0, 95.83, 56.75, 0.42, 'leather'], ['b', 95.33, 55.84, 0.42, 95.83, 56.76, 0.5, 'wood'], ['b', 95.33, 55.975, 0, 95.83, 56.025, 0.5, 'iron'], ['b', 95.33, 56.575, 0, 95.83, 56.625, 0.5, 'iron'],
+    ['b', 95.31, 56.13, 0.1, 95.35, 56.47, 0.4, 'cloth'], ['b', 89.681, 57.137, 0.45, 90.041, 57.397, 0.53, 'linen'], ['b', 89.681, 57.137, 0.53, 90.041, 57.397, 0.61, 'linen'], ['b', 90.875, 53.87, 0, 91.325, 53.95, 1.6, 'pine']]);
+  /* G-ADDS end telescope-store-6 */
+  /* G-ADDS cleaning-cupboard-6-west */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): plank-bench-1, iron-bound-chest-1; NOT PLACED for want of a clear spot: oil-lamp-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-6.js for collision only */
+  add('cleaning-cupboard-6-west', [
+    ['b', 4.3, 53.87, 0.42, 5.6, 54.25, 0.47, 'pine'], ['b', 4.37, 53.9, 0, 4.43, 54.2, 0.42, 'pine'], ['b', 5.47, 53.9, 0, 5.53, 54.2, 0.42, 'pine'], ['b', 6.28, 54.85, 0, 6.78, 55.75, 0.55, 'iron']]);
+  /* G-ADDS end cleaning-cupboard-6-west */
+  /* G-ADDS washrooms-6-north */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): washbasin-1, plank-bench-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-6.js for collision only */
+  add('washrooms-6-north', [
+    ['b', 96.27, 54.85, 0, 96.67, 55.35, 0.85, 'white'], ['b', 96.27, 56.45, 0.42, 96.65, 57.75, 0.47, 'pine'], ['b', 96.3, 56.52, 0, 96.6, 56.58, 0.42, 'pine'], ['b', 96.3, 57.62, 0, 96.6, 57.68, 0.42, 'pine']]);
+  /* G-ADDS end washrooms-6-north */
+  /* G-ADDS washrooms-6-east */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): washbasin-1, plank-bench-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-6.js for collision only */
+  add('washrooms-6-east', [
+    ['b', 149.85, 53.87, 0, 150.35, 54.27, 0.85, 'white'], ['b', 145.55, 53.87, 0.42, 146.85, 54.25, 0.47, 'pine'], ['b', 145.62, 53.9, 0, 145.68, 54.2, 0.42, 'pine'], ['b', 146.72, 53.9, 0, 146.78, 54.2, 0.42, 'pine']]);
+  /* G-ADDS end washrooms-6-east */
+  /* G-ADDS old-textbooks-store-6-east */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): hall-chair-1, hearth-rug-1, stool-1, oil-lamp-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-6.js for collision only */
+  add('old-textbooks-store-6-east', [
+    ['b', 158.25, 53.87, 0, 158.75, 54.37, 0.95, 'oak'], ['b', 154.77, 53.9, 0, 155.77, 55.3, 0.012, 'tartan'], ['y', 159.73, 57.1, 0.17, 0.43, 0.47, 'pine'], ['b', 159.81, 57.18, 0, 159.85, 57.22, 0.43, 'pine'],
+    ['b', 159.61, 57.18, 0, 159.65, 57.22, 0.43, 'pine'], ['b', 159.81, 56.98, 0, 159.85, 57.02, 0.43, 'pine'], ['b', 159.61, 56.98, 0, 159.65, 57.02, 0.43, 'pine'], ['y', 155.248, 57.195, 0.06, 0.8, 0.9, 'brass'],
+    ['y', 155.248, 57.195, 0.045, 0.9, 1.05, 'glass']]);
+  /* G-ADDS end old-textbooks-store-6-east */
+  /* G-ADDS spare-desks-store-6 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): book-crate-1, hessian-sack-1, hanging-lantern-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-6.js for collision only */
+  add('spare-desks-store-6', [
+    ['b', 143.19, 57.11, 0, 143.81, 57.53, 0.32, 'pine'], ['b', 143.43, 55.93, 0, 143.83, 56.27, 0.5, 'rush'], ['b', 143.51, 55.98, 0.5, 143.77, 56.22, 0.56, 'rush'], ['b', 143.55, 56.01, 0.56, 143.75, 56.19, 0.6, 'straw'],
+    ['b', 143.285, 53.83, 1.77, 143.315, 54.07, 1.8, 'iron'], ['y', 143.3, 54.05, 0.01, 1.72, 1.77, 'iron'], ['y', 143.3, 54.05, 0.05, 1.68, 1.72, 'brass'], ['y', 143.3, 54.05, 0.085, 1.46, 1.68, 'glass'],
+    ['y', 143.3, 54.05, 0.1, 1.41, 1.46, 'brass']]);
+  /* G-ADDS end spare-desks-store-6 */
+  /* G-ADDS passage-6-east */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): chair-squab-1, stair-runner-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-6.js for collision only */
+  add('passage-6-east', [
+    ['b', 152.27, 55.5, 0, 152.87, 56.1, 0.95, 'leather'], ['b', 152.9, 54.87, 0, 153.9, 56.87, 0.01, 'scarlet']]);
+  /* G-ADDS end passage-6-east */
+  /* G-ADDS service-passage-6-lobby */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): umbrella-1; NOT PLACED for want of a clear spot: hearth-rug-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-6.js for collision only */
+  add('service-passage-6-lobby', [
+    ['b', 68.64, 54.47, 0.8, 68.71, 54.53, 1.7, 'black']]);
+  /* G-ADDS end service-passage-6-lobby */
+  /* G-ADDS passage-6-west */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): plank-bench-1, boot-mat-1, noticeboard-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-6.js for collision only */
+  add('passage-6-west', [
+    ['b', 7.27, 54.45, 0.42, 7.65, 55.75, 0.47, 'pine'], ['b', 7.3, 54.52, 0, 7.6, 54.58, 0.42, 'pine'], ['b', 7.3, 55.62, 0, 7.6, 55.68, 0.42, 'pine'], ['b', 8.38, 54.45, 0, 8.83, 55.15, 0.02, 'rush'],
+    ['b', 7.24, 54.5, 1.3, 7.29, 55.5, 2.0, 'pine']]);
+  /* G-ADDS end passage-6-west */
+  /* G-ADDS passage-6-west-middle */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): chair-squab-1; NOT PLACED for want of a clear spot: stair-runner-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-6.js for collision only */
+  add('passage-6-west-middle', [
+    ['b', 38.27, 54.7, 0, 38.87, 55.3, 0.95, 'leather']]);
+  /* G-ADDS end passage-6-west-middle */
+  /* G-ADDS passage-6-lobby-west */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): umbrella-1, hearth-rug-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-6.js for collision only */
+  add('passage-6-lobby-west', [
+    ['b', 64.24, 56.37, 0.8, 64.31, 56.43, 1.7, 'black'], ['b', 64.27, 54.5, 0, 65.27, 55.9, 0.012, 'tartan']]);
+  /* G-ADDS end passage-6-lobby-west */
+  /* G-ADDS passage-6-cleaning */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): plank-bench-1, boot-mat-1, noticeboard-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-6.js for collision only */
+  add('passage-6-cleaning', [
+    ['b', 70.27, 54.45, 0.42, 70.65, 55.75, 0.47, 'pine'], ['b', 70.3, 54.52, 0, 70.6, 54.58, 0.42, 'pine'], ['b', 70.3, 55.62, 0, 70.6, 55.68, 0.42, 'pine'], ['b', 71.38, 55.35, 0, 71.83, 56.05, 0.02, 'rush'],
+    ['b', 71.81, 55.1, 1.3, 71.86, 56.1, 2.0, 'pine']]);
+  /* G-ADDS end passage-6-cleaning */
+  /* G-ADDS passage-6-astronomy */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): chair-squab-1; NOT PLACED for want of a clear spot: stair-runner-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-6.js for collision only */
+  add('passage-6-astronomy', [
+    ['b', 87.27, 54.5, 0, 87.87, 55.1, 0.95, 'leather']]);
+  /* G-ADDS end passage-6-astronomy */
+  /* G-ADDS passage-6-middle */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): umbrella-1, hearth-rug-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-6.js for collision only */
+  add('passage-6-middle', [
+    ['b', 113.04, 54.47, 0.8, 113.11, 54.53, 1.7, 'black'], ['b', 113.07, 54.5, 0, 114.07, 55.9, 0.012, 'tartan']]);
+  /* G-ADDS end passage-6-middle */
+  /* G-ADDS passage-6-east-middle */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): plank-bench-1, boot-mat-1, noticeboard-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-6.js for collision only */
+  add('passage-6-east-middle', [
+    ['b', 138.87, 54.45, 0.42, 139.25, 55.75, 0.47, 'pine'], ['b', 138.9, 54.52, 0, 139.2, 54.58, 0.42, 'pine'], ['b', 138.9, 55.62, 0, 139.2, 55.68, 0.42, 'pine'], ['b', 139.88, 54.45, 0, 140.33, 55.15, 0.02, 'rush'],
+    ['b', 140.31, 55.5, 1.3, 140.36, 56.5, 2.0, 'pine']]);
+  /* G-ADDS end passage-6-east-middle */
+  /* G-ADDS north-range-corridor-6 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): chair-squab-1; NOT PLACED for want of a clear spot: stair-runner-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-6.js for collision only */
+  add('north-range-corridor-6', [
+    ['b', 101.75, 50.87, 0, 102.35, 51.47, 0.95, 'leather']]);
+  /* G-ADDS end north-range-corridor-6 */
+  /* G-ADDS west-wing-corridor-6 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): umbrella-1; NOT PLACED for want of a clear spot: hearth-rug-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-6.js for collision only */
+  add('west-wing-corridor-6', [
+    ['b', 15.09, 38.27, 0.8, 15.16, 38.33, 1.7, 'black']]);
+  /* G-ADDS end west-wing-corridor-6 */
+  /* G-ADDS east-wing-corridor-6 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): plank-bench-1, boot-mat-1, noticeboard-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-6.js for collision only */
+  add('east-wing-corridor-6', [
+    ['b', 146.95, 37.85, 0.42, 147.33, 39.15, 0.47, 'pine'], ['b', 147.0, 37.92, 0, 147.3, 37.98, 0.42, 'pine'], ['b', 147.0, 39.02, 0, 147.3, 39.08, 0.42, 'pine'], ['b', 144.87, 18.85, 0, 145.32, 19.55, 0.02, 'rush'],
+    ['b', 147.31, 45.6, 1.3, 147.36, 46.6, 2.0, 'pine']]);
+  /* G-ADDS end east-wing-corridor-6 */
+  /* G-ADDS arithmancy-marking-room-6 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): trestle-bench-1, worktable-1, stool-1, oil-lamp-1, short-ladder-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-6.js for collision only */
+  add('arithmancy-marking-room-6', [
+    ['b', 23.35, 8.38, 0, 24.75, 8.88, 0.8, 'pine'], ['b', 18.52, 4.15, 0, 19.22, 5.55, 0.8, 'deal'], ['y', 18.72, 7.55, 0.17, 0.43, 0.47, 'pine'], ['b', 18.8, 7.63, 0, 18.84, 7.67, 0.43, 'pine'],
+    ['b', 18.6, 7.63, 0, 18.64, 7.67, 0.43, 'pine'], ['b', 18.8, 7.43, 0, 18.84, 7.47, 0.43, 'pine'], ['b', 18.6, 7.43, 0, 18.64, 7.47, 0.43, 'pine'], ['y', 23.717, 5.912, 0.06, 0.76, 0.86, 'brass'],
+    ['y', 23.717, 5.912, 0.045, 0.86, 1.01, 'glass'], ['b', 25.4, 7.425, 0, 25.48, 7.875, 1.6, 'pine']]);
+  /* G-ADDS end arithmancy-marking-room-6 */
+  /* G-ADDS arithmancy-reading-room-6 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): windsor-chair-1, library-ladder-1, oil-lamp-1, bookcase-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-6.js for collision only */
+  add('arithmancy-reading-room-6', [
+    ['b', 31.78, 7.1, 0, 32.28, 7.6, 0.95, 'oak'], ['b', 26.02, 7.4, 0, 26.12, 7.9, 2.4, 'oak'], ['y', 28.864, 5.711, 0.06, 0.76, 0.86, 'brass'], ['y', 28.864, 5.711, 0.045, 0.86, 1.01, 'glass'],
+    ['b', 26.02, 4.15, 0, 26.32, 5.15, 1.9, 'oak']]);
+  /* G-ADDS end arithmancy-reading-room-6 */
+  /* G-ADDS vectors-book-closet-6 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): short-ladder-1; NOT PLACED for want of a clear spot: school-trunk-1, folded-linen-1, folded-linen-1, folded-linen-1, folded-linen-1, folded-linen-1, folded-linen-1, folded-linen-1, luggage-tag-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-6.js for collision only */
+  add('vectors-book-closet-6', [
+    ['b', 32.2, 11.025, 0, 32.28, 11.475, 1.6, 'pine']]);
+  /* G-ADDS end vectors-book-closet-6 */
+  /* G-ADDS ravenclaw-tower-room-6 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): plank-bench-1, iron-bound-chest-1, oil-lamp-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-6.js for collision only */
+  add('ravenclaw-tower-room-6', [
+    ['b', -8.404, 40.465, 0.42, -7.104, 40.845, 0.47, 'pine'], ['b', -8.334, 40.515, 0, -8.274, 40.815, 0.42, 'pine'], ['b', -7.234, 40.515, 0, -7.174, 40.815, 0.42, 'pine'], ['b', -9.016, 27.155, 0, -8.116, 27.655, 0.55, 'iron'],
+    ['y', -1.553, 35.868, 0.06, 0.7, 0.8, 'brass'], ['y', -1.553, 35.868, 0.045, 0.8, 0.95, 'glass']]);
+  /* G-ADDS end ravenclaw-tower-room-6 */
+  /* G-ADDS heads-tower-room-6 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): hall-chair-1, hearth-rug-1, stool-1, oil-lamp-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-6.js for collision only */
+  add('heads-tower-room-6', [
+    ['b', 165.128, 43.894, 0, 165.628, 44.394, 0.95, 'oak'], ['b', 164.336, 42.817, 0, 165.736, 43.817, 0.012, 'tartan'], ['y', 169.728, 41.958, 0.17, 0.43, 0.47, 'pine'], ['b', 169.808, 42.038, 0, 169.848, 42.078, 0.43, 'pine'],
+    ['b', 169.608, 42.038, 0, 169.648, 42.078, 0.43, 'pine'], ['b', 169.808, 41.838, 0, 169.848, 41.878, 0.43, 'pine'], ['b', 169.608, 41.838, 0, 169.648, 41.878, 0.43, 'pine'], ['y', 162.362, 37.822, 0.06, 0.7, 0.8, 'brass'],
+    ['y', 162.362, 37.822, 0.045, 0.8, 0.95, 'glass']]);
+  /* G-ADDS end heads-tower-room-6 */
+  /* G-ADDS lake-tower-6 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): book-crate-1, hessian-sack-1, hanging-lantern-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-6.js for collision only */
+  add('lake-tower-6', [
+    ['b', 126.106, -4.062, 0, 126.526, -3.442, 0.32, 'pine'], ['b', 133.994, -3.998, 0, 134.394, -3.658, 0.5, 'rush'], ['b', 134.074, -3.948, 0.5, 134.334, -3.708, 0.56, 'rush'], ['b', 134.114, -3.918, 0.56, 134.314, -3.738, 0.6, 'straw'],
+    ['y', 128.524, -0.316, 0.03, 1.77, 1.8, 'iron'], ['y', 128.551, -0.381, 0.02, 1.77, 1.8, 'iron'], ['y', 128.589, -0.473, 0.01, 1.72, 1.77, 'iron'], ['y', 128.589, -0.473, 0.05, 1.68, 1.72, 'brass'],
+    ['y', 128.589, -0.473, 0.085, 1.46, 1.68, 'glass'], ['y', 128.589, -0.473, 0.1, 1.41, 1.46, 'brass']]);
+  /* G-ADDS end lake-tower-6 */
+  /* G-ADDS west-tower-room-6 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): school-trunk-1, folded-linen-1, short-ladder-1; NOT PLACED for want of a clear spot: luggage-tag-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-6.js for collision only */
+  add('west-tower-room-6', [
+    ['b', -0.966, 67.312, 0, -0.066, 67.792, 0.42, 'leather'], ['b', -0.976, 67.312, 0.42, -0.056, 67.812, 0.5, 'wood'], ['b', -0.841, 67.312, 0, -0.791, 67.812, 0.5, 'iron'], ['b', -0.241, 67.312, 0, -0.191, 67.812, 0.5, 'iron'],
+    ['b', -0.686, 67.792, 0.1, -0.346, 67.832, 0.4, 'cloth'], ['b', 3.577, 73.758, 0.7, 3.937, 74.018, 0.78, 'linen'], ['b', 3.577, 73.758, 0.78, 3.937, 74.018, 0.86, 'linen'], ['b', 0.651, 76.608, 0, 1.101, 76.688, 1.6, 'pine']]);
+  /* G-ADDS end west-tower-room-6 */
+  /* G-ADDS east-lift-shaft-6 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): chair-squab-1, stair-runner-1; sited by tools/architect-now.py, plain stand-ins; read back from None for collision only */
+  add('east-lift-shaft-6', [
+    ['b', 160.12, 31.75, 0, 160.72, 32.35, 0.95, 'leather'], ['b', 161.88, 31.65, 0, 163.88, 32.65, 0.01, 'scarlet']]);
+  /* G-ADDS end east-lift-shaft-6 */
+  /* G-ADDS west-pole-shaft-6 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): umbrella-1, hearth-rug-1; sited by tools/architect-now.py, plain stand-ins; read back from None for collision only */
+  add('west-pole-shaft-6', [
+    ['b', -4.41, 23.82, 0.8, -4.34, 23.88, 1.7, 'black'], ['b', -2.15, 25.98, 0, -0.75, 26.98, 0.012, 'tartan']]);
+  /* G-ADDS end west-pole-shaft-6 */
+  /* G-ADDS west-dumbwaiter-shaft-6 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): plank-bench-1, boot-mat-1, noticeboard-1; sited by tools/architect-now.py, plain stand-ins; read back from None for collision only */
+  add('west-dumbwaiter-shaft-6', [
+    ['b', -3.1, 44.9, 0.42, -1.8, 45.28, 0.47, 'pine'], ['b', -3.03, 44.95, 0, -2.97, 45.25, 0.42, 'pine'], ['b', -1.93, 44.95, 0, -1.87, 45.25, 0.42, 'pine'], ['b', -3.1, 41.02, 0, -2.4, 41.47, 0.02, 'rush'],
+    ['b', -4.41, 42.35, 1.3, -4.36, 43.35, 2.0, 'pine']]);
+  /* G-ADDS end west-dumbwaiter-shaft-6 */
+  /* G-ADDS loop-gallery-stair-6 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): chair-squab-1, stair-runner-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-6.js for collision only */
+  add('loop-gallery-stair-6', [
+    ['b', 97.45, -2.68, 0, 98.05, -2.08, 0.95, 'leather'], ['b', 95.15, -2.68, 0, 96.15, -0.68, 0.01, 'scarlet']]);
+  /* G-ADDS end loop-gallery-stair-6 */
+  /* G-ADDS loop-gallery-6 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): umbrella-1, hearth-rug-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-6.js for collision only */
+  add('loop-gallery-6', [
+    ['b', 116.02, 0.14, 0.8, 116.08, 0.21, 1.7, 'black'], ['b', 113.65, -2.68, 0, 115.05, -1.68, 0.012, 'tartan']]);
+  /* G-ADDS end loop-gallery-6 */
+  /* G-ADDS linen-room-7-west */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): book-crate-1, hessian-sack-1, hanging-lantern-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-7.js for collision only */
+  add('linen-room-7-west', [
+    ['b', 20.7, 11.89, 0, 21.12, 12.51, 0.32, 'pine'], ['b', 11.23, 3.87, 0, 11.57, 4.27, 0.5, 'rush'], ['b', 11.28, 3.93, 0.5, 11.52, 4.19, 0.56, 'rush'], ['b', 11.31, 3.95, 0.56, 11.49, 4.15, 0.6, 'straw'],
+    ['b', 20.92, 10.385, 1.77, 21.16, 10.415, 1.8, 'iron'], ['y', 20.94, 10.4, 0.01, 1.72, 1.77, 'iron'], ['y', 20.94, 10.4, 0.05, 1.68, 1.72, 'brass'], ['y', 20.94, 10.4, 0.085, 1.46, 1.68, 'glass'],
+    ['y', 20.94, 10.4, 0.1, 1.41, 1.46, 'brass']]);
+  /* G-ADDS end linen-room-7-west */
+  /* G-ADDS staff-bedrooms-7 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): iron-bedstead-1, school-trunk-1, washbasin-1, nest-of-drawers-1, candlestick-1, hearth-rug-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-7.js for collision only */
+  add('staff-bedrooms-7', [
+    ['b', 32.29, 3.87, 0, 34.29, 4.82, 0.55, 'iron'], ['b', 21.66, 8.85, 0, 22.14, 9.75, 0.42, 'leather'], ['b', 21.66, 8.84, 0.42, 22.16, 9.76, 0.5, 'wood'], ['b', 21.66, 8.975, 0, 22.16, 9.025, 0.5, 'iron'],
+    ['b', 21.66, 9.575, 0, 22.16, 9.625, 0.5, 'iron'], ['b', 22.14, 9.13, 0.1, 22.18, 9.47, 0.4, 'cloth'], ['b', 30.44, 17.58, 0, 30.94, 17.98, 0.85, 'white'], ['b', 21.66, 16.2, 0, 22.06, 16.8, 0.8, 'oak'],
+    ['y', 21.773, 6.561, 0.035, 0.76, 1.01, 'brass'], ['b', 34.52, 8.6, 0, 35.52, 10.0, 0.012, 'tartan']]);
+  /* G-ADDS end staff-bedrooms-7 */
+  /* G-ADDS headmaster-guest-rooms-7 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): low-easy-chair-1, leather-armchair-1, hearth-rug-1, fire-irons-1, oil-lamp-1, silver-teapot-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-7.js for collision only */
+  add('headmaster-guest-rooms-7', [
+    ['b', 61.97, 6.05, 0, 62.67, 6.75, 0.75, 'leather'], ['b', 66.93, 12.8, 0, 67.73, 13.6, 0.95, 'leather'], ['b', 61.97, 7.0, 0, 62.97, 8.4, 0.012, 'tartan'], ['b', 67.43, 15.55, 0, 67.73, 15.85, 0.7, 'iron'],
+    ['y', 67.246, 10.317, 0.06, 0.55, 0.65, 'brass'], ['y', 67.246, 10.317, 0.045, 0.65, 0.8, 'glass'], ['b', 67.211, 10.39, 0.55, 67.411, 10.51, 0.73, 'steel']]);
+  /* G-ADDS end headmaster-guest-rooms-7 */
+  /* G-ADDS broom-cupboard-7-south */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): school-trunk-1, short-ladder-1; NOT PLACED for want of a clear spot: folded-linen-1, luggage-tag-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-7.js for collision only */
+  add('broom-cupboard-7-south', [
+    ['b', 51.72, 12.85, 0, 52.2, 13.75, 0.42, 'leather'], ['b', 51.72, 12.84, 0.42, 52.22, 13.76, 0.5, 'wood'], ['b', 51.72, 12.975, 0, 52.22, 13.025, 0.5, 'iron'], ['b', 51.72, 13.575, 0, 52.22, 13.625, 0.5, 'iron'],
+    ['b', 52.2, 13.13, 0.1, 52.24, 13.47, 0.4, 'cloth'], ['b', 55.25, 14.175, 0, 55.33, 14.625, 1.6, 'pine']]);
+  /* G-ADDS end broom-cupboard-7-south */
+  /* G-ADDS washrooms-7-sw */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): washbasin-1, plank-bench-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-7.js for collision only */
+  add('washrooms-7-sw', [
+    ['b', 1.7, 12.27, 0, 2.2, 12.67, 0.85, 'white'], ['b', 0.02, 15.85, 0.42, 0.4, 17.15, 0.47, 'pine'], ['b', 0.05, 15.92, 0, 0.35, 15.98, 0.42, 'pine'], ['b', 0.05, 17.02, 0, 0.35, 17.08, 0.42, 'pine']]);
+  /* G-ADDS end washrooms-7-sw */
+  /* G-ADDS staff-bedroom-7-west */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): iron-bedstead-1, washbasin-1, iron-bound-chest-1, candlestick-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-7.js for collision only */
+  add('staff-bedroom-7-west', [
+    ['b', 11.18, 26.3, 0, 12.13, 28.3, 0.55, 'iron'], ['b', 0.27, 26.65, 0, 0.67, 27.15, 0.85, 'white'], ['b', 1.75, 18.27, 0, 2.65, 18.77, 0.55, 'iron'], ['y', 8.461, 18.383, 0.035, 0.76, 1.01, 'brass']]);
+  /* G-ADDS end staff-bedroom-7-west */
+  /* G-ADDS study-room-7-west */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): writing-desk-1, dip-holder-1, leather-armchair-1, oil-lamp-1, fire-irons-1, bookcase-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-7.js for collision only */
+  add('study-room-7-west', [
+    ['b', 11.58, 34.87, 0, 12.13, 35.87, 0.78, 'oak'], ['y', 4.311, 33.562, 0.025, 0.76, 0.96, 'wood'], ['b', 11.33, 38.27, 0, 12.13, 39.07, 0.95, 'leather'], ['y', 4.311, 33.688, 0.06, 0.76, 0.86, 'brass'],
+    ['y', 4.311, 33.688, 0.045, 0.86, 1.01, 'glass'], ['b', 11.83, 31.72, 0, 12.13, 32.02, 0.7, 'iron'], ['b', 11.83, 35.97, 0, 12.13, 36.97, 1.9, 'oak']]);
+  /* G-ADDS end study-room-7-west */
+  /* G-ADDS linen-room-7-north-west */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): plank-bench-1, iron-bound-chest-1, oil-lamp-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-7.js for collision only */
+  add('linen-room-7-north-west', [
+    ['b', 11.75, 42.18, 0.42, 12.13, 43.48, 0.47, 'pine'], ['b', 11.8, 42.25, 0, 12.1, 42.31, 0.42, 'pine'], ['b', 11.8, 43.35, 0, 12.1, 43.41, 0.42, 'pine'], ['b', 11.63, 45.58, 0, 12.13, 46.48, 0.55, 'iron'],
+    ['y', 0.326, 40.07, 0.06, 0.4, 0.5, 'brass'], ['y', 0.326, 40.07, 0.045, 0.5, 0.65, 'glass']]);
+  /* G-ADDS end linen-room-7-north-west */
+  /* G-ADDS west-range-corridor-7 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): chair-squab-1; NOT PLACED for want of a clear spot: stair-runner-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-7.js for collision only */
+  add('west-range-corridor-7', [
+    ['b', 12.67, 31.0, 0, 13.27, 31.6, 0.95, 'leather']]);
+  /* G-ADDS end west-range-corridor-7 */
+  /* G-ADDS west-corridor-7 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): umbrella-1; NOT PLACED for want of a clear spot: hearth-rug-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-7.js for collision only */
+  add('west-corridor-7', [
+    ['b', 13.72, 53.29, 0.8, 13.78, 53.36, 1.7, 'black']]);
+  /* G-ADDS end west-corridor-7 */
+  /* G-ADDS lake-corridor-7-corner */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): plank-bench-1, boot-mat-1, noticeboard-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-7.js for collision only */
+  add('lake-corridor-7-corner', [
+    ['b', 4.77, 1.05, 0.42, 5.15, 2.35, 0.47, 'pine'], ['b', 4.8, 1.12, 0, 5.1, 1.18, 0.42, 'pine'], ['b', 4.8, 2.22, 0, 5.1, 2.28, 0.42, 'pine'], ['b', 4.77, 2.35, 0, 5.22, 3.05, 0.02, 'rush'],
+    ['b', 4.74, 2.0, 1.3, 4.79, 3.0, 2.0, 'pine']]);
+  /* G-ADDS end lake-corridor-7-corner */
+  /* G-ADDS lake-corridor-7-west */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): chair-squab-1; NOT PLACED for want of a clear spot: stair-runner-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-7.js for collision only */
+  add('lake-corridor-7-west', [
+    ['b', 8.9, 0.87, 0, 9.5, 1.47, 0.95, 'leather']]);
+  /* G-ADDS end lake-corridor-7-west */
+  /* G-ADDS caretakers-cleaning-cupboard-7-west */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): linen-press-1, short-ladder-1, worktable-1, oil-lamp-1; NOT PLACED for want of a clear spot: folded-linen-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-7.js for collision only */
+  add('caretakers-cleaning-cupboard-7-west', [
+    ['b', 0.02, 53.9, 0, 0.57, 54.9, 1.8, 'pine'], ['b', 6.7, 53.875, 0, 6.78, 54.325, 1.6, 'pine'], ['b', 4.25, 53.87, 0, 5.65, 54.57, 0.8, 'deal'], ['y', 4.341, 53.964, 0.06, 0.8, 0.9, 'brass'],
+    ['y', 4.341, 53.964, 0.045, 0.9, 1.05, 'glass']]);
+  /* G-ADDS end caretakers-cleaning-cupboard-7-west */
+  /* G-ADDS passage-7-west-stair */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): umbrella-1, hearth-rug-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-7.js for collision only */
+  add('passage-7-west-stair', [
+    ['b', 8.79, 55.27, 0.8, 8.86, 55.33, 1.7, 'black'], ['b', 7.27, 54.5, 0, 8.27, 55.9, 0.012, 'tartan']]);
+  /* G-ADDS end passage-7-west-stair */
+  /* G-ADDS linen-room-7-north */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): hall-chair-1, hearth-rug-1, stool-1, oil-lamp-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-7.js for collision only */
+  add('linen-room-7-north', [
+    ['b', 19.85, 54.17, 0, 20.35, 54.67, 0.95, 'oak'], ['b', 20.4, 54.17, 0, 21.8, 55.17, 0.012, 'tartan'], ['y', 22.0, 54.37, 0.17, 0.43, 0.47, 'pine'], ['b', 22.08, 54.45, 0, 22.12, 54.49, 0.43, 'pine'],
+    ['b', 21.88, 54.45, 0, 21.92, 54.49, 0.43, 'pine'], ['b', 22.08, 54.25, 0, 22.12, 54.29, 0.43, 'pine'], ['b', 21.88, 54.25, 0, 21.92, 54.29, 0.43, 'pine'], ['y', 9.441, 57.146, 0.06, 0.1, 0.2, 'brass'],
+    ['y', 9.441, 57.146, 0.045, 0.2, 0.35, 'glass']]);
+  /* G-ADDS end linen-room-7-north */
+  /* G-ADDS broom-cupboard-7-north-west */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): book-crate-1, hessian-sack-1, hanging-lantern-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-7.js for collision only */
+  add('broom-cupboard-7-north-west', [
+    ['b', 31.69, 55.81, 0, 32.31, 56.23, 0.32, 'pine'], ['b', 22.73, 54.17, 0, 23.07, 54.57, 0.5, 'rush'], ['b', 22.78, 54.23, 0.5, 23.02, 54.49, 0.56, 'rush'], ['b', 22.81, 54.25, 0.56, 22.99, 54.45, 0.6, 'straw'],
+    ['b', 23.685, 54.13, 1.77, 23.715, 54.37, 1.8, 'iron'], ['y', 23.7, 54.35, 0.01, 1.72, 1.77, 'iron'], ['y', 23.7, 54.35, 0.05, 1.68, 1.72, 'brass'], ['y', 23.7, 54.35, 0.085, 1.46, 1.68, 'glass'],
+    ['y', 23.7, 54.35, 0.1, 1.41, 1.46, 'brass']]);
+  /* G-ADDS end broom-cupboard-7-north-west */
+  /* G-ADDS passage-7-cupboard-row */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): plank-bench-1, boot-mat-1; NOT PLACED for want of a clear spot: noticeboard-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-7.js for collision only */
+  add('passage-7-cupboard-row', [
+    ['b', 36.25, 54.85, 0.42, 37.55, 55.23, 0.47, 'pine'], ['b', 36.32, 54.9, 0, 36.38, 55.2, 0.42, 'pine'], ['b', 37.42, 54.9, 0, 37.48, 55.2, 0.42, 'pine'], ['b', 36.45, 54.78, 0, 37.15, 55.23, 0.02, 'rush']]);
+  /* G-ADDS end passage-7-cupboard-row */
+  /* G-ADDS back-passage-7-west */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): chair-squab-1, stair-runner-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-7.js for collision only */
+  add('back-passage-7-west', [
+    ['b', 38.0, 56.27, 0, 38.6, 56.87, 0.95, 'leather'], ['b', 24.27, 56.3, 0, 26.27, 57.3, 0.01, 'scarlet']]);
+  /* G-ADDS end back-passage-7-west */
+  /* G-ADDS lamp-candle-cupboard-7 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): school-trunk-1, folded-linen-1, short-ladder-1; NOT PLACED for want of a clear spot: luggage-tag-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-7.js for collision only */
+  add('lamp-candle-cupboard-7', [
+    ['b', 41.35, 54.17, 0, 42.25, 54.65, 0.42, 'leather'], ['b', 41.34, 54.17, 0.42, 42.26, 54.67, 0.5, 'wood'], ['b', 41.475, 54.17, 0, 41.525, 54.67, 0.5, 'iron'], ['b', 42.075, 54.17, 0, 42.125, 54.67, 0.5, 'iron'],
+    ['b', 41.63, 54.65, 0.1, 41.97, 54.69, 0.4, 'cloth'], ['b', 39.982, 57.194, 0.4, 40.342, 57.454, 0.48, 'linen'], ['b', 39.982, 57.194, 0.48, 40.342, 57.454, 0.56, 'linen'], ['b', 39.87, 54.175, 0, 39.95, 54.625, 1.6, 'pine']]);
+  /* G-ADDS end lamp-candle-cupboard-7 */
+  /* G-ADDS linen-cupboard-7 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): plank-bench-1, iron-bound-chest-1, oil-lamp-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-7.js for collision only */
+  add('linen-cupboard-7', [
+    ['b', 63.45, 54.75, 0.42, 63.83, 56.05, 0.47, 'pine'], ['b', 63.5, 54.82, 0, 63.8, 54.88, 0.42, 'pine'], ['b', 63.5, 55.92, 0, 63.8, 55.98, 0.42, 'pine'], ['b', 51.27, 55.45, 0, 51.77, 56.35, 0.55, 'iron'],
+    ['y', 51.44, 57.146, 0.06, 0.1, 0.2, 'brass'], ['y', 51.44, 57.146, 0.045, 0.2, 0.35, 'glass']]);
+  /* G-ADDS end linen-cupboard-7 */
+  /* G-ADDS passage-7-back-stair */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): umbrella-1, hearth-rug-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-7.js for collision only */
+  add('passage-7-back-stair', [
+    ['b', 65.49, 56.57, 0.8, 65.56, 56.63, 1.7, 'black'], ['b', 64.27, 54.8, 0, 65.27, 56.2, 0.012, 'tartan']]);
+  /* G-ADDS end passage-7-back-stair */
+  /* G-ADDS service-passage-7-lobby */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): plank-bench-1, boot-mat-1, noticeboard-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-7.js for collision only */
+  add('service-passage-7-lobby', [
+    ['b', 69.45, 54.75, 0.42, 69.83, 56.05, 0.47, 'pine'], ['b', 69.5, 54.82, 0, 69.8, 54.88, 0.42, 'pine'], ['b', 69.5, 55.92, 0, 69.8, 55.98, 0.42, 'pine'], ['b', 69.38, 55.15, 0, 69.83, 55.85, 0.02, 'rush'],
+    ['b', 69.81, 55.6, 1.3, 69.86, 56.6, 2.0, 'pine']]);
+  /* G-ADDS end service-passage-7-lobby */
+  /* G-ADDS passage-7-cleaning */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): chair-squab-1; NOT PLACED for want of a clear spot: stair-runner-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-7.js for collision only */
+  add('passage-7-cleaning', [
+    ['b', 70.27, 54.7, 0, 70.87, 55.3, 0.95, 'leather']]);
+  /* G-ADDS end passage-7-cleaning */
+  /* G-ADDS broom-cupboard-7-north-east */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): hall-chair-1, hearth-rug-1, stool-1, oil-lamp-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-7.js for collision only */
+  add('broom-cupboard-7-north-east', [
+    ['b', 81.85, 57.03, 0, 82.35, 57.53, 0.95, 'oak'], ['b', 72.27, 55.3, 0, 73.27, 56.7, 0.012, 'tartan'], ['y', 86.6, 54.07, 0.17, 0.43, 0.47, 'pine'], ['b', 86.68, 54.15, 0, 86.72, 54.19, 0.43, 'pine'],
+    ['b', 86.48, 54.15, 0, 86.52, 54.19, 0.43, 'pine'], ['b', 86.68, 53.95, 0, 86.72, 53.99, 0.43, 'pine'], ['b', 86.48, 53.95, 0, 86.52, 53.99, 0.43, 'pine'], ['y', 81.943, 57.123, 0.06, 0.95, 1.05, 'brass'],
+    ['y', 81.943, 57.123, 0.045, 1.05, 1.2, 'glass']]);
+  /* G-ADDS end broom-cupboard-7-north-east */
+  /* G-ADDS passage-7-stair-hall */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): umbrella-1, hearth-rug-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-7.js for collision only */
+  add('passage-7-stair-hall', [
+    ['b', 87.27, 54.14, 0.8, 87.33, 54.21, 1.7, 'black'], ['b', 87.3, 54.17, 0, 88.7, 55.17, 0.012, 'tartan']]);
+  /* G-ADDS end passage-7-stair-hall */
+  /* G-ADDS desk-store-7 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): book-crate-1, hessian-sack-1, hanging-lantern-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-7.js for collision only */
+  add('desk-store-7', [
+    ['b', 89.89, 54.17, 0, 90.51, 54.59, 0.32, 'pine'], ['b', 89.93, 57.13, 0, 90.27, 57.53, 0.5, 'rush'], ['b', 89.98, 57.21, 0.5, 90.22, 57.47, 0.56, 'rush'], ['b', 90.01, 57.25, 0.56, 90.19, 57.45, 0.6, 'straw'],
+    ['b', 93.93, 56.485, 1.77, 94.17, 56.515, 1.8, 'iron'], ['y', 93.95, 56.5, 0.01, 1.72, 1.77, 'iron'], ['y', 93.95, 56.5, 0.05, 1.68, 1.72, 'brass'], ['y', 93.95, 56.5, 0.085, 1.46, 1.68, 'glass'],
+    ['y', 93.95, 56.5, 0.1, 1.41, 1.46, 'brass']]);
+  /* G-ADDS end desk-store-7 */
+  /* G-ADDS teachers-study-7-west */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): writing-desk-1, oak-chair-1, bookcase-1, silver-teapot-1, log-basket-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-7.js for collision only */
+  add('teachers-study-7-west', [
+    ['b', 13.7, 71.43, 0, 14.7, 71.98, 0.78, 'oak'], ['b', 18.35, 59.27, 0, 18.85, 59.77, 0.9, 'oak'], ['b', 15.7, 71.68, 0, 16.7, 71.98, 1.9, 'oak'], ['b', 14.624, 69.457, 0.76, 14.824, 69.577, 0.94, 'steel'],
+    ['b', 11.05, 59.27, 0, 11.55, 59.67, 0.4, 'wicker']]);
+  /* G-ADDS end teachers-study-7-west */
+  /* G-ADDS staff-bedroom-7-north */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): iron-bedstead-1, low-easy-chair-1, hearth-rug-1, nest-of-drawers-1, oil-lamp-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-7.js for collision only */
+  add('staff-bedroom-7-north', [
+    ['b', 31.48, 68.1, 0, 32.43, 70.1, 0.55, 'iron'], ['b', 22.75, 59.67, 0, 23.45, 60.37, 0.75, 'leather'], ['b', 30.7, 59.67, 0, 32.1, 60.67, 0.012, 'tartan'], ['b', 28.8, 59.67, 0, 29.4, 60.07, 0.8, 'oak'],
+    ['y', 22.883, 62.361, 0.06, 0.76, 0.86, 'brass'], ['y', 22.883, 62.361, 0.045, 0.86, 1.01, 'glass']]);
+  /* G-ADDS end staff-bedroom-7-north */
+  /* G-ADDS teachers-study-7-north */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): writing-desk-1, oak-chair-1, hearth-rug-1, oil-lamp-1, silver-teapot-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-7.js for collision only */
+  add('teachers-study-7-north', [
+    ['b', 72.27, 64.9, 0, 72.82, 65.9, 0.78, 'oak'], ['b', 72.27, 60.25, 0, 72.77, 60.75, 0.9, 'oak'], ['b', 80.73, 67.3, 0, 81.73, 68.7, 0.012, 'tartan'], ['y', 76.412, 66.267, 0.06, 0.76, 0.86, 'brass'],
+    ['y', 76.412, 66.267, 0.045, 0.86, 1.01, 'glass'], ['b', 76.374, 66.34, 0.76, 76.574, 66.46, 0.94, 'steel']]);
+  /* G-ADDS end teachers-study-7-north */
+  /* G-ADDS astronomy-stair-foot-7 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): plank-bench-1, stair-runner-1; NOT PLACED for want of a clear spot: oil-lamp-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-7.js for collision only */
+  add('astronomy-stair-foot-7', [
+    ['b', 82.25, 59.27, 0.42, 83.55, 59.65, 0.47, 'pine'], ['b', 82.32, 59.3, 0, 82.38, 59.6, 0.42, 'pine'], ['b', 83.42, 59.3, 0, 83.48, 59.6, 0.42, 'pine'], ['b', 83.8, 66.73, 0, 84.8, 68.73, 0.01, 'scarlet']]);
+  /* G-ADDS end astronomy-stair-foot-7 */
+  /* G-ADDS caretakers-cleaning-cupboard-7 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): scrubbing-brush-1, hooped-bucket-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-7.js for collision only */
+  add('caretakers-cleaning-cupboard-7', [
+    ['b', 71.69, 69.7, 1.2, 71.76, 69.9, 1.3, 'wood'], ['y', 68.45, 68.3, 0.17, 0, 0.34, 'tin'], ['y', 68.45, 68.3, 0.175, 0.3, 0.34, 'iron']]);
+  /* G-ADDS end caretakers-cleaning-cupboard-7 */
+  /* G-ADDS examiners-room-7 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): trestle-bench-1, worktable-1, stool-1, oil-lamp-1, short-ladder-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-7.js for collision only */
+  add('examiners-room-7', [
+    ['b', 143.55, 8.52, 0, 144.95, 9.02, 0.8, 'pine'], ['b', 143.52, 15.95, 0, 144.22, 17.35, 0.8, 'deal'], ['y', 144.75, 17.68, 0.17, 0.43, 0.47, 'pine'], ['b', 144.83, 17.76, 0, 144.87, 17.8, 0.43, 'pine'],
+    ['b', 144.63, 17.76, 0, 144.67, 17.8, 0.43, 'pine'], ['b', 144.83, 17.56, 0, 144.87, 17.6, 0.43, 'pine'], ['b', 144.63, 17.56, 0, 144.67, 17.6, 0.43, 'pine'], ['y', 149.31, 11.113, 0.06, 0.76, 0.86, 'brass'],
+    ['y', 149.31, 11.113, 0.045, 0.86, 1.01, 'glass'], ['b', 158.5, 14.925, 0, 158.58, 15.375, 1.6, 'pine']]);
+  /* G-ADDS end examiners-room-7 */
+  /* G-ADDS examination-papers-store-7 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): school-trunk-1, folded-linen-1, short-ladder-1; NOT PLACED for want of a clear spot: luggage-tag-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-7.js for collision only */
+  add('examination-papers-store-7', [
+    ['b', 152.0, 6.5, 0, 152.48, 7.4, 0.42, 'leather'], ['b', 151.98, 6.49, 0.42, 152.48, 7.41, 0.5, 'wood'], ['b', 151.98, 6.625, 0, 152.48, 6.675, 0.5, 'iron'], ['b', 151.98, 7.225, 0, 152.48, 7.275, 0.5, 'iron'],
+    ['b', 151.96, 6.78, 0.1, 152.0, 7.12, 0.4, 'cloth'], ['b', 144.631, 0.011, 0.4, 144.991, 0.271, 0.48, 'linen'], ['b', 144.631, 0.011, 0.48, 144.991, 0.271, 0.56, 'linen'], ['b', 149.525, 7.9, 0, 149.975, 7.98, 1.6, 'pine']]);
+  /* G-ADDS end examination-papers-store-7 */
+  /* G-ADDS headmaster-guest-sitting-room-7 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): low-easy-chair-1, leather-armchair-1, hearth-rug-1, fire-irons-1, oil-lamp-1, silver-teapot-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-7.js for collision only */
+  add('headmaster-guest-sitting-room-7', [
+    ['b', 55.87, 8.7, 0, 56.57, 9.4, 0.75, 'leather'], ['b', 55.87, 10.85, 0, 56.67, 11.65, 0.95, 'leather'], ['b', 55.9, 16.98, 0, 57.3, 17.98, 0.012, 'tartan'], ['b', 61.13, 10.8, 0, 61.43, 11.1, 0.7, 'iron'],
+    ['y', 56.336, 8.216, 0.06, 0.55, 0.65, 'brass'], ['y', 56.336, 8.216, 0.045, 0.65, 0.8, 'glass'], ['b', 56.301, 8.287, 0.55, 56.501, 8.407, 0.73, 'steel']]);
+  /* G-ADDS end headmaster-guest-sitting-room-7 */
+  /* G-ADDS washrooms-7-north-east */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): washbasin-1, plank-bench-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-7.js for collision only */
+  add('washrooms-7-north-east', [
+    ['b', 95.75, 54.17, 0, 96.25, 54.57, 0.85, 'white'], ['b', 100.05, 57.15, 0.42, 101.35, 57.53, 0.47, 'pine'], ['b', 100.12, 57.2, 0, 100.18, 57.5, 0.42, 'pine'], ['b', 101.22, 57.2, 0, 101.28, 57.5, 0.42, 'pine']]);
+  /* G-ADDS end washrooms-7-north-east */
+  /* G-ADDS old-textbooks-store-7 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): plank-bench-1, iron-bound-chest-1, oil-lamp-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-7.js for collision only */
+  add('old-textbooks-store-7', [
+    ['b', 104.27, 55.55, 0.42, 104.65, 56.85, 0.47, 'pine'], ['b', 104.3, 55.62, 0, 104.6, 55.68, 0.42, 'pine'], ['b', 104.3, 56.72, 0, 104.6, 56.78, 0.42, 'pine'], ['b', 111.78, 55.45, 0, 112.28, 56.35, 0.55, 'iron'],
+    ['y', 104.44, 54.222, 0.06, 0.1, 0.2, 'brass'], ['y', 104.44, 54.222, 0.045, 0.2, 0.35, 'glass']]);
+  /* G-ADDS end old-textbooks-store-7 */
+  /* G-ADDS store-7-middle */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): hall-chair-1, hearth-rug-1, stool-1, oil-lamp-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-7.js for collision only */
+  add('store-7-middle', [
+    ['b', 125.2, 57.03, 0, 125.7, 57.53, 0.95, 'oak'], ['b', 115.32, 54.7, 0, 116.32, 56.1, 0.012, 'tartan'], ['y', 137.88, 54.3, 0.17, 0.43, 0.47, 'pine'], ['b', 137.96, 54.38, 0, 138.0, 54.42, 0.43, 'pine'],
+    ['b', 137.76, 54.38, 0, 137.8, 54.42, 0.43, 'pine'], ['b', 137.96, 54.18, 0, 138.0, 54.22, 0.43, 'pine'], ['b', 137.76, 54.18, 0, 137.8, 54.22, 0.43, 'pine'], ['y', 115.562, 54.288, 0.06, 0.7, 0.8, 'brass'],
+    ['y', 115.562, 54.288, 0.045, 0.8, 0.95, 'glass']]);
+  /* G-ADDS end store-7-middle */
+  /* G-ADDS passage-7-east-middle */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): plank-bench-1, boot-mat-1, noticeboard-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-7.js for collision only */
+  add('passage-7-east-middle', [
+    ['b', 140.2, 55.15, 0.42, 140.58, 56.45, 0.47, 'pine'], ['b', 140.25, 55.22, 0, 140.55, 55.28, 0.42, 'pine'], ['b', 140.25, 56.32, 0, 140.55, 56.38, 0.42, 'pine'], ['b', 138.62, 54.75, 0, 139.07, 55.45, 0.02, 'rush'],
+    ['b', 138.59, 55.2, 1.3, 138.64, 56.2, 2.0, 'pine']]);
+  /* G-ADDS end passage-7-east-middle */
+  /* G-ADDS sherry-store-7 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): book-crate-1, hessian-sack-1, hanging-lantern-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-7.js for collision only */
+  add('sherry-store-7', [
+    ['b', 141.64, 54.17, 0, 142.26, 54.59, 0.32, 'pine'], ['b', 141.68, 57.13, 0, 142.02, 57.53, 0.5, 'rush'], ['b', 141.73, 57.21, 0.5, 141.97, 57.47, 0.56, 'rush'], ['b', 141.76, 57.25, 0.56, 141.94, 57.45, 0.6, 'straw'],
+    ['b', 145.28, 55.885, 1.77, 145.52, 55.915, 1.8, 'iron'], ['y', 145.3, 55.9, 0.01, 1.72, 1.77, 'iron'], ['y', 145.3, 55.9, 0.05, 1.68, 1.72, 'brass'], ['y', 145.3, 55.9, 0.085, 1.46, 1.68, 'glass'],
+    ['y', 145.3, 55.9, 0.1, 1.41, 1.46, 'brass']]);
+  /* G-ADDS end sherry-store-7 */
+  /* G-ADDS sir-cadogans-landing-7 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): chair-squab-1, stair-runner-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-7.js for collision only */
+  add('sir-cadogans-landing-7', [
+    ['b', 147.65, 58.33, 0, 148.25, 58.93, 0.95, 'leather'], ['b', 153.05, 56.93, 0, 154.05, 58.93, 0.01, 'scarlet']]);
+  /* G-ADDS end sir-cadogans-landing-7 */
+  /* G-ADDS astronomy-corridor-7 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): umbrella-1, hearth-rug-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-7.js for collision only */
+  add('astronomy-corridor-7', [
+    ['b', 99.97, 59.24, 0.8, 100.03, 59.31, 1.7, 'black'], ['b', 95.2, 59.27, 0, 96.6, 60.27, 0.012, 'tartan']]);
+  /* G-ADDS end astronomy-corridor-7 */
+  /* G-ADDS astronomy-waiting-room-7 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): low-easy-chair-1, leather-armchair-1, hearth-rug-1, fire-irons-1, oil-lamp-1, silver-teapot-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-7.js for collision only */
+  add('astronomy-waiting-room-7', [
+    ['b', 91.95, 62.77, 0, 92.65, 63.47, 0.75, 'leather'], ['b', 88.3, 62.77, 0, 89.1, 63.57, 0.95, 'leather'], ['b', 95.3, 62.77, 0, 96.7, 63.77, 0.012, 'tartan'], ['b', 90.95, 62.77, 0, 91.25, 63.07, 0.7, 'iron'],
+    ['y', 88.86, 68.638, 0.06, 0.45, 0.55, 'brass'], ['y', 88.86, 68.638, 0.045, 0.55, 0.7, 'glass'], ['b', 88.82, 68.714, 0.45, 89.02, 68.834, 0.63, 'steel']]);
+  /* G-ADDS end astronomy-waiting-room-7 */
+  /* G-ADDS teachers-study-7-east-a */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): writing-desk-1, dip-holder-1, leather-armchair-1, oil-lamp-1, fire-irons-1, bookcase-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-7.js for collision only */
+  add('teachers-study-7-east-a', [
+    ['b', 125.63, 61.8, 0, 126.18, 62.8, 0.78, 'oak'], ['y', 120.112, 66.517, 0.025, 0.76, 0.96, 'wood'], ['b', 125.38, 68.0, 0, 126.18, 68.8, 0.95, 'leather'], ['y', 120.112, 66.65, 0.06, 0.76, 0.86, 'brass'],
+    ['y', 120.112, 66.65, 0.045, 0.86, 1.01, 'glass'], ['b', 124.2, 59.27, 0, 124.5, 59.57, 0.7, 'iron'], ['b', 115.22, 64.6, 0, 115.52, 65.6, 1.9, 'oak']]);
+  /* G-ADDS end teachers-study-7-east-a */
+  /* G-ADDS study-room-7-east */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): writing-desk-1, oak-chair-1, bookcase-1, silver-teapot-1, log-basket-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-7.js for collision only */
+  add('study-room-7-east', [
+    ['b', 126.72, 59.3, 0, 127.27, 60.3, 0.78, 'oak'], ['b', 126.72, 64.85, 0, 127.22, 65.35, 0.9, 'oak'], ['b', 131.35, 68.68, 0, 132.35, 68.98, 1.9, 'oak'], ['b', 132.425, 62.175, 0.76, 132.625, 62.295, 0.94, 'steel'],
+    ['b', 126.72, 61.85, 0, 127.12, 62.35, 0.4, 'wicker']]);
+  /* G-ADDS end study-room-7-east */
+  /* G-ADDS teachers-study-7-east-b */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): writing-desk-1, oak-chair-1, hearth-rug-1, oil-lamp-1, silver-teapot-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-7.js for collision only */
+  add('teachers-study-7-east-b', [
+    ['b', 139.85, 59.27, 0, 140.85, 59.82, 0.78, 'oak'], ['b', 145.4, 59.27, 0, 145.9, 59.77, 0.9, 'oak'], ['b', 150.98, 64.7, 0, 151.98, 66.1, 0.012, 'tartan'], ['y', 145.212, 66.517, 0.06, 0.76, 0.86, 'brass'],
+    ['y', 145.212, 66.517, 0.045, 0.86, 1.01, 'glass'], ['b', 145.174, 66.59, 0.76, 145.374, 66.71, 0.94, 'steel']]);
+  /* G-ADDS end teachers-study-7-east-b */
+  /* G-ADDS ravenclaw-common-room */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): low-easy-chair-1, leather-armchair-1, hearth-rug-1, fire-irons-1, oil-lamp-1, silver-teapot-1; sited by tools/architect-now.py, plain stand-ins; read back from None for collision only */
+  add('ravenclaw-common-room', [
+    ['b', -3.186, 29.726, 0, -2.486, 30.426, 0.75, 'leather'], ['b', -1.934, 33.078, 0, -1.134, 33.878, 0.95, 'leather'], ['b', -2.753, 30.474, 0, -1.753, 31.874, 0.012, 'tartan'], ['b', -1.341, 31.23, 0, -1.041, 31.53, 0.7, 'iron'],
+    ['y', -3.092, 29.82, 0.06, 0.75, 0.85, 'brass'], ['y', -3.092, 29.82, 0.045, 0.85, 1.0, 'glass'], ['b', -3.128, 29.952, 0.75, -2.928, 30.072, 0.93, 'steel']]);
+  /* G-ADDS end ravenclaw-common-room */
+  /* G-ADDS west-tower-room-7 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): school-trunk-1, folded-linen-1, short-ladder-1; NOT PLACED for want of a clear spot: luggage-tag-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-7.js for collision only */
+  add('west-tower-room-7', [
+    ['b', -3.459, 73.918, 0, -2.979, 74.818, 0.42, 'leather'], ['b', -3.459, 73.908, 0.42, -2.959, 74.828, 0.5, 'wood'], ['b', -3.459, 74.043, 0, -2.959, 74.093, 0.5, 'iron'], ['b', -3.459, 74.643, 0, -2.959, 74.693, 0.5, 'iron'],
+    ['b', -2.979, 74.198, 0.1, -2.939, 74.538, 0.4, 'cloth'], ['b', 3.588, 73.713, 0.7, 3.948, 73.973, 0.78, 'linen'], ['b', 3.588, 73.713, 0.78, 3.948, 73.973, 0.86, 'linen'], ['b', -1.108, 76.525, 0, -0.658, 76.605, 1.6, 'pine']]);
+  /* G-ADDS end west-tower-room-7 */
+  /* G-ADDS headmasters-tower-room-7 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): plank-bench-1, iron-bound-chest-1, oil-lamp-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-7.js for collision only */
+  add('headmasters-tower-room-7', [
+    ['b', 162.858, 42.641, 0.42, 164.158, 43.021, 0.47, 'pine'], ['b', 162.928, 42.691, 0, 162.988, 42.991, 0.42, 'pine'], ['b', 164.028, 42.691, 0, 164.088, 42.991, 0.42, 'pine'], ['b', 164.765, 43.314, 0, 165.665, 43.814, 0.55, 'iron'],
+    ['y', 162.379, 37.875, 0.06, 0.7, 0.8, 'brass'], ['y', 162.379, 37.875, 0.045, 0.8, 0.95, 'glass']]);
+  /* G-ADDS end headmasters-tower-room-7 */
+  /* G-ADDS southeast-drum-room-7 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): hall-chair-1, hearth-rug-1, stool-1, oil-lamp-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-7.js for collision only */
+  add('southeast-drum-room-7', [
+    ['b', 161.369, 4.158, 0, 161.869, 4.658, 0.95, 'oak'], ['b', 155.569, -0.897, 0, 156.569, 0.503, 0.012, 'tartan'], ['y', 155.227, -0.016, 0.17, 0.43, 0.47, 'pine'], ['b', 155.307, 0.064, 0, 155.347, 0.104, 0.43, 'pine'],
+    ['b', 155.107, 0.064, 0, 155.147, 0.104, 0.43, 'pine'], ['b', 155.307, -0.136, 0, 155.347, -0.096, 0.43, 'pine'], ['b', 155.107, -0.136, 0, 155.147, -0.096, 0.43, 'pine'], ['y', 155.535, -1.662, 0.06, 0.7, 0.8, 'brass'],
+    ['y', 155.535, -1.662, 0.045, 0.8, 0.95, 'glass']]);
+  /* G-ADDS end southeast-drum-room-7 */
+  /* G-ADDS north-tower-room-7 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): book-crate-1, hessian-sack-1, hanging-lantern-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-7.js for collision only */
+  add('north-tower-room-7', [
+    ['b', 153.514, 72.665, 0, 153.934, 73.285, 0.32, 'pine'], ['b', 166.086, 70.855, 0, 166.486, 71.195, 0.5, 'rush'], ['b', 166.166, 70.905, 0.5, 166.426, 71.145, 0.56, 'rush'], ['b', 166.206, 70.935, 0.56, 166.406, 71.115, 0.6, 'straw'],
+    ['y', 159.123, 78.495, 0.03, 1.77, 1.8, 'iron'], ['y', 159.137, 78.426, 0.02, 1.77, 1.8, 'iron'], ['y', 159.156, 78.328, 0.01, 1.72, 1.77, 'iron'], ['y', 159.156, 78.328, 0.05, 1.68, 1.72, 'brass'],
+    ['y', 159.156, 78.328, 0.085, 1.46, 1.68, 'glass'], ['y', 159.156, 78.328, 0.1, 1.41, 1.46, 'brass']]);
+  /* G-ADDS end north-tower-room-7 */
+  /* G-ADDS lake-tower-room-7 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): school-trunk-1, folded-linen-1, short-ladder-1; NOT PLACED for want of a clear spot: luggage-tag-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-7.js for collision only */
+  add('lake-tower-room-7', [
+    ['b', 134.16, -4.7, 0, 134.64, -3.8, 0.42, 'leather'], ['b', 134.14, -4.71, 0.42, 134.64, -3.79, 0.5, 'wood'], ['b', 134.14, -4.575, 0, 134.64, -4.525, 0.5, 'iron'], ['b', 134.14, -3.975, 0, 134.64, -3.925, 0.5, 'iron'],
+    ['b', 134.12, -4.42, 0.1, 134.16, -4.08, 0.4, 'cloth'], ['b', 127.531, -0.585, 0.7, 127.891, -0.325, 0.78, 'linen'], ['b', 127.531, -0.585, 0.78, 127.891, -0.325, 0.86, 'linen'], ['b', 134.56, -5.555, 0, 134.64, -5.105, 1.6, 'pine']]);
+  /* G-ADDS end lake-tower-room-7 */
+  /* G-ADDS west-pole-shaft-7 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): plank-bench-1, boot-mat-1, noticeboard-1; sited by tools/architect-now.py, plain stand-ins; read back from None for collision only */
+  add('west-pole-shaft-7', [
+    ['b', -4.38, 22.7, 0.42, -4.0, 24.0, 0.47, 'pine'], ['b', -4.35, 22.77, 0, -4.05, 22.83, 0.42, 'pine'], ['b', -4.35, 23.87, 0, -4.05, 23.93, 0.42, 'pine'], ['b', -4.38, 24.5, 0, -3.93, 25.2, 0.02, 'rush'],
+    ['b', -4.41, 25.45, 1.3, -4.36, 26.45, 2.0, 'pine']]);
+  /* G-ADDS end west-pole-shaft-7 */
+  /* G-ADDS west-dumbwaiter-shaft-7 */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): chair-squab-1, stair-runner-1; sited by tools/architect-now.py, plain stand-ins; read back from None for collision only */
+  add('west-dumbwaiter-shaft-7', [
+    ['b', -1.75, 44.68, 0, -1.15, 45.28, 0.95, 'leather'], ['b', -4.35, 41.02, 0, -3.35, 43.02, 0.01, 'scarlet']]);
+  /* G-ADDS end west-dumbwaiter-shaft-7 */
+  /* G-ADDS still-room */
+  /* NOW (floor-1-by-purpose-1031.md): worktable-1, herb-bunch-1, candle-mould-1, stearin-candle-1, stool-1, boarded-chest-1, oil-lamp-1, snuffer-pole-1, school-trunk-1; NOT PLACED for want of a clear spot: copper-funnel-1, specimen-jar-1, 2 hung item(s) that floated on the curve; stand-in gap, no emitter: preserve-pot-1, stockpots-1; sited by tools/architect-now.py, plain stand-ins; read back from None for collision only */
+  add('still-room', [
+    ['b', -4.78, 71.3, 0, -4.08, 72.7, 0.8, 'deal'], ['b', -4.736, 71.341, 0.8, -4.636, 71.441, 1.0, 'tin'], ['y', -4.75, 71.513, 0.02, 0.8, 0.95, 'white'], ['y', -0.24, 76.574, 0.17, 0.43, 0.47, 'pine'],
+    ['b', -0.16, 76.654, 0, -0.12, 76.694, 0.43, 'pine'], ['b', -0.36, 76.654, 0, -0.32, 76.694, 0.43, 'pine'], ['b', -0.16, 76.454, 0, -0.12, 76.494, 0.43, 'pine'], ['b', -0.36, 76.454, 0, -0.32, 76.494, 0.43, 'pine'],
+    ['b', -0.199, 67.227, 0, 0.701, 67.727, 0.5, 'pine'], ['y', -4.686, 71.635, 0.06, 0.8, 0.9, 'brass'], ['y', -4.686, 71.635, 0.045, 0.9, 1.05, 'glass'], ['b', -4.07, 72.879, 0, -3.59, 73.779, 0.42, 'leather'],
+    ['b', -4.07, 72.869, 0.42, -3.57, 73.789, 0.5, 'wood'], ['b', -4.07, 73.004, 0, -3.57, 73.054, 0.5, 'iron'], ['b', -4.07, 73.604, 0, -3.57, 73.654, 0.5, 'iron'], ['b', -3.59, 73.159, 0.1, -3.55, 73.499, 0.4, 'cloth']]);
+  /* G-ADDS end still-room */
+  /* G-ADDS drum-room-1 */
+  /* NOW (floor-1-by-purpose-1031.md): school-trunk-1, stool-1, boarded-chest-1, pulley-block-1, hanging-lantern-1, tin-bucket-1, snuffer-pole-1, stearin-candle-1; NOT PLACED for want of a clear spot: luggage-tag-1, 2 hung item(s) that floated on the curve; stand-in gap, no emitter: preserve-pot-1, stockpots-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-1.js for collision only */
+  add('drum-room-1', [
+    ['b', 41.478, 6.443, 0, 42.378, 6.923, 0.42, 'leather'], ['b', 41.468, 6.423, 0.42, 42.388, 6.923, 0.5, 'wood'], ['b', 41.603, 6.423, 0, 41.653, 6.923, 0.5, 'iron'], ['b', 42.203, 6.423, 0, 42.253, 6.923, 0.5, 'iron'],
+    ['b', 41.758, 6.403, 0.1, 42.098, 6.443, 0.4, 'cloth'], ['y', 44.793, 5.959, 0.17, 0.43, 0.47, 'pine'], ['b', 44.873, 6.039, 0, 44.913, 6.079, 0.43, 'pine'], ['b', 44.673, 6.039, 0, 44.713, 6.079, 0.43, 'pine'],
+    ['b', 44.873, 5.839, 0, 44.913, 5.879, 0.43, 'pine'], ['b', 44.673, 5.839, 0, 44.713, 5.879, 0.43, 'pine'], ['b', 46.663, 1.762, 0, 47.163, 2.662, 0.5, 'pine'], ['y', 44.675, -2.354, 0.03, 1.77, 1.8, 'iron'],
+    ['y', 44.64, -2.294, 0.02, 1.77, 1.8, 'iron'], ['y', 44.59, -2.207, 0.01, 1.72, 1.77, 'iron'], ['y', 44.59, -2.207, 0.05, 1.68, 1.72, 'brass'], ['y', 44.59, -2.207, 0.085, 1.46, 1.68, 'glass'],
+    ['y', 44.59, -2.207, 0.1, 1.41, 1.46, 'brass'], ['y', 37.449, 1.199, 0.17, 0, 0.34, 'tin'], ['y', 37.449, 1.199, 0.175, 0.3, 0.34, 'iron'], ['y', 38.28, 2.58, 0.02, 0.75, 0.9, 'white']]);
+  /* G-ADDS end drum-room-1 */
+  /* G-ADDS drum-room-2 */
+  /* NOW (floor-2-by-purpose-1031.md): trestle-bench-1, short-ladder-1, sweet-tin-1, hanging-lantern-1, school-trunk-1; NOT PLACED for want of a clear spot: house-banner-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-2.js for collision only */
+  add('drum-room-2', [
+    ['b', 41.254, 5.924, 0, 42.654, 6.424, 0.8, 'pine'], ['b', 37.319, 0.685, 0, 37.399, 1.135, 1.6, 'pine'], ['y', 45.376, 3.064, 0.06, 0.6, 0.68, 'tin'], ['y', 40.904, 6.751, 0.03, 1.77, 1.8, 'iron'],
+    ['y', 40.922, 6.683, 0.02, 1.77, 1.8, 'iron'], ['y', 40.948, 6.586, 0.01, 1.72, 1.77, 'iron'], ['y', 40.948, 6.586, 0.05, 1.68, 1.72, 'brass'], ['y', 40.948, 6.586, 0.085, 1.46, 1.68, 'glass'],
+    ['y', 40.948, 6.586, 0.1, 1.41, 1.46, 'brass'], ['b', 42.976, 5.254, 0, 43.876, 5.734, 0.42, 'leather'], ['b', 42.966, 5.234, 0.42, 43.886, 5.734, 0.5, 'wood'], ['b', 43.101, 5.234, 0, 43.151, 5.734, 0.5, 'iron'],
+    ['b', 43.701, 5.234, 0, 43.751, 5.734, 0.5, 'iron'], ['b', 43.256, 5.214, 0.1, 43.596, 5.254, 0.4, 'cloth']]);
+  /* G-ADDS end drum-room-2 */
+  /* G-ADDS drum-room-b */
+  /* NOW (floor-b-by-purpose-1031.md): hessian-sack-1, hooped-bucket-1, school-trunk-1, iron-bound-chest-1; stand-in gap, no emitter: school-trunk-open-1, iron-shield-1; sited by tools/architect-now.py, plain stand-ins; read back from None for collision only */
+  add('drum-room-b', [
+    ['b', 40.228, 6.198, 0, 40.568, 6.598, 0.5, 'rush'], ['b', 40.278, 6.278, 0.5, 40.518, 6.538, 0.56, 'rush'], ['b', 40.308, 6.318, 0.56, 40.488, 6.518, 0.6, 'straw'], ['y', 43.673, 6.515, 0.17, 0, 0.34, 'tin'],
+    ['y', 43.673, 6.515, 0.175, 0.3, 0.34, 'iron'], ['b', 41.478, 6.443, 0, 42.378, 6.923, 0.42, 'leather'], ['b', 41.468, 6.423, 0.42, 42.388, 6.923, 0.5, 'wood'], ['b', 41.603, 6.423, 0, 41.653, 6.923, 0.5, 'iron'],
+    ['b', 42.203, 6.423, 0, 42.253, 6.923, 0.5, 'iron'], ['b', 41.758, 6.403, 0.1, 42.098, 6.443, 0.4, 'cloth'], ['b', 37.217, 1.238, 0, 37.717, 2.138, 0.55, 'iron']]);
+  /* G-ADDS end drum-room-b */
+  /* G-ADDS owlery */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): short-ladder-1, hanging-lantern-1; stand-in gap, no emitter: dovecote-potence-1; sited by tools/architect-now.py, plain stand-ins; read back from None for collision only */
+  add('owlery', [
+    ['b', -4.616, 70.533, 0, -4.536, 70.983, 1.6, 'pine'], ['y', 4.666, 71.008, 0.03, 1.77, 1.8, 'iron'], ['y', 4.597, 71.023, 0.02, 1.77, 1.8, 'iron'], ['y', 4.499, 71.044, 0.01, 1.72, 1.77, 'iron'],
+    ['y', 4.499, 71.044, 0.05, 1.68, 1.72, 'brass'], ['y', 4.499, 71.044, 0.085, 1.46, 1.68, 'glass'], ['y', 4.499, 71.044, 0.1, 1.41, 1.46, 'brass']]);
+  /* G-ADDS end owlery */
+  /* G-ADDS divination-classroom */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): hearth-rug-1; NOT PLACED for want of a clear spot: silver-teapot-1; sited by tools/architect-now.py, plain stand-ins; read back from None for collision only */
+  add('divination-classroom', [
+    ['b', 165.68, 71.3, 0, 166.68, 72.7, 0.012, 'tartan']]);
+  /* G-ADDS end divination-classroom */
+  /* G-ADDS north-tower-landing */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): hanging-lantern-1; sited by tools/architect-now.py, plain stand-ins; read back from None for collision only */
+  add('north-tower-landing', [
+    ['y', 154.057, 68.972, 0.03, 1.77, 1.8, 'iron'], ['y', 154.119, 69.004, 0.02, 1.77, 1.8, 'iron'], ['y', 154.208, 69.049, 0.01, 1.72, 1.77, 'iron'], ['y', 154.208, 69.049, 0.05, 1.68, 1.72, 'brass'],
+    ['y', 154.208, 69.049, 0.085, 1.46, 1.68, 'glass'], ['y', 154.208, 69.049, 0.1, 1.41, 1.46, 'brass']]);
+  /* G-ADDS end north-tower-landing */
+  /* G-ADDS dumbledores-office */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): leather-armchair-1, fire-irons-1; sited by tools/architect-now.py, plain stand-ins; read back from None for collision only */
+  add('dumbledores-office', [
+    ['b', 169.655, 40.07, 0, 170.455, 40.87, 0.95, 'leather'], ['b', 167.68, 35.909, 0, 167.98, 36.209, 0.7, 'iron']]);
+  /* G-ADDS end dumbledores-office */
+  /* G-ADDS astronomy-tower-top */
+  /* NOW (floors-3-to-7-by-purpose-1031.md): short-ladder-1, telescope-1; NOT PLACED for want of a clear spot: oil-lamp-1; sited by tools/architect-now.py, plain stand-ins; read back from None for collision only */
+  add('astronomy-tower-top', [
+    ['b', 72.776, 74.834, 0, 72.856, 75.284, 1.6, 'pine'], ['b', 86.532, 79.901, 0, 86.832, 80.201, 1.4, 'brass']]);
+  /* G-ADDS end astronomy-tower-top */
+  /* G-ADDS slytherin-way */
+  /* NOW (hidden-doc.md): hanging-lantern-1; sited by tools/architect-now.py, plain stand-ins; read back from None for collision only */
+  add('slytherin-way', [
+    ['b', 49.58, -9.915, 1.77, 49.82, -9.885, 1.8, 'iron'], ['y', 49.8, -9.9, 0.01, 1.72, 1.77, 'iron'], ['y', 49.8, -9.9, 0.05, 1.68, 1.72, 'brass'], ['y', 49.8, -9.9, 0.085, 1.46, 1.68, 'glass'],
+    ['y', 49.8, -9.9, 0.1, 1.41, 1.46, 'brass']]);
+  /* G-ADDS end slytherin-way */
+  /* G-ADDS mirror-way-4 */
+  /* NOW (hidden-doc.md): hanging-lantern-1; sited by tools/architect-now.py, plain stand-ins; read back from None for collision only */
+  add('mirror-way-4', [
+    ['b', 69.035, 55.98, 1.77, 69.065, 56.22, 1.8, 'iron'], ['y', 69.05, 56.0, 0.01, 1.72, 1.77, 'iron'], ['y', 69.05, 56.0, 0.05, 1.68, 1.72, 'brass'], ['y', 69.05, 56.0, 0.085, 1.46, 1.68, 'glass'],
+    ['y', 69.05, 56.0, 0.1, 1.41, 1.46, 'brass']]);
+  /* G-ADDS end mirror-way-4 */
+  /* G-ADDS mirror-passage-b */
+  /* NOW (hidden-doc.md): hanging-lantern-1; sited by tools/architect-now.py, plain stand-ins; read back from None for collision only */
+  add('mirror-passage-b', [
+    ['b', 66.38, 70.935, 1.77, 66.62, 70.965, 1.8, 'iron'], ['y', 66.6, 70.95, 0.01, 1.72, 1.77, 'iron'], ['y', 66.6, 70.95, 0.05, 1.68, 1.72, 'brass'], ['y', 66.6, 70.95, 0.085, 1.46, 1.68, 'glass'],
+    ['y', 66.6, 70.95, 0.1, 1.41, 1.46, 'brass']]);
+  /* G-ADDS end mirror-passage-b */
+  /* G-ADDS undercroft-west-way */
+  /* NOW (hidden-doc.md): hanging-lantern-1; sited by tools/architect-now.py, plain stand-ins; read back from None for collision only */
+  add('undercroft-west-way', [
+    ['b', 68.935, 2.08, 1.77, 68.965, 2.32, 1.8, 'iron'], ['y', 68.95, 2.3, 0.01, 1.72, 1.77, 'iron'], ['y', 68.95, 2.3, 0.05, 1.68, 1.72, 'brass'], ['y', 68.95, 2.3, 0.085, 1.46, 1.68, 'glass'],
+    ['y', 68.95, 2.3, 0.1, 1.41, 1.46, 'brass']]);
+  /* G-ADDS end undercroft-west-way */
+  /* G-ADDS ice-house-way */
+  /* NOW (hidden-doc.md): hanging-lantern-1; sited by tools/architect-now.py, plain stand-ins; read back from None for collision only */
+  add('ice-house-way', [
+    ['b', 1.435, 67.23, 1.77, 1.465, 67.47, 1.8, 'iron'], ['y', 1.45, 67.25, 0.01, 1.72, 1.77, 'iron'], ['y', 1.45, 67.25, 0.05, 1.68, 1.72, 'brass'], ['y', 1.45, 67.25, 0.085, 1.46, 1.68, 'glass'],
+    ['y', 1.45, 67.25, 0.1, 1.41, 1.46, 'brass']]);
+  /* G-ADDS end ice-house-way */
+  /* G-ADDS s2-level-way-g */
+  /* NOW (hidden-doc.md): hanging-lantern-1; sited by tools/architect-now.py, plain stand-ins; read back from None for collision only */
+  add('s2-level-way-g', [
+    ['b', 74.835, 84.08, 1.77, 74.865, 84.32, 1.8, 'iron'], ['y', 74.85, 84.3, 0.01, 1.72, 1.77, 'iron'], ['y', 74.85, 84.3, 0.05, 1.68, 1.72, 'brass'], ['y', 74.85, 84.3, 0.085, 1.46, 1.68, 'glass'],
+    ['y', 74.85, 84.3, 0.1, 1.41, 1.46, 'brass']]);
+  /* G-ADDS end s2-level-way-g */
+  /* G-ADDS study-void */
+  /* NOW (hidden-doc.md): hanging-lantern-1; sited by tools/architect-now.py, plain stand-ins; read back from None for collision only */
+  add('study-void', [
+    ['y', 154.18, 6.47, 0.03, 1.77, 1.8, 'iron'], ['y', 154.18, 6.4, 0.02, 1.77, 1.8, 'iron'], ['y', 154.18, 6.3, 0.01, 1.72, 1.77, 'iron'], ['y', 154.18, 6.3, 0.05, 1.68, 1.72, 'brass'],
+    ['y', 154.18, 6.3, 0.085, 1.46, 1.68, 'glass'], ['y', 154.18, 6.3, 0.1, 1.41, 1.46, 'brass']]);
+  /* G-ADDS end study-void */
+  /* G-ADDS elves-tunnel */
+  /* NOW (hidden-doc.md): hanging-lantern-1; sited by tools/architect-now.py, plain stand-ins; read back from None for collision only */
+  add('elves-tunnel', [
+    ['b', 44.035, 70.88, 1.77, 44.065, 71.12, 1.8, 'iron'], ['y', 44.05, 70.9, 0.01, 1.72, 1.77, 'iron'], ['y', 44.05, 70.9, 0.05, 1.68, 1.72, 'brass'], ['y', 44.05, 70.9, 0.085, 1.46, 1.68, 'glass'],
+    ['y', 44.05, 70.9, 0.1, 1.41, 1.46, 'brass']]);
+  /* G-ADDS end elves-tunnel */
+  /* G-ADDS hall-wall-passage */
+  /* NOW (hidden-doc.md): hanging-lantern-1; sited by tools/architect-now.py, plain stand-ins; read back from None for collision only */
+  add('hall-wall-passage', [
+    ['b', 47.535, 70.88, 1.77, 47.565, 71.12, 1.8, 'iron'], ['y', 47.55, 70.9, 0.01, 1.72, 1.77, 'iron'], ['y', 47.55, 70.9, 0.05, 1.68, 1.72, 'brass'], ['y', 47.55, 70.9, 0.085, 1.46, 1.68, 'glass'],
+    ['y', 47.55, 70.9, 0.1, 1.41, 1.46, 'brass']]);
+  /* G-ADDS end hall-wall-passage */
+  /* G-ADDS keep-wall-walk */
+  /* NOW (hidden-doc.md): hanging-lantern-1; sited by tools/architect-now.py, plain stand-ins; read back from None for collision only */
+  add('keep-wall-walk', [
+    ['b', 80.435, -0.82, 1.77, 80.465, -0.58, 1.8, 'iron'], ['y', 80.45, -0.8, 0.01, 1.72, 1.77, 'iron'], ['y', 80.45, -0.8, 0.05, 1.68, 1.72, 'brass'], ['y', 80.45, -0.8, 0.085, 1.46, 1.68, 'glass'],
+    ['y', 80.45, -0.8, 0.1, 1.41, 1.46, 'brass']]);
+  /* G-ADDS end keep-wall-walk */
+  /* G-ADDS keep-east-stairwell */
+  /* NOW (hidden-doc.md): hanging-lantern-1; sited by tools/architect-now.py, plain stand-ins; read back from None for collision only */
+  add('keep-east-stairwell', [
+    ['b', 92.68, 10.135, 1.77, 92.92, 10.165, 1.8, 'iron'], ['y', 92.7, 10.15, 0.01, 1.72, 1.77, 'iron'], ['y', 92.7, 10.15, 0.05, 1.68, 1.72, 'brass'], ['y', 92.7, 10.15, 0.085, 1.46, 1.68, 'glass'],
+    ['y', 92.7, 10.15, 0.1, 1.41, 1.46, 'brass']]);
+  /* G-ADDS end keep-east-stairwell */
+  /* G-ADDS porters-squint */
+  /* NOW (hidden-doc.md): hanging-lantern-1; sited by tools/architect-now.py, plain stand-ins; read back from None for collision only */
+  add('porters-squint', [
+    ['b', 85.035, 70.48, 1.77, 85.065, 70.72, 1.8, 'iron'], ['y', 85.05, 70.7, 0.01, 1.72, 1.77, 'iron'], ['y', 85.05, 70.7, 0.05, 1.68, 1.72, 'brass'], ['y', 85.05, 70.7, 0.085, 1.46, 1.68, 'glass'],
+    ['y', 85.05, 70.7, 0.1, 1.41, 1.46, 'brass']]);
+  /* G-ADDS end porters-squint */
+  /* G-ADDS k-hide */
+  /* NOW (hidden-doc.md): hanging-lantern-1; sited by tools/architect-now.py, plain stand-ins; read back from None for collision only */
+  add('k-hide', [
+    ['b', 66.935, 71.38, 1.77, 66.965, 71.62, 1.8, 'iron'], ['y', 66.95, 71.4, 0.01, 1.72, 1.77, 'iron'], ['y', 66.95, 71.4, 0.05, 1.68, 1.72, 'brass'], ['y', 66.95, 71.4, 0.085, 1.46, 1.68, 'glass'],
+    ['y', 66.95, 71.4, 0.1, 1.41, 1.46, 'brass']]);
+  /* G-ADDS end k-hide */
+  /* G-ADDS chimney-hide */
+  /* NOW (hidden-doc.md): hanging-lantern-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-5.js for collision only */
+  add('chimney-hide', [
+    ['b', 21.435, 10.18, 1.77, 21.465, 10.42, 1.8, 'iron'], ['y', 21.45, 10.2, 0.01, 1.72, 1.77, 'iron'], ['y', 21.45, 10.2, 0.05, 1.68, 1.72, 'brass'], ['y', 21.45, 10.2, 0.085, 1.46, 1.68, 'glass'],
+    ['y', 21.45, 10.2, 0.1, 1.41, 1.46, 'brass']]);
+  /* G-ADDS end chimney-hide */
+  /* G-ADDS secret-s4a */
+  /* NOW (hidden-doc.md): hanging-lantern-1; sited by tools/architect-now.py, plain stand-ins; read back from None for collision only */
+  add('secret-s4a', [
+    ['b', 55.83, 6.785, 1.77, 56.07, 6.815, 1.8, 'iron'], ['y', 56.05, 6.8, 0.01, 1.72, 1.77, 'iron'], ['y', 56.05, 6.8, 0.05, 1.68, 1.72, 'brass'], ['y', 56.05, 6.8, 0.085, 1.46, 1.68, 'glass'],
+    ['y', 56.05, 6.8, 0.1, 1.41, 1.46, 'brass']]);
+  /* G-ADDS end secret-s4a */
+  /* G-ADDS vanishing-step-hollow */
+  /* NOW (hidden-doc.md): hanging-lantern-1; sited by tools/architect-now.py, plain stand-ins; read back from None for collision only */
+  add('vanishing-step-hollow', [
+    ['b', 87.635, 39.18, 1.77, 87.665, 39.42, 1.8, 'iron'], ['y', 87.65, 39.4, 0.01, 1.72, 1.77, 'iron'], ['y', 87.65, 39.4, 0.05, 1.68, 1.72, 'brass'], ['y', 87.65, 39.4, 0.085, 1.46, 1.68, 'glass'],
+    ['y', 87.65, 39.4, 0.1, 1.41, 1.46, 'brass']]);
+  /* G-ADDS end vanishing-step-hollow */
+  /* G-ADDS ink-room */
+  /* NOW (hidden-doc.md): hanging-lantern-1; sited by tools/architect-now.py, plain stand-ins; read back from None for collision only */
+  add('ink-room', [
+    ['y', 38.056, 6.87, 0.03, 1.77, 1.8, 'iron'], ['y', 38.01, 6.923, 0.02, 1.77, 1.8, 'iron'], ['y', 37.944, 6.998, 0.01, 1.72, 1.77, 'iron'], ['y', 37.944, 6.998, 0.05, 1.68, 1.72, 'brass'],
+    ['y', 37.944, 6.998, 0.085, 1.46, 1.68, 'glass'], ['y', 37.944, 6.998, 0.1, 1.41, 1.46, 'brass']]);
+  /* G-ADDS end ink-room */
+  /* G-ADDS secret-s2 */
+  /* NOW (hidden-doc.md): hanging-lantern-1, book-crate-1, hessian-sack-1; sited by tools/architect-now.py, plain stand-ins; read back from None for collision only */
+  add('secret-s2', [
+    ['b', 88.535, 44.98, 1.77, 88.565, 45.22, 1.8, 'iron'], ['y', 88.55, 45.0, 0.01, 1.72, 1.77, 'iron'], ['y', 88.55, 45.0, 0.05, 1.68, 1.72, 'brass'], ['y', 88.55, 45.0, 0.085, 1.46, 1.68, 'glass'],
+    ['y', 88.55, 45.0, 0.1, 1.41, 1.46, 'brass'], ['b', 89.16, 44.24, 0, 89.58, 44.86, 0.32, 'pine'], ['b', 82.18, 43.02, 0, 82.52, 43.42, 0.5, 'rush'], ['b', 82.23, 43.08, 0.5, 82.47, 43.34, 0.56, 'rush'],
+    ['b', 82.26, 43.1, 0.56, 82.44, 43.3, 0.6, 'straw']]);
+  /* G-ADDS end secret-s2 */
+  /* G-HANG classroom-corridor */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 3 tapestries, 3 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('classroom-corridor', [
+    ['b', 124.85, 60.45, 0.4, 126.05, 60.51, 4.0, 'tartan'], ['b', 122.55, 57.49, 3.25, 127.55, 57.55, 4.35, 'tartan'], ['b', 120.05, 57.49, 2.3, 122.45, 57.55, 4.2, 'tartan'], ['b', 93.95, 60.45, 1.15, 94.55, 60.51, 1.95, 'gilt'],
+    ['b', 101.45, 57.49, 1.15, 102.05, 57.55, 1.95, 'gilt'], ['b', 101.85, 60.45, 1.15, 102.45, 60.51, 1.95, 'gilt']]);
+  /* G-HANG end classroom-corridor */
+  /* G-HANG classroom-corridor-east */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 2 tapestries, 3 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('classroom-corridor-east', [
+    ['b', 152.0, 57.74, 0.4, 153.2, 57.8, 4.0, 'tartan'], ['b', 150.1, 60.2, 3.25, 155.1, 60.26, 4.35, 'tartan'], ['b', 149.2, 60.2, 1.15, 149.8, 60.26, 1.95, 'gilt'], ['b', 141.9, 60.2, 1.15, 142.5, 60.26, 1.95, 'gilt'],
+    ['b', 144.2, 57.74, 1.15, 144.8, 57.8, 1.95, 'gilt']]);
+  /* G-HANG end classroom-corridor-east */
+  /* G-HANG classroom-eleven */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('classroom-eleven', [
+    ['b', 123.9, 71.95, 3.2, 125.3, 72.01, 4.2, 'tartan'], ['b', 123.0, 71.95, 1.15, 123.6, 72.01, 1.95, 'gilt']]);
+  /* G-HANG end classroom-eleven */
+  /* G-HANG drum-bend-g */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('drum-bend-g', [
+    ['b', 40.15, 11.3, 0.4, 41.35, 11.36, 4.0, 'tartan'], ['b', 43.05, 8.34, 1.15, 43.65, 8.4, 1.95, 'gilt'], ['b', 39.15, 8.34, 1.15, 39.75, 8.4, 1.95, 'gilt']]);
+  /* G-HANG end drum-bend-g */
+  /* G-HANG duelling-practice-room */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('duelling-practice-room', [
+    ['b', 14.95, 17.95, 3.2, 16.35, 18.01, 4.2, 'tartan'], ['b', 13.45, 3.59, 1.15, 14.05, 3.65, 1.95, 'gilt']]);
+  /* G-HANG end duelling-practice-room */
+  /* G-HANG east-wing-corridor-g */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 2 tapestries, 3 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('east-wing-corridor-g', [
+    ['b', 144.84, 22.7, 0.4, 144.9, 23.9, 4.0, 'tartan'], ['b', 147.3, 20.8, 3.25, 147.36, 25.8, 4.35, 'tartan'], ['b', 145.2, 49.7, 1.15, 145.8, 49.76, 1.95, 'gilt'], ['b', 144.84, 30.8, 1.15, 144.9, 31.4, 1.95, 'gilt'],
+    ['b', 147.3, 29.1, 1.15, 147.36, 29.7, 1.95, 'gilt']]);
+  /* G-HANG end east-wing-corridor-g */
+  /* G-HANG elves-linen-room-g */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 0 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('elves-linen-room-g', [
+    ['b', 141.24, 63.625, 1.325, 141.3, 63.975, 1.775, 'gilt']]);
+  /* G-HANG end elves-linen-room-g */
+  /* G-HANG elves-service-stair-g */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 0 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('elves-service-stair-g', [
+    ['b', 1.025, 28.37, 1.325, 1.375, 28.43, 1.775, 'gilt']]);
+  /* G-HANG end elves-service-stair-g */
+  /* G-HANG entrance-hall */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 2 tapestries, 6 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('entrance-hall', [
+    ['b', 77.85, 49.99, 6.4, 82.05, 50.05, 9.4, 'tartan'], ['b', 82.15, 49.99, 6.6, 85.55, 50.05, 9.4, 'tartan'], ['b', 72.9, 69.95, 0.95, 73.8, 70.01, 2.15, 'gilt'], ['b', 85.1, 49.99, 0.95, 86.0, 50.05, 2.15, 'gilt'],
+    ['b', 79.5, 49.99, 0.95, 80.4, 50.05, 2.15, 'gilt'], ['b', 78.4, 49.99, 0.95, 79.3, 50.05, 2.15, 'gilt'], ['b', 67.99, 68.9, 0.95, 68.05, 69.8, 2.15, 'gilt'], ['b', 67.99, 64.8, 0.95, 68.05, 65.7, 2.15, 'gilt']]);
+  /* G-HANG end entrance-hall */
+  /* G-HANG fencing-room */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 0 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang; NOT PLACED: hang-fencing-room-1 (t 1.4x1.0) */
+  add('fencing-room', [
+    ['b', 154.99, -0.3, 1.15, 155.05, 0.3, 1.95, 'gilt']]);
+  /* G-HANG end fencing-room */
+  /* G-HANG filchs-office */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 0 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('filchs-office', [
+    ['b', 105.275, 69.95, 1.325, 105.625, 70.01, 1.775, 'gilt']]);
+  /* G-HANG end filchs-office */
+  /* G-HANG free-classroom-g */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('free-classroom-g', [
+    ['b', 97.25, 17.95, 3.2, 98.65, 18.01, 4.2, 'tartan'], ['b', 92.99, 10.25, 1.15, 93.05, 10.85, 1.95, 'gilt']]);
+  /* G-HANG end free-classroom-g */
+  /* G-HANG great-hall */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 5 tapestries, 4 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('great-hall', [
+    ['b', 14.99, 57.55, 11.4, 15.05, 63.55, 14.6, 'tartan'], ['b', 14.99, 60.05, 0.4, 15.05, 61.05, 3.4, 'tartan'], ['b', 14.99, 58.95, 0.4, 15.05, 59.95, 3.4, 'tartan'], ['b', 14.99, 61.15, 0.4, 15.05, 62.15, 3.4, 'tartan'],
+    ['b', 14.99, 62.25, 0.4, 15.05, 63.25, 3.4, 'tartan'], ['b', 58.35, 51.49, 0.5, 59.15, 51.55, 2.3, 'gilt'], ['b', 35.4, 51.49, 0.95, 36.3, 51.55, 2.15, 'gilt'], ['b', 46.1, 51.49, 0.95, 47.0, 51.55, 2.15, 'gilt'],
+    ['b', 56.5, 69.45, 0.95, 57.4, 69.51, 2.15, 'gilt']]);
+  /* G-HANG end great-hall */
+  /* G-HANG greenhouse-one */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('greenhouse-one', [
+    ['b', 224.95, 23.99, 8.48, 226.35, 24.05, 9.48, 'tartan'], ['b', 214.25, 45.91, 1.15, 214.85, 45.97, 1.95, 'gilt']]);
+  /* G-HANG end greenhouse-one */
+  /* G-HANG hall-chamber */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('hall-chamber', [
+    ['b', 3.99, 54.95, 2.4, 4.05, 57.95, 4.2, 'tartan'], ['b', 14.95, 53.05, 1.15, 15.01, 53.65, 1.95, 'gilt'], ['b', 5.275, 62.95, 1.325, 5.625, 63.01, 1.775, 'gilt']]);
+  /* G-HANG end hall-chamber */
+  /* G-HANG herbology-study-g */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('herbology-study-g', [
+    ['b', 159.95, 33.27, 3.2, 160.01, 34.67, 4.2, 'tartan'], ['b', 153.3, 28.91, 1.15, 153.9, 28.97, 1.95, 'gilt'], ['b', 154.525, 28.91, 1.325, 154.875, 28.97, 1.775, 'gilt']]);
+  /* G-HANG end herbology-study-g */
+  /* G-HANG lake-corridor-g-mid */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('lake-corridor-g-mid', [
+    ['b', 63.55, 0.59, 0.4, 64.75, 0.65, 4.0, 'tartan'], ['b', 53.05, 0.59, 1.15, 53.65, 0.65, 1.95, 'gilt'], ['b', 49.95, 0.59, 1.15, 50.55, 0.65, 1.95, 'gilt']]);
+  /* G-HANG end lake-corridor-g-mid */
+  /* G-HANG lake-corridor-g-west */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 2 tapestries, 3 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('lake-corridor-g-west', [
+    ['b', 32.55, 0.59, 0.4, 33.75, 0.65, 4.0, 'tartan'], ['b', 30.75, 3.55, 3.25, 35.75, 3.61, 4.35, 'tartan'], ['b', 22.95, 3.55, 1.15, 23.55, 3.61, 1.95, 'gilt'], ['b', 16.75, 0.59, 1.15, 17.35, 0.65, 1.95, 'gilt'],
+    ['b', 22.35, 0.59, 1.15, 22.95, 0.65, 1.95, 'gilt']]);
+  /* G-HANG end lake-corridor-g-west */
+  /* G-HANG north-stair-foot-g */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('north-stair-foot-g', [
+    ['b', 153.35, 60.49, 0.4, 154.55, 60.55, 4.0, 'tartan'], ['b', 159.95, 60.975, 1.325, 160.01, 61.325, 1.775, 'gilt']]);
+  /* G-HANG end north-stair-foot-g */
+  /* G-HANG porters-lodge */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('porters-lodge', [
+    ['b', 106.3, 50.84, 2.6, 108.5, 50.9, 4.2, 'tartan'], ['b', 104.225, 57.2, 1.325, 104.575, 57.26, 1.775, 'gilt']]);
+  /* G-HANG end porters-lodge */
+  /* G-HANG post-room */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 0 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('post-room', [
+    ['b', 128.85, 5.875, 1.325, 128.91, 6.225, 1.775, 'gilt']]);
+  /* G-HANG end post-room */
+  /* G-HANG potting-room */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 0 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('potting-room', [
+    ['b', 159.325, 18.24, 1.325, 159.675, 18.3, 1.775, 'gilt']]);
+  /* G-HANG end potting-room */
+  /* G-HANG staff-bedroom-g */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('staff-bedroom-g', [
+    ['b', 155.4, 50.84, 3.2, 156.8, 50.9, 4.2, 'tartan'], ['b', 152.24, 50.825, 1.325, 152.3, 51.175, 1.775, 'gilt'], ['b', 155.625, 50.84, 1.325, 155.975, 50.9, 1.775, 'gilt']]);
+  /* G-HANG end staff-bedroom-g */
+  /* G-HANG staff-dining-room */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('staff-dining-room', [
+    ['b', 133.7, 71.95, 2.4, 136.7, 72.01, 4.2, 'tartan'], ['b', 140.7, 63.0, 1.15, 140.76, 63.6, 1.95, 'gilt'], ['b', 130.225, 71.95, 1.325, 130.575, 72.01, 1.775, 'gilt']]);
+  /* G-HANG end staff-dining-room */
+  /* G-HANG staff-passage */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 0 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('staff-passage', [
+    ['b', 124.59, 51.95, 1.15, 124.65, 52.55, 1.95, 'gilt']]);
+  /* G-HANG end staff-passage */
+  /* G-HANG staff-room */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('staff-room', [
+    ['b', 141.95, 52.85, 2.6, 142.01, 55.05, 4.2, 'tartan'], ['b', 141.95, 55.65, 1.15, 142.01, 56.25, 1.95, 'gilt'], ['b', 141.95, 52.975, 1.325, 142.01, 53.325, 1.775, 'gilt']]);
+  /* G-HANG end staff-room */
+  /* G-HANG sw-corner-lobby-g */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('sw-corner-lobby-g', [
+    ['b', 9.95, 11.55, 0.4, 10.01, 12.75, 4.0, 'tartan'], ['b', 9.95, 16.65, 1.15, 10.01, 17.25, 1.95, 'gilt'], ['b', 6.99, 5.55, 1.15, 7.05, 6.15, 1.95, 'gilt']]);
+  /* G-HANG end sw-corner-lobby-g */
+  /* G-HANG sw-stair-foot-g */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('sw-stair-foot-g', [
+    ['b', 0.55, 11.95, 0.4, 1.75, 12.01, 4.0, 'tartan'], ['b', 4.775, 11.95, 1.325, 5.125, 12.01, 1.775, 'gilt']]);
+  /* G-HANG end sw-stair-foot-g */
+  /* G-HANG teachers-study-g */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('teachers-study-g', [
+    ['b', 156.35, 17.95, 2.6, 158.55, 18.01, 4.2, 'tartan'], ['b', 153.49, 11.15, 1.15, 153.55, 11.75, 1.95, 'gilt'], ['b', 159.95, 11.375, 1.325, 160.01, 11.725, 1.775, 'gilt']]);
+  /* G-HANG end teachers-study-g */
+  /* G-HANG treatment-room */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 0 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('treatment-room', [
+    ['b', 128.89, 14.275, 1.325, 128.95, 14.625, 1.775, 'gilt']]);
+  /* G-HANG end treatment-room */
+  /* G-HANG visitors-parlour */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('visitors-parlour', [
+    ['b', 108.95, 17.95, 2.8, 110.75, 18.01, 4.2, 'tartan'], ['b', 104.29, 4.45, 1.15, 104.35, 5.05, 1.95, 'gilt'], ['b', 104.29, 17.475, 1.325, 104.35, 17.825, 1.775, 'gilt']]);
+  /* G-HANG end visitors-parlour */
+  /* G-HANG waiting-chamber */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('waiting-chamber', [
+    ['b', 97.95, 63.85, 2.6, 98.01, 66.05, 4.2, 'tartan'], ['b', 97.95, 63.85, 1.15, 98.01, 64.45, 1.95, 'gilt'], ['b', 95.975, 69.95, 1.325, 96.325, 70.01, 1.775, 'gilt']]);
+  /* G-HANG end waiting-chamber */
+  /* G-HANG west-wing-corridor-g */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 2 tapestries, 3 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('west-wing-corridor-g', [
+    ['b', 15.1, 22.7, 0.4, 15.16, 23.9, 4.0, 'tartan'], ['b', 12.64, 20.8, 3.25, 12.7, 25.8, 4.35, 'tartan'], ['b', 12.64, 27.7, 1.15, 12.7, 28.3, 1.95, 'gilt'], ['b', 12.64, 47.6, 1.15, 12.7, 48.2, 1.95, 'gilt'],
+    ['b', 14.0, 49.7, 1.15, 14.6, 49.76, 1.95, 'gilt']]);
+  /* G-HANG end west-wing-corridor-g */
+  /* G-HANG bakery-ovens */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 0 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('bakery-ovens', [
+    ['b', -0.01, 52.825, 1.325, 0.05, 53.175, 1.775, 'gilt']]);
+  /* G-HANG end bakery-ovens */
+  /* G-HANG detention-dungeon */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 0 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('detention-dungeon', [
+    ['b', 113.5, 70.925, 1.325, 113.56, 71.275, 1.775, 'gilt']]);
+  /* G-HANG end detention-dungeon */
+  /* G-HANG east-wing-corridor-b */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 2 tapestries, 3 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('east-wing-corridor-b', [
+    ['b', 144.59, 48.5, 0.4, 144.65, 49.7, 4.0, 'tartan'], ['b', 147.3, 44.7, 3.25, 147.36, 49.7, 4.35, 'tartan'], ['b', 147.3, 31.3, 1.15, 147.36, 31.9, 1.95, 'gilt'], ['b', 147.3, 21.6, 1.15, 147.36, 22.2, 1.95, 'gilt'],
+    ['b', 144.59, 28.7, 1.15, 144.65, 29.3, 1.95, 'gilt']]);
+  /* G-HANG end east-wing-corridor-b */
+  /* G-HANG ghosts-gathering-room */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('ghosts-gathering-room', [
+    ['b', 143.87, 54.35, 2.3, 143.93, 56.75, 4.2, 'tartan'], ['b', 136.49, 53.15, 1.15, 136.55, 53.75, 1.95, 'gilt'], ['b', 143.05, 50.59, 1.15, 143.65, 50.65, 1.95, 'gilt']]);
+  /* G-HANG end ghosts-gathering-room */
+  /* G-HANG house-elves-quarters */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('house-elves-quarters', [
+    ['b', 68.9, 50.84, 2.6, 71.1, 50.9, 4.2, 'tartan'], ['b', 69.2, 50.84, 1.15, 69.8, 50.9, 1.95, 'gilt'], ['b', 72.7, 56.325, 1.325, 72.76, 56.675, 1.775, 'gilt']]);
+  /* G-HANG end house-elves-quarters */
+  /* G-HANG hufflepuff-basement-corridor */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 2 tapestries, 3 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('hufflepuff-basement-corridor', [
+    ['b', 41.8, 49.15, 0.4, 43.0, 49.21, 4.0, 'tartan'], ['b', 36.7, 49.15, 3.25, 41.7, 49.21, 4.35, 'tartan'], ['b', 40.5, 49.15, 1.15, 41.1, 49.21, 1.95, 'gilt'], ['b', 24.9, 49.15, 1.15, 25.5, 49.21, 1.95, 'gilt'],
+    ['b', 21.7, 46.49, 1.15, 22.3, 46.55, 1.95, 'gilt']]);
+  /* G-HANG end hufflepuff-basement-corridor */
+  /* G-HANG kitchens */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 0 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('kitchens', [
+    ['b', 62.275, 69.45, 1.325, 62.625, 69.51, 1.775, 'gilt']]);
+  /* G-HANG end kitchens */
+  /* G-HANG kitchens-corridor */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 0 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('kitchens-corridor', [
+    ['b', 47.475, 51.45, 1.325, 47.825, 51.51, 1.775, 'gilt']]);
+  /* G-HANG end kitchens-corridor */
+  /* G-HANG lake-corridor-b-keep */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('lake-corridor-b-keep', [
+    ['b', 48.59, 2.35, 0.4, 48.65, 3.55, 4.0, 'tartan'], ['b', 60.85, 3.55, 1.15, 61.45, 3.61, 1.95, 'gilt'], ['b', 66.35, 3.55, 1.15, 66.95, 3.61, 1.95, 'gilt']]);
+  /* G-HANG end lake-corridor-b-keep */
+  /* G-HANG lake-passage-b */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 0 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('lake-passage-b', [
+    ['b', 33.95, 11.35, 1.15, 34.01, 11.95, 1.95, 'gilt']]);
+  /* G-HANG end lake-passage-b */
+  /* G-HANG laundry */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 0 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('laundry', [
+    ['b', 14.7, 55.425, 1.325, 14.76, 55.775, 1.775, 'gilt']]);
+  /* G-HANG end laundry */
+  /* G-HANG north-stair-foot-b */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 0 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('north-stair-foot-b', [
+    ['b', 159.625, 60.74, 1.325, 159.975, 60.8, 1.775, 'gilt']]);
+  /* G-HANG end north-stair-foot-b */
+  /* G-HANG potions-classroom-b */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('potions-classroom-b', [
+    ['b', 1.35, 45.7, 3.2, 2.75, 45.76, 4.2, 'tartan'], ['b', 7.55, 45.7, 1.15, 8.15, 45.76, 1.95, 'gilt']]);
+  /* G-HANG end potions-classroom-b */
+  /* G-HANG potions-dungeon-newt */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('potions-dungeon-newt', [
+    ['b', 5.25, 49.73, 3.2, 6.65, 49.79, 4.2, 'tartan'], ['b', -0.01, 47.03, 1.15, 0.05, 47.63, 1.95, 'gilt']]);
+  /* G-HANG end potions-dungeon-newt */
+  /* G-HANG potions-dungeon-owl */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('potions-dungeon-owl', [
+    ['b', -0.01, 19.5, 3.2, 0.05, 20.9, 4.2, 'tartan'], ['b', -0.01, 21.1, 1.15, 0.05, 21.7, 1.95, 'gilt']]);
+  /* G-HANG end potions-dungeon-owl */
+  /* G-HANG prefects-patrol-room */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('prefects-patrol-room', [
+    ['b', 145.4, 71.95, 3.2, 146.8, 72.01, 4.2, 'tartan'], ['b', 142.1, 71.95, 1.15, 142.7, 72.01, 1.95, 'gilt']]);
+  /* G-HANG end prefects-patrol-room */
+  /* G-HANG roomier-dungeon */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang; NOT PLACED: 1 floated on the curve */
+  add('roomier-dungeon', [
+    ['b', 25.18, 4.09, 1.8, 27.58, 4.15, 3.7, 'tartan'], ['b', 15.99, 8.02, 1.15, 16.05, 8.62, 1.95, 'gilt']]);
+  /* G-HANG end roomier-dungeon */
+  /* G-HANG scullery */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 0 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('scullery', [
+    ['b', 77.745, 57.2, 1.325, 78.095, 57.26, 1.775, 'gilt']]);
+  /* G-HANG end scullery */
+  /* G-HANG service-corridor-b */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 3 tapestries, 3 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('service-corridor-b', [
+    ['b', 159.95, 58.4, 0.4, 160.01, 59.6, 4.0, 'tartan'], ['b', 155.0, 57.74, 3.25, 160.0, 57.8, 4.35, 'tartan'], ['b', 157.6, 60.2, 2.3, 160.0, 60.26, 4.2, 'tartan'], ['b', 85.0, 57.74, 1.15, 85.6, 57.8, 1.95, 'gilt'],
+    ['b', 82.3, 60.2, 1.15, 82.9, 60.26, 1.95, 'gilt'], ['b', 65.3, 57.74, 1.15, 65.9, 57.8, 1.95, 'gilt']]);
+  /* G-HANG end service-corridor-b */
+  /* G-HANG slytherin-common-room */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 3 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('slytherin-common-room', [
+    ['b', 59.85, -23.01, 2.0, 62.85, -22.95, 4.2, 'tartan'], ['b', 71.95, -21.35, 1.15, 72.01, -20.75, 1.95, 'gilt'], ['b', 71.95, -20.65, 1.15, 72.01, -20.05, 1.95, 'gilt'], ['b', 39.99, -22.95, 1.15, 40.05, -22.35, 1.95, 'gilt']]);
+  /* G-HANG end slytherin-common-room */
+  /* G-HANG spell-practice-room */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('spell-practice-room', [
+    ['b', 159.95, 33.27, 3.2, 160.01, 34.67, 4.2, 'tartan'], ['b', 152.2, 39.03, 1.15, 152.8, 39.09, 1.95, 'gilt']]);
+  /* G-HANG end spell-practice-room */
+  /* G-HANG sw-stair-foot-b */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('sw-stair-foot-b', [
+    ['b', 2.75, 6.99, 0.4, 3.95, 7.05, 4.0, 'tartan'], ['b', 1.775, 11.7, 1.325, 2.125, 11.76, 1.775, 'gilt']]);
+  /* G-HANG end sw-stair-foot-b */
+  /* G-HANG west-stair-corridor-b */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 0 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('west-stair-corridor-b', [
+    ['b', 0.85, 60.2, 1.15, 1.45, 60.26, 1.95, 'gilt']]);
+  /* G-HANG end west-stair-corridor-b */
+  /* G-HANG west-stair-foot-b */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('west-stair-foot-b', [
+    ['b', 5.85, 60.49, 0.4, 7.05, 60.55, 4.0, 'tartan'], ['b', 2.775, 60.49, 1.325, 3.125, 60.55, 1.775, 'gilt']]);
+  /* G-HANG end west-stair-foot-b */
+  /* G-HANG wizard-chess-room */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('wizard-chess-room', [
+    ['b', 136.07, 17.95, 3.2, 137.47, 18.01, 4.2, 'tartan'], ['b', 131.41, 7.0, 1.15, 131.47, 7.6, 1.95, 'gilt']]);
+  /* G-HANG end wizard-chess-room */
+  /* G-HANG back-stair-lobby-1 */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('back-stair-lobby-1', [
+    ['b', 66.35, 64.95, 0.4, 67.55, 65.01, 4.0, 'tartan'], ['b', 67.95, 57.35, 1.15, 68.01, 57.95, 1.95, 'gilt']]);
+  /* G-HANG end back-stair-lobby-1 */
+  /* G-HANG chandelier-classroom */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('chandelier-classroom', [
+    ['b', 0.24, 22.6, 3.2, 0.3, 24.0, 4.2, 'tartan'], ['b', 0.24, 22.9, 1.15, 0.3, 23.5, 1.95, 'gilt']]);
+  /* G-HANG end chandelier-classroom */
+  /* G-HANG chandlery */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 0 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('chandlery', [
+    ['b', -5.502, -0.463, 1.325, -5.442, -0.113, 1.775, 'gilt']]);
+  /* G-HANG end chandlery */
+  /* G-HANG deputy-heads-records-room */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 0 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('deputy-heads-records-room', [
+    ['b', 3.425, 39.57, 1.325, 3.775, 39.63, 1.775, 'gilt']]);
+  /* G-HANG end deputy-heads-records-room */
+  /* G-HANG drum-bend-1 */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('drum-bend-1', [
+    ['b', 40.09, 8.34, 0.4, 41.29, 8.4, 4.0, 'tartan'], ['b', 43.09, 11.3, 1.15, 43.69, 11.36, 1.95, 'gilt'], ['b', 37.39, 11.3, 1.15, 37.99, 11.36, 1.95, 'gilt']]);
+  /* G-HANG end drum-bend-1 */
+  /* G-HANG drum-bend-1-east */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 0 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('drum-bend-1-east', [
+    ['b', 51.29, 10.0, 1.15, 51.35, 10.6, 1.95, 'gilt']]);
+  /* G-HANG end drum-bend-1-east */
+  /* G-HANG drum-bend-1-west */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 0 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('drum-bend-1-west', [
+    ['b', 33.03, 5.3, 1.15, 33.09, 5.9, 1.95, 'gilt']]);
+  /* G-HANG end drum-bend-1-west */
+  /* G-HANG east-first-floor-corridor */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 2 tapestries, 3 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('east-first-floor-corridor', [
+    ['b', 147.55, 28.15, 0.4, 147.61, 29.35, 4.0, 'tartan'], ['b', 144.59, 18.05, 3.25, 144.65, 23.05, 4.35, 'tartan'], ['b', 144.59, 37.45, 1.15, 144.65, 38.05, 1.95, 'gilt'], ['b', 144.59, 23.95, 1.15, 144.65, 24.55, 1.95, 'gilt'],
+    ['b', 144.59, 45.35, 1.15, 144.65, 45.95, 1.95, 'gilt']]);
+  /* G-HANG end east-first-floor-corridor */
+  /* G-HANG empty-classroom-1 */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 0 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('empty-classroom-1', [
+    ['b', 0.24, 29.87, 1.15, 0.3, 30.47, 1.95, 'gilt']]);
+  /* G-HANG end empty-classroom-1 */
+  /* G-HANG first-floor-corridor */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 3 tapestries, 3 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('first-floor-corridor', [
+    ['b', 102.45, 52.95, 0.4, 103.65, 53.01, 4.0, 'tartan'], ['b', 97.35, 52.95, 3.25, 102.35, 53.01, 4.35, 'tartan'], ['b', 100.35, 49.99, 2.3, 102.75, 50.05, 4.2, 'tartan'], ['b', 144.75, 52.95, 1.15, 145.35, 53.01, 1.95, 'gilt'],
+    ['b', 122.25, 49.99, 1.15, 122.85, 50.05, 1.95, 'gilt'], ['b', 110.95, 52.95, 1.15, 111.55, 53.01, 1.95, 'gilt']]);
+  /* G-HANG end first-floor-corridor */
+  /* G-HANG history-dates-room-1 */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('history-dates-room-1', [
+    ['b', 135.05, 59.9, 2.3, 135.11, 62.3, 4.2, 'tartan'], ['b', 133.45, 62.85, 1.15, 134.05, 62.91, 1.95, 'gilt'], ['b', 135.05, 60.7, 1.15, 135.11, 61.3, 1.95, 'gilt']]);
+  /* G-HANG end history-dates-room-1 */
+  /* G-HANG history-of-magic-classroom */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('history-of-magic-classroom', [
+    ['b', 134.95, 66.75, 3.2, 135.01, 68.15, 4.2, 'tartan'], ['b', 126.95, 71.35, 1.15, 127.55, 71.41, 1.95, 'gilt']]);
+  /* G-HANG end history-of-magic-classroom */
+  /* G-HANG history-of-magic-lecture-hall */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('history-of-magic-lecture-hall', [
+    ['b', 119.7, 9.9, 3.2, 119.76, 11.3, 4.2, 'tartan'], ['b', 119.7, 12.5, 1.15, 119.76, 13.1, 1.95, 'gilt']]);
+  /* G-HANG end history-of-magic-lecture-hall */
+  /* G-HANG history-of-magic-passage */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 0 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('history-of-magic-passage', [
+    ['b', 121.59, 63.05, 1.15, 121.65, 63.65, 1.95, 'gilt'], ['b', 121.59, 69.15, 1.15, 121.65, 69.75, 1.95, 'gilt']]);
+  /* G-HANG end history-of-magic-passage */
+  /* G-HANG history-teachers-study */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('history-teachers-study', [
+    ['b', 130.87, 10.7, 2.6, 130.93, 12.9, 4.2, 'tartan'], ['b', 123.3, 17.95, 1.15, 123.9, 18.01, 1.95, 'gilt'], ['b', 120.24, 17.425, 1.325, 120.3, 17.775, 1.775, 'gilt']]);
+  /* G-HANG end history-teachers-study */
+  /* G-HANG hospital-passage */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 0 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('hospital-passage', [
+    ['b', 149.55, 24.55, 1.15, 150.15, 24.61, 1.95, 'gilt']]);
+  /* G-HANG end hospital-passage */
+  /* G-HANG hospital-wing */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 0 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('hospital-wing', [
+    ['b', 159.35, 41.175, 1.325, 159.41, 41.525, 1.775, 'gilt']]);
+  /* G-HANG end hospital-wing */
+  /* G-HANG lake-corridor-1-mid */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('lake-corridor-1-mid', [
+    ['b', 56.89, 0.84, 0.4, 58.09, 0.9, 4.0, 'tartan'], ['b', 52.59, 0.84, 1.15, 53.19, 0.9, 1.95, 'gilt'], ['b', 53.19, 3.3, 1.15, 53.79, 3.36, 1.95, 'gilt']]);
+  /* G-HANG end lake-corridor-1-mid */
+  /* G-HANG lake-corridor-1-west */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 2 tapestries, 3 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('lake-corridor-1-west', [
+    ['b', 7.5, 3.3, 0.4, 8.7, 3.36, 4.0, 'tartan'], ['b', 7.3, 0.84, 3.25, 12.3, 0.9, 4.35, 'tartan'], ['b', 13.2, 0.84, 1.15, 13.8, 0.9, 1.95, 'gilt'], ['b', 14.7, 0.84, 1.15, 15.3, 0.9, 1.95, 'gilt'],
+    ['b', 8.9, 3.3, 1.15, 9.5, 3.36, 1.95, 'gilt']]);
+  /* G-HANG end lake-corridor-1-west */
+  /* G-HANG loop-gallery-1 */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 0 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang; NOT PLACED: hang-loop-gallery-1-1 (t 1.2x3.6 too tall for the wall) */
+  add('loop-gallery-1', [
+    ['b', 110.95, 0.15, 1.15, 111.55, 0.21, 1.95, 'gilt'], ['b', 107.65, -2.71, 1.15, 108.25, -2.65, 1.95, 'gilt']]);
+  /* G-HANG end loop-gallery-1 */
+  /* G-HANG mcgonagall-landing-passage-1 */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 0 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('mcgonagall-landing-passage-1', [
+    ['b', 159.95, 52.05, 1.15, 160.01, 52.65, 1.95, 'gilt']]);
+  /* G-HANG end mcgonagall-landing-passage-1 */
+  /* G-HANG mcgonagalls-office */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('mcgonagalls-office', [
+    ['b', 156.95, 70.74, 2.6, 157.01, 72.94, 4.2, 'tartan'], ['b', 151.99, 71.35, 1.15, 152.59, 71.41, 1.95, 'gilt'], ['b', 156.95, 76.345, 1.325, 157.01, 76.695, 1.775, 'gilt']]);
+  /* G-HANG end mcgonagalls-office */
+  /* G-HANG newt-transfiguration-classroom */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('newt-transfiguration-classroom', [
+    ['b', 102.0, 71.95, 3.2, 103.4, 72.01, 4.2, 'tartan'], ['b', 92.24, 67.9, 1.15, 92.3, 68.5, 1.95, 'gilt']]);
+  /* G-HANG end newt-transfiguration-classroom */
+  /* G-HANG north-stair-foot-1 */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('north-stair-foot-1', [
+    ['b', 155.75, 58.99, 0.4, 156.95, 59.05, 4.0, 'tartan'], ['b', 157.05, 64.45, 1.15, 157.65, 64.51, 1.95, 'gilt']]);
+  /* G-HANG end north-stair-foot-1 */
+  /* G-HANG pomfrey-bedroom */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('pomfrey-bedroom', [
+    ['b', 148.09, 45.55, 2.6, 148.15, 47.75, 4.2, 'tartan'], ['b', 148.175, 45.49, 1.325, 148.525, 45.55, 1.775, 'gilt'], ['b', 148.575, 45.49, 1.325, 148.925, 45.55, 1.775, 'gilt']]);
+  /* G-HANG end pomfrey-bedroom */
+  /* G-HANG pomfrey-office */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('pomfrey-office', [
+    ['b', 155.55, 49.35, 2.6, 157.75, 49.41, 4.2, 'tartan'], ['b', 158.15, 49.35, 1.15, 158.75, 49.41, 1.95, 'gilt'], ['b', 159.35, 47.975, 1.325, 159.41, 48.325, 1.775, 'gilt']]);
+  /* G-HANG end pomfrey-office */
+  /* G-HANG quiet-rooms */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 0 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('quiet-rooms', [
+    ['b', 21.09, 15.725, 1.325, 21.15, 16.075, 1.775, 'gilt']]);
+  /* G-HANG end quiet-rooms */
+  /* G-HANG room-over-caretakers-office */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 0 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('room-over-caretakers-office', [
+    ['b', 108.625, 69.7, 1.325, 108.975, 69.76, 1.775, 'gilt']]);
+  /* G-HANG end room-over-caretakers-office */
+  /* G-HANG staff-library */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('staff-library', [
+    ['b', 159.95, 11.5, 3.2, 160.01, 12.9, 4.2, 'tartan'], ['b', 153.74, 6.8, 1.15, 153.8, 7.4, 1.95, 'gilt']]);
+  /* G-HANG end staff-library */
+  /* G-HANG still-room */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 0 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('still-room', [
+    ['b', -0.426, 76.743, 1.325, -0.076, 76.803, 1.775, 'gilt']]);
+  /* G-HANG end still-room */
+  /* G-HANG sw-stair-foot-1 */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('sw-stair-foot-1', [
+    ['b', 4.85, 11.95, 0.4, 6.05, 12.01, 4.0, 'tartan'], ['b', 0.675, 11.95, 1.325, 1.025, 12.01, 1.775, 'gilt']]);
+  /* G-HANG end sw-stair-foot-1 */
+  /* G-HANG tapestry-stairwell */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 0 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('tapestry-stairwell', [
+    ['b', 144.55, 60.675, 1.325, 144.61, 61.025, 1.775, 'gilt']]);
+  /* G-HANG end tapestry-stairwell */
+  /* G-HANG teachers-study-1 */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('teachers-study-1', [
+    ['b', 14.5, 66.8, 3.2, 14.56, 68.2, 4.2, 'tartan'], ['b', 8.64, 66.2, 1.15, 8.7, 66.8, 1.95, 'gilt'], ['b', 10.325, 59.24, 1.325, 10.675, 59.3, 1.775, 'gilt']]);
+  /* G-HANG end teachers-study-1 */
+  /* G-HANG transfiguration-classroom */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('transfiguration-classroom', [
+    ['b', 139.59, 64.05, 3.2, 139.65, 65.45, 4.2, 'tartan'], ['b', 139.65, 63.39, 1.15, 140.25, 63.45, 1.95, 'gilt']]);
+  /* G-HANG end transfiguration-classroom */
+  /* G-HANG transfiguration-passage */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 0 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('transfiguration-passage', [
+    ['b', 137.19, 59.35, 1.15, 137.25, 59.95, 1.95, 'gilt'], ['b', 139.15, 65.75, 1.15, 139.21, 66.35, 1.95, 'gilt']]);
+  /* G-HANG end transfiguration-passage */
+  /* G-HANG transfiguration-teachers-rooms */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('transfiguration-teachers-rooms', [
+    ['b', 153.2, 10.5, 2.6, 153.26, 12.7, 4.2, 'tartan'], ['b', 142.57, 12.3, 1.15, 142.63, 12.9, 1.95, 'gilt'], ['b', 153.2, 7.025, 1.325, 153.26, 7.375, 1.775, 'gilt']]);
+  /* G-HANG end transfiguration-teachers-rooms */
+  /* G-HANG transfiguration-teachers-study-1 */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 0 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('transfiguration-teachers-study-1', [
+    ['b', 152.8, 53.49, 1.15, 153.4, 53.55, 1.95, 'gilt'], ['b', 156.425, 53.49, 1.325, 156.775, 53.55, 1.775, 'gilt']]);
+  /* G-HANG end transfiguration-teachers-study-1 */
+  /* G-HANG west-cross-corridor-1 */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('west-cross-corridor-1', [
+    ['b', 1.35, 50.84, 0.4, 2.55, 50.9, 4.0, 'tartan'], ['b', 4.95, 53.3, 1.15, 5.55, 53.36, 1.95, 'gilt'], ['b', 14.7, 52.1, 1.15, 14.76, 52.7, 1.95, 'gilt']]);
+  /* G-HANG end west-cross-corridor-1 */
+  /* G-HANG west-dispensary */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 0 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('west-dispensary', [
+    ['b', 21.745, 17.95, 1.325, 22.095, 18.01, 1.775, 'gilt']]);
+  /* G-HANG end west-dispensary */
+  /* G-HANG west-range-corridor-1 */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 2 tapestries, 3 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('west-range-corridor-1', [
+    ['b', 15.1, 47.7, 0.4, 15.16, 48.9, 4.0, 'tartan'], ['b', 12.64, 44.7, 3.25, 12.7, 49.7, 4.35, 'tartan'], ['b', 15.1, 41.9, 1.15, 15.16, 42.5, 1.95, 'gilt'], ['b', 12.64, 35.4, 1.15, 12.7, 36.0, 1.95, 'gilt'],
+    ['b', 15.1, 32.5, 1.15, 15.16, 33.1, 1.95, 'gilt']]);
+  /* G-HANG end west-range-corridor-1 */
+  /* G-HANG west-stair-foot-1 */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('west-stair-foot-1', [
+    ['b', 0.85, 58.99, 0.4, 2.05, 59.05, 4.0, 'tartan'], ['b', -0.01, 61.875, 1.325, 0.05, 62.225, 1.775, 'gilt']]);
+  /* G-HANG end west-stair-foot-1 */
+  /* G-HANG arras-room */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 0 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('arras-room', [
+    ['b', -5.502, -0.463, 1.325, -5.442, -0.113, 1.775, 'gilt']]);
+  /* G-HANG end arras-room */
+  /* G-HANG astronomy-stair-foot-2 */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('astronomy-stair-foot-2', [
+    ['b', 82.24, 66.4, 0.4, 82.3, 67.6, 4.0, 'tartan'], ['b', 88.7, 67.825, 1.325, 88.76, 68.175, 1.775, 'gilt']]);
+  /* G-HANG end astronomy-stair-foot-2 */
+  /* G-HANG back-stair-lobby-2 */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('back-stair-lobby-2', [
+    ['b', 66.35, 64.95, 0.4, 67.55, 65.01, 4.0, 'tartan'], ['b', 65.99, 53.85, 1.15, 66.05, 54.45, 1.95, 'gilt']]);
+  /* G-HANG end back-stair-lobby-2 */
+  /* G-HANG bindery */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 0 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('bindery', [
+    ['b', 160.087, -5.003, 1.325, 160.437, -4.943, 1.775, 'gilt']]);
+  /* G-HANG end bindery */
+  /* G-HANG defence-bedroom */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('defence-bedroom', [
+    ['b', 62.45, 0.59, 2.6, 64.65, 0.65, 4.2, 'tartan'], ['b', 64.975, 9.55, 1.325, 65.325, 9.61, 1.775, 'gilt'], ['b', 67.35, 9.275, 1.325, 67.41, 9.625, 1.775, 'gilt']]);
+  /* G-HANG end defence-bedroom */
+  /* G-HANG defence-office */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 0 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('defence-office', [
+    ['b', 67.35, 12.25, 1.15, 67.41, 12.85, 1.95, 'gilt'], ['b', 67.35, 12.975, 1.325, 67.41, 13.325, 1.775, 'gilt']]);
+  /* G-HANG end defence-office */
+  /* G-HANG defence-office-2-north */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('defence-office-2-north', [
+    ['b', 98.9, 17.95, 2.8, 100.7, 18.01, 4.2, 'tartan'], ['b', 99.7, 3.84, 1.15, 100.3, 3.9, 1.95, 'gilt'], ['b', 92.24, 7.825, 1.325, 92.3, 8.175, 1.775, 'gilt']]);
+  /* G-HANG end defence-office-2-north */
+  /* G-HANG defence-sitting-room */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('defence-sitting-room', [
+    ['b', 55.99, 1.35, 3.2, 56.05, 2.75, 4.2, 'tartan'], ['b', 56.05, 13.95, 1.15, 56.65, 14.01, 1.95, 'gilt'], ['b', 58.875, 13.95, 1.325, 59.225, 14.01, 1.775, 'gilt']]);
+  /* G-HANG end defence-sitting-room */
+  /* G-HANG disused-classroom-2-east */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 0 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('disused-classroom-2-east', [
+    ['b', 147.5, 71.95, 1.15, 148.1, 72.01, 1.95, 'gilt']]);
+  /* G-HANG end disused-classroom-2-east */
+  /* G-HANG disused-classroom-2-northwest */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 0 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('disused-classroom-2-northwest', [
+    ['b', 15.7, 10.6, 1.15, 15.76, 11.2, 1.95, 'gilt']]);
+  /* G-HANG end disused-classroom-2-northwest */
+  /* G-HANG drum-back-study-2 */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('drum-back-study-2', [
+    ['b', 41.5, 13.95, 3.2, 42.9, 14.01, 4.2, 'tartan'], ['b', 35.54, 13.0, 1.15, 35.6, 13.6, 1.95, 'gilt']]);
+  /* G-HANG end drum-back-study-2 */
+  /* G-HANG duelling-practice-room-2 */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('duelling-practice-room-2', [
+    ['b', 134.3, 17.95, 3.2, 135.7, 18.01, 4.2, 'tartan'], ['b', 131.2, 3.84, 1.15, 131.8, 3.9, 1.95, 'gilt']]);
+  /* G-HANG end duelling-practice-room-2 */
+  /* G-HANG elves-linen-room-2 */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 0 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('elves-linen-room-2', [
+    ['b', 159.95, 38.225, 1.325, 160.01, 38.575, 1.775, 'gilt']]);
+  /* G-HANG end elves-linen-room-2 */
+  /* G-HANG gobstones-club-room */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('gobstones-club-room', [
+    ['b', 122.1, 17.95, 3.2, 123.5, 18.01, 4.2, 'tartan'], ['b', 116.84, 6.6, 1.15, 116.9, 7.2, 1.95, 'gilt']]);
+  /* G-HANG end gobstones-club-room */
+  /* G-HANG long-gallery-2 */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 3 tapestries, 3 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('long-gallery-2', [
+    ['b', 66.05, 71.55, 0.4, 66.11, 72.75, 4.0, 'tartan'], ['b', 61.05, 73.25, 3.25, 66.05, 73.31, 4.35, 'tartan'], ['b', 63.65, 69.49, 2.3, 66.05, 69.55, 4.2, 'tartan'], ['b', 35.15, 73.25, 1.15, 35.75, 73.31, 1.95, 'gilt'],
+    ['b', 32.05, 69.49, 1.15, 32.65, 69.55, 1.95, 'gilt'], ['b', 53.75, 69.49, 1.15, 54.35, 69.55, 1.95, 'gilt']]);
+  /* G-HANG end long-gallery-2 */
+  /* G-HANG loop-gallery-2 */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 0 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang; NOT PLACED: hang-loop-gallery-2-1 (t 1.2x3.6 too tall for the wall) */
+  add('loop-gallery-2', [
+    ['b', 106.05, 0.15, 1.15, 106.65, 0.21, 1.95, 'gilt'], ['b', 108.45, -2.71, 1.15, 109.05, -2.65, 1.95, 'gilt']]);
+  /* G-HANG end loop-gallery-2 */
+  /* G-HANG map-room */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('map-room', [
+    ['b', 115.1, 59.24, 2.3, 117.5, 59.3, 4.2, 'tartan'], ['b', 126.4, 63.4, 1.15, 126.46, 64.0, 1.95, 'gilt'], ['b', 118.4, 59.24, 1.15, 119.0, 59.3, 1.95, 'gilt']]);
+  /* G-HANG end map-room */
+  /* G-HANG north-range-corridor-2 */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 3 tapestries, 3 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('north-range-corridor-2', [
+    ['b', 157.6, 50.84, 0.4, 158.8, 50.9, 4.0, 'tartan'], ['b', 155.0, 53.3, 3.25, 160.0, 53.36, 4.35, 'tartan'], ['b', 155.1, 50.84, 2.3, 157.5, 50.9, 4.2, 'tartan'], ['b', 128.5, 53.3, 1.15, 129.1, 53.36, 1.95, 'gilt'],
+    ['b', 145.0, 53.3, 1.15, 145.6, 53.36, 1.95, 'gilt'], ['b', 76.4, 50.84, 1.15, 77.0, 50.9, 1.95, 'gilt']]);
+  /* G-HANG end north-range-corridor-2 */
+  /* G-HANG north-stair-foot-2 */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('north-stair-foot-2', [
+    ['b', 154.25, 58.99, 0.4, 155.45, 59.05, 4.0, 'tartan'], ['b', 158.775, 58.99, 1.325, 159.125, 59.05, 1.775, 'gilt']]);
+  /* G-HANG end north-stair-foot-2 */
+  /* G-HANG second-floor-east-corridor */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 2 tapestries, 3 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('second-floor-east-corridor', [
+    ['b', 144.59, 44.85, 0.4, 144.65, 46.05, 4.0, 'tartan'], ['b', 147.55, 42.95, 3.25, 147.61, 47.95, 4.35, 'tartan'], ['b', 147.55, 42.45, 1.15, 147.61, 43.05, 1.95, 'gilt'], ['b', 147.55, 41.75, 1.15, 147.61, 42.35, 1.95, 'gilt'],
+    ['b', 144.59, 24.25, 1.15, 144.65, 24.85, 1.95, 'gilt']]);
+  /* G-HANG end second-floor-east-corridor */
+  /* G-HANG second-years-study-room */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('second-years-study-room', [
+    ['b', 126.94, 64.8, 3.2, 127.0, 66.2, 4.2, 'tartan'], ['b', 137.7, 59.24, 1.15, 138.3, 59.3, 1.95, 'gilt']]);
+  /* G-HANG end second-years-study-room */
+  /* G-HANG staff-bedroom-2-east */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('staff-bedroom-2-east', [
+    ['b', 160.0, 33.9, 3.2, 160.06, 35.3, 4.2, 'tartan'], ['b', 150.625, 29.84, 1.325, 150.975, 29.9, 1.775, 'gilt'], ['b', 148.725, 29.84, 1.325, 149.075, 29.9, 1.775, 'gilt']]);
+  /* G-HANG end staff-bedroom-2-east */
+  /* G-HANG staff-bedroom-2-west */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('staff-bedroom-2-west', [
+    ['b', 0.24, 43.53, 2.6, 0.3, 45.73, 4.2, 'tartan'], ['b', 12.1, 41.555, 1.325, 12.16, 41.905, 1.775, 'gilt'], ['b', 7.425, 49.7, 1.325, 7.775, 49.76, 1.775, 'gilt']]);
+  /* G-HANG end staff-bedroom-2-west */
+  /* G-HANG staff-bedrooms-2-east */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('staff-bedrooms-2-east', [
+    ['b', 146.4, 17.7, 2.8, 148.2, 17.76, 4.2, 'tartan'], ['b', 141.44, 12.225, 1.325, 141.5, 12.575, 1.775, 'gilt'], ['b', 141.44, 3.825, 1.325, 141.5, 4.175, 1.775, 'gilt']]);
+  /* G-HANG end staff-bedrooms-2-east */
+  /* G-HANG study-room-2-west */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('study-room-2-west', [
+    ['b', 0.24, 33.27, 3.2, 0.3, 34.67, 4.2, 'tartan'], ['b', 7.1, 28.91, 1.15, 7.7, 28.97, 1.95, 'gilt']]);
+  /* G-HANG end study-room-2-west */
+  /* G-HANG sw-stair-foot-2 */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('sw-stair-foot-2', [
+    ['b', 4.85, 11.95, 0.4, 6.05, 12.01, 4.0, 'tartan'], ['b', -0.025, 11.95, 1.325, 0.325, 12.01, 1.775, 'gilt']]);
+  /* G-HANG end sw-stair-foot-2 */
+  /* G-HANG teachers-office-2-north */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('teachers-office-2-north', [
+    ['b', 110.8, 17.95, 2.6, 113.0, 18.01, 4.2, 'tartan'], ['b', 107.5, 3.84, 1.15, 108.1, 3.9, 1.95, 'gilt'], ['b', 116.3, 5.425, 1.325, 116.36, 5.775, 1.775, 'gilt']]);
+  /* G-HANG end teachers-office-2-north */
+  /* G-HANG teachers-study-2-southeast */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('teachers-study-2-southeast', [
+    ['b', 155.6, 6.74, 2.6, 157.8, 6.8, 4.2, 'tartan'], ['b', 155.2, 17.7, 1.15, 155.8, 17.76, 1.95, 'gilt'], ['b', 159.95, 12.025, 1.325, 160.01, 12.375, 1.775, 'gilt']]);
+  /* G-HANG end teachers-study-2-southeast */
+  /* G-HANG teachers-study-2-southwest */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('teachers-study-2-southwest', [
+    ['b', 14.7, 68.6, 2.8, 14.76, 70.4, 4.2, 'tartan'], ['b', 13.1, 59.24, 1.15, 13.7, 59.3, 1.95, 'gilt'], ['b', 8.24, 68.625, 1.325, 8.3, 68.975, 1.775, 'gilt']]);
+  /* G-HANG end teachers-study-2-southwest */
+  /* G-HANG teachers-study-2-west */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('teachers-study-2-west', [
+    ['b', 0.24, 22.2, 2.6, 0.3, 24.4, 4.2, 'tartan'], ['b', 10.1, 18.24, 1.15, 10.7, 18.3, 1.95, 'gilt'], ['b', 12.1, 24.225, 1.325, 12.16, 24.575, 1.775, 'gilt']]);
+  /* G-HANG end teachers-study-2-west */
+  /* G-HANG unused-classroom-2-east */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 0 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('unused-classroom-2-east', [
+    ['b', 55.45, 5.65, 1.15, 55.51, 6.25, 1.95, 'gilt']]);
+  /* G-HANG end unused-classroom-2-east */
+  /* G-HANG unused-classroom-2-west */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 0 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('unused-classroom-2-west', [
+    ['b', 22.09, 1.35, 1.15, 22.15, 1.95, 1.95, 'gilt']]);
+  /* G-HANG end unused-classroom-2-west */
+  /* G-HANG west-corridor-2-south */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('west-corridor-2-south', [
+    ['b', 0.45, 50.84, 0.4, 1.65, 50.9, 4.0, 'tartan'], ['b', 1.75, 50.84, 1.15, 2.35, 50.9, 1.95, 'gilt'], ['b', 1.85, 53.3, 1.15, 2.45, 53.36, 1.95, 'gilt']]);
+  /* G-HANG end west-corridor-2-south */
+  /* G-HANG west-refuge */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 0 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang; NOT PLACED: hang-west-refuge-1 (t 2.2x1.6) */
+  add('west-refuge', [
+    ['b', -0.3, 76.75, 1.15, 0.3, 76.81, 1.95, 'gilt'], ['b', 0.076, 67.197, 1.325, 0.426, 67.257, 1.775, 'gilt']]);
+  /* G-HANG end west-refuge */
+  /* G-HANG west-stair-foot-2 */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('west-stair-foot-2', [
+    ['b', 0.85, 58.99, 0.4, 2.05, 59.05, 4.0, 'tartan'], ['b', 2.075, 63.95, 1.325, 2.425, 64.01, 1.775, 'gilt']]);
+  /* G-HANG end west-stair-foot-2 */
+  /* G-HANG west-wing-corridor-2 */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 2 tapestries, 3 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('west-wing-corridor-2', [
+    ['b', 15.1, 23.1, 0.4, 15.16, 24.3, 4.0, 'tartan'], ['b', 12.64, 20.8, 3.25, 12.7, 25.8, 4.35, 'tartan'], ['b', 12.64, 21.8, 1.15, 12.7, 22.4, 1.95, 'gilt'], ['b', 15.1, 18.3, 1.15, 15.16, 18.9, 1.95, 'gilt'],
+    ['b', 15.1, 19.1, 1.15, 15.16, 19.7, 1.95, 'gilt']]);
+  /* G-HANG end west-wing-corridor-2 */
+  /* G-HANG armour-gallery */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 2 tapestries, 3 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('armour-gallery', [
+    ['b', 7.35, 69.95, 0.4, 8.55, 70.01, 4.0, 'tartan'], ['b', 4.99, 64.95, 3.25, 5.05, 69.95, 4.35, 'tartan'], ['b', 10.95, 64.25, 1.15, 11.01, 64.85, 1.95, 'gilt'], ['b', 10.95, 63.55, 1.15, 11.01, 64.15, 1.95, 'gilt'],
+    ['b', 4.99, 46.05, 1.15, 5.05, 46.65, 1.95, 'gilt']]);
+  /* G-HANG end armour-gallery */
+  /* G-HANG armour-repair-room-3 */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 0 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('armour-repair-room-3', [
+    ['b', 32.49, 4.825, 1.325, 32.55, 5.175, 1.775, 'gilt']]);
+  /* G-HANG end armour-repair-room-3 */
+  /* G-HANG astronomy-stair-foot-3 */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('astronomy-stair-foot-3', [
+    ['b', 84.4, 68.7, 0.4, 85.6, 68.76, 4.0, 'tartan'], ['b', 82.24, 63.625, 1.325, 82.3, 63.975, 1.775, 'gilt']]);
+  /* G-HANG end astronomy-stair-foot-3 */
+  /* G-HANG back-stair-lobby-3 */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('back-stair-lobby-3', [
+    ['b', 66.35, 64.95, 0.4, 67.55, 65.01, 4.0, 'tartan'], ['b', 65.99, 53.65, 1.15, 66.05, 54.25, 1.95, 'gilt']]);
+  /* G-HANG end back-stair-lobby-3 */
+  /* G-HANG charms-classroom */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('charms-classroom', [
+    ['b', 151.55, 66.25, 3.2, 151.61, 67.65, 4.2, 'tartan'], ['b', 139.59, 70.55, 1.15, 139.65, 71.15, 1.95, 'gilt']]);
+  /* G-HANG end charms-classroom */
+  /* G-HANG charms-classroom-3-west */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('charms-classroom-3-west', [
+    ['b', 127.7, 69.8, 3.2, 129.1, 69.86, 4.2, 'tartan'], ['b', 124.3, 69.8, 1.15, 124.9, 69.86, 1.95, 'gilt']]);
+  /* G-HANG end charms-classroom-3-west */
+  /* G-HANG charms-corridor */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 3 tapestries, 3 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('charms-corridor', [
+    ['b', 91.15, 49.99, 0.4, 92.35, 50.05, 4.0, 'tartan'], ['b', 89.65, 52.95, 3.25, 94.65, 53.01, 4.35, 'tartan'], ['b', 92.45, 49.99, 2.3, 94.85, 50.05, 4.2, 'tartan'], ['b', 123.35, 52.95, 1.15, 123.95, 53.01, 1.95, 'gilt'],
+    ['b', 130.65, 49.99, 1.15, 131.25, 50.05, 1.95, 'gilt'], ['b', 92.75, 49.99, 1.15, 93.35, 50.05, 1.95, 'gilt']]);
+  /* G-HANG end charms-corridor */
+  /* G-HANG charms-passage */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 0 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('charms-passage', [
+    ['b', 137.19, 63.45, 1.15, 137.25, 64.05, 1.95, 'gilt'], ['b', 139.15, 57.15, 1.15, 139.21, 57.75, 1.95, 'gilt']]);
+  /* G-HANG end charms-passage */
+  /* G-HANG charms-preparation-room-3 */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 0 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('charms-preparation-room-3', [
+    ['b', 123.375, 70.29, 1.325, 123.725, 70.35, 1.775, 'gilt']]);
+  /* G-HANG end charms-preparation-room-3 */
+  /* G-HANG defence-classroom */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('defence-classroom', [
+    ['b', 36.99, 66.75, 3.2, 37.05, 68.15, 4.2, 'tartan'], ['b', 44.65, 71.35, 1.15, 45.25, 71.41, 1.95, 'gilt']]);
+  /* G-HANG end defence-classroom */
+  /* G-HANG defence-passage */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 0 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('defence-passage', [
+    ['b', 50.35, 60.75, 1.15, 50.41, 61.35, 1.95, 'gilt'], ['b', 48.39, 55.05, 1.15, 48.45, 55.65, 1.95, 'gilt']]);
+  /* G-HANG end defence-passage */
+  /* G-HANG defence-practice-room-3 */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('defence-practice-room-3', [
+    ['b', 29.8, 71.95, 3.2, 31.2, 72.01, 4.2, 'tartan'], ['b', 36.7, 63.0, 1.15, 36.76, 63.6, 1.95, 'gilt']]);
+  /* G-HANG end defence-practice-room-3 */
+  /* G-HANG defence-teachers-bedroom-3 */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('defence-teachers-bedroom-3', [
+    ['b', 93.2, 71.95, 2.8, 95.0, 72.01, 4.2, 'tartan'], ['b', 100.0, 68.825, 1.325, 100.06, 69.175, 1.775, 'gilt'], ['b', 91.625, 71.95, 1.325, 91.975, 72.01, 1.775, 'gilt']]);
+  /* G-HANG end defence-teachers-bedroom-3 */
+  /* G-HANG disused-classroom-3-lake */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 0 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('disused-classroom-3-lake', [
+    ['b', 136.66, 3.84, 1.15, 137.26, 3.9, 1.95, 'gilt']]);
+  /* G-HANG end disused-classroom-3-lake */
+  /* G-HANG drum-bend-3 */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('drum-bend-3', [
+    ['b', 40.09, 8.59, 0.4, 41.29, 8.65, 4.0, 'tartan'], ['b', 40.39, 11.3, 1.15, 40.99, 11.36, 1.95, 'gilt'], ['b', 46.39, 11.3, 1.15, 46.99, 11.36, 1.95, 'gilt']]);
+  /* G-HANG end drum-bend-3 */
+  /* G-HANG drum-bend-3-east */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 0 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('drum-bend-3-east', [
+    ['b', 50.69, 11.3, 1.15, 51.29, 11.36, 1.95, 'gilt']]);
+  /* G-HANG end drum-bend-3-east */
+  /* G-HANG drum-bend-3-west */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 0 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('drum-bend-3-west', [
+    ['b', 33.03, 5.5, 1.15, 33.09, 6.1, 1.95, 'gilt']]);
+  /* G-HANG end drum-bend-3-west */
+  /* G-HANG elves-linen-room-3-east */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 0 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('elves-linen-room-3-east', [
+    ['b', 157.325, 6.74, 1.325, 157.675, 6.8, 1.775, 'gilt']]);
+  /* G-HANG end elves-linen-room-3-east */
+  /* G-HANG glass-room */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 0 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('glass-room', [
+    ['b', 159.563, 4.943, 1.325, 159.913, 5.003, 1.775, 'gilt']]);
+  /* G-HANG end glass-room */
+  /* G-HANG lake-corridor-3-mid */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('lake-corridor-3-mid', [
+    ['b', 56.89, 0.84, 0.4, 58.09, 0.9, 4.0, 'tartan'], ['b', 48.89, 0.84, 1.15, 49.49, 0.9, 1.95, 'gilt'], ['b', 49.59, 0.84, 1.15, 50.19, 0.9, 1.95, 'gilt']]);
+  /* G-HANG end lake-corridor-3-mid */
+  /* G-HANG lake-corridor-3-west */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 2 tapestries, 3 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('lake-corridor-3-west', [
+    ['b', 8.6, 3.3, 0.4, 9.8, 3.36, 4.0, 'tartan'], ['b', 7.3, 0.84, 3.25, 12.3, 0.9, 4.35, 'tartan'], ['b', 7.3, 3.3, 1.15, 7.9, 3.36, 1.95, 'gilt'], ['b', 35.49, 0.9, 1.15, 35.55, 1.5, 1.95, 'gilt'],
+    ['b', 7.9, 0.84, 1.15, 8.5, 0.9, 1.95, 'gilt']]);
+  /* G-HANG end lake-corridor-3-west */
+  /* G-HANG loop-gallery-3 */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 0 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang; NOT PLACED: hang-loop-gallery-3-1 (t 1.2x3.6 too tall for the wall) */
+  add('loop-gallery-3', [
+    ['b', 116.55, -2.71, 1.15, 117.15, -2.65, 1.95, 'gilt'], ['b', 105.55, -2.71, 1.15, 106.15, -2.65, 1.95, 'gilt']]);
+  /* G-HANG end loop-gallery-3 */
+  /* G-HANG north-corridor-3-link */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 2 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('north-corridor-3-link', [
+    ['b', 85.9, 50.84, 0.4, 87.1, 50.9, 4.0, 'tartan'], ['b', 84.0, 53.3, 3.25, 89.0, 53.36, 4.35, 'tartan'], ['b', 70.0, 50.84, 1.15, 70.6, 50.9, 1.95, 'gilt'], ['b', 82.8, 53.3, 1.15, 83.4, 53.36, 1.95, 'gilt']]);
+  /* G-HANG end north-corridor-3-link */
+  /* G-HANG north-stair-foot-3 */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('north-stair-foot-3', [
+    ['b', 159.95, 62.55, 0.4, 160.01, 63.75, 4.0, 'tartan'], ['b', 159.95, 63.85, 1.15, 160.01, 64.45, 1.95, 'gilt']]);
+  /* G-HANG end north-stair-foot-3 */
+  /* G-HANG right-hand-corridor-3 */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 2 tapestries, 3 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('right-hand-corridor-3', [
+    ['b', 157.25, 49.7, 0.4, 158.45, 49.76, 4.0, 'tartan'], ['b', 152.15, 49.7, 3.25, 157.15, 49.76, 4.35, 'tartan'], ['b', 159.25, 49.7, 1.15, 159.85, 49.76, 1.95, 'gilt'], ['b', 159.95, 27.1, 1.15, 160.01, 27.7, 1.95, 'gilt'],
+    ['b', 143.99, 34.1, 1.15, 144.05, 34.7, 1.95, 'gilt']]);
+  /* G-HANG end right-hand-corridor-3 */
+  /* G-HANG staff-bedroom-3-lake */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('staff-bedroom-3-lake', [
+    ['b', 110.22, 17.95, 2.8, 112.02, 18.01, 4.2, 'tartan'], ['b', 112.345, 17.95, 1.325, 112.695, 18.01, 1.775, 'gilt'], ['b', 109.645, 17.95, 1.325, 109.995, 18.01, 1.775, 'gilt']]);
+  /* G-HANG end staff-bedroom-3-lake */
+  /* G-HANG staff-bedrooms-3-lake */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('staff-bedrooms-3-lake', [
+    ['b', 60.19, 17.95, 2.6, 62.39, 18.01, 4.2, 'tartan'], ['b', 67.7, 5.325, 1.325, 67.76, 5.675, 1.775, 'gilt'], ['b', 61.515, 17.95, 1.325, 61.865, 18.01, 1.775, 'gilt']]);
+  /* G-HANG end staff-bedrooms-3-lake */
+  /* G-HANG study-room-3-lake */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('study-room-3-lake', [
+    ['b', 122.54, 17.95, 3.2, 123.94, 18.01, 4.2, 'tartan'], ['b', 117.38, 8.9, 1.15, 117.44, 9.5, 1.95, 'gilt']]);
+  /* G-HANG end study-room-3-lake */
+  /* G-HANG sw-stair-foot-3 */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('sw-stair-foot-3', [
+    ['b', 4.85, 11.95, 0.4, 6.05, 12.01, 4.0, 'tartan'], ['b', 1.875, 11.95, 1.325, 2.225, 12.01, 1.775, 'gilt']]);
+  /* G-HANG end sw-stair-foot-3 */
+  /* G-HANG swivelling-staircase-room-3 */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('swivelling-staircase-room-3', [
+    ['b', 57.0, 71.95, 2.3, 59.4, 72.01, 4.2, 'tartan'], ['b', 60.3, 59.24, 1.15, 60.9, 59.3, 1.95, 'gilt'], ['b', 58.0, 71.95, 1.15, 58.6, 72.01, 1.95, 'gilt']]);
+  /* G-HANG end swivelling-staircase-room-3 */
+  /* G-HANG teachers-study-3-east */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('teachers-study-3-east', [
+    ['b', 160.0, 19.5, 3.2, 160.06, 20.9, 4.2, 'tartan'], ['b', 151.1, 22.2, 1.15, 151.7, 22.26, 1.95, 'gilt'], ['b', 158.725, 22.2, 1.325, 159.075, 22.26, 1.775, 'gilt']]);
+  /* G-HANG end teachers-study-3-east */
+  /* G-HANG teachers-study-3-lake-east */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('teachers-study-3-lake-east', [
+    ['b', 146.38, 17.7, 2.6, 148.58, 17.76, 4.2, 'tartan'], ['b', 151.28, 17.7, 1.15, 151.88, 17.76, 1.95, 'gilt'], ['b', 149.505, 3.84, 1.325, 149.855, 3.9, 1.775, 'gilt']]);
+  /* G-HANG end teachers-study-3-lake-east */
+  /* G-HANG teachers-study-3-north */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('teachers-study-3-north', [
+    ['b', 105.5, 71.7, 2.8, 107.3, 71.76, 4.2, 'tartan'], ['b', 100.54, 65.4, 1.15, 100.6, 66.0, 1.95, 'gilt'], ['b', 100.54, 63.225, 1.325, 100.6, 63.575, 1.775, 'gilt']]);
+  /* G-HANG end teachers-study-3-north */
+  /* G-HANG third-floor-north-corridor */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 3 tapestries, 3 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('third-floor-north-corridor', [
+    ['b', 33.95, 50.59, 0.4, 35.15, 50.65, 4.0, 'tartan'], ['b', 32.05, 53.55, 3.25, 37.05, 53.61, 4.35, 'tartan'], ['b', 35.25, 50.59, 2.3, 37.65, 50.65, 4.2, 'tartan'], ['b', 43.75, 53.55, 1.15, 44.35, 53.61, 1.95, 'gilt'],
+    ['b', 58.45, 50.59, 1.15, 59.05, 50.65, 1.95, 'gilt'], ['b', 56.75, 50.59, 1.15, 57.35, 50.65, 1.95, 'gilt']]);
+  /* G-HANG end third-floor-north-corridor */
+  /* G-HANG third-years-study-room-3 */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('third-years-study-room-3', [
+    ['b', 98.3, 17.95, 3.2, 99.7, 18.01, 4.2, 'tartan'], ['b', 104.72, 4.2, 1.15, 104.78, 4.8, 1.95, 'gilt']]);
+  /* G-HANG end third-years-study-room-3 */
+  /* G-HANG tracing-floor */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 0 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('tracing-floor', [
+    ['b', 0.113, 5.442, 1.325, 0.463, 5.502, 1.775, 'gilt']]);
+  /* G-HANG end tracing-floor */
+  /* G-HANG trophy-polishing-room-3 */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 0 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('trophy-polishing-room-3', [
+    ['b', 7.24, 9.625, 1.325, 7.3, 9.975, 1.775, 'gilt']]);
+  /* G-HANG end trophy-polishing-room-3 */
+  /* G-HANG trophy-room */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 4 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('trophy-room', [
+    ['b', 4.55, 43.95, 2.3, 6.95, 44.01, 4.2, 'tartan'], ['b', 9.0, 23.99, 0.95, 9.9, 24.05, 2.15, 'gilt'], ['b', 15.95, 34.6, 0.95, 16.01, 35.5, 2.15, 'gilt'], ['b', 0.05, 23.99, 1.15, 0.65, 24.05, 1.95, 'gilt'],
+    ['b', -0.01, 28.95, 1.15, 0.05, 29.55, 1.95, 'gilt']]);
+  /* G-HANG end trophy-room */
+  /* G-HANG west-stair-foot-3 */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('west-stair-foot-3', [
+    ['b', -0.01, 60.95, 0.4, 0.05, 62.15, 4.0, 'tartan'], ['b', 3.55, 63.95, 1.15, 4.15, 64.01, 1.95, 'gilt']]);
+  /* G-HANG end west-stair-foot-3 */
+  /* G-HANG witch-landing */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 0 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('witch-landing', [
+    ['b', 67.25, 33.95, 1.15, 67.85, 34.01, 1.95, 'gilt']]);
+  /* G-HANG end witch-landing */
+  /* G-HANG ancient-runes-classroom */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('ancient-runes-classroom', [
+    ['b', 32.55, 66.65, 3.2, 32.61, 68.05, 4.2, 'tartan'], ['b', 24.65, 63.39, 1.15, 25.25, 63.45, 1.95, 'gilt']]);
+  /* G-HANG end ancient-runes-classroom */
+  /* G-HANG astronomy-stair-foot-4 */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('astronomy-stair-foot-4', [
+    ['b', 84.4, 68.7, 0.4, 85.6, 68.76, 4.0, 'tartan'], ['b', 87.7, 66.925, 1.325, 87.76, 67.275, 1.775, 'gilt']]);
+  /* G-HANG end astronomy-stair-foot-4 */
+  /* G-HANG back-stair-lobby-4 */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('back-stair-lobby-4', [
+    ['b', 66.35, 65.55, 0.4, 67.55, 65.61, 4.0, 'tartan'], ['b', 65.99, 53.65, 1.15, 66.05, 54.25, 1.95, 'gilt']]);
+  /* G-HANG end back-stair-lobby-4 */
+  /* G-HANG disused-classroom-4-east */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 0 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('disused-classroom-4-east', [
+    ['b', 159.95, 46.43, 1.15, 160.01, 47.03, 1.95, 'gilt']]);
+  /* G-HANG end disused-classroom-4-east */
+  /* G-HANG disused-classroom-4-lake-east */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 0 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('disused-classroom-4-lake-east', [
+    ['b', 141.08, 13.4, 1.15, 141.14, 14.0, 1.95, 'gilt']]);
+  /* G-HANG end disused-classroom-4-lake-east */
+  /* G-HANG drum-bend-4 */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('drum-bend-4', [
+    ['b', 40.09, 8.59, 0.4, 41.29, 8.65, 4.0, 'tartan'], ['b', 40.09, 11.3, 1.15, 40.69, 11.36, 1.95, 'gilt'], ['b', 37.49, 11.3, 1.15, 38.09, 11.36, 1.95, 'gilt']]);
+  /* G-HANG end drum-bend-4 */
+  /* G-HANG drum-bend-4-east */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 0 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('drum-bend-4-east', [
+    ['b', 51.29, 9.3, 1.15, 51.35, 9.9, 1.95, 'gilt']]);
+  /* G-HANG end drum-bend-4-east */
+  /* G-HANG drum-bend-4-west */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 0 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('drum-bend-4-west', [
+    ['b', 33.03, 5.3, 1.15, 33.09, 5.9, 1.95, 'gilt']]);
+  /* G-HANG end drum-bend-4-west */
+  /* G-HANG east-wing-corridor-4 */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 2 tapestries, 3 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('east-wing-corridor-4', [
+    ['b', 144.84, 43.7, 0.4, 144.9, 44.9, 4.0, 'tartan'], ['b', 147.3, 42.2, 3.25, 147.36, 47.2, 4.35, 'tartan'], ['b', 144.84, 34.9, 1.15, 144.9, 35.5, 1.95, 'gilt'], ['b', 147.3, 27.7, 1.15, 147.36, 28.3, 1.95, 'gilt'],
+    ['b', 144.84, 25.4, 1.15, 144.9, 26.0, 1.95, 'gilt']]);
+  /* G-HANG end east-wing-corridor-4 */
+  /* G-HANG electives-passage-4 */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 0 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('electives-passage-4', [
+    ['b', 19.49, 63.55, 1.15, 19.55, 64.15, 1.95, 'gilt'], ['b', 19.49, 69.25, 1.15, 19.55, 69.85, 1.95, 'gilt']]);
+  /* G-HANG end electives-passage-4 */
+  /* G-HANG elves-linen-room-4-east */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 0 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('elves-linen-room-4-east', [
+    ['b', 159.525, 18.24, 1.325, 159.875, 18.3, 1.775, 'gilt']]);
+  /* G-HANG end elves-linen-room-4-east */
+  /* G-HANG elves-linen-room-4-lake */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 0 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('elves-linen-room-4-lake', [
+    ['b', 32.49, 4.125, 1.325, 32.55, 4.475, 1.775, 'gilt']]);
+  /* G-HANG end elves-linen-room-4-lake */
+  /* G-HANG first-schoolroom */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 0 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang; NOT PLACED: hang-first-schoolroom-1 (t 1.4x1.0) */
+  add('first-schoolroom', [
+    ['b', 153.99, 71.7, 1.15, 154.05, 72.3, 1.95, 'gilt']]);
+  /* G-HANG end first-schoolroom */
+  /* G-HANG fourth-floor-corridor */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 3 tapestries, 3 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('fourth-floor-corridor', [
+    ['b', 16.05, 50.59, 0.4, 17.25, 50.65, 4.0, 'tartan'], ['b', 16.05, 53.55, 3.25, 21.05, 53.61, 4.35, 'tartan'], ['b', 17.35, 50.59, 2.3, 19.75, 50.65, 4.2, 'tartan'], ['b', 16.05, 53.55, 1.15, 16.65, 53.61, 1.95, 'gilt'],
+    ['b', 49.65, 50.59, 1.15, 50.25, 50.65, 1.95, 'gilt'], ['b', 34.95, 50.59, 1.15, 35.55, 50.65, 1.95, 'gilt']]);
+  /* G-HANG end fourth-floor-corridor */
+  /* G-HANG herbology-library-4 */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('herbology-library-4', [
+    ['b', 93.8, 71.95, 3.2, 95.2, 72.01, 4.2, 'tartan'], ['b', 100.6, 68.8, 1.15, 100.66, 69.4, 1.95, 'gilt']]);
+  /* G-HANG end herbology-library-4 */
+  /* G-HANG lake-corridor-4-keep */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('lake-corridor-4-keep', [
+    ['b', 56.89, 0.84, 0.4, 58.09, 0.9, 4.0, 'tartan'], ['b', 48.89, 0.84, 1.15, 49.49, 0.9, 1.95, 'gilt'], ['b', 61.19, 0.84, 1.15, 61.79, 0.9, 1.95, 'gilt']]);
+  /* G-HANG end lake-corridor-4-keep */
+  /* G-HANG lake-corridor-4-west */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 2 tapestries, 3 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('lake-corridor-4-west', [
+    ['b', 32.5, 0.84, 0.4, 33.7, 0.9, 4.0, 'tartan'], ['b', 30.5, 3.3, 3.25, 35.5, 3.36, 4.35, 'tartan'], ['b', 18.4, 3.3, 1.15, 19.0, 3.36, 1.95, 'gilt'], ['b', 23.0, 3.3, 1.15, 23.6, 3.36, 1.95, 'gilt'],
+    ['b', 28.4, 0.84, 1.15, 29.0, 0.9, 1.95, 'gilt']]);
+  /* G-HANG end lake-corridor-4-west */
+  /* G-HANG landscape-painting-corridor-4 */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('landscape-painting-corridor-4', [
+    ['b', 97.8, 17.95, 2.3, 100.2, 18.01, 4.2, 'tartan'], ['b', 104.72, 10.2, 1.15, 104.78, 10.8, 1.95, 'gilt'], ['b', 104.72, 8.3, 1.15, 104.78, 8.9, 1.95, 'gilt']]);
+  /* G-HANG end landscape-painting-corridor-4 */
+  /* G-HANG library */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 2 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('library', [
+    ['b', 32.99, 65.85, 0.4, 33.05, 67.05, 4.0, 'tartan'], ['b', 32.99, 65.75, 8.4, 33.05, 67.15, 9.4, 'tartan'], ['b', 42.85, 61.39, 1.15, 43.45, 61.45, 1.95, 'gilt'], ['b', 36.95, 61.39, 1.15, 37.55, 61.45, 1.95, 'gilt']]);
+  /* G-HANG end library */
+  /* G-HANG library-corridor */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('library-corridor', [
+    ['b', 68.75, 67.95, 3.2, 70.15, 68.01, 4.2, 'tartan'], ['b', 70.35, 67.95, 1.15, 70.95, 68.01, 1.95, 'gilt']]);
+  /* G-HANG end library-corridor */
+  /* G-HANG library-map-room */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 0 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('library-map-room', [
+    ['b', 44.4, 60.45, 1.15, 45.0, 60.51, 1.95, 'gilt']]);
+  /* G-HANG end library-map-room */
+  /* G-HANG library-reading-room */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('library-reading-room', [
+    ['b', 52.8, 60.45, 3.2, 54.2, 60.51, 4.2, 'tartan'], ['b', 52.9, 60.45, 1.15, 53.5, 60.51, 1.95, 'gilt']]);
+  /* G-HANG end library-reading-room */
+  /* G-HANG library-returns-desk-4 */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 0 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('library-returns-desk-4', [
+    ['b', 66.15, 71.8, 1.15, 66.75, 71.86, 1.95, 'gilt']]);
+  /* G-HANG end library-returns-desk-4 */
+  /* G-HANG model-room */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 0 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('model-room', [
+    ['b', 154.99, -0.3, 1.15, 155.05, 0.3, 1.95, 'gilt'], ['b', 159.7, -5.01, 1.15, 160.3, -4.95, 1.95, 'gilt']]);
+  /* G-HANG end model-room */
+  /* G-HANG muggle-studies-classroom */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('muggle-studies-classroom', [
+    ['b', 8.39, 66.65, 3.2, 8.45, 68.05, 4.2, 'tartan'], ['b', 8.39, 64.55, 1.15, 8.45, 65.15, 1.95, 'gilt']]);
+  /* G-HANG end muggle-studies-classroom */
+  /* G-HANG muggle-studies-collection-4 */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('muggle-studies-collection-4', [
+    ['b', 122.04, 17.95, 2.3, 124.44, 18.01, 4.2, 'tartan'], ['b', 121.54, 17.95, 1.15, 122.14, 18.01, 1.95, 'gilt'], ['b', 128.96, 3.9, 1.15, 129.02, 4.5, 1.95, 'gilt']]);
+  /* G-HANG end muggle-studies-collection-4 */
+  /* G-HANG muggle-studies-room */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 0 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('muggle-studies-room', [
+    ['b', 37.3, 60.45, 1.15, 37.9, 60.51, 1.95, 'gilt']]);
+  /* G-HANG end muggle-studies-room */
+  /* G-HANG muggle-studies-study */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 0 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('muggle-studies-study', [
+    ['b', 33.14, 59.45, 1.15, 33.2, 60.05, 1.95, 'gilt'], ['b', 33.14, 54.475, 1.325, 33.2, 54.825, 1.775, 'gilt']]);
+  /* G-HANG end muggle-studies-study */
+  /* G-HANG newspaper-room-4 */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('newspaper-room-4', [
+    ['b', 60.59, 17.95, 3.2, 61.99, 18.01, 4.2, 'tartan'], ['b', 57.79, 17.95, 1.15, 58.39, 18.01, 1.95, 'gilt']]);
+  /* G-HANG end newspaper-room-4 */
+  /* G-HANG north-range-corridor-4 */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 3 tapestries, 3 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('north-range-corridor-4', [
+    ['b', 81.8, 53.3, 0.4, 83.0, 53.36, 4.0, 'tartan'], ['b', 83.1, 53.3, 3.25, 88.1, 53.36, 4.35, 'tartan'], ['b', 84.7, 50.84, 2.3, 87.1, 50.9, 4.2, 'tartan'], ['b', 92.8, 50.84, 1.15, 93.4, 50.9, 1.95, 'gilt'],
+    ['b', 94.3, 53.3, 1.15, 94.9, 53.36, 1.95, 'gilt'], ['b', 84.1, 50.84, 1.15, 84.7, 50.9, 1.95, 'gilt']]);
+  /* G-HANG end north-range-corridor-4 */
+  /* G-HANG north-stair-foot-4 */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('north-stair-foot-4', [
+    ['b', 159.95, 63.25, 0.4, 160.01, 64.45, 4.0, 'tartan'], ['b', 157.475, 57.99, 1.325, 157.825, 58.05, 1.775, 'gilt']]);
+  /* G-HANG end north-stair-foot-4 */
+  /* G-HANG pince-office */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 0 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('pince-office', [
+    ['b', 58.65, 53.99, 1.15, 59.25, 54.05, 1.95, 'gilt']]);
+  /* G-HANG end pince-office */
+  /* G-HANG revision-rooms-4 */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('revision-rooms-4', [
+    ['b', 110.42, 17.95, 3.2, 111.82, 18.01, 4.2, 'tartan'], ['b', 113.22, 17.95, 1.15, 113.82, 18.01, 1.95, 'gilt']]);
+  /* G-HANG end revision-rooms-4 */
+  /* G-HANG runes-dictionary-room-4 */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 0 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('runes-dictionary-room-4', [
+    ['b', 32.6, 60.7, 1.15, 32.66, 61.3, 1.95, 'gilt']]);
+  /* G-HANG end runes-dictionary-room-4 */
+  /* G-HANG runes-teachers-study-4 */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('runes-teachers-study-4', [
+    ['b', 0.24, 22.4, 2.8, 0.3, 24.2, 4.2, 'tartan'], ['b', 12.1, 21.5, 1.15, 12.16, 22.1, 1.95, 'gilt'], ['b', 12.1, 20.525, 1.325, 12.16, 20.875, 1.775, 'gilt']]);
+  /* G-HANG end runes-teachers-study-4 */
+  /* G-HANG staff-bedroom-4-east */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('staff-bedroom-4-east', [
+    ['b', 159.95, 32.87, 2.6, 160.01, 35.07, 4.2, 'tartan'], ['b', 147.84, 35.395, 1.325, 147.9, 35.745, 1.775, 'gilt'], ['b', 155.725, 28.91, 1.325, 156.075, 28.97, 1.775, 'gilt']]);
+  /* G-HANG end staff-bedroom-4-east */
+  /* G-HANG staff-bedroom-4-lake-west */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('staff-bedroom-4-lake-west', [
+    ['b', 13.5, 17.7, 3.2, 14.9, 17.76, 4.2, 'tartan'], ['b', 7.24, 16.925, 1.325, 7.3, 17.275, 1.775, 'gilt'], ['b', 7.24, 10.725, 1.325, 7.3, 11.075, 1.775, 'gilt']]);
+  /* G-HANG end staff-bedroom-4-lake-west */
+  /* G-HANG staff-bedroom-4-north-east */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('staff-bedroom-4-north-east', [
+    ['b', 119.2, 71.7, 2.6, 121.4, 71.76, 4.2, 'tartan'], ['b', 125.125, 71.7, 1.325, 125.475, 71.76, 1.775, 'gilt'], ['b', 126.4, 61.025, 1.325, 126.46, 61.375, 1.775, 'gilt']]);
+  /* G-HANG end staff-bedroom-4-north-east */
+  /* G-HANG staff-bedrooms-4-north */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('staff-bedrooms-4-north', [
+    ['b', 106.6, 71.7, 3.2, 108.0, 71.76, 4.2, 'tartan'], ['b', 112.325, 59.24, 1.325, 112.675, 59.3, 1.775, 'gilt'], ['b', 101.14, 66.425, 1.325, 101.2, 66.775, 1.775, 'gilt']]);
+  /* G-HANG end staff-bedrooms-4-north */
+  /* G-HANG study-room-4-lake-east */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('study-room-4-lake-east', [
+    ['b', 146.78, 17.7, 3.2, 148.18, 17.76, 4.2, 'tartan'], ['b', 141.62, 8.3, 1.15, 141.68, 8.9, 1.95, 'gilt']]);
+  /* G-HANG end study-room-4-lake-east */
+  /* G-HANG study-room-4-north-east */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('study-room-4-north-east', [
+    ['b', 145.4, 71.95, 3.2, 146.8, 72.01, 4.2, 'tartan'], ['b', 147.4, 71.95, 1.15, 148.0, 72.01, 1.95, 'gilt']]);
+  /* G-HANG end study-room-4-north-east */
+  /* G-HANG sw-stair-foot-4 */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('sw-stair-foot-4', [
+    ['b', 4.85, 11.95, 0.4, 6.05, 12.01, 4.0, 'tartan'], ['b', 2.575, 6.99, 1.325, 2.925, 7.05, 1.775, 'gilt']]);
+  /* G-HANG end sw-stair-foot-4 */
+  /* G-HANG teachers-study-4-lake-east */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('teachers-study-4-lake-east', [
+    ['b', 159.95, 11.1, 2.6, 160.01, 13.3, 4.2, 'tartan'], ['b', 153.74, 15.5, 1.15, 153.8, 16.1, 1.95, 'gilt'], ['b', 153.74, 6.725, 1.325, 153.8, 7.075, 1.775, 'gilt']]);
+  /* G-HANG end teachers-study-4-lake-east */
+  /* G-HANG teachers-study-4-north */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('teachers-study-4-north', [
+    ['b', 132.4, 71.7, 3.2, 133.8, 71.76, 4.2, 'tartan'], ['b', 130.1, 59.24, 1.15, 130.7, 59.3, 1.95, 'gilt'], ['b', 133.625, 71.7, 1.325, 133.975, 71.76, 1.775, 'gilt']]);
+  /* G-HANG end teachers-study-4-north */
+  /* G-HANG tudor-bay-4 */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 0 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('tudor-bay-4', [
+    ['b', 100.99, -6.45, 1.15, 101.05, -5.85, 1.95, 'gilt'], ['b', 100.99, -5.225, 1.325, 101.05, -4.875, 1.775, 'gilt']]);
+  /* G-HANG end tudor-bay-4 */
+  /* G-HANG unused-classroom-4-mirror */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 0 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('unused-classroom-4-mirror', [
+    ['b', 78.9, 57.5, 1.15, 79.5, 57.56, 1.95, 'gilt']]);
+  /* G-HANG end unused-classroom-4-mirror */
+  /* G-HANG west-corridor-4-south */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('west-corridor-4-south', [
+    ['b', 0.75, 53.3, 0.4, 1.95, 53.36, 4.0, 'tartan'], ['b', 2.95, 50.84, 1.15, 3.55, 50.9, 1.95, 'gilt'], ['b', -0.01, 52.4, 1.15, 0.05, 53.0, 1.95, 'gilt']]);
+  /* G-HANG end west-corridor-4-south */
+  /* G-HANG west-stair-foot-4 */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('west-stair-foot-4', [
+    ['b', 0.85, 58.99, 0.4, 2.05, 59.05, 4.0, 'tartan'], ['b', 2.375, 58.99, 1.325, 2.725, 59.05, 1.775, 'gilt']]);
+  /* G-HANG end west-stair-foot-4 */
+  /* G-HANG west-wing-corridor-4 */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 2 tapestries, 3 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('west-wing-corridor-4', [
+    ['b', 12.64, 45.9, 0.4, 12.7, 47.1, 4.0, 'tartan'], ['b', 15.1, 44.7, 3.25, 15.16, 49.7, 4.35, 'tartan'], ['b', 12.64, 40.9, 1.15, 12.7, 41.5, 1.95, 'gilt'], ['b', 12.64, 18.3, 1.15, 12.7, 18.9, 1.95, 'gilt'],
+    ['b', 15.1, 18.3, 1.15, 15.16, 18.9, 1.95, 'gilt']]);
+  /* G-HANG end west-wing-corridor-4 */
+  /* G-HANG armour-corridor-5 */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('armour-corridor-5', [
+    ['b', 96.9, 17.95, 2.3, 99.3, 18.01, 4.2, 'tartan'], ['b', 92.3, 3.84, 1.15, 92.9, 3.9, 1.95, 'gilt'], ['b', 93.9, 17.95, 1.15, 94.5, 18.01, 1.95, 'gilt']]);
+  /* G-HANG end armour-corridor-5 */
+  /* G-HANG astronomy-stair-foot-5 */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('astronomy-stair-foot-5', [
+    ['b', 82.4, 68.7, 0.4, 83.6, 68.76, 4.0, 'tartan'], ['b', 84.825, 59.24, 1.325, 85.175, 59.3, 1.775, 'gilt']]);
+  /* G-HANG end astronomy-stair-foot-5 */
+  /* G-HANG back-stair-lobby-5 */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('back-stair-lobby-5', [
+    ['b', 65.99, 59.45, 0.4, 66.05, 60.65, 4.0, 'tartan'], ['b', 67.95, 62.05, 1.15, 68.01, 62.65, 1.95, 'gilt']]);
+  /* G-HANG end back-stair-lobby-5 */
+  /* G-HANG disused-classroom-5-east */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 0 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('disused-classroom-5-east', [
+    ['b', 145.4, 3.84, 1.15, 146.0, 3.9, 1.95, 'gilt']]);
+  /* G-HANG end disused-classroom-5-east */
+  /* G-HANG disused-classroom-5-west */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 0 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('disused-classroom-5-west', [
+    ['b', 20.2, 60.4, 1.15, 20.26, 61.0, 1.95, 'gilt']]);
+  /* G-HANG end disused-classroom-5-west */
+  /* G-HANG drum-bend-5 */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 0 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang; NOT PLACED: hang-drum-bend-5-1 (t 1.2x3.6 too tall for the wall) */
+  add('drum-bend-5', [
+    ['b', 46.15, 8.34, 1.15, 46.75, 8.4, 1.95, 'gilt'], ['b', 43.05, 8.34, 1.15, 43.65, 8.4, 1.95, 'gilt']]);
+  /* G-HANG end drum-bend-5 */
+  /* G-HANG drum-bend-5-east */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 0 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('drum-bend-5-east', [
+    ['b', 48.59, 8.6, 1.15, 48.65, 9.2, 1.95, 'gilt']]);
+  /* G-HANG end drum-bend-5-east */
+  /* G-HANG drum-bend-5-west */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 0 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('drum-bend-5-west', [
+    ['b', 33.35, 3.59, 1.15, 33.95, 3.65, 1.95, 'gilt']]);
+  /* G-HANG end drum-bend-5-west */
+  /* G-HANG east-wing-5 */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('east-wing-5', [
+    ['b', 154.15, 49.7, 2.3, 156.55, 49.76, 4.2, 'tartan'], ['b', 146.95, 18.24, 1.15, 147.55, 18.3, 1.95, 'gilt'], ['b', 143.99, 34.3, 1.15, 144.05, 34.9, 1.95, 'gilt']]);
+  /* G-HANG end east-wing-5 */
+  /* G-HANG elves-linen-room-5 */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 0 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('elves-linen-room-5', [
+    ['b', 18.425, 53.84, 1.325, 18.775, 53.9, 1.775, 'gilt']]);
+  /* G-HANG end elves-linen-room-5 */
+  /* G-HANG falconers-room */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 0 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('falconers-room', [
+    ['b', -0.426, 76.743, 1.325, -0.076, 76.803, 1.775, 'gilt']]);
+  /* G-HANG end falconers-room */
+  /* G-HANG fifth-floor-south-corridor */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('fifth-floor-south-corridor', [
+    ['b', 54.85, 3.4, 0.4, 56.05, 3.46, 4.0, 'tartan'], ['b', 57.55, 3.4, 1.15, 58.15, 3.46, 1.95, 'gilt'], ['b', 57.75, 0.44, 1.15, 58.35, 0.5, 1.95, 'gilt']]);
+  /* G-HANG end fifth-floor-south-corridor */
+  /* G-HANG head-boy-girl-study-5 */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('head-boy-girl-study-5', [
+    ['b', 58.6, 17.95, 2.6, 60.8, 18.01, 4.2, 'tartan'], ['b', 51.84, 16.0, 1.15, 51.9, 16.6, 1.95, 'gilt'], ['b', 67.7, 8.525, 1.325, 67.76, 8.875, 1.775, 'gilt']]);
+  /* G-HANG end head-boy-girl-study-5 */
+  /* G-HANG herbarium */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 0 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('herbarium', [
+    ['b', -4.803, -0.426, 1.325, -4.743, -0.076, 1.775, 'gilt']]);
+  /* G-HANG end herbarium */
+  /* G-HANG library-gallery */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 0 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang; NOT PLACED: hang-library-gallery-1 (t 1.2x3.6 too tall for the wall) */
+  add('library-gallery', [
+    ['b', 54.35, 58.99, 1.15, 54.95, 59.05, 1.95, 'gilt'], ['b', 54.175, 60.45, 1.325, 54.525, 60.51, 1.775, 'gilt']]);
+  /* G-HANG end library-gallery */
+  /* G-HANG library-gallery-way */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 0 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('library-gallery-way', [
+    ['b', 65.95, 58.25, 1.15, 66.01, 58.85, 1.95, 'gilt']]);
+  /* G-HANG end library-gallery-way */
+  /* G-HANG loop-gallery-5 */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 0 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang; NOT PLACED: hang-loop-gallery-5-1 (t 1.2x3.6 too tall for the wall) */
+  add('loop-gallery-5', [
+    ['b', 110.75, -2.71, 1.15, 111.35, -2.65, 1.95, 'gilt'], ['b', 116.05, -2.71, 1.15, 116.65, -2.65, 1.95, 'gilt']]);
+  /* G-HANG end loop-gallery-5 */
+  /* G-HANG music-room-5 */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('music-room-5', [
+    ['b', 122.1, 17.95, 3.2, 123.5, 18.01, 4.2, 'tartan'], ['b', 117.5, 3.84, 1.15, 118.1, 3.9, 1.95, 'gilt']]);
+  /* G-HANG end music-room-5 */
+  /* G-HANG north-range-corridor-5 */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 3 tapestries, 3 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('north-range-corridor-5', [
+    ['b', 92.75, 50.84, 0.4, 93.95, 50.9, 4.0, 'tartan'], ['b', 90.55, 53.3, 3.25, 95.55, 53.36, 4.35, 'tartan'], ['b', 90.25, 50.84, 2.3, 92.65, 50.9, 4.2, 'tartan'], ['b', 111.55, 50.84, 1.15, 112.15, 50.9, 1.95, 'gilt'],
+    ['b', 107.55, 50.84, 1.15, 108.15, 50.9, 1.95, 'gilt'], ['b', 36.75, 50.84, 1.15, 37.35, 50.9, 1.95, 'gilt']]);
+  /* G-HANG end north-range-corridor-5 */
+  /* G-HANG north-stair-foot-5 */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('north-stair-foot-5', [
+    ['b', 159.95, 63.25, 0.4, 160.01, 64.45, 4.0, 'tartan'], ['b', 155.475, 64.45, 1.325, 155.825, 64.51, 1.775, 'gilt']]);
+  /* G-HANG end north-stair-foot-5 */
+  /* G-HANG orrery-room */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 0 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('orrery-room', [
+    ['b', 154.99, -0.3, 1.15, 155.05, 0.3, 1.95, 'gilt'], ['b', 159.7, -5.01, 1.15, 160.3, -4.95, 1.95, 'gilt']]);
+  /* G-HANG end orrery-room */
+  /* G-HANG owl-examiners-rooms-5 */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('owl-examiners-rooms-5', [
+    ['b', 109.7, 17.95, 3.2, 111.1, 18.01, 4.2, 'tartan'], ['b', 104.6, 3.84, 1.15, 105.2, 3.9, 1.95, 'gilt']]);
+  /* G-HANG end owl-examiners-rooms-5 */
+  /* G-HANG prefects-common-room */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 3 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('prefects-common-room', [
+    ['b', 0.24, 20.9, 2.6, 0.3, 23.1, 4.2, 'tartan'], ['b', 0.3, 18.24, 1.15, 0.9, 18.3, 1.95, 'gilt'], ['b', 12.1, 23.8, 1.15, 12.16, 24.4, 1.95, 'gilt'], ['b', 9.725, 25.7, 1.325, 10.075, 25.76, 1.775, 'gilt']]);
+  /* G-HANG end prefects-common-room */
+  /* G-HANG staff-bedroom-5-east */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('staff-bedroom-5-east', [
+    ['b', 124.6, 71.95, 2.8, 126.4, 72.01, 4.2, 'tartan'], ['b', 113.04, 66.425, 1.325, 113.1, 66.775, 1.775, 'gilt'], ['b', 113.04, 69.225, 1.325, 113.1, 69.575, 1.775, 'gilt']]);
+  /* G-HANG end staff-bedroom-5-east */
+  /* G-HANG staff-bedroom-5-west */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('staff-bedroom-5-west', [
+    ['b', 10.24, 10.6, 2.6, 10.3, 12.8, 4.2, 'tartan'], ['b', 12.425, 17.7, 1.325, 12.775, 17.76, 1.775, 'gilt'], ['b', 10.24, 7.525, 1.325, 10.3, 7.875, 1.775, 'gilt']]);
+  /* G-HANG end staff-bedroom-5-west */
+  /* G-HANG staff-bedrooms-5-east */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('staff-bedrooms-5-east', [
+    ['b', 133.9, 17.95, 2.6, 136.1, 18.01, 4.2, 'tartan'], ['b', 132.425, 3.84, 1.325, 132.775, 3.9, 1.775, 'gilt'], ['b', 140.9, 11.025, 1.325, 140.96, 11.375, 1.775, 'gilt']]);
+  /* G-HANG end staff-bedrooms-5-east */
+  /* G-HANG star-chart-room-5 */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 0 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('star-chart-room-5', [
+    ['b', 100.6, 66.4, 2.2, 100.66, 68.0, 4.2, 'tartan']]);
+  /* G-HANG end star-chart-room-5 */
+  /* G-HANG study-room-5 */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('study-room-5', [
+    ['b', 138.3, 65.0, 3.2, 138.36, 66.4, 4.2, 'tartan'], ['b', 128.3, 71.95, 1.15, 128.9, 72.01, 1.95, 'gilt']]);
+  /* G-HANG end study-room-5 */
+  /* G-HANG sw-stair-foot-5 */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('sw-stair-foot-5', [
+    ['b', -0.01, 10.35, 0.4, 0.05, 11.55, 4.0, 'tartan'], ['b', 5.675, 6.99, 1.325, 6.025, 7.05, 1.775, 'gilt']]);
+  /* G-HANG end sw-stair-foot-5 */
+  /* G-HANG teachers-study-5-east */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('teachers-study-5-east', [
+    ['b', 150.0, 71.95, 2.6, 152.2, 72.01, 4.2, 'tartan'], ['b', 152.2, 66.2, 1.15, 152.26, 66.8, 1.95, 'gilt'], ['b', 138.84, 66.725, 1.325, 138.9, 67.075, 1.775, 'gilt']]);
+  /* G-HANG end teachers-study-5-east */
+  /* G-HANG teachers-study-5-middle */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('teachers-study-5-middle', [
+    ['b', 81.7, 63.1, 2.8, 81.76, 64.9, 4.2, 'tartan'], ['b', 72.3, 59.24, 1.15, 72.9, 59.3, 1.95, 'gilt'], ['b', 75.425, 59.24, 1.325, 75.775, 59.3, 1.775, 'gilt']]);
+  /* G-HANG end teachers-study-5-middle */
+  /* G-HANG teachers-study-5-southeast */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('teachers-study-5-southeast', [
+    ['b', 159.95, 11.1, 2.6, 160.01, 13.3, 4.2, 'tartan'], ['b', 157.3, 6.74, 1.15, 157.9, 6.8, 1.95, 'gilt'], ['b', 153.74, 14.725, 1.325, 153.8, 15.075, 1.775, 'gilt']]);
+  /* G-HANG end teachers-study-5-southeast */
+  /* G-HANG teachers-study-5-southwest */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('teachers-study-5-southwest', [
+    ['b', 20.8, 71.95, 3.2, 22.2, 72.01, 4.2, 'tartan'], ['b', 32.7, 60.8, 1.15, 32.76, 61.4, 1.95, 'gilt'], ['b', 25.525, 71.95, 1.325, 25.875, 72.01, 1.775, 'gilt']]);
+  /* G-HANG end teachers-study-5-southwest */
+  /* G-HANG teachers-study-5-west */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('teachers-study-5-west', [
+    ['b', 0.24, 43.9, 2.6, 0.3, 46.1, 4.2, 'tartan'], ['b', 11.4, 40.24, 1.15, 12.0, 40.3, 1.95, 'gilt'], ['b', 1.825, 40.24, 1.325, 2.175, 40.3, 1.775, 'gilt']]);
+  /* G-HANG end teachers-study-5-west */
+  /* G-HANG tudor-bay-5 */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 0 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('tudor-bay-5', [
+    ['b', 105.95, -6.51, 1.15, 106.55, -6.45, 1.95, 'gilt'], ['b', 106.275, -3.05, 1.325, 106.625, -2.99, 1.775, 'gilt']]);
+  /* G-HANG end tudor-bay-5 */
+  /* G-HANG west-stair-foot-5 */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('west-stair-foot-5', [
+    ['b', 0.85, 58.99, 0.4, 2.05, 59.05, 4.0, 'tartan'], ['b', 0.175, 63.95, 1.325, 0.525, 64.01, 1.775, 'gilt']]);
+  /* G-HANG end west-stair-foot-5 */
+  /* G-HANG west-wing-corridor-5-north */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 0 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('west-wing-corridor-5-north', [
+    ['b', 15.1, 23.7, 1.15, 15.16, 24.3, 1.95, 'gilt']]);
+  /* G-HANG end west-wing-corridor-5-north */
+  /* G-HANG west-wing-corridor-5-south */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 0 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('west-wing-corridor-5-south', [
+    ['b', 15.1, 47.1, 1.15, 15.16, 47.7, 1.95, 'gilt']]);
+  /* G-HANG end west-wing-corridor-5-south */
+  /* G-HANG arithmancy-classroom */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('arithmancy-classroom', [
+    ['b', 29.35, 12.65, 3.2, 29.41, 14.05, 4.2, 'tartan'], ['b', 27.75, 9.39, 1.15, 28.35, 9.45, 1.95, 'gilt']]);
+  /* G-HANG end arithmancy-classroom */
+  /* G-HANG arithmancy-passage */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 0 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('arithmancy-passage', [
+    ['b', 15.99, 5.25, 1.15, 16.05, 5.85, 1.95, 'gilt'], ['b', 17.95, 15.75, 1.15, 18.01, 16.35, 1.95, 'gilt']]);
+  /* G-HANG end arithmancy-passage */
+  /* G-HANG arithmancy-reading-room-6 */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 0 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('arithmancy-reading-room-6', [
+    ['b', 32.25, 6.45, 1.15, 32.31, 7.05, 1.95, 'gilt']]);
+  /* G-HANG end arithmancy-reading-room-6 */
+  /* G-HANG arithmancy-room-6 */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('arithmancy-room-6', [
+    ['b', 0.24, 22.6, 3.2, 0.3, 24.0, 4.2, 'tartan'], ['b', 12.1, 24.2, 1.15, 12.16, 24.8, 1.95, 'gilt']]);
+  /* G-HANG end arithmancy-room-6 */
+  /* G-HANG astronomy-stair-foot-6 */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('astronomy-stair-foot-6', [
+    ['b', 84.0, 68.7, 0.4, 85.2, 68.76, 4.0, 'tartan'], ['b', 87.7, 60.625, 1.325, 87.76, 60.975, 1.775, 'gilt']]);
+  /* G-HANG end astronomy-stair-foot-6 */
+  /* G-HANG back-stair-lobby-6 */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('back-stair-lobby-6', [
+    ['b', 67.95, 59.45, 0.4, 68.01, 60.65, 4.0, 'tartan'], ['b', 65.99, 53.65, 1.15, 66.05, 54.25, 1.95, 'gilt']]);
+  /* G-HANG end back-stair-lobby-6 */
+  /* G-HANG clock-room-6 */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 0 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('clock-room-6', [
+    ['b', 67.5, 8.625, 1.325, 67.56, 8.975, 1.775, 'gilt']]);
+  /* G-HANG end clock-room-6 */
+  /* G-HANG curiosities-cabinet */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 0 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('curiosities-cabinet', [
+    ['b', 159.7, 65.29, 1.15, 160.3, 65.35, 1.95, 'gilt'], ['b', 159.7, 78.65, 1.15, 160.3, 78.71, 1.95, 'gilt']]);
+  /* G-HANG end curiosities-cabinet */
+  /* G-HANG disused-classroom-6-east */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 0 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('disused-classroom-6-east', [
+    ['b', 129.14, 14.5, 1.15, 129.2, 15.1, 1.95, 'gilt']]);
+  /* G-HANG end disused-classroom-6-east */
+  /* G-HANG disused-classroom-6-middle */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 0 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('disused-classroom-6-middle', [
+    ['b', 126.94, 66.6, 1.15, 127.0, 67.2, 1.95, 'gilt']]);
+  /* G-HANG end disused-classroom-6-middle */
+  /* G-HANG disused-classroom-6-west-wing */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 0 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('disused-classroom-6-west-wing', [
+    ['b', 12.1, 37.77, 1.15, 12.16, 38.37, 1.95, 'gilt']]);
+  /* G-HANG end disused-classroom-6-west-wing */
+  /* G-HANG dovecote */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 0 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('dovecote', [
+    ['b', 154.997, -0.437, 1.325, 155.057, -0.087, 1.775, 'gilt']]);
+  /* G-HANG end dovecote */
+  /* G-HANG drum-bend-6 */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('drum-bend-6', [
+    ['b', 43.15, 11.3, 0.4, 44.35, 11.36, 4.0, 'tartan'], ['b', 36.75, 8.34, 1.15, 37.35, 8.4, 1.95, 'gilt'], ['b', 43.05, 8.34, 1.15, 43.65, 8.4, 1.95, 'gilt']]);
+  /* G-HANG end drum-bend-6 */
+  /* G-HANG drum-bend-6-east */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 0 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('drum-bend-6-east', [
+    ['b', 51.55, 3.65, 1.15, 51.61, 4.25, 1.95, 'gilt']]);
+  /* G-HANG end drum-bend-6-east */
+  /* G-HANG drum-bend-6-west */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 0 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('drum-bend-6-west', [
+    ['b', 34.75, 3.59, 1.15, 35.35, 3.65, 1.95, 'gilt']]);
+  /* G-HANG end drum-bend-6-west */
+  /* G-HANG east-wing-corridor-6 */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 2 tapestries, 3 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('east-wing-corridor-6', [
+    ['b', 144.84, 43.7, 0.4, 144.9, 44.9, 4.0, 'tartan'], ['b', 147.3, 42.2, 3.25, 147.36, 47.2, 4.35, 'tartan'], ['b', 147.3, 36.7, 1.15, 147.36, 37.3, 1.95, 'gilt'], ['b', 144.84, 47.9, 1.15, 144.9, 48.5, 1.95, 'gilt'],
+    ['b', 144.84, 20.1, 1.15, 144.9, 20.7, 1.95, 'gilt']]);
+  /* G-HANG end east-wing-corridor-6 */
+  /* G-HANG elves-linen-room-6-east-wing */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 0 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('elves-linen-room-6-east-wing', [
+    ['b', 147.84, 41.955, 1.325, 147.9, 42.305, 1.775, 'gilt']]);
+  /* G-HANG end elves-linen-room-6-east-wing */
+  /* G-HANG elves-linen-room-6-lake */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 0 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('elves-linen-room-6-lake', [
+    ['b', 143.825, 3.84, 1.325, 144.175, 3.9, 1.775, 'gilt']]);
+  /* G-HANG end elves-linen-room-6-lake */
+  /* G-HANG elves-linen-room-6-middle */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 0 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('elves-linen-room-6-middle', [
+    ['b', 59.225, 57.5, 1.325, 59.575, 57.56, 1.775, 'gilt']]);
+  /* G-HANG end elves-linen-room-6-middle */
+  /* G-HANG frog-choir-room-6 */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('frog-choir-room-6', [
+    ['b', 97.4, 17.95, 3.2, 98.8, 18.01, 4.2, 'tartan'], ['b', 92.24, 7.2, 1.15, 92.3, 7.8, 1.95, 'gilt']]);
+  /* G-HANG end frog-choir-room-6 */
+  /* G-HANG guest-rooms-6 */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('guest-rooms-6', [
+    ['b', 109.3, 17.95, 2.6, 111.5, 18.01, 4.2, 'tartan'], ['b', 110.225, 17.95, 1.325, 110.575, 18.01, 1.775, 'gilt'], ['b', 107.325, 17.95, 1.325, 107.675, 18.01, 1.775, 'gilt']]);
+  /* G-HANG end guest-rooms-6 */
+  /* G-HANG lake-corridor-6-middle */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('lake-corridor-6-middle', [
+    ['b', 51.45, 0.59, 0.4, 52.65, 0.65, 4.0, 'tartan'], ['b', 62.25, 2.15, 1.15, 62.31, 2.75, 1.95, 'gilt'], ['b', 56.45, 3.55, 1.15, 57.05, 3.61, 1.95, 'gilt']]);
+  /* G-HANG end lake-corridor-6-middle */
+  /* G-HANG lake-corridor-6-turn */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 0 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('lake-corridor-6-turn', [
+    ['b', 60.95, 6.85, 1.15, 61.55, 6.91, 1.95, 'gilt']]);
+  /* G-HANG end lake-corridor-6-turn */
+  /* G-HANG lake-corridor-6-west */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 2 tapestries, 3 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('lake-corridor-6-west', [
+    ['b', 30.65, 0.59, 0.4, 31.85, 0.65, 4.0, 'tartan'], ['b', 30.75, 3.55, 3.25, 35.75, 3.61, 4.35, 'tartan'], ['b', 6.99, 0.75, 1.15, 7.05, 1.35, 1.95, 'gilt'], ['b', 22.65, 0.59, 1.15, 23.25, 0.65, 1.95, 'gilt'],
+    ['b', 12.45, 3.55, 1.15, 13.05, 3.61, 1.95, 'gilt']]);
+  /* G-HANG end lake-corridor-6-west */
+  /* G-HANG north-range-corridor-6 */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 3 tapestries, 3 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('north-range-corridor-6', [
+    ['b', 92.75, 50.84, 0.4, 93.95, 50.9, 4.0, 'tartan'], ['b', 90.55, 53.3, 3.25, 95.55, 53.36, 4.35, 'tartan'], ['b', 90.25, 50.84, 2.3, 92.65, 50.9, 4.2, 'tartan'], ['b', 89.35, 50.84, 1.15, 89.95, 50.9, 1.95, 'gilt'],
+    ['b', 96.45, 53.3, 1.15, 97.05, 53.36, 1.95, 'gilt'], ['b', 66.35, 50.84, 1.15, 66.95, 50.9, 1.95, 'gilt']]);
+  /* G-HANG end north-range-corridor-6 */
+  /* G-HANG north-stair-foot-6 */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('north-stair-foot-6', [
+    ['b', 159.95, 63.25, 0.4, 160.01, 64.45, 4.0, 'tartan'], ['b', 159.95, 62.575, 1.325, 160.01, 62.925, 1.775, 'gilt']]);
+  /* G-HANG end north-stair-foot-6 */
+  /* G-HANG staff-bedroom-6-east */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('staff-bedroom-6-east', [
+    ['b', 145.4, 71.95, 3.2, 146.8, 72.01, 4.2, 'tartan'], ['b', 144.325, 71.95, 1.325, 144.675, 72.01, 1.775, 'gilt'], ['b', 139.84, 66.425, 1.325, 139.9, 66.775, 1.775, 'gilt']]);
+  /* G-HANG end staff-bedroom-6-east */
+  /* G-HANG staff-bedroom-6-east-wing */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('staff-bedroom-6-east-wing', [
+    ['b', 159.95, 22.2, 2.6, 160.01, 24.4, 4.2, 'tartan'], ['b', 154.125, 18.24, 1.325, 154.475, 18.3, 1.775, 'gilt'], ['b', 147.84, 24.525, 1.325, 147.9, 24.875, 1.775, 'gilt']]);
+  /* G-HANG end staff-bedroom-6-east-wing */
+  /* G-HANG staff-bedroom-6-middle */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('staff-bedroom-6-middle', [
+    ['b', 106.4, 71.7, 2.8, 108.2, 71.76, 4.2, 'tartan'], ['b', 113.5, 70.125, 1.325, 113.56, 70.475, 1.775, 'gilt'], ['b', 113.5, 59.225, 1.325, 113.56, 59.575, 1.775, 'gilt']]);
+  /* G-HANG end staff-bedroom-6-middle */
+  /* G-HANG staff-bedroom-6-west */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('staff-bedroom-6-west', [
+    ['b', 14.9, 71.95, 2.6, 17.1, 72.01, 4.2, 'tartan'], ['b', 8.24, 65.725, 1.325, 8.3, 66.075, 1.775, 'gilt'], ['b', 8.925, 59.24, 1.325, 9.275, 59.3, 1.775, 'gilt']]);
+  /* G-HANG end staff-bedroom-6-west */
+  /* G-HANG staff-bedrooms-6-lake */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('staff-bedrooms-6-lake', [
+    ['b', 121.9, 17.95, 2.8, 123.7, 18.01, 4.2, 'tartan'], ['b', 117.625, 3.84, 1.325, 117.975, 3.9, 1.775, 'gilt'], ['b', 116.84, 8.425, 1.325, 116.9, 8.775, 1.775, 'gilt']]);
+  /* G-HANG end staff-bedrooms-6-lake */
+  /* G-HANG study-room-6-west */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('study-room-6-west', [
+    ['b', 27.7, 72.0, 3.2, 29.1, 72.06, 4.2, 'tartan'], ['b', 25.4, 72.0, 1.15, 26.0, 72.06, 1.95, 'gilt']]);
+  /* G-HANG end study-room-6-west */
+  /* G-HANG study-room-6-west-wing */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('study-room-6-west-wing', [
+    ['b', 0.24, 43.93, 3.2, 0.3, 45.33, 4.2, 'tartan'], ['b', 6.8, 49.7, 1.15, 7.4, 49.76, 1.95, 'gilt']]);
+  /* G-HANG end study-room-6-west-wing */
+  /* G-HANG sw-stair-foot-6 */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('sw-stair-foot-6', [
+    ['b', -0.01, 10.35, 0.4, 0.05, 11.55, 4.0, 'tartan'], ['b', -0.01, 8.275, 1.325, 0.05, 8.625, 1.775, 'gilt']]);
+  /* G-HANG end sw-stair-foot-6 */
+  /* G-HANG teachers-study-6-astronomy */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('teachers-study-6-astronomy', [
+    ['b', 76.1, 68.7, 2.8, 77.9, 68.76, 4.2, 'tartan'], ['b', 72.24, 67.4, 1.15, 72.3, 68.0, 1.95, 'gilt'], ['b', 72.625, 68.7, 1.325, 72.975, 68.76, 1.775, 'gilt']]);
+  /* G-HANG end teachers-study-6-astronomy */
+  /* G-HANG teachers-study-6-east */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('teachers-study-6-east', [
+    ['b', 119.2, 71.95, 2.6, 121.4, 72.01, 4.2, 'tartan'], ['b', 114.04, 71.4, 1.15, 114.1, 72.0, 1.95, 'gilt'], ['b', 114.04, 62.825, 1.325, 114.1, 63.175, 1.775, 'gilt']]);
+  /* G-HANG end teachers-study-6-east */
+  /* G-HANG teachers-study-6-east-wing */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('teachers-study-6-east-wing', [
+    ['b', 159.95, 33.27, 3.2, 160.01, 34.67, 4.2, 'tartan'], ['b', 156.2, 39.03, 1.15, 156.8, 39.09, 1.95, 'gilt'], ['b', 157.425, 39.03, 1.325, 157.775, 39.09, 1.775, 'gilt']]);
+  /* G-HANG end teachers-study-6-east-wing */
+  /* G-HANG teachers-study-6-lake-east */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('teachers-study-6-lake-east', [
+    ['b', 159.95, 11.1, 2.6, 160.01, 13.3, 4.2, 'tartan'], ['b', 155.0, 17.7, 1.15, 155.6, 17.76, 1.95, 'gilt'], ['b', 159.95, 13.825, 1.325, 160.01, 14.175, 1.775, 'gilt']]);
+  /* G-HANG end teachers-study-6-lake-east */
+  /* G-HANG teachers-study-6-middle */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('teachers-study-6-middle', [
+    ['b', 93.6, 71.95, 2.8, 95.4, 72.01, 4.2, 'tartan'], ['b', 95.7, 71.95, 1.15, 96.3, 72.01, 1.95, 'gilt'], ['b', 100.6, 67.925, 1.325, 100.66, 68.275, 1.775, 'gilt']]);
+  /* G-HANG end teachers-study-6-middle */
+  /* G-HANG vectors-study-6 */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 0 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('vectors-study-6', [
+    ['b', 30.04, 15.8, 1.15, 30.1, 16.4, 1.95, 'gilt'], ['b', 34.525, 18.0, 1.325, 34.875, 18.06, 1.775, 'gilt']]);
+  /* G-HANG end vectors-study-6 */
+  /* G-HANG west-stair-foot-6 */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('west-stair-foot-6', [
+    ['b', -0.01, 62.75, 0.4, 0.05, 63.95, 4.0, 'tartan'], ['b', 5.075, 57.99, 1.325, 5.425, 58.05, 1.775, 'gilt']]);
+  /* G-HANG end west-stair-foot-6 */
+  /* G-HANG west-wing-corridor-6 */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 2 tapestries, 3 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('west-wing-corridor-6', [
+    ['b', 15.1, 45.5, 0.4, 15.16, 46.7, 4.0, 'tartan'], ['b', 15.1, 40.4, 3.25, 15.16, 45.4, 4.35, 'tartan'], ['b', 15.1, 23.0, 1.15, 15.16, 23.6, 1.95, 'gilt'], ['b', 15.1, 42.6, 1.15, 15.16, 43.2, 1.95, 'gilt'],
+    ['b', 12.64, 45.7, 1.15, 12.7, 46.3, 1.95, 'gilt']]);
+  /* G-HANG end west-wing-corridor-6 */
+  /* G-HANG astronomy-corridor-7 */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('astronomy-corridor-7', [
+    ['b', 99.2, 62.2, 0.4, 100.4, 62.26, 4.0, 'tartan'], ['b', 89.1, 59.24, 1.15, 89.7, 59.3, 1.95, 'gilt'], ['b', 97.9, 59.24, 1.15, 98.5, 59.3, 1.95, 'gilt']]);
+  /* G-HANG end astronomy-corridor-7 */
+  /* G-HANG astronomy-stair-foot-7 */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('astronomy-stair-foot-7', [
+    ['b', 84.4, 68.7, 0.4, 85.6, 68.76, 4.0, 'tartan'], ['b', 82.24, 60.625, 1.325, 82.3, 60.975, 1.775, 'gilt']]);
+  /* G-HANG end astronomy-stair-foot-7 */
+  /* G-HANG astronomy-waiting-room-7 */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('astronomy-waiting-room-7', [
+    ['b', 93.3, 68.95, 2.8, 95.1, 69.01, 4.2, 'tartan'], ['b', 90.6, 62.74, 1.15, 91.2, 62.8, 1.95, 'gilt'], ['b', 90.025, 62.74, 1.325, 90.375, 62.8, 1.775, 'gilt']]);
+  /* G-HANG end astronomy-waiting-room-7 */
+  /* G-HANG astronomy-warming-room */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('astronomy-warming-room', [
+    ['b', 100.95, 71.95, 2.6, 103.15, 72.01, 4.2, 'tartan'], ['b', 100.89, 69.975, 1.325, 100.95, 70.325, 1.775, 'gilt']]);
+  /* G-HANG end astronomy-warming-room */
+  /* G-HANG back-stair-lobby-7 */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('back-stair-lobby-7', [
+    ['b', 67.95, 59.45, 0.4, 68.01, 60.65, 4.0, 'tartan'], ['b', 67.35, 64.95, 1.15, 67.95, 65.01, 1.95, 'gilt']]);
+  /* G-HANG end back-stair-lobby-7 */
+  /* G-HANG drying-loft */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 0 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('drying-loft', [
+    ['b', 9.075, 0.59, 1.325, 9.425, 0.65, 1.775, 'gilt']]);
+  /* G-HANG end drying-loft */
+  /* G-HANG examiners-room-7 */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 0 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('examiners-room-7', [
+    ['b', 157.975, 8.49, 1.325, 158.325, 8.55, 1.775, 'gilt']]);
+  /* G-HANG end examiners-room-7 */
+  /* G-HANG feast-ladder-well */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 0 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('feast-ladder-well', [
+    ['b', 113.775, 63.99, 1.325, 114.125, 64.05, 1.775, 'gilt']]);
+  /* G-HANG end feast-ladder-well */
+  /* G-HANG headmaster-guest-rooms-7 */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('headmaster-guest-rooms-7', [
+    ['b', 63.7, 17.95, 2.6, 65.9, 18.01, 4.2, 'tartan'], ['b', 67.7, 13.525, 1.325, 67.76, 13.875, 1.775, 'gilt'], ['b', 66.825, 17.95, 1.325, 67.175, 18.01, 1.775, 'gilt']]);
+  /* G-HANG end headmaster-guest-rooms-7 */
+  /* G-HANG headmaster-guest-sitting-room-7 */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('headmaster-guest-sitting-room-7', [
+    ['b', 55.84, 11.75, 2.8, 55.9, 13.55, 4.2, 'tartan'], ['b', 55.84, 9.275, 1.325, 55.9, 9.625, 1.775, 'gilt'], ['b', 55.84, 7.575, 1.325, 55.9, 7.925, 1.775, 'gilt']]);
+  /* G-HANG end headmaster-guest-sitting-room-7 */
+  /* G-HANG heads-corridor */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 0 tapestries, 3 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('heads-corridor', [
+    ['b', 156.59, 20.45, 1.15, 156.65, 21.05, 1.95, 'gilt'], ['b', 156.59, 48.55, 1.15, 156.65, 49.15, 1.95, 'gilt'], ['b', 156.59, 28.25, 1.15, 156.65, 28.85, 1.95, 'gilt']]);
+  /* G-HANG end heads-corridor */
+  /* G-HANG lake-corridor-7-corner */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 0 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('lake-corridor-7-corner', [
+    ['b', 4.74, 0.9, 1.15, 4.8, 1.5, 1.95, 'gilt']]);
+  /* G-HANG end lake-corridor-7-corner */
+  /* G-HANG lake-corridor-7-west */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 2 tapestries, 3 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('lake-corridor-7-west', [
+    ['b', 13.5, 0.84, 0.4, 14.7, 0.9, 4.0, 'tartan'], ['b', 11.6, 3.3, 3.25, 16.6, 3.36, 4.35, 'tartan'], ['b', 8.9, 0.84, 1.15, 9.5, 0.9, 1.95, 'gilt'], ['b', 17.5, 3.3, 1.15, 18.1, 3.36, 1.95, 'gilt'],
+    ['b', 33.0, 0.84, 1.15, 33.6, 0.9, 1.95, 'gilt']]);
+  /* G-HANG end lake-corridor-7-west */
+  /* G-HANG north-landing-run-7 */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('north-landing-run-7', [
+    ['b', 79.15, 50.59, 0.4, 80.35, 50.65, 4.0, 'tartan'], ['b', 88.45, 51.15, 1.15, 88.51, 51.75, 1.95, 'gilt'], ['b', 87.25, 53.55, 1.15, 87.85, 53.61, 1.95, 'gilt']]);
+  /* G-HANG end north-landing-run-7 */
+  /* G-HANG north-tower-passage */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 0 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('north-tower-passage', [
+    ['b', 159.95, 61.35, 1.15, 160.01, 61.95, 1.95, 'gilt']]);
+  /* G-HANG end north-tower-passage */
+  /* G-HANG old-exam-hall */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('old-exam-hall', [
+    ['b', 149.75, 25.39, 5.6, 152.15, 25.45, 7.5, 'tartan'], ['b', 145.99, 46.15, 1.15, 146.05, 46.75, 1.95, 'gilt'], ['b', 150.85, 25.39, 1.15, 151.45, 25.45, 1.95, 'gilt']]);
+  /* G-HANG end old-exam-hall */
+  /* G-HANG seventh-floor-north-corridor-east */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 3 tapestries, 3 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('seventh-floor-north-corridor-east', [
+    ['b', 134.15, 50.59, 0.4, 135.35, 50.65, 4.0, 'tartan'], ['b', 132.15, 53.55, 3.25, 137.15, 53.61, 4.35, 'tartan'], ['b', 131.65, 50.59, 2.3, 134.05, 50.65, 4.2, 'tartan'], ['b', 138.05, 50.59, 1.15, 138.65, 50.65, 1.95, 'gilt'],
+    ['b', 101.95, 50.59, 1.15, 102.55, 50.65, 1.95, 'gilt'], ['b', 108.15, 50.59, 1.15, 108.75, 50.65, 1.95, 'gilt']]);
+  /* G-HANG end seventh-floor-north-corridor-east */
+  /* G-HANG sir-cadogans-landing-7 */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 0 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('sir-cadogans-landing-7', [
+    ['b', 146.49, 54.75, 1.15, 146.55, 55.35, 1.95, 'gilt']]);
+  /* G-HANG end sir-cadogans-landing-7 */
+  /* G-HANG staff-bedroom-7-north */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('staff-bedroom-7-north', [
+    ['b', 26.9, 72.0, 3.2, 28.3, 72.06, 4.2, 'tartan'], ['b', 22.74, 61.425, 1.325, 22.8, 61.775, 1.775, 'gilt'], ['b', 29.125, 59.64, 1.325, 29.475, 59.7, 1.775, 'gilt']]);
+  /* G-HANG end staff-bedroom-7-north */
+  /* G-HANG staff-bedroom-7-west */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('staff-bedroom-7-west', [
+    ['b', 0.24, 22.2, 2.6, 0.3, 24.4, 4.2, 'tartan'], ['b', 0.24, 20.525, 1.325, 0.3, 20.875, 1.775, 'gilt'], ['b', 12.1, 24.225, 1.325, 12.16, 24.575, 1.775, 'gilt']]);
+  /* G-HANG end staff-bedroom-7-west */
+  /* G-HANG staff-bedrooms-7 */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('staff-bedrooms-7', [
+    ['b', 27.49, 17.95, 2.6, 29.69, 18.01, 4.2, 'tartan'], ['b', 35.49, 14.925, 1.325, 35.55, 15.275, 1.775, 'gilt'], ['b', 29.315, 17.95, 1.325, 29.665, 18.01, 1.775, 'gilt']]);
+  /* G-HANG end staff-bedrooms-7 */
+  /* G-HANG study-room-7-east */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('study-room-7-east', [
+    ['b', 132.15, 68.95, 3.2, 133.55, 69.01, 4.2, 'tartan'], ['b', 127.25, 59.24, 1.15, 127.85, 59.3, 1.95, 'gilt']]);
+  /* G-HANG end study-room-7-east */
+  /* G-HANG study-room-7-west */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('study-room-7-west', [
+    ['b', 0.24, 33.27, 3.2, 0.3, 34.67, 4.2, 'tartan'], ['b', 0.3, 28.91, 1.15, 0.9, 28.97, 1.95, 'gilt']]);
+  /* G-HANG end study-room-7-west */
+  /* G-HANG sw-stair-foot-7 */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('sw-stair-foot-7', [
+    ['b', 0.55, 11.95, 0.4, 1.75, 12.01, 4.0, 'tartan'], ['b', -0.01, 11.375, 1.325, 0.05, 11.725, 1.775, 'gilt']]);
+  /* G-HANG end sw-stair-foot-7 */
+  /* G-HANG teachers-study-7-east-a */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('teachers-study-7-east-a', [
+    ['b', 120.05, 68.95, 2.6, 122.25, 69.01, 4.2, 'tartan'], ['b', 122.15, 59.24, 1.15, 122.75, 59.3, 1.95, 'gilt'], ['b', 115.19, 59.225, 1.325, 115.25, 59.575, 1.775, 'gilt']]);
+  /* G-HANG end teachers-study-7-east-a */
+  /* G-HANG teachers-study-7-east-b */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('teachers-study-7-east-b', [
+    ['b', 147.85, 68.95, 3.2, 149.25, 69.01, 4.2, 'tartan'], ['b', 145.35, 68.95, 1.15, 145.95, 69.01, 1.95, 'gilt'], ['b', 151.95, 68.025, 1.325, 152.01, 68.375, 1.775, 'gilt']]);
+  /* G-HANG end teachers-study-7-east-b */
+  /* G-HANG teachers-study-7-north */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('teachers-study-7-north', [
+    ['b', 75.9, 68.7, 2.6, 78.1, 68.76, 4.2, 'tartan'], ['b', 72.24, 59.5, 1.15, 72.3, 60.1, 1.95, 'gilt'], ['b', 72.24, 61.125, 1.325, 72.3, 61.475, 1.775, 'gilt']]);
+  /* G-HANG end teachers-study-7-north */
+  /* G-HANG teachers-study-7-west */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('teachers-study-7-west', [
+    ['b', 14.3, 71.95, 2.8, 16.1, 72.01, 4.2, 'tartan'], ['b', 20.4, 71.95, 1.15, 21.0, 72.01, 1.95, 'gilt'], ['b', 16.125, 59.24, 1.325, 16.475, 59.3, 1.775, 'gilt']]);
+  /* G-HANG end teachers-study-7-west */
+  /* G-HANG west-corridor-7 */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('west-corridor-7', [
+    ['b', 1.25, 53.3, 0.4, 2.45, 53.36, 4.0, 'tartan'], ['b', -0.01, 52.6, 1.15, 0.05, 53.2, 1.95, 'gilt'], ['b', 0.05, 50.84, 1.15, 0.65, 50.9, 1.95, 'gilt']]);
+  /* G-HANG end west-corridor-7 */
+  /* G-HANG west-range-corridor-7 */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 2 tapestries, 3 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('west-range-corridor-7', [
+    ['b', 12.64, 45.6, 0.4, 12.7, 46.8, 4.0, 'tartan'], ['b', 15.1, 44.7, 3.25, 15.16, 49.7, 4.35, 'tartan'], ['b', 15.1, 29.4, 1.15, 15.16, 30.0, 1.95, 'gilt'], ['b', 15.1, 39.5, 1.15, 15.16, 40.1, 1.95, 'gilt'],
+    ['b', 15.1, 28.4, 1.15, 15.16, 29.0, 1.95, 'gilt']]);
+  /* G-HANG end west-range-corridor-7 */
+  /* G-HANG west-stair-foot-7 */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('west-stair-foot-7', [
+    ['b', -0.01, 62.75, 0.4, 0.05, 63.95, 4.0, 'tartan'], ['b', -0.025, 57.99, 1.325, 0.325, 58.05, 1.775, 'gilt']]);
+  /* G-HANG end west-stair-foot-7 */
+  /* G-HANG wind-harp-room */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 0 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
+  add('wind-harp-room', [
+    ['b', -0.3, 4.75, 1.15, 0.3, 4.81, 1.95, 'gilt'], ['b', 4.75, -0.3, 1.15, 4.81, 0.3, 1.95, 'gilt']]);
+  /* G-HANG end wind-harp-room */
+  /* G-HANG dumbledores-office */
+  /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 0 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang; NOT PLACED: hang-dumbledores-office-1 (t 1.8x1.4), hang-dumbledores-office-2 (f 0.9x1.2), hang-dumbledores-office-3 (f 0.9x1.2), hang-dumbledores-office-4 (f 0.9x1.2) */
+  add('dumbledores-office', [
+    ['b', 161.49, 39.6, 0.5, 161.55, 40.4, 2.3, 'gilt']]);
+  /* G-HANG end dumbledores-office */
+  /* G-ADDS transfiguration-teachers-study-1 */
+  /* NOW (floor-1-by-purpose-1031.md): writing-desk-1, oak-chair-1, bookcase-1, hearth-rug-1, fire-irons-1, sweet-tin-1, silver-teapot-1, squab-cushion-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-1.js for collision only */
+  add('transfiguration-teachers-study-1', [
+    ['b', 152.27, 54.25, 0, 152.82, 55.25, 0.78, 'oak'], ['b', 155.45, 53.52, 0, 155.95, 54.02, 0.9, 'oak'], ['b', 156.0, 53.52, 0, 157.0, 53.82, 1.9, 'oak'], ['b', 153.6, 56.98, 0, 155.0, 57.98, 0.012, 'tartan'],
+    ['b', 152.27, 56.3, 0, 152.57, 56.6, 0.7, 'iron'], ['y', 154.287, 56.01, 0.06, 0.76, 0.84, 'tin'], ['b', 154.249, 56.13, 0.76, 154.449, 56.25, 0.94, 'steel'], ['b', 154.52, 55.93, 0.76, 154.92, 56.33, 0.84, 'scarlet']]);
+  /* G-ADDS end transfiguration-teachers-study-1 */
+  /* G-ADDS west-dispensary */
+  /* NOW (floor-1-by-purpose-1031.md): medicine-cabinet-1, labelled-bottle-1, beam-balance-1, mortar-1, still-room-book-1, rim-lock-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-1.js for collision only */
+  add('west-dispensary', [
+    ['b', 21.63, 5.04, 1.2, 21.84, 5.64, 2.0, 'white'], ['y', 27.2, 10.542, 0.035, 0.95, 1.15, 'green'], ['b', 27.171, 10.625, 0.95, 27.471, 10.725, 1.3, 'brass'], ['y', 27.2, 10.808, 0.06, 0.95, 1.05, 'steel'],
+    ['b', 21.63, 17.215, 1.3, 21.69, 17.465, 1.62, 'books'], ['b', 24.58, 17.95, 1.0, 24.78, 18.01, 1.15, 'iron']]);
+  /* G-ADDS end west-dispensary */
+  /* G-ADDS transfiguration-prep-room-1 */
+  /* NOW (floor-1-by-purpose-1031.md): match-1, needle-card-1, blackboard-1, herbarium-cabinet-1, worktable-1, match-1, needle-card-1, sweet-tin-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-1.js for collision only */
+  add('transfiguration-prep-room-1', [
+    ['b', 146.086, 60.77, 0.76, 146.136, 60.78, 0.77, 'pine'], ['b', 146.061, 60.83, 0.76, 146.161, 60.84, 0.9, 'paper'], ['b', 145.09, 59.3, 1.0, 145.14, 61.1, 2.0, 'black'], ['b', 146.5, 59.27, 0, 147.4, 59.67, 1.3, 'oak'],
+    ['b', 145.12, 59.3, 0, 145.82, 60.7, 0.8, 'deal'], ['b', 146.086, 60.89, 0.76, 146.136, 60.9, 0.77, 'pine'], ['b', 146.061, 60.95, 0.76, 146.161, 60.96, 0.9, 'paper'], ['y', 146.111, 61.075, 0.06, 0.76, 0.84, 'tin']]);
+  /* G-ADDS end transfiguration-prep-room-1 */
+  /* G-ADDS history-of-magic-lecture-hall */
+  /* NOW (floor-1-by-purpose-1031.md): plank-bench-1, oak-lectern-1, longcase-clock-1, plank-bench-1, oak-lectern-1, globe-1; NOT PLACED for want of a clear spot: history-chart-1, history-chart-1, history-chart-1, history-chart-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-1.js for collision only */
+  add('history-of-magic-lecture-hall', [
+    ['b', 92.27, 11.45, 0.42, 92.65, 12.75, 0.47, 'pine'], ['b', 92.3, 11.52, 0, 92.6, 11.58, 0.42, 'pine'], ['b', 92.3, 12.62, 0, 92.6, 12.68, 0.42, 'pine'], ['b', 103.3, 3.87, 0, 103.9, 4.37, 1.2, 'oak'],
+    ['b', 97.25, 15.43, 0, 97.75, 15.73, 2.0, 'oak'], ['b', 119.35, 11.45, 0.42, 119.73, 12.75, 0.47, 'pine'], ['b', 119.4, 11.52, 0, 119.7, 11.58, 0.42, 'pine'], ['b', 119.4, 12.62, 0, 119.7, 12.68, 0.42, 'pine'],
+    ['b', 103.3, 15.23, 0, 103.9, 15.73, 1.2, 'oak'], ['y', 93.9, 15.45, 0.2, 0, 0.04, 'wood'], ['y', 93.9, 15.45, 0.03, 0.04, 1.0, 'wood'], ['y', 93.9, 15.45, 0.24, 1.0, 1.45, 'blue'],
+    ['y', 93.9, 15.45, 0.27, 1.25, 1.5, 'linen']]);
+  /* G-ADDS end history-of-magic-lecture-hall */
+  /* G-ADDS empty-classroom-1 */
+  /* NOW (floor-1-by-purpose-1031.md): single-desk-1, masters-desk-1, blackboard-1, folded-curtain-1, double-desk-1; stand-in gap, no emitter: ring-chandelier-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-1.js for collision only */
+  add('empty-classroom-1', [
+    ['b', 0.27, 34.92, 0, 0.77, 35.82, 0.75, 'oak'], ['b', 0.27, 28.97, 0, 0.97, 30.37, 0.95, 'oak'], ['b', 0.24, 34.97, 1.0, 0.29, 36.77, 2.0, 'black'], ['b', 7.713, 30.316, 0.82, 8.073, 30.576, 0.9, 'linen'],
+    ['b', 0.95, 38.56, 0, 2.25, 39.06, 0.75, 'oak']]);
+  /* G-ADDS end empty-classroom-1 */
+  /* G-ADDS lake-corridor-1-west */
+  /* NOW (floor-1-by-purpose-1031.md): plank-bench-1, umbrella-1, noticeboard-1, longcase-clock-1; NOT PLACED for want of a clear spot: stair-runner-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-1.js for collision only */
+  add('lake-corridor-1-west', [
+    ['b', 10.15, 2.95, 0.42, 11.45, 3.33, 0.47, 'pine'], ['b', 10.22, 3.0, 0, 10.28, 3.3, 0.42, 'pine'], ['b', 11.32, 3.0, 0, 11.38, 3.3, 0.42, 'pine'], ['b', 13.17, 0.84, 0.8, 13.23, 0.91, 1.7, 'black'],
+    ['b', 26.0, 3.31, 1.3, 27.0, 3.36, 2.0, 'pine'], ['b', 7.25, 3.03, 0, 7.75, 3.33, 2.0, 'oak']]);
+  /* G-ADDS end lake-corridor-1-west */
+  /* G-ADDS lake-corridor-1-mid */
+  /* NOW (floor-1-by-purpose-1031.md): plank-bench-1, umbrella-1, noticeboard-1, longcase-clock-1; NOT PLACED for want of a clear spot: stair-runner-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-1.js for collision only */
+  add('lake-corridor-1-mid', [
+    ['b', 62.14, 0.87, 0.42, 63.44, 1.25, 0.47, 'pine'], ['b', 62.21, 0.9, 0, 62.27, 1.2, 0.42, 'pine'], ['b', 63.31, 0.9, 0, 63.37, 1.2, 0.42, 'pine'], ['b', 54.46, 3.29, 0.8, 54.52, 3.36, 1.7, 'black'],
+    ['b', 48.89, 0.84, 1.3, 49.89, 0.89, 2.0, 'pine'], ['b', 50.44, 0.87, 0, 50.94, 1.17, 2.0, 'oak']]);
+  /* G-ADDS end lake-corridor-1-mid */
+  /* G-ADDS drum-bend-1-west */
+  /* NOW (floor-1-by-purpose-1031.md): stair-runner-1, plank-bench-1, umbrella-1, noticeboard-1, longcase-clock-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-1.js for collision only */
+  add('drum-bend-1-west', [
+    ['b', 33.52, 6.2, 0, 35.52, 7.2, 0.01, 'scarlet'], ['b', 33.06, 6.75, 0.42, 33.44, 8.05, 0.47, 'pine'], ['b', 33.09, 6.82, 0, 33.39, 6.88, 0.42, 'pine'], ['b', 33.09, 7.92, 0, 33.39, 7.98, 0.42, 'pine'],
+    ['b', 33.03, 5.57, 0.8, 33.1, 5.63, 1.7, 'black'], ['b', 35.5, 5.3, 1.3, 35.55, 6.3, 2.0, 'pine'], ['b', 33.06, 5.75, 0, 33.36, 6.25, 2.0, 'oak']]);
+  /* G-ADDS end drum-bend-1-west */
+  /* G-ADDS drum-bend-1 */
+  /* NOW (floor-1-by-purpose-1031.md): plank-bench-1, umbrella-1, noticeboard-1, longcase-clock-1; NOT PLACED for want of a clear spot: stair-runner-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-1.js for collision only */
+  add('drum-bend-1', [
+    ['b', 37.34, 10.95, 0.42, 38.64, 11.33, 0.47, 'pine'], ['b', 37.41, 11.0, 0, 37.47, 11.3, 0.42, 'pine'], ['b', 38.51, 11.0, 0, 38.57, 11.3, 0.42, 'pine'], ['b', 44.66, 8.34, 0.8, 44.72, 8.41, 1.7, 'black'],
+    ['b', 38.49, 8.34, 1.3, 39.49, 8.39, 2.0, 'pine'], ['b', 39.54, 8.37, 0, 40.04, 8.67, 2.0, 'oak']]);
+  /* G-ADDS end drum-bend-1 */
+  /* G-ADDS drum-bend-1-east */
+  /* NOW (floor-1-by-purpose-1031.md): stair-runner-1, plank-bench-1, umbrella-1, noticeboard-1, longcase-clock-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-1.js for collision only */
+  add('drum-bend-1-east', [
+    ['b', 48.86, 5.3, 0, 50.86, 6.3, 0.01, 'scarlet'], ['b', 50.94, 5.25, 0.42, 51.32, 6.55, 0.47, 'pine'], ['b', 50.99, 5.32, 0, 51.29, 5.38, 0.42, 'pine'], ['b', 50.99, 6.42, 0, 51.29, 6.48, 0.42, 'pine'],
+    ['b', 51.28, 9.77, 0.8, 51.35, 9.83, 1.7, 'black'], ['b', 48.83, 5.3, 1.3, 48.88, 6.3, 2.0, 'pine'], ['b', 48.86, 6.35, 0, 49.16, 6.85, 2.0, 'oak']]);
+  /* G-ADDS end drum-bend-1-east */
+  /* G-ADDS loop-gallery-1 */
+  /* NOW (floor-1-by-purpose-1031.md): stool-1, joined-table-1, telescope-stand-1, box-settle-1, squab-cushion-1, plank-bench-1; NOT PLACED for want of a clear spot: squab-cushion-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-1.js for collision only */
+  add('loop-gallery-1', [
+    ['y', 111.65, -2.48, 0.17, 0.43, 0.47, 'pine'], ['b', 111.73, -2.4, 0, 111.77, -2.36, 0.43, 'pine'], ['b', 111.53, -2.4, 0, 111.57, -2.36, 0.43, 'pine'], ['b', 111.73, -2.6, 0, 111.77, -2.56, 0.43, 'pine'],
+    ['b', 111.53, -2.6, 0, 111.57, -2.56, 0.43, 'pine'], ['b', 115.2, -0.62, 0, 116.7, 0.18, 0.78, 'oak'], ['b', 109.8, -2.68, 0, 110.1, -2.38, 1.3, 'brass'], ['b', 114.3, -2.68, 0, 115.8, -2.18, 0.9, 'oak'],
+    ['b', 115.218, -0.605, 0.78, 115.618, -0.205, 0.86, 'scarlet'], ['b', 115.9, -2.68, 0.42, 117.2, -2.3, 0.47, 'pine'], ['b', 115.97, -2.65, 0, 116.03, -2.35, 0.42, 'pine'], ['b', 117.07, -2.65, 0, 117.13, -2.35, 0.42, 'pine']]);
+  /* G-ADDS end loop-gallery-1 */
 })(window.SHELL_W5A.things);
 /* G-ADDS finish */
 /* G-PURPOSE begin */
@@ -3854,3 +8535,7697 @@ window.SHELL_W5A = {
   /* G-TOUCHES end washrooms-g */
 })(window.SHELL_W5A.things);
 /* G-TOUCHES finish */
+
+/* HAND hospital-wing (Architect, 1 November 2026; Godric on req 2306: a cart for pushing supplies to the beds, a portable screen beside a bed). Written by hand, not by tools/architect-now.py: 
+   the cart stands in the aisle at x 155.1 to 155.7, y 39.4 to 40.5 (steel frame, two shelves, push handle, basin, linen, phials, a covered pan, bandages); the screen of three panels beside the west bed at y 33.75 to 34.75. */
+(function (T) {
+  T['hospital-wing'] = T['hospital-wing'] || { items: [] };
+  T['hospital-wing'].items = T['hospital-wing'].items.concat([
+    ['b', 155.100, 39.400, 0.820, 155.700, 40.500, 0.860, 'steel'],
+    ['b', 155.100, 39.400, 0.200, 155.700, 40.500, 0.230, 'steel'],
+    ['b', 155.100, 39.400, 0.000, 155.130, 39.430, 0.820, 'steel'],
+    ['b', 155.100, 40.470, 0.000, 155.130, 40.500, 0.820, 'steel'],
+    ['b', 155.670, 39.400, 0.000, 155.700, 39.430, 0.820, 'steel'],
+    ['b', 155.670, 40.470, 0.000, 155.700, 40.500, 0.820, 'steel'],
+    ['b', 155.100, 40.470, 0.860, 155.130, 40.500, 1.020, 'steel'],
+    ['b', 155.670, 40.470, 0.860, 155.700, 40.500, 1.020, 'steel'],
+    ['b', 155.100, 40.470, 0.990, 155.700, 40.500, 1.020, 'steel'],
+    ['b', 155.180, 39.480, 0.860, 155.500, 39.800, 0.930, 'white'],
+    ['b', 155.200, 39.900, 0.860, 155.620, 40.200, 1.000, 'linen'],
+    ['b', 155.550, 39.500, 0.860, 155.610, 39.560, 0.980, 'glass'],
+    ['b', 155.450, 39.500, 0.860, 155.510, 39.560, 0.950, 'glass'],
+    ['b', 155.180, 39.550, 0.230, 155.620, 39.950, 0.300, 'white'],
+    ['b', 155.200, 40.050, 0.230, 155.600, 40.350, 0.330, 'linen'],
+    ['b', 153.600, 33.550, 0.120, 153.620, 33.980, 1.650, 'white'],
+    ['b', 153.590, 33.550, 0.080, 153.630, 33.980, 0.120, 'wood'],
+    ['b', 153.590, 33.550, 1.650, 153.630, 33.980, 1.700, 'wood'],
+    ['b', 153.590, 33.550, 0.080, 153.630, 33.590, 1.700, 'wood'],
+    ['b', 153.590, 33.940, 0.080, 153.630, 33.980, 1.700, 'wood'],
+    ['b', 153.820, 34.000, 0.120, 153.840, 34.430, 1.650, 'white'],
+    ['b', 153.810, 34.000, 0.080, 153.850, 34.430, 0.120, 'wood'],
+    ['b', 153.810, 34.000, 1.650, 153.850, 34.430, 1.700, 'wood'],
+    ['b', 153.810, 34.000, 0.080, 153.850, 34.040, 1.700, 'wood'],
+    ['b', 153.810, 34.390, 0.080, 153.850, 34.430, 1.700, 'wood'],
+    ['b', 153.600, 34.450, 0.120, 153.620, 34.880, 1.650, 'white'],
+    ['b', 153.590, 34.450, 0.080, 153.630, 34.880, 0.120, 'wood'],
+    ['b', 153.590, 34.450, 1.650, 153.630, 34.880, 1.700, 'wood'],
+    ['b', 153.590, 34.450, 0.080, 153.630, 34.490, 1.700, 'wood'],
+    ['b', 153.590, 34.840, 0.080, 153.630, 34.880, 1.700, 'wood']]);
+})(window.SHELL_W5A.things);
+/* HAND2 begin charms-classroom */
+/* Godric, req 2317: the blackboard, shelves of what a spell is cast with and on, the master's diagram of the motions and the words, a glossary of the words' roots; sited by tools/architect-hand-rooms-1101.py, plain stand-ins (Objects draw the real ones) */
+(function (T) {
+  T['charms-classroom'] = T['charms-classroom'] || { items: [] };
+  T['charms-classroom'].items = T['charms-classroom'].items.concat([
+    ['b', 151.55, 65.65, 0.95, 151.6, 68.25, 2.1, 'wood'],
+    ['b', 151.52, 65.7, 1.0, 151.55, 68.2, 2.05, 'black'],
+    ['b', 151.4, 65.65, 0.9, 151.55, 68.25, 0.95, 'wood'],
+    ['b', 151.46, 66.09, 0.95, 151.52, 66.21, 0.97, 'white'],
+    ['b', 151.46, 66.25, 0.95, 151.52, 66.45, 0.96, 'dust'],
+    ['b', 142.15, 62.4, 1.3, 143.75, 62.66, 1.33, 'oak'],
+    ['b', 142.15, 62.4, 1.85, 143.75, 62.66, 1.88, 'oak'],
+    ['b', 142.15, 62.4, 1.3, 142.19, 62.66, 1.88, 'oak'],
+    ['b', 143.71, 62.4, 1.3, 143.75, 62.66, 1.88, 'oak'],
+    ['b', 142.32, 62.46, 1.33, 142.38, 62.52, 1.53, 'white'],
+    ['b', 142.46, 62.46, 1.33, 142.54, 62.54, 1.43, 'tin'],
+    ['b', 142.655, 62.46, 1.33, 142.745, 62.55, 1.42, 'amber'],
+    ['b', 142.865, 62.46, 1.33, 142.935, 62.53, 1.47, 'wood'],
+    ['b', 143.1, 62.46, 1.33, 143.2, 62.56, 1.43, 'copper'],
+    ['b', 143.36, 62.46, 1.33, 143.44, 62.54, 1.45, 'stone'],
+    ['b', 143.57, 62.46, 1.33, 143.63, 62.52, 1.43, 'white'],
+    ['b', 142.29, 62.46, 1.88, 142.41, 62.58, 2.04, 'linen'],
+    ['b', 142.6, 62.46, 1.88, 142.7, 62.56, 2.1, 'ruby'],
+    ['b', 142.88, 62.46, 1.88, 143.02, 62.6, 2.02, 'glass'],
+    ['b', 143.21, 62.46, 1.88, 143.29, 62.54, 1.98, 'iron'],
+    ['b', 143.49, 62.46, 1.88, 143.61, 62.58, 2.06, 'petals'],
+    ['b', 142.15, 71.14, 1.3, 143.75, 71.4, 1.33, 'oak'],
+    ['b', 142.15, 71.14, 1.85, 143.75, 71.4, 1.88, 'oak'],
+    ['b', 142.15, 71.14, 1.3, 142.19, 71.4, 1.88, 'oak'],
+    ['b', 143.71, 71.14, 1.3, 143.75, 71.4, 1.88, 'oak'],
+    ['b', 142.32, 71.28, 1.33, 142.38, 71.34, 1.53, 'white'],
+    ['b', 142.46, 71.26, 1.33, 142.54, 71.34, 1.43, 'tin'],
+    ['b', 142.655, 71.25, 1.33, 142.745, 71.34, 1.42, 'amber'],
+    ['b', 142.865, 71.27, 1.33, 142.935, 71.34, 1.47, 'wood'],
+    ['b', 143.1, 71.24, 1.33, 143.2, 71.34, 1.43, 'copper'],
+    ['b', 143.36, 71.26, 1.33, 143.44, 71.34, 1.45, 'stone'],
+    ['b', 143.57, 71.28, 1.33, 143.63, 71.34, 1.43, 'white'],
+    ['b', 142.29, 71.22, 1.88, 142.41, 71.34, 2.04, 'linen'],
+    ['b', 142.6, 71.24, 1.88, 142.7, 71.34, 2.1, 'ruby'],
+    ['b', 142.88, 71.2, 1.88, 143.02, 71.34, 2.02, 'glass'],
+    ['b', 143.21, 71.26, 1.88, 143.29, 71.34, 1.98, 'iron'],
+    ['b', 143.49, 71.22, 1.88, 143.61, 71.34, 2.06, 'petals'],
+    ['b', 146.32, 62.4, 2.47, 147.58, 62.48, 3.43, 'wood'],
+    ['b', 146.35, 62.48, 2.5, 147.55, 62.5, 3.4, 'linen'],
+    ['b', 146.63, 62.5, 2.62, 146.67, 62.51, 3.28, 'black'],
+    ['b', 146.93, 62.5, 2.62, 146.97, 62.51, 3.28, 'black'],
+    ['b', 147.23, 62.5, 2.62, 147.27, 62.51, 3.28, 'black'],
+    ['b', 146.42, 71.32, 2.47, 147.48, 71.4, 3.33, 'wood'],
+    ['b', 146.45, 71.3, 2.5, 147.45, 71.32, 3.3, 'white'],
+    ['b', 146.68, 71.29, 2.62, 146.72, 71.3, 3.18, 'black'],
+    ['b', 146.93, 71.29, 2.62, 146.97, 71.3, 3.18, 'black'],
+    ['b', 147.18, 71.29, 2.62, 147.22, 71.3, 3.18, 'black'],
+    ['b', 149.47, 71.32, 2.47, 150.43, 71.4, 3.23, 'wood'],
+    ['b', 149.5, 71.3, 2.5, 150.4, 71.32, 3.2, 'linen'],
+    ['b', 149.705, 71.29, 2.62, 149.745, 71.3, 3.08, 'black'],
+    ['b', 149.93, 71.29, 2.62, 149.97, 71.3, 3.08, 'black'],
+    ['b', 150.155, 71.29, 2.62, 150.195, 71.3, 3.08, 'black']]);
+})(window.SHELL_W5A.things);
+/* HAND2 end charms-classroom */
+/* HAND2 begin potions-classroom-b */
+/* Godric, req 2319: grim tapestries, iron wall torches (sources of light), a hearth; sited by tools/architect-hand-rooms-1101.py, plain stand-ins (Objects draw the real ones) */
+(function (T) {
+  T['potions-classroom-b'] = T['potions-classroom-b'] || { items: [] };
+  T['potions-classroom-b'].items = T['potions-classroom-b'].items.concat([
+    ['b', 5.15, 22.25, 2.5, 6.75, 22.33, 4.1, 'dust'],
+    ['b', 5.25, 22.33, 2.62, 6.65, 22.34, 3.98, 'stone'],
+    ['b', 5.1, 22.25, 4.1, 6.8, 22.34, 4.14, 'wood'],
+    ['b', 9.15, 22.25, 2.5, 10.75, 22.33, 4.1, 'blue'],
+    ['b', 9.25, 22.33, 2.62, 10.65, 22.34, 3.98, 'stone'],
+    ['b', 9.1, 22.25, 4.1, 10.8, 22.34, 4.14, 'wood'],
+    ['b', 0, 29.2, 2.5, 0.08, 30.8, 4.1, 'ruby'],
+    ['b', 0.08, 29.3, 2.62, 0.09, 30.7, 3.98, 'stone'],
+    ['b', 0, 29.15, 4.1, 0.09, 30.85, 4.14, 'wood'],
+    ['b', 15.92, 29.2, 2.5, 16, 30.8, 4.1, 'dust'],
+    ['b', 15.91, 29.3, 2.62, 15.92, 30.7, 3.98, 'stone'],
+    ['b', 15.91, 29.15, 4.1, 16, 30.85, 4.14, 'wood'],
+    ['b', 0, 24.45, 1.95, 0.04, 24.55, 2.15, 'iron'],
+    ['b', 0.04, 24.48, 2.0, 0.18, 24.52, 2.03, 'iron'],
+    ['b', 0.14, 24.47, 2.03, 0.2, 24.53, 2.3, 'flame'],
+    ['b', 0, 27.85, 1.95, 0.04, 27.95, 2.15, 'iron'],
+    ['b', 0.04, 27.88, 2.0, 0.18, 27.92, 2.03, 'iron'],
+    ['b', 0.14, 27.87, 2.03, 0.2, 27.93, 2.3, 'flame'],
+    ['b', 0, 31.25, 1.95, 0.04, 31.35, 2.15, 'iron'],
+    ['b', 0.04, 31.28, 2.0, 0.18, 31.32, 2.03, 'iron'],
+    ['b', 0.14, 31.27, 2.03, 0.2, 31.33, 2.3, 'flame'],
+    ['b', 0, 34.65, 1.95, 0.04, 34.75, 2.15, 'iron'],
+    ['b', 0.04, 34.68, 2.0, 0.18, 34.72, 2.03, 'iron'],
+    ['b', 0.14, 34.67, 2.03, 0.2, 34.73, 2.3, 'flame'],
+    ['b', 0, 38.05, 1.95, 0.04, 38.15, 2.15, 'iron'],
+    ['b', 0.04, 38.08, 2.0, 0.18, 38.12, 2.03, 'iron'],
+    ['b', 0.14, 38.07, 2.03, 0.2, 38.13, 2.3, 'flame'],
+    ['b', 0, 41.45, 1.95, 0.04, 41.55, 2.15, 'iron'],
+    ['b', 0.04, 41.48, 2.0, 0.18, 41.52, 2.03, 'iron'],
+    ['b', 0.14, 41.47, 2.03, 0.2, 41.53, 2.3, 'flame'],
+    ['b', 15.96, 24.45, 1.95, 16, 24.55, 2.15, 'iron'],
+    ['b', 15.82, 24.48, 2.0, 15.96, 24.52, 2.03, 'iron'],
+    ['b', 15.8, 24.47, 2.03, 15.86, 24.53, 2.3, 'flame'],
+    ['b', 15.96, 27.85, 1.95, 16, 27.95, 2.15, 'iron'],
+    ['b', 15.82, 27.88, 2.0, 15.96, 27.92, 2.03, 'iron'],
+    ['b', 15.8, 27.87, 2.03, 15.86, 27.93, 2.3, 'flame'],
+    ['b', 15.96, 31.25, 1.95, 16, 31.35, 2.15, 'iron'],
+    ['b', 15.82, 31.28, 2.0, 15.96, 31.32, 2.03, 'iron'],
+    ['b', 15.8, 31.27, 2.03, 15.86, 31.33, 2.3, 'flame'],
+    ['b', 15.96, 34.65, 1.95, 16, 34.75, 2.15, 'iron'],
+    ['b', 15.82, 34.68, 2.0, 15.96, 34.72, 2.03, 'iron'],
+    ['b', 15.8, 34.67, 2.03, 15.86, 34.73, 2.3, 'flame'],
+    ['b', 15.96, 38.05, 1.95, 16, 38.15, 2.15, 'iron'],
+    ['b', 15.82, 38.08, 2.0, 15.96, 38.12, 2.03, 'iron'],
+    ['b', 15.8, 38.07, 2.03, 15.86, 38.13, 2.3, 'flame'],
+    ['b', 15.96, 41.45, 1.95, 16, 41.55, 2.15, 'iron'],
+    ['b', 15.82, 41.48, 2.0, 15.96, 41.52, 2.03, 'iron'],
+    ['b', 15.8, 41.47, 2.03, 15.86, 41.53, 2.3, 'flame']]);
+  T['potions-classroom-b'].lights = (T['potions-classroom-b'].lights || []).concat([[0.17, 24.5, 2.35, 16757862, 1.1, 8], [0.17, 27.9, 2.35, 16757862, 1.1, 8], [0.17, 31.3, 2.35, 16757862, 1.1, 8], [0.17, 34.7, 2.35, 16757862, 1.1, 8], [0.17, 38.1, 2.35, 16757862, 1.1, 8], [0.17, 41.5, 2.35, 16757862, 1.1, 8], [15.83, 24.5, 2.35, 16757862, 1.1, 8], [15.83, 27.9, 2.35, 16757862, 1.1, 8], [15.83, 31.3, 2.35, 16757862, 1.1, 8], [15.83, 34.7, 2.35, 16757862, 1.1, 8], [15.83, 38.1, 2.35, 16757862, 1.1, 8], [15.83, 41.5, 2.35, 16757862, 1.1, 8]]);
+})(window.SHELL_W5A.things);
+/* HAND2 end potions-classroom-b */
+/* HAND2 begin history-of-magic-lecture-hall */
+/* Godric, req 2320: sources of light, maps, tapestries, curios on floating shelves; blackboard behind the lectern; sited by tools/architect-hand-rooms-1101.py, plain stand-ins (Objects draw the real ones) */
+(function (T) {
+  T['history-of-magic-lecture-hall'] = T['history-of-magic-lecture-hall'] || { items: [] };
+  T['history-of-magic-lecture-hall'].items = T['history-of-magic-lecture-hall'].items.concat([
+    ['b', 117.1, 3.85, 0.95, 119.7, 3.9, 2.1, 'wood'],
+    ['b', 117.15, 3.9, 1.0, 119.65, 3.93, 2.05, 'black'],
+    ['b', 117.1, 3.9, 0.9, 119.7, 4.05, 0.95, 'wood'],
+    ['b', 117.54, 3.93, 0.95, 117.66, 3.99, 0.97, 'white'],
+    ['b', 117.7, 3.93, 0.95, 117.9, 3.99, 0.96, 'dust'],
+    ['b', 98.97, 3.85, 2.47, 101.03, 3.93, 3.93, 'wood'],
+    ['b', 99.0, 3.93, 2.5, 101.0, 3.95, 3.9, 'linen'],
+    ['b', 99.48, 3.95, 2.62, 99.52, 3.96, 3.78, 'black'],
+    ['b', 99.98, 3.95, 2.62, 100.02, 3.96, 3.78, 'black'],
+    ['b', 100.48, 3.95, 2.62, 100.52, 3.96, 3.78, 'black'],
+    ['b', 106.97, 3.85, 2.47, 109.03, 3.93, 3.93, 'wood'],
+    ['b', 107.0, 3.93, 2.5, 109.0, 3.95, 3.9, 'petals'],
+    ['b', 107.48, 3.95, 2.62, 107.52, 3.96, 3.78, 'black'],
+    ['b', 107.98, 3.95, 2.62, 108.02, 3.96, 3.78, 'black'],
+    ['b', 108.48, 3.95, 2.62, 108.52, 3.96, 3.78, 'black'],
+    ['b', 94.17, 15.67, 2.47, 95.83, 15.75, 3.73, 'wood'],
+    ['b', 94.2, 15.65, 2.5, 95.8, 15.67, 3.7, 'linen'],
+    ['b', 94.58, 15.64, 2.62, 94.62, 15.65, 3.58, 'black'],
+    ['b', 94.98, 15.64, 2.62, 95.02, 15.65, 3.58, 'black'],
+    ['b', 95.38, 15.64, 2.62, 95.42, 15.65, 3.58, 'black'],
+    ['b', 103.0, 15.67, 2.5, 105.0, 15.75, 4.2, 'ruby'],
+    ['b', 103.1, 15.66, 2.62, 104.9, 15.67, 4.08, 'stone'],
+    ['b', 102.95, 15.66, 4.2, 105.05, 15.75, 4.24, 'wood'],
+    ['b', 111.0, 15.67, 2.5, 113.0, 15.75, 4.2, 'blue'],
+    ['b', 111.1, 15.66, 2.62, 112.9, 15.67, 4.08, 'stone'],
+    ['b', 110.95, 15.66, 4.2, 113.05, 15.75, 4.24, 'wood'],
+    ['b', 92.25, 6.8, 1.7, 92.47, 8.0, 1.73, 'oak'],
+    ['b', 92.3, 6.88, 1.73, 92.44, 7.02, 1.93, 'glass'],
+    ['b', 92.3, 7.15, 1.73, 92.4, 7.25, 1.87, 'copper'],
+    ['b', 92.3, 7.39, 1.73, 92.42, 7.51, 1.83, 'stone'],
+    ['b', 92.3, 7.65, 1.73, 92.4, 7.75, 1.97, 'amber'],
+    ['b', 92.3, 7.86, 1.73, 92.38, 7.94, 1.85, 'ruby'],
+    ['b', 92.25, 11.9, 1.7, 92.47, 13.1, 1.73, 'oak'],
+    ['b', 92.3, 11.98, 1.73, 92.44, 12.12, 1.93, 'glass'],
+    ['b', 92.3, 12.25, 1.73, 92.4, 12.35, 1.87, 'copper'],
+    ['b', 92.3, 12.49, 1.73, 92.42, 12.61, 1.83, 'stone'],
+    ['b', 92.3, 12.75, 1.73, 92.4, 12.85, 1.97, 'amber'],
+    ['b', 92.3, 12.96, 1.73, 92.38, 13.04, 1.85, 'ruby'],
+    ['b', 97.4, 3.85, 1.7, 98.6, 4.07, 1.73, 'oak'],
+    ['b', 97.48, 3.9, 1.73, 97.62, 4.04, 1.93, 'glass'],
+    ['b', 97.75, 3.9, 1.73, 97.85, 4.0, 1.87, 'copper'],
+    ['b', 97.99, 3.9, 1.73, 98.11, 4.02, 1.83, 'stone'],
+    ['b', 98.25, 3.9, 1.73, 98.35, 4.0, 1.97, 'amber'],
+    ['b', 98.46, 3.9, 1.73, 98.54, 3.98, 1.85, 'ruby'],
+    ['b', 115.4, 3.85, 1.7, 116.6, 4.07, 1.73, 'oak'],
+    ['b', 115.48, 3.9, 1.73, 115.62, 4.04, 1.93, 'glass'],
+    ['b', 115.75, 3.9, 1.73, 115.85, 4.0, 1.87, 'copper'],
+    ['b', 115.99, 3.9, 1.73, 116.11, 4.02, 1.83, 'stone'],
+    ['b', 116.25, 3.9, 1.73, 116.35, 4.0, 1.97, 'amber'],
+    ['b', 116.46, 3.9, 1.73, 116.54, 3.98, 1.85, 'ruby'],
+    ['b', 94.95, 3.85, 1.95, 95.05, 3.89, 2.15, 'iron'],
+    ['b', 94.98, 3.89, 2.0, 95.02, 4.03, 2.03, 'iron'],
+    ['b', 94.97, 3.99, 2.03, 95.03, 4.05, 2.3, 'flame'],
+    ['b', 100.95, 3.85, 1.95, 101.05, 3.89, 2.15, 'iron'],
+    ['b', 100.98, 3.89, 2.0, 101.02, 4.03, 2.03, 'iron'],
+    ['b', 100.97, 3.99, 2.03, 101.03, 4.05, 2.3, 'flame'],
+    ['b', 106.95, 3.85, 1.95, 107.05, 3.89, 2.15, 'iron'],
+    ['b', 106.98, 3.89, 2.0, 107.02, 4.03, 2.03, 'iron'],
+    ['b', 106.97, 3.99, 2.03, 107.03, 4.05, 2.3, 'flame'],
+    ['b', 112.95, 3.85, 1.95, 113.05, 3.89, 2.15, 'iron'],
+    ['b', 112.98, 3.89, 2.0, 113.02, 4.03, 2.03, 'iron'],
+    ['b', 112.97, 3.99, 2.03, 113.03, 4.05, 2.3, 'flame'],
+    ['b', 97.95, 15.71, 1.95, 98.05, 15.75, 2.15, 'iron'],
+    ['b', 97.98, 15.57, 2.0, 98.02, 15.71, 2.03, 'iron'],
+    ['b', 97.97, 15.55, 2.03, 98.03, 15.61, 2.3, 'flame'],
+    ['b', 103.95, 15.71, 1.95, 104.05, 15.75, 2.15, 'iron'],
+    ['b', 103.98, 15.57, 2.0, 104.02, 15.71, 2.03, 'iron'],
+    ['b', 103.97, 15.55, 2.03, 104.03, 15.61, 2.3, 'flame'],
+    ['b', 109.95, 15.71, 1.95, 110.05, 15.75, 2.15, 'iron'],
+    ['b', 109.98, 15.57, 2.0, 110.02, 15.71, 2.03, 'iron'],
+    ['b', 109.97, 15.55, 2.03, 110.03, 15.61, 2.3, 'flame'],
+    ['b', 115.95, 15.71, 1.95, 116.05, 15.75, 2.15, 'iron'],
+    ['b', 115.98, 15.57, 2.0, 116.02, 15.71, 2.03, 'iron'],
+    ['b', 115.97, 15.55, 2.03, 116.03, 15.61, 2.3, 'flame']]);
+  T['history-of-magic-lecture-hall'].lights = (T['history-of-magic-lecture-hall'].lights || []).concat([[95.0, 4.02, 2.35, 16757862, 1.1, 8], [101.0, 4.02, 2.35, 16757862, 1.1, 8], [107.0, 4.02, 2.35, 16757862, 1.1, 8], [113.0, 4.02, 2.35, 16757862, 1.1, 8], [98.0, 15.58, 2.35, 16757862, 1.1, 8], [104.0, 15.58, 2.35, 16757862, 1.1, 8], [110.0, 15.58, 2.35, 16757862, 1.1, 8], [116.0, 15.58, 2.35, 16757862, 1.1, 8]]);
+})(window.SHELL_W5A.things);
+/* HAND2 end history-of-magic-lecture-hall */
+/* HAND2 begin library-reading-room */
+/* Godric, req 2318: a portrait that shushes (a living frame, Events), a tapestry of scholars at the library of Alexandria (a wink at Clementine); sited by tools/architect-hand-rooms-1101.py, plain stand-ins (Objects draw the real ones) */
+(function (T) {
+  T['library-reading-room'] = T['library-reading-room'] || { items: [] };
+  T['library-reading-room'].items = T['library-reading-room'].items.concat([
+    ['b', 49.15, 55.95, 2.5, 49.23, 58.15, 4.1, 'amber'],
+    ['b', 49.23, 56.05, 2.62, 49.24, 58.05, 3.98, 'stone'],
+    ['b', 49.15, 55.9, 4.1, 49.24, 58.2, 4.14, 'wood'],
+    ['b', 57.77, 56.2, 1.5, 57.85, 56.9, 2.4, 'gilt'],
+    ['b', 57.76, 56.25, 1.55, 57.77, 56.85, 2.35, 'black'],
+    ['b', 57.77, 58.25, 1.5, 57.85, 58.85, 2.3, 'gilt'],
+    ['b', 57.76, 58.3, 1.55, 57.77, 58.8, 2.25, 'black'],
+    ['b', 50.7, 54, 2.9, 52.3, 54.08, 4.1, 'blue'],
+    ['b', 50.8, 54.08, 3.02, 52.2, 54.09, 3.98, 'stone'],
+    ['b', 50.65, 54, 4.1, 52.35, 54.09, 4.14, 'wood']]);
+})(window.SHELL_W5A.things);
+/* HAND2 end library-reading-room */
+/* HAND2 begin scullery */
+/* Interiors req 2423 sec 9: light (hanging lamp, brackets, boiler firebox), a rota, pump, plate racks scrubbing in the sink, pots on hooks, mangle, tubs; sited by tools/architect-hand-rooms-1101.py, plain stand-ins (Objects draw the real ones) */
+(function (T) {
+  T['scullery'] = T['scullery'] || { items: [] };
+  T['scullery'].items = T['scullery'].items.concat([
+    ['b', 79.78, 56.25, 0, 80.58, 57.25, 0.7, 'stone'],
+    ['b', 79.76, 56.55, 0.1, 79.78, 56.95, 0.45, 'black'],
+    ['b', 79.78, 56.6, 0.12, 80.08, 56.9, 0.3, 'flame'],
+    ['b', 79.78, 56.3, 0.7, 80.58, 57.2, 1.5, 'copper'],
+    ['b', 79.68, 56.71, 1.0, 79.78, 56.79, 1.05, 'copper'],
+    ['b', 77.82, 57.15, 1.9, 79.62, 57.25, 1.93, 'iron'],
+    ['b', 77.85, 56.87, 1.6, 78.19, 57.21, 1.9, 'copper'],
+    ['b', 78.22, 56.91, 1.64, 78.52, 57.21, 1.9, 'copper'],
+    ['b', 78.59, 56.95, 1.68, 78.85, 57.21, 1.9, 'copper'],
+    ['b', 78.96, 56.99, 1.7, 79.18, 57.21, 1.9, 'copper'],
+    ['b', 79.33, 57.03, 1.74, 79.51, 57.21, 1.9, 'copper'],
+    ['b', 74.42, 50.6, 0, 75.62, 51.1, 0.9, 'oak'],
+    ['b', 74.42, 50.6, 0.9, 75.62, 51.1, 0.95, 'oak'],
+    ['b', 74.47, 50.65, 0.95, 75.57, 51.05, 1.0, 'oak'],
+    ['b', 74.5, 50.72, 1.0, 74.54, 50.98, 1.28, 'white'],
+    ['b', 74.64, 50.72, 1.0, 74.68, 50.98, 1.28, 'white'],
+    ['b', 74.78, 50.72, 1.0, 74.82, 50.98, 1.28, 'white'],
+    ['b', 74.92, 50.72, 1.0, 74.96, 50.98, 1.28, 'white'],
+    ['b', 75.06, 50.72, 1.0, 75.1, 50.98, 1.28, 'white'],
+    ['b', 75.2, 50.72, 1.0, 75.24, 50.98, 1.28, 'white'],
+    ['b', 75.34, 50.72, 1.0, 75.38, 50.98, 1.28, 'white'],
+    ['b', 75.48, 50.72, 1.0, 75.52, 50.98, 1.28, 'white'],
+    ['b', 79.88, 51.6, 0, 80.58, 52.5, 1.0, 'oak'],
+    ['b', 79.98, 51.65, 1.0, 80.48, 52.45, 1.15, 'iron'],
+    ['b', 80.18, 52.5, 1.15, 80.28, 52.6, 1.45, 'iron'],
+    ['b', 73.17, 52.95, 0, 73.77, 54.75, 0.9, 'oak'],
+    ['b', 73.17, 55.7, 0, 73.72, 56.2, 0.5, 'oak'],
+    ['b', 73.17, 56.2, 0, 73.72, 56.7, 0.5, 'oak'],
+    ['b', 73.17, 56.7, 0, 73.72, 57.2, 0.5, 'oak'],
+    ['b', 74.92, 50.6, 1.3, 76.52, 50.86, 1.33, 'oak'],
+    ['b', 74.92, 50.6, 1.85, 76.52, 50.86, 1.88, 'oak'],
+    ['b', 74.92, 50.6, 1.3, 74.96, 50.86, 1.88, 'oak'],
+    ['b', 76.48, 50.6, 1.3, 76.52, 50.86, 1.88, 'oak'],
+    ['b', 75.09, 50.66, 1.33, 75.15, 50.72, 1.53, 'white'],
+    ['b', 75.23, 50.66, 1.33, 75.31, 50.74, 1.43, 'tin'],
+    ['b', 75.425, 50.66, 1.33, 75.515, 50.75, 1.42, 'amber'],
+    ['b', 75.635, 50.66, 1.33, 75.705, 50.73, 1.47, 'wood'],
+    ['b', 75.87, 50.66, 1.33, 75.97, 50.76, 1.43, 'copper'],
+    ['b', 76.13, 50.66, 1.33, 76.21, 50.74, 1.45, 'stone'],
+    ['b', 76.34, 50.66, 1.33, 76.4, 50.72, 1.43, 'white'],
+    ['b', 75.06, 50.66, 1.88, 75.18, 50.78, 2.04, 'linen'],
+    ['b', 75.37, 50.66, 1.88, 75.47, 50.76, 2.1, 'ruby'],
+    ['b', 75.65, 50.66, 1.88, 75.79, 50.8, 2.02, 'glass'],
+    ['b', 75.98, 50.66, 1.88, 76.06, 50.74, 1.98, 'iron'],
+    ['b', 76.26, 50.66, 1.88, 76.38, 50.78, 2.06, 'petals'],
+    ['b', 73.79, 57.17, 1.37, 74.65, 57.25, 2.03, 'wood'],
+    ['b', 73.82, 57.15, 1.4, 74.62, 57.17, 2.0, 'linen'],
+    ['b', 74.0, 57.14, 1.52, 74.04, 57.15, 1.88, 'black'],
+    ['b', 74.2, 57.14, 1.52, 74.24, 57.15, 1.88, 'black'],
+    ['b', 74.4, 57.14, 1.52, 74.44, 57.15, 1.88, 'black'],
+    ['b', 75.86, 57.21, 1.9, 75.98, 57.25, 2.3, 'iron'],
+    ['b', 75.895, 56.95, 2.25, 75.945, 57.21, 2.3, 'iron'],
+    ['b', 75.86, 56.91, 2.0, 75.98, 56.99, 2.28, 'flame'],
+    ['b', 80.54, 54.99, 1.9, 80.58, 55.11, 2.3, 'iron'],
+    ['b', 80.28, 55.025, 2.25, 80.54, 55.075, 2.3, 'iron'],
+    ['b', 80.24, 54.99, 2.0, 80.32, 55.11, 2.28, 'flame'],
+    ['b', 73.17, 51.99, 1.9, 73.21, 52.11, 2.3, 'iron'],
+    ['b', 73.21, 52.025, 2.25, 73.47, 52.075, 2.3, 'iron'],
+    ['b', 73.43, 51.99, 2.0, 73.51, 52.11, 2.28, 'flame']]);
+  T['scullery'].lights = (T['scullery'].lights || []).concat([[79.93, 56.75, 0.35, 16757862, 1.1, 8], [75.92, 56.95, 2.33, 16757862, 1.1, 8], [80.28, 55.05, 2.33, 16757862, 1.1, 8], [73.47, 52.05, 2.33, 16757862, 1.1, 8]]);
+})(window.SHELL_W5A.things);
+/* HAND2 end scullery */
+/* HAND2 begin gobstones-club-room */
+/* Interiors req 2423 sec 8: hearth, wall brackets, club pennants, roll of champions, glass cupboard of sets, fixtures board, score slate; sited by tools/architect-hand-rooms-1101.py, plain stand-ins (Objects draw the real ones) */
+(function (T) {
+  T['gobstones-club-room'] = T['gobstones-club-room'] || { items: [] };
+  T['gobstones-club-room'].items = T['gobstones-club-room'].items.concat([
+    ['b', 128.15, 14.3, 0, 128.65, 16.1, 1.3, 'stone'],
+    ['b', 128.13, 14.7, 0.1, 128.65, 15.7, 1.0, 'black'],
+    ['b', 128.25, 14.95, 0.12, 128.55, 15.45, 0.45, 'flame'],
+    ['b', 127.95, 14.5, 0, 128.15, 15.9, 0.18, 'iron'],
+    ['b', 128.0, 14.15, 1.3, 128.65, 16.25, 1.38, 'oak'],
+    ['b', 116.85, 5.94, 1.9, 116.89, 6.06, 2.3, 'iron'],
+    ['b', 116.89, 5.975, 2.25, 117.15, 6.025, 2.3, 'iron'],
+    ['b', 117.11, 5.94, 2.0, 117.19, 6.06, 2.28, 'flame'],
+    ['b', 116.85, 15.44, 1.9, 116.89, 15.56, 2.3, 'iron'],
+    ['b', 116.89, 15.475, 2.25, 117.15, 15.525, 2.3, 'iron'],
+    ['b', 117.11, 15.44, 2.0, 117.19, 15.56, 2.28, 'flame'],
+    ['b', 121.94, 17.96, 1.9, 122.06, 18.0, 2.3, 'iron'],
+    ['b', 121.975, 17.7, 2.25, 122.025, 17.96, 2.3, 'iron'],
+    ['b', 121.94, 17.66, 2.0, 122.06, 17.74, 2.28, 'flame'],
+    ['b', 121.74, 3.85, 1.9, 121.86, 3.89, 2.3, 'iron'],
+    ['b', 121.775, 3.89, 2.25, 121.825, 4.15, 2.3, 'iron'],
+    ['b', 121.74, 4.11, 2.0, 121.86, 4.19, 2.28, 'flame'],
+    ['b', 118.05, 17.92, 2.5, 118.95, 18.0, 4.0, 'ruby'],
+    ['b', 118.15, 17.91, 2.62, 118.85, 17.92, 3.88, 'stone'],
+    ['b', 118.0, 17.91, 4.0, 119.0, 18.0, 4.04, 'wood'],
+    ['b', 124.55, 17.92, 2.5, 125.45, 18.0, 4.0, 'blue'],
+    ['b', 124.65, 17.91, 2.62, 125.35, 17.92, 3.88, 'stone'],
+    ['b', 124.5, 17.91, 4.0, 125.5, 18.0, 4.04, 'wood'],
+    ['b', 125.95, 3.85, 2.5, 126.85, 3.93, 4.0, 'amber'],
+    ['b', 126.05, 3.93, 2.62, 126.75, 3.94, 3.88, 'stone'],
+    ['b', 125.9, 3.85, 4.0, 126.9, 3.94, 4.04, 'wood'],
+    ['b', 119.55, 3.85, 1.3, 120.45, 3.93, 2.4, 'gilt'],
+    ['b', 119.6, 3.93, 1.35, 120.4, 3.94, 2.35, 'black'],
+    ['b', 116.85, 7.1, 0, 117.3, 8.7, 2.1, 'oak'],
+    ['b', 117.3, 7.2, 0.7, 117.32, 8.6, 2.0, 'glass'],
+    ['b', 123.67, 3.85, 1.37, 124.73, 3.93, 2.23, 'wood'],
+    ['b', 123.7, 3.93, 1.4, 124.7, 3.95, 2.2, 'linen'],
+    ['b', 123.93, 3.95, 1.52, 123.97, 3.96, 2.08, 'black'],
+    ['b', 124.18, 3.95, 1.52, 124.22, 3.96, 2.08, 'black'],
+    ['b', 124.43, 3.95, 1.52, 124.47, 3.96, 2.08, 'black'],
+    ['b', 125.47, 17.92, 1.37, 126.53, 18.0, 2.13, 'wood'],
+    ['b', 125.5, 17.9, 1.4, 126.5, 17.92, 2.1, 'black'],
+    ['b', 125.73, 17.89, 1.52, 125.77, 17.9, 1.98, 'black'],
+    ['b', 125.98, 17.89, 1.52, 126.02, 17.9, 1.98, 'black'],
+    ['b', 126.23, 17.89, 1.52, 126.27, 17.9, 1.98, 'black']]);
+  T['gobstones-club-room'].lights = (T['gobstones-club-room'].lights || []).concat([[128.4, 15.2, 0.5, 16757862, 1.1, 8], [117.15, 6.0, 2.33, 16757862, 1.1, 8], [117.15, 15.5, 2.33, 16757862, 1.1, 8], [122.0, 17.7, 2.33, 16757862, 1.1, 8], [121.8, 4.15, 2.33, 16757862, 1.1, 8]]);
+})(window.SHELL_W5A.things);
+/* HAND2 end gobstones-club-room */
+/* HAND2 begin still-room */
+/* Interiors req 2423 sec 10: a hearth, a bank of copper stills, a flask bench with spirit lamps, herbs, bottle dresser, receipts book, herbal prints, a faded alchemist tapestry; req 2543 adds a copper alembic with its worm tub, bubbling flasks on lamps and a rack of copper pans (Godric, req 2326: not plain); the floor ring gets a water butt, a herb drying frame, stools and a basket (the high view showed a lone table on bare floor); sited by tools/architect-hand-rooms-1101.py, plain stand-ins (Objects draw the real ones) */
+(function (T) {
+  T['still-room'] = T['still-room'] || { items: [] };
+  T['still-room'].items = T['still-room'].items.concat([
+    ['b', -4.005, 73.7, 0, -3.505, 75.5, 1.3, 'stone'],
+    ['b', -4.005, 74.1, 0.1, -3.485, 75.1, 1.0, 'black'],
+    ['b', -3.905, 74.35, 0.12, -3.605, 74.85, 0.45, 'flame'],
+    ['b', -3.505, 73.9, 0, -3.305, 75.3, 0.18, 'iron'],
+    ['b', -4.005, 73.55, 1.3, -3.355, 75.65, 1.38, 'oak'],
+    ['b', -4.665, 69.7, 0, -3.765, 72.3, 0.8, 'stone'],
+    ['b', -4.465, 69.875, 0.8, -3.965, 70.425, 1.35, 'copper'],
+    ['b', -4.385, 70.05, 1.35, -4.165, 70.25, 1.75, 'copper'],
+    ['b', -4.265, 70.15, 1.65, -4.115, 70.55, 1.75, 'copper'],
+    ['b', -4.465, 70.725, 0.8, -3.965, 71.275, 1.35, 'copper'],
+    ['b', -4.385, 70.9, 1.35, -4.165, 71.1, 1.75, 'copper'],
+    ['b', -4.265, 71.0, 1.65, -4.115, 71.4, 1.75, 'copper'],
+    ['b', -4.465, 71.575, 0.8, -3.965, 72.125, 1.35, 'copper'],
+    ['b', -4.385, 71.75, 1.35, -4.165, 71.95, 1.75, 'copper'],
+    ['b', -4.265, 71.85, 1.65, -4.115, 72.25, 1.75, 'copper'],
+    ['b', -3.885, 71.075, 0.0, -3.515, 71.525, 0.9, 'oak'],
+    ['b', -1.8, 75.932, 0, 0.6, 76.732, 0.9, 'oak'],
+    ['b', -1.59, 76.352, 0.9, -1.51, 76.432, 0.98, 'flame'],
+    ['b', -1.7, 76.232, 1.0, -1.4, 76.532, 1.35, 'ruby'],
+    ['b', -1.11, 76.352, 0.9, -1.03, 76.432, 0.98, 'iron'],
+    ['b', -1.22, 76.232, 1.0, -0.92, 76.532, 1.35, 'amber'],
+    ['b', -0.63, 76.352, 0.9, -0.55, 76.432, 0.98, 'flame'],
+    ['b', -0.74, 76.232, 1.0, -0.44, 76.532, 1.35, 'glass'],
+    ['b', -0.15, 76.352, 0.9, -0.07, 76.432, 0.98, 'iron'],
+    ['b', -0.26, 76.232, 1.0, 0.04, 76.532, 1.35, 'blue'],
+    ['b', 0.33, 76.352, 0.9, 0.41, 76.432, 0.98, 'flame'],
+    ['b', 0.22, 76.232, 1.0, 0.52, 76.532, 1.35, 'petals'],
+    ['b', -3.0, 67.764, 0, -1.4, 68.164, 0.8, 'oak'],
+    ['b', -3.0, 67.764, 0.8, -1.4, 67.984, 2.0, 'wood'],
+    ['b', -2.826, 67.984, 1.1, -2.726, 68.064, 1.4, 'amber'],
+    ['b', -2.442, 67.984, 1.5, -2.342, 68.064, 1.8, 'amber'],
+    ['b', -2.058, 67.984, 1.1, -1.958, 68.064, 1.4, 'amber'],
+    ['b', -1.674, 67.984, 1.5, -1.574, 68.064, 1.8, 'amber'],
+    ['b', 2.15, 75.777, 0, 2.65, 76.127, 1.0, 'oak'],
+    ['b', 2.1, 75.627, 1.0, 2.7, 76.127, 1.08, 'linen'],
+    ['b', -0.1, 67.315, 2.45, 1.9, 67.415, 2.48, 'wood'],
+    ['b', -0.07, 67.365, 1.95, 0.07, 67.565, 2.45, 'petals'],
+    ['b', 0.23, 67.365, 1.95, 0.37, 67.565, 2.45, 'linen'],
+    ['b', 0.53, 67.365, 1.95, 0.67, 67.565, 2.45, 'dust'],
+    ['b', 0.83, 67.365, 1.95, 0.97, 67.565, 2.45, 'petals'],
+    ['b', 1.13, 67.365, 1.95, 1.27, 67.565, 2.45, 'linen'],
+    ['b', 1.43, 67.365, 1.95, 1.57, 67.565, 2.45, 'dust'],
+    ['b', 1.73, 67.365, 1.95, 1.87, 67.565, 2.45, 'petals'],
+    ['b', -4.77, 71.1, 2.6, -4.69, 72.9, 4.1, 'dust'],
+    ['b', -4.69, 71.2, 2.72, -4.68, 72.8, 3.98, 'stone'],
+    ['b', -4.77, 71.05, 4.1, -4.68, 72.95, 4.14, 'wood'],
+    ['b', 2.15, 67.873, 1.6, 2.65, 67.953, 2.3, 'gilt'],
+    ['b', 2.2, 67.953, 1.65, 2.6, 67.963, 2.25, 'black'],
+    ['b', -2.65, 76.047, 1.6, -2.15, 76.127, 2.3, 'gilt'],
+    ['b', -2.6, 76.037, 1.65, -2.2, 76.047, 2.25, 'black'],
+    ['b', 0.95, 76.538, 1.6, 1.45, 76.618, 2.3, 'gilt'],
+    ['b', 1.0, 76.528, 1.65, 1.4, 76.538, 2.25, 'black'],
+    ['b', -0.06, 67.23, 1.9, 0.06, 67.27, 2.3, 'iron'],
+    ['b', -0.025, 67.27, 2.25, 0.025, 67.53, 2.3, 'iron'],
+    ['b', -0.06, 67.49, 2.0, 0.06, 67.57, 2.28, 'flame'],
+    ['b', 0.84, 76.645, 1.9, 0.96, 76.685, 2.3, 'iron'],
+    ['b', 0.875, 76.385, 2.25, 0.925, 76.645, 2.3, 'iron'],
+    ['b', 0.84, 76.345, 2.0, 0.96, 76.425, 2.28, 'flame'],
+    ['b', -3.717, 68.94, 1.9, -3.677, 69.06, 2.3, 'iron'],
+    ['b', -3.677, 68.975, 2.25, -3.417, 69.025, 2.3, 'iron'],
+    ['b', -3.457, 68.94, 2.0, -3.377, 69.06, 2.28, 'flame'],
+    ['b', 3.52, 69.75, 0, 4.32, 70.65, 0.45, 'stone'],
+    ['b', 3.57, 69.8, 0.45, 4.27, 70.6, 1.0, 'copper'],
+    ['b', 3.67, 69.925, 1.0, 4.17, 70.475, 1.3, 'copper'],
+    ['b', 3.77, 70.05, 1.3, 4.07, 70.35, 1.6, 'copper'],
+    ['b', 3.87, 70.14, 1.6, 3.97, 70.26, 1.7, 'gilt'],
+    ['b', 3.82, 70.3, 1.5, 4.02, 70.8, 1.58, 'copper'],
+    ['b', 3.62, 70.85, 0, 4.22, 71.45, 1.0, 'oak'],
+    ['b', 3.87, 71.1, 1.0, 3.97, 71.2, 1.58, 'copper'],
+    ['b', 3.72, 70.95, 1.0, 4.12, 71.35, 1.06, 'glass'],
+    ['b', 3.795, 72.65, 0, 4.495, 74.55, 0.8, 'oak'],
+    ['b', 4.045, 72.9, 0.8, 4.245, 73.1, 0.86, 'brass'],
+    ['b', 4.095, 72.96, 0.86, 4.195, 73.04, 0.93, 'flame'],
+    ['b', 3.945, 72.8, 0.93, 4.345, 73.2, 1.3, 'glass'],
+    ['b', 3.925, 72.79, 0.95, 4.365, 73.21, 1.1, 'amber'],
+    ['b', 4.155, 72.895, 1.0, 4.195, 72.945, 1.06, 'white'],
+    ['b', 4.115, 72.975, 1.1, 4.155, 73.025, 1.16, 'white'],
+    ['b', 4.075, 73.055, 1.2, 4.115, 73.105, 1.26, 'white'],
+    ['b', 4.075, 72.93, 1.3, 4.215, 73.07, 1.68, 'glass'],
+    ['b', 4.055, 72.91, 1.62, 4.235, 73.09, 1.68, 'white'],
+    ['b', 4.045, 73.5, 0.8, 4.245, 73.7, 0.86, 'brass'],
+    ['b', 4.095, 73.56, 0.86, 4.195, 73.64, 0.93, 'flame'],
+    ['b', 3.945, 73.4, 0.93, 4.345, 73.8, 1.3, 'glass'],
+    ['b', 3.925, 73.39, 0.95, 4.365, 73.81, 1.1, 'blue'],
+    ['b', 4.155, 73.495, 1.0, 4.195, 73.545, 1.06, 'white'],
+    ['b', 4.115, 73.575, 1.1, 4.155, 73.625, 1.16, 'white'],
+    ['b', 4.075, 73.655, 1.2, 4.115, 73.705, 1.26, 'white'],
+    ['b', 4.075, 73.53, 1.3, 4.215, 73.67, 1.68, 'glass'],
+    ['b', 4.055, 73.51, 1.62, 4.235, 73.69, 1.68, 'white'],
+    ['b', 4.045, 74.1, 0.8, 4.245, 74.3, 0.86, 'brass'],
+    ['b', 4.095, 74.16, 0.86, 4.195, 74.24, 0.93, 'flame'],
+    ['b', 3.945, 74.0, 0.93, 4.345, 74.4, 1.3, 'glass'],
+    ['b', 3.925, 73.99, 0.95, 4.365, 74.41, 1.1, 'ruby'],
+    ['b', 4.155, 74.095, 1.0, 4.195, 74.145, 1.06, 'white'],
+    ['b', 4.115, 74.175, 1.1, 4.155, 74.225, 1.16, 'white'],
+    ['b', 4.075, 74.255, 1.2, 4.115, 74.305, 1.26, 'white'],
+    ['b', 4.075, 74.13, 1.3, 4.215, 74.27, 1.68, 'glass'],
+    ['b', 4.055, 74.11, 1.62, 4.235, 74.29, 1.68, 'white'],
+    ['b', 4.67, 71.1, 1.95, 4.77, 72.9, 2.0, 'black'],
+    ['b', 4.71, 71.16, 1.3, 4.77, 71.44, 1.95, 'copper'],
+    ['b', 4.68, 71.48, 1.35, 4.77, 71.82, 1.95, 'copper'],
+    ['b', 4.71, 71.8, 1.3, 4.77, 72.2, 1.95, 'copper'],
+    ['b', 4.68, 72.21, 1.35, 4.77, 72.49, 1.95, 'copper'],
+    ['b', 4.71, 72.53, 1.3, 4.77, 72.87, 1.95, 'copper'],
+    ['b', -0.95, 67.268, 0, -0.25, 67.968, 0.9, 'wood'],
+    ['b', -0.925, 67.318, 0.9, -0.275, 67.918, 0.95, 'linen'],
+    ['b', -3.717, 68.7, 0.7, -2.617, 69.3, 0.75, 'oak'],
+    ['b', -3.667, 68.47, 0, -3.657, 68.53, 0.7, 'oak'],
+    ['b', -3.657, 68.47, 0, -3.167, 68.53, 0.7, 'oak'],
+    ['b', -3.667, 69.47, 0, -3.657, 69.53, 0.7, 'oak'],
+    ['b', -3.657, 69.47, 0, -3.167, 69.53, 0.7, 'oak'],
+    ['b', -3.557, 68.38, 0.75, -3.417, 68.78, 0.82, 'green'],
+    ['b', -3.557, 68.59, 0.75, -3.417, 68.99, 0.82, 'linen'],
+    ['b', -3.557, 68.8, 0.75, -3.417, 69.2, 0.82, 'ruby'],
+    ['b', -3.557, 69.01, 0.75, -3.417, 69.41, 0.82, 'green'],
+    ['b', -3.557, 69.22, 0.75, -3.417, 69.62, 0.82, 'linen'],
+    ['b', 0.42, 76.372, 0, 0.78, 76.732, 0.45, 'oak'],
+    ['b', 1.02, 76.258, 0, 1.38, 76.618, 0.45, 'oak'],
+    ['b', 1.8, 67.667, 0, 2.2, 68.167, 0.35, 'wood'],
+    ['b', 1.83, 67.717, 0.35, 2.17, 68.107, 0.5, 'green']]);
+  T['still-room'].lights = (T['still-room'].lights || []).concat([[-3.75, 74.6, 0.5, 16757862, 1.1, 8], [-1.55, 76.39, 1.03, 16757862, 1.1, 8], [-0.59, 76.39, 1.03, 16757862, 1.1, 8], [0.37, 76.39, 1.03, 16757862, 1.1, 8], [0.0, 67.53, 2.33, 16757862, 1.1, 8], [0.9, 76.38, 2.33, 16757862, 1.1, 8], [-3.42, 69.0, 2.33, 16757862, 1.1, 8], [4.14, 73.0, 0.98, 16757862, 1.1, 8], [4.14, 73.6, 0.98, 16757862, 1.1, 8], [4.14, 74.2, 0.98, 16757862, 1.1, 8]]);
+})(window.SHELL_W5A.things);
+/* HAND2 end still-room */
+/* HAND2 begin defence-office-2-north */
+/* Interiors req 2423 sec 11: hearth, lamps, chart of curses, cloth-covered mirror, cabinet, textbooks; sited by tools/architect-hand-rooms-1101.py, plain stand-ins (Objects draw the real ones) */
+(function (T) {
+  T['defence-office-2-north'] = T['defence-office-2-north'] || { items: [] };
+  T['defence-office-2-north'].items = T['defence-office-2-north'].items.concat([
+    ['b', 97.5, 3.85, 0, 99.3, 4.35, 1.3, 'stone'],
+    ['b', 97.9, 3.85, 0.1, 98.9, 4.37, 1.0, 'black'],
+    ['b', 98.15, 3.95, 0.12, 98.65, 4.25, 0.45, 'flame'],
+    ['b', 97.7, 4.35, 0, 99.1, 4.55, 0.18, 'iron'],
+    ['b', 97.35, 3.85, 1.3, 99.45, 4.5, 1.38, 'oak'],
+    ['b', 94.54, 3.85, 1.9, 94.66, 3.89, 2.3, 'iron'],
+    ['b', 94.575, 3.89, 2.25, 94.625, 4.15, 2.3, 'iron'],
+    ['b', 94.54, 4.11, 2.0, 94.66, 4.19, 2.28, 'flame'],
+    ['b', 95.84, 17.96, 1.9, 95.96, 18.0, 2.3, 'iron'],
+    ['b', 95.875, 17.7, 2.25, 95.925, 17.96, 2.3, 'iron'],
+    ['b', 95.84, 17.66, 2.0, 95.96, 17.74, 2.28, 'flame'],
+    ['b', 103.97, 6.67, 1.57, 104.05, 8.13, 2.63, 'wood'],
+    ['b', 103.95, 6.7, 1.6, 103.97, 8.1, 2.6, 'linen'],
+    ['b', 103.94, 7.03, 1.72, 103.95, 7.07, 2.48, 'black'],
+    ['b', 103.94, 7.38, 1.72, 103.95, 7.42, 2.48, 'black'],
+    ['b', 103.94, 7.73, 1.72, 103.95, 7.77, 2.48, 'black'],
+    ['b', 92.25, 13.35, 0, 92.55, 14.25, 2.0, 'linen'],
+    ['b', 92.25, 7.3, 0, 92.7, 8.9, 2.1, 'oak'],
+    ['b', 92.7, 7.4, 0.7, 92.72, 8.8, 2.0, 'glass'],
+    ['b', 99.7, 17.74, 1.3, 101.3, 18.0, 1.33, 'oak'],
+    ['b', 99.7, 17.74, 1.85, 101.3, 18.0, 1.88, 'oak'],
+    ['b', 99.7, 17.74, 1.3, 99.74, 18.0, 1.88, 'oak'],
+    ['b', 101.26, 17.74, 1.3, 101.3, 18.0, 1.88, 'oak'],
+    ['b', 99.87, 17.88, 1.33, 99.93, 17.94, 1.53, 'white'],
+    ['b', 100.01, 17.86, 1.33, 100.09, 17.94, 1.43, 'tin'],
+    ['b', 100.205, 17.85, 1.33, 100.295, 17.94, 1.42, 'amber'],
+    ['b', 100.415, 17.87, 1.33, 100.485, 17.94, 1.47, 'wood'],
+    ['b', 100.65, 17.84, 1.33, 100.75, 17.94, 1.43, 'copper'],
+    ['b', 100.91, 17.86, 1.33, 100.99, 17.94, 1.45, 'stone'],
+    ['b', 101.12, 17.88, 1.33, 101.18, 17.94, 1.43, 'white'],
+    ['b', 99.84, 17.82, 1.88, 99.96, 17.94, 2.04, 'linen'],
+    ['b', 100.15, 17.84, 1.88, 100.25, 17.94, 2.1, 'ruby'],
+    ['b', 100.43, 17.8, 1.88, 100.57, 17.94, 2.02, 'glass'],
+    ['b', 100.76, 17.86, 1.88, 100.84, 17.94, 1.98, 'iron'],
+    ['b', 101.04, 17.82, 1.88, 101.16, 17.94, 2.06, 'petals'],
+    ['b', 103.97, 13.45, 1.5, 104.05, 14.15, 2.4, 'gilt'],
+    ['b', 103.96, 13.5, 1.55, 103.97, 14.1, 2.35, 'black']]);
+  T['defence-office-2-north'].lights = (T['defence-office-2-north'].lights || []).concat([[98.4, 4.1, 0.5, 16757862, 1.1, 8], [94.6, 4.15, 2.33, 16757862, 1.1, 8], [95.9, 17.7, 2.33, 16757862, 1.1, 8]]);
+})(window.SHELL_W5A.things);
+/* HAND2 end defence-office-2-north */
+/* HAND2 begin staff-bedroom-2-west */
+/* Interiors req 2423 sec 13: hearth, curtained window light, portrait, sampler, wardrobe, dressing table, lamps; req 2532 adds hangings, a dado and a thing to read or pull; req 2543 / row 2658 after Godric 4.27 pm (1 Nov, the 437th): pendants, sconces, framed papers, seats, standard lamps; req 2532 adds hangings, a dado and a thing to read or pull; req 2543 / row 2658 after Godric 4.55 pm (2 Nov, the 438th): tapestries, portraits, chandeliers, rugs, room-use pieces; sited by tools/architect-hand-rooms-1101.py, plain stand-ins (Objects draw the real ones) */
+(function (T) {
+  T['staff-bedroom-2-west'] = T['staff-bedroom-2-west'] || { items: [] };
+  T['staff-bedroom-2-west'].items = T['staff-bedroom-2-west'].items.concat([
+    ['b', 4.8, 39.58, 0, 6.6, 40.08, 1.3, 'stone'],
+    ['b', 5.2, 39.58, 0.1, 6.2, 40.1, 1.0, 'black'],
+    ['b', 5.45, 39.68, 0.12, 5.95, 39.98, 0.45, 'flame'],
+    ['b', 5.0, 40.08, 0, 6.4, 40.28, 0.18, 'iron'],
+    ['b', 4.65, 39.58, 1.3, 6.75, 40.23, 1.38, 'oak'],
+    ['b', 1.94, 39.58, 1.9, 2.06, 39.62, 2.3, 'iron'],
+    ['b', 1.975, 39.62, 2.25, 2.025, 39.88, 2.3, 'iron'],
+    ['b', 1.94, 39.84, 2.0, 2.06, 39.92, 2.28, 'flame'],
+    ['b', 6.14, 49.71, 1.9, 6.26, 49.75, 2.3, 'iron'],
+    ['b', 6.175, 49.45, 2.25, 6.225, 49.71, 2.3, 'iron'],
+    ['b', 6.14, 49.41, 2.0, 6.26, 49.49, 2.28, 'flame'],
+    ['b', 9.65, 39.58, 1.5, 10.35, 39.66, 2.4, 'gilt'],
+    ['b', 9.7, 39.66, 1.55, 10.3, 39.67, 2.35, 'black'],
+    ['b', 0.25, 44.3, 1.57, 0.33, 44.96, 2.13, 'wood'],
+    ['b', 0.33, 44.33, 1.6, 0.35, 44.93, 2.1, 'petals'],
+    ['b', 0.35, 44.46, 1.72, 0.36, 44.5, 1.98, 'black'],
+    ['b', 0.35, 44.61, 1.72, 0.36, 44.65, 1.98, 'black'],
+    ['b', 0.35, 44.76, 1.72, 0.36, 44.8, 1.98, 'black'],
+    ['b', 1.75, 49.15, 0, 3.05, 49.75, 2.1, 'oak'],
+    ['b', 2.38, 49.13, 0.2, 2.42, 49.15, 2.0, 'black'],
+    ['b', 9.95, 49.25, 0, 11.05, 49.75, 0.78, 'oak'],
+    ['b', 10.15, 49.69, 0.9, 10.85, 49.73, 1.7, 'glass'],
+    ['b', 10.15, 49.5, 0.78, 10.25, 49.65, 0.9, 'tin'],
+    ['b', 11.7, 42.205, 0, 12.15, 43.055, 0.85, 'oak'],
+    ['b', 11.75, 42.33, 0.85, 12.05, 42.73, 0.93, 'white'],
+    ['b', 11.85, 42.78, 0.85, 12.0, 42.98, 1.15, 'white'],
+    ['b', 1.64, 39.58, 2.1, 1.76, 39.62, 2.4, 'brass'],
+    ['b', 1.675, 39.62, 2.2, 1.725, 39.78, 2.26, 'brass'],
+    ['b', 1.65, 39.72, 2.26, 1.75, 39.82, 2.4, 'linen'],
+    ['b', 1.68, 39.75, 2.4, 1.72, 39.79, 2.5, 'amber'],
+    ['b', 11.14, 39.58, 2.1, 11.26, 39.62, 2.4, 'brass'],
+    ['b', 11.175, 39.62, 2.2, 11.225, 39.78, 2.26, 'brass'],
+    ['b', 11.15, 39.72, 2.26, 11.25, 39.82, 2.4, 'linen'],
+    ['b', 11.18, 39.75, 2.4, 11.22, 39.79, 2.5, 'amber'],
+    ['b', 1.64, 49.71, 2.1, 1.76, 49.75, 2.4, 'brass'],
+    ['b', 1.675, 49.55, 2.2, 1.725, 49.71, 2.26, 'brass'],
+    ['b', 1.65, 49.51, 2.26, 1.75, 49.61, 2.4, 'linen'],
+    ['b', 1.68, 49.54, 2.4, 1.72, 49.58, 2.5, 'amber'],
+    ['b', 11.14, 49.71, 2.1, 11.26, 49.75, 2.4, 'brass'],
+    ['b', 11.175, 49.55, 2.2, 11.225, 49.71, 2.26, 'brass'],
+    ['b', 11.15, 49.51, 2.26, 11.25, 49.61, 2.4, 'linen'],
+    ['b', 11.18, 49.54, 2.4, 11.22, 49.58, 2.5, 'amber'],
+    ['b', 12.11, 41.07, 2.1, 12.15, 41.19, 2.4, 'brass'],
+    ['b', 11.95, 41.105, 2.2, 12.11, 41.155, 2.26, 'brass'],
+    ['b', 11.91, 41.08, 2.26, 12.01, 41.18, 2.4, 'linen'],
+    ['b', 11.94, 41.11, 2.4, 11.98, 41.15, 2.5, 'amber'],
+    ['b', 12.11, 43.67, 2.1, 12.15, 43.79, 2.4, 'brass'],
+    ['b', 11.95, 43.705, 2.2, 12.11, 43.755, 2.26, 'brass'],
+    ['b', 11.91, 43.68, 2.26, 12.01, 43.78, 2.4, 'linen'],
+    ['b', 11.94, 43.71, 2.4, 11.98, 43.75, 2.5, 'amber'],
+    ['b', 0.25, 42.17, 2.1, 0.29, 42.29, 2.4, 'brass'],
+    ['b', 0.29, 42.205, 2.2, 0.45, 42.255, 2.26, 'brass'],
+    ['b', 0.39, 42.18, 2.26, 0.49, 42.28, 2.4, 'linen'],
+    ['b', 0.42, 42.21, 2.4, 0.46, 42.25, 2.5, 'amber'],
+    ['b', 0.25, 47.17, 2.1, 0.29, 47.29, 2.4, 'brass'],
+    ['b', 0.29, 47.205, 2.2, 0.45, 47.255, 2.26, 'brass'],
+    ['b', 0.39, 47.18, 2.26, 0.49, 47.28, 2.4, 'linen'],
+    ['b', 0.42, 47.21, 2.4, 0.46, 47.25, 2.5, 'amber'],
+    ['b', 3.45, 39.58, 1.3, 4.15, 39.62, 2.2, 'gilt'],
+    ['b', 3.49, 39.62, 1.34, 4.11, 39.64, 2.16, 'linen'],
+    ['b', 3.6, 39.64, 1.795, 4.0, 39.65, 1.84, 'black'],
+    ['b', 3.65, 39.64, 1.615, 3.95, 39.65, 1.66, 'black'],
+    ['b', 8.3, 39.58, 1.3, 8.9, 39.62, 2.1, 'gilt'],
+    ['b', 8.34, 39.62, 1.34, 8.86, 39.64, 2.06, 'linen'],
+    ['b', 8.45, 39.64, 1.74, 8.75, 39.65, 1.78, 'ruby'],
+    ['b', 8.5, 39.64, 1.58, 8.7, 39.65, 1.62, 'ruby'],
+    ['b', 6.35, 49.71, 1.4, 7.65, 49.75, 2.2, 'gilt'],
+    ['b', 6.39, 49.69, 1.44, 7.61, 49.71, 2.16, 'linen'],
+    ['b', 6.5, 49.68, 1.84, 7.5, 49.69, 1.88, 'green'],
+    ['b', 6.55, 49.68, 1.68, 7.45, 49.69, 1.72, 'green'],
+    ['b', 8.2, 49.71, 1.4, 9.0, 49.75, 2.0, 'gilt'],
+    ['b', 8.24, 49.69, 1.44, 8.96, 49.71, 1.96, 'linen'],
+    ['b', 8.35, 49.68, 1.73, 8.85, 49.69, 1.76, 'black'],
+    ['b', 8.4, 49.68, 1.61, 8.8, 49.69, 1.64, 'black'],
+    ['b', 12.11, 42.33, 1.4, 12.15, 42.93, 2.2, 'gilt'],
+    ['b', 12.09, 42.37, 1.44, 12.11, 42.89, 2.16, 'linen'],
+    ['b', 12.08, 42.48, 1.84, 12.09, 42.78, 1.88, 'blue'],
+    ['b', 12.08, 42.53, 1.68, 12.09, 42.73, 1.72, 'blue'],
+    ['b', 12.11, 46.28, 1.4, 12.15, 47.18, 2.1, 'gilt'],
+    ['b', 12.09, 46.32, 1.44, 12.11, 47.14, 2.06, 'linen'],
+    ['b', 12.08, 46.43, 1.785, 12.09, 47.03, 1.82, 'black'],
+    ['b', 12.08, 46.48, 1.645, 12.09, 46.98, 1.68, 'black'],
+    ['b', 11.65, 45.58, 0, 12.15, 47.08, 0.42, 'oak'],
+    ['b', 11.69, 45.63, 0.42, 12.11, 47.03, 0.5, 'dark'],
+    ['b', 11.75, 46.43, 0.5, 12.07, 46.93, 0.56, 'tartan'],
+    ['b', 3.15, 49.25, 0, 4.65, 49.75, 0.42, 'oak'],
+    ['b', 3.2, 49.29, 0.42, 4.6, 49.71, 0.5, 'dark'],
+    ['b', 4.0, 49.35, 0.5, 4.5, 49.67, 0.56, 'tartan'],
+    ['b', 1.85, 41.805, 0, 2.65, 42.655, 0.45, 'leather'],
+    ['b', 1.85, 41.805, 0.45, 2.05, 42.655, 1.1, 'leather'],
+    ['b', 2.05, 41.8, 0.45, 2.65, 41.9, 0.65, 'leather'],
+    ['b', 2.05, 42.56, 0.45, 2.65, 42.66, 0.65, 'leather'],
+    ['b', 2.8, 41.98, 0, 3.2, 42.48, 0.3, 'leather'],
+    ['b', 1.95, 42.93, 0, 2.15, 43.13, 0.06, 'oak'],
+    ['b', 2.02, 43.0, 0.06, 2.08, 43.06, 1.5, 'brass'],
+    ['b', 1.93, 42.91, 1.5, 2.17, 43.15, 1.7, 'linen'],
+    ['b', 1.85, 47.305, 0, 2.65, 48.155, 0.45, 'leather'],
+    ['b', 1.85, 47.305, 0.45, 2.05, 48.155, 1.1, 'leather'],
+    ['b', 2.05, 47.3, 0.45, 2.65, 47.4, 0.65, 'leather'],
+    ['b', 2.05, 48.06, 0.45, 2.65, 48.16, 0.65, 'leather'],
+    ['b', 2.8, 47.48, 0, 3.2, 47.98, 0.3, 'leather'],
+    ['b', 1.95, 48.43, 0, 2.15, 48.63, 0.06, 'oak'],
+    ['b', 2.02, 48.5, 0.06, 2.08, 48.56, 1.5, 'brass'],
+    ['b', 1.93, 48.41, 1.5, 2.17, 48.65, 1.7, 'linen'],
+    ['b', 0.25, 39.78, 0, 0.55, 40.08, 0.05, 'iron'],
+    ['b', 0.37, 39.9, 0.05, 0.43, 39.96, 1.6, 'brass'],
+    ['b', 0.25, 39.78, 1.6, 0.55, 40.08, 1.95, 'linen'],
+    ['b', 0.25, 48.78, 0, 0.55, 49.08, 0.05, 'iron'],
+    ['b', 0.37, 48.9, 0.05, 0.43, 48.96, 1.6, 'brass'],
+    ['b', 0.25, 48.78, 1.6, 0.55, 49.08, 1.95, 'linen'],
+    ['b', 3.301, 42.61, 3.4, 3.341, 42.65, 4.5, 'iron'],
+    ['b', 3.001, 42.33, 3.3, 3.601, 42.93, 3.4, 'brass'],
+    ['b', 3.001, 42.32, 3.0, 3.061, 42.38, 3.3, 'amber'],
+    ['b', 3.001, 42.88, 3.0, 3.061, 42.94, 3.3, 'amber'],
+    ['b', 3.541, 42.32, 3.0, 3.601, 42.38, 3.3, 'amber'],
+    ['b', 3.541, 42.88, 3.0, 3.601, 42.94, 3.3, 'amber'],
+    ['b', 9.059, 42.61, 3.4, 9.099, 42.65, 4.5, 'iron'],
+    ['b', 8.799, 42.33, 3.3, 9.399, 42.93, 3.4, 'brass'],
+    ['b', 9.339, 42.32, 3.0, 9.399, 42.38, 3.3, 'amber'],
+    ['b', 9.339, 42.88, 3.0, 9.399, 42.94, 3.3, 'amber'],
+    ['b', 8.799, 42.32, 3.0, 8.859, 42.38, 3.3, 'amber'],
+    ['b', 8.799, 42.88, 3.0, 8.859, 42.94, 3.3, 'amber'],
+    ['b', 5.301, 46.71, 3.4, 5.341, 46.75, 4.5, 'iron'],
+    ['b', 5.001, 46.43, 3.3, 5.601, 47.03, 3.4, 'brass'],
+    ['b', 5.001, 46.42, 3.0, 5.061, 46.48, 3.3, 'amber'],
+    ['b', 5.001, 46.98, 3.0, 5.061, 47.04, 3.3, 'amber'],
+    ['b', 5.541, 46.42, 3.0, 5.601, 46.48, 3.3, 'amber'],
+    ['b', 5.541, 46.98, 3.0, 5.601, 47.04, 3.3, 'amber'],
+    ['b', 7.059, 46.71, 3.4, 7.099, 46.75, 4.5, 'iron'],
+    ['b', 6.799, 46.43, 3.3, 7.399, 47.03, 3.4, 'brass'],
+    ['b', 7.339, 46.42, 3.0, 7.399, 46.48, 3.3, 'amber'],
+    ['b', 7.339, 46.98, 3.0, 7.399, 47.04, 3.3, 'amber'],
+    ['b', 6.799, 46.42, 3.0, 6.859, 46.48, 3.3, 'amber'],
+    ['b', 6.799, 46.98, 3.0, 6.859, 47.04, 3.3, 'amber'],
+    ['b', 12.07, 47.93, 1.3, 12.15, 49.73, 3.5, 'gilt'],
+    ['b', 12.06, 48.05, 1.42, 12.07, 49.61, 3.38, 'blue'],
+    ['b', 12.05, 48.05, 1.6, 12.06, 49.61, 1.72, 'linen'],
+    ['b', 12.05, 48.05, 3.08, 12.06, 49.61, 3.2, 'linen'],
+    ['b', 12.06, 47.88, 3.5, 12.15, 49.78, 3.54, 'wood'],
+    ['b', 0.25, 45.03, 1.4, 0.33, 46.63, 3.4, 'dust'],
+    ['b', 0.33, 45.15, 1.52, 0.34, 46.51, 3.28, 'green'],
+    ['b', 0.34, 45.15, 1.7, 0.35, 46.51, 1.82, 'petals'],
+    ['b', 0.34, 45.15, 2.98, 0.35, 46.51, 3.1, 'petals'],
+    ['b', 0.25, 44.98, 3.4, 0.34, 46.68, 3.44, 'wood'],
+    ['b', 4.9, 49.67, 1.1, 5.7, 49.75, 2.1, 'gilt'],
+    ['b', 4.97, 49.66, 1.17, 5.63, 49.67, 2.03, 'black'],
+    ['b', 5.24, 49.65, 1.65, 5.44, 49.66, 1.9, 'dust'],
+    ['b', 5.1, 49.65, 1.3, 5.5, 49.66, 1.6, 'linen'],
+    ['b', 5.24, 49.66, 1.03, 5.36, 49.75, 1.07, 'brass'],
+    ['b', 9.35, 49.67, 1.15, 10.05, 49.75, 2.05, 'gilt'],
+    ['b', 9.42, 49.66, 1.22, 9.98, 49.67, 1.98, 'black'],
+    ['b', 9.64, 49.65, 1.645, 9.84, 49.66, 1.87, 'dust'],
+    ['b', 9.5, 49.65, 1.33, 9.9, 49.66, 1.6, 'linen'],
+    ['b', 9.64, 49.66, 1.08, 9.76, 49.75, 1.12, 'brass'],
+    ['b', 12.07, 41.38, 1.0, 12.15, 42.28, 2.2, 'black'],
+    ['b', 12.06, 41.45, 1.07, 12.07, 42.21, 2.13, 'black'],
+    ['b', 12.05, 41.77, 1.66, 12.06, 41.97, 1.96, 'dust'],
+    ['b', 12.05, 41.63, 1.24, 12.06, 42.03, 1.6, 'linen'],
+    ['b', 12.06, 41.77, 0.93, 12.15, 41.89, 0.97, 'brass'],
+    ['b', 10.65, 39.58, 1.15, 11.35, 39.66, 2.05, 'black'],
+    ['b', 10.72, 39.66, 1.22, 11.28, 39.67, 1.98, 'black'],
+    ['b', 10.94, 39.67, 1.645, 11.14, 39.68, 1.87, 'dust'],
+    ['b', 10.8, 39.67, 1.33, 11.2, 39.68, 1.6, 'linen'],
+    ['b', 10.94, 39.58, 1.08, 11.06, 39.67, 1.12, 'brass'],
+    ['b', 3.3, 39.58, 0, 4.3, 40.13, 0.9, 'oak'],
+    ['b', 3.35, 40.13, 0.08, 4.25, 40.16, 0.32, 'wood'],
+    ['b', 3.74, 40.16, 0.17, 3.86, 40.18, 0.21, 'brass'],
+    ['b', 3.35, 40.13, 0.36, 4.25, 40.16, 0.6, 'wood'],
+    ['b', 3.74, 40.16, 0.45, 3.86, 40.18, 0.49, 'brass'],
+    ['b', 3.35, 40.13, 0.64, 4.25, 40.16, 0.88, 'wood'],
+    ['b', 3.74, 40.16, 0.73, 3.86, 40.18, 0.77, 'brass'],
+    ['b', 3.4, 39.68, 0.9, 3.7, 39.98, 0.93, 'white'],
+    ['b', 3.97, 39.7, 0.9, 4.19, 39.92, 1.1, 'blue'],
+    ['b', 4.05, 39.78, 1.1, 4.11, 39.84, 1.15, 'linen'],
+    ['b', 9.625, 39.58, 0, 10.575, 40.13, 0.5, 'oak'],
+    ['b', 9.65, 39.6, 0.5, 10.55, 40.11, 0.6, 'wood'],
+    ['b', 9.775, 39.57, 0, 9.825, 40.14, 0.6, 'iron'],
+    ['b', 10.375, 39.57, 0, 10.425, 40.14, 0.6, 'iron'],
+    ['b', 10.05, 40.13, 0.38, 10.15, 40.16, 0.46, 'brass'],
+    ['b', 6.875, 49.71, 0, 7.325, 49.75, 1.4, 'wood'],
+    ['b', 7.375, 49.71, 0, 7.825, 49.75, 1.4, 'wood'],
+    ['b', 7.875, 49.71, 0, 8.325, 49.75, 1.4, 'wood'],
+    ['b', 6.9, 49.71, 0.5, 8.3, 49.75, 0.53, 'wood'],
+    ['b', 6.9, 49.71, 0.9, 8.3, 49.75, 0.93, 'wood'],
+    ['b', 6.9, 49.71, 1.3, 8.3, 49.75, 1.33, 'wood'],
+    ['b', 7.1, 49.69, 0.7, 7.5, 49.77, 1.4, 'linen'],
+    ['b', 7.7, 49.69, 0.55, 8.1, 49.77, 1.3, 'white'],
+    ['b', 0.25, 46.73, 1.8, 0.31, 48.33, 1.9, 'oak'],
+    ['b', 0.31, 46.91, 1.78, 0.39, 46.95, 1.84, 'brass'],
+    ['b', 0.31, 47.21, 1.78, 0.39, 47.25, 1.84, 'brass'],
+    ['b', 0.31, 47.51, 1.78, 0.39, 47.55, 1.84, 'brass'],
+    ['b', 0.31, 47.81, 1.78, 0.39, 47.85, 1.84, 'brass'],
+    ['b', 0.31, 48.11, 1.78, 0.39, 48.15, 1.84, 'brass'],
+    ['b', 0.31, 47.08, 0.7, 0.37, 47.38, 1.78, 'dark'],
+    ['b', 0.31, 47.77, 1.3, 0.36, 47.89, 1.78, 'ruby'],
+    ['b', 0.31, 48.03, 1.66, 0.41, 48.23, 1.78, 'tartan'],
+    ['b', 4.4, 41.15, 0.0, 8.0, 43.75, 0.016, 'gilt'],
+    ['b', 4.52, 41.27, 0.016, 7.88, 43.63, 0.02, 'blue'],
+    ['b', 5.48, 42.06, 0.02, 6.92, 42.84, 0.024, 'gilt'],
+    ['b', 4.94, 39.58, 2.1, 5.06, 39.62, 2.4, 'brass'],
+    ['b', 4.975, 39.62, 2.2, 5.025, 39.78, 2.26, 'brass'],
+    ['b', 4.95, 39.72, 2.26, 5.05, 39.82, 2.4, 'linen'],
+    ['b', 4.98, 39.75, 2.4, 5.02, 39.79, 2.5, 'amber'],
+    ['b', 7.34, 39.58, 2.1, 7.46, 39.62, 2.4, 'brass'],
+    ['b', 7.375, 39.62, 2.2, 7.425, 39.78, 2.26, 'brass'],
+    ['b', 7.35, 39.72, 2.26, 7.45, 39.82, 2.4, 'linen'],
+    ['b', 7.38, 39.75, 2.4, 7.42, 39.79, 2.5, 'amber'],
+    ['b', 4.94, 49.71, 2.1, 5.06, 49.75, 2.4, 'brass'],
+    ['b', 4.975, 49.55, 2.2, 5.025, 49.71, 2.26, 'brass'],
+    ['b', 4.95, 49.51, 2.26, 5.05, 49.61, 2.4, 'linen'],
+    ['b', 4.98, 49.54, 2.4, 5.02, 49.58, 2.5, 'amber'],
+    ['b', 7.74, 49.71, 2.1, 7.86, 49.75, 2.4, 'brass'],
+    ['b', 7.775, 49.55, 2.2, 7.825, 49.71, 2.26, 'brass'],
+    ['b', 7.75, 49.51, 2.26, 7.85, 49.61, 2.4, 'linen'],
+    ['b', 7.78, 49.54, 2.4, 7.82, 49.58, 2.5, 'amber'],
+    ['b', 12.11, 43.47, 2.1, 12.15, 43.59, 2.4, 'brass'],
+    ['b', 11.95, 43.505, 2.2, 12.11, 43.555, 2.26, 'brass'],
+    ['b', 11.91, 43.48, 2.26, 12.01, 43.58, 2.4, 'linen'],
+    ['b', 11.94, 43.51, 2.4, 11.98, 43.55, 2.5, 'amber'],
+    ['b', 12.11, 45.67, 2.1, 12.15, 45.79, 2.4, 'brass'],
+    ['b', 11.95, 45.705, 2.2, 12.11, 45.755, 2.26, 'brass'],
+    ['b', 11.91, 45.68, 2.26, 12.01, 45.78, 2.4, 'linen'],
+    ['b', 11.94, 45.71, 2.4, 11.98, 45.75, 2.5, 'amber'],
+    ['b', 0.25, 43.97, 2.1, 0.29, 44.09, 2.4, 'brass'],
+    ['b', 0.29, 44.005, 2.2, 0.45, 44.055, 2.26, 'brass'],
+    ['b', 0.39, 43.98, 2.26, 0.49, 44.08, 2.4, 'linen'],
+    ['b', 0.42, 44.01, 2.4, 0.46, 44.05, 2.5, 'amber'],
+    ['b', 0.25, 46.67, 2.1, 0.29, 46.79, 2.4, 'brass'],
+    ['b', 0.29, 46.705, 2.2, 0.45, 46.755, 2.26, 'brass'],
+    ['b', 0.39, 46.68, 2.26, 0.49, 46.78, 2.4, 'linen'],
+    ['b', 0.42, 46.71, 2.4, 0.46, 46.75, 2.5, 'amber'],
+    ['b', 6.25, 44.605, 3.5, 6.3, 44.655, 4.6, 'iron'],
+    ['b', 5.75, 44.13, 3.35, 6.75, 45.13, 3.45, 'brass'],
+    ['b', 5.95, 44.33, 3.1, 6.55, 44.93, 3.2, 'brass'],
+    ['b', 5.75, 44.1, 3.45, 5.81, 44.16, 3.62, 'linen'],
+    ['b', 5.76, 44.11, 3.62, 5.8, 44.15, 3.7, 'amber'],
+    ['b', 5.75, 45.05, 3.45, 5.81, 45.11, 3.62, 'linen'],
+    ['b', 5.76, 45.06, 3.62, 5.8, 45.1, 3.7, 'amber'],
+    ['b', 6.7, 44.1, 3.45, 6.76, 44.16, 3.62, 'linen'],
+    ['b', 6.71, 44.11, 3.62, 6.75, 44.15, 3.7, 'amber'],
+    ['b', 6.7, 45.05, 3.45, 6.76, 45.11, 3.62, 'linen'],
+    ['b', 6.71, 45.06, 3.62, 6.75, 45.1, 3.7, 'amber'],
+    ['b', 5.75, 44.58, 3.45, 5.81, 44.64, 3.62, 'linen'],
+    ['b', 5.76, 44.59, 3.62, 5.8, 44.63, 3.7, 'amber'],
+    ['b', 6.7, 44.58, 3.45, 6.76, 44.64, 3.62, 'linen'],
+    ['b', 6.71, 44.59, 3.62, 6.75, 44.63, 3.7, 'amber'],
+    ['b', 6.23, 44.1, 3.45, 6.29, 44.16, 3.62, 'linen'],
+    ['b', 6.24, 44.11, 3.62, 6.28, 44.15, 3.7, 'amber'],
+    ['b', 6.23, 45.05, 3.45, 6.29, 45.11, 3.62, 'linen'],
+    ['b', 6.24, 45.06, 3.62, 6.28, 45.1, 3.7, 'amber'],
+    ['b', 5.95, 44.31, 3.2, 5.99, 44.35, 3.32, 'amber'],
+    ['b', 5.95, 44.87, 3.2, 5.99, 44.91, 3.32, 'amber'],
+    ['b', 6.51, 44.31, 3.2, 6.55, 44.35, 3.32, 'amber'],
+    ['b', 6.51, 44.87, 3.2, 6.55, 44.91, 3.32, 'amber']]);
+  T['staff-bedroom-2-west'].lights = (T['staff-bedroom-2-west'].lights || []).concat([[5.7, 39.83, 0.5, 16757862, 1.1, 8], [2.0, 39.88, 2.33, 16757862, 1.1, 8], [6.2, 49.45, 2.33, 16757862, 1.1, 8]]);
+})(window.SHELL_W5A.things);
+/* HAND2 end staff-bedroom-2-west */
+/* HAND2 begin armour-repair-room-3 */
+/* Interiors req 2423 sec 14: a cold iron stove, lamps over the bench, vice, hammers, armour on a stand, grindstone, barrel, helm shelf; req 2532 adds hangings, a dado and a thing to read or pull; req 2532 adds hangings, a dado and a thing to read or pull; req 2543 / row 2658 after Godric 4.27 pm (1 Nov, the 437th): pendants, sconces, framed papers, seats, standard lamps; req 2532 adds hangings, a dado and a thing to read or pull; req 2543 / row 2658 after Godric 4.55 pm (2 Nov, the 438th): tapestries, portraits, chandeliers, rugs, room-use pieces; sited by tools/architect-hand-rooms-1101.py, plain stand-ins (Objects draw the real ones) */
+(function (T) {
+  T['armour-repair-room-3'] = T['armour-repair-room-3'] || { items: [] };
+  T['armour-repair-room-3'].items = T['armour-repair-room-3'].items.concat([
+    ['b', 26.74, 3.85, 0, 27.44, 4.55, 1.2, 'iron'],
+    ['b', 26.965, 4.55, 0.2, 27.215, 4.75, 1.0, 'black'],
+    ['b', 23.73, 3.85, 1.9, 23.85, 3.89, 2.3, 'iron'],
+    ['b', 23.765, 3.89, 2.25, 23.815, 4.15, 2.3, 'iron'],
+    ['b', 23.73, 4.11, 2.0, 23.85, 4.19, 2.28, 'flame'],
+    ['b', 30.33, 3.85, 1.9, 30.45, 3.89, 2.3, 'iron'],
+    ['b', 30.365, 3.89, 2.25, 30.415, 4.15, 2.3, 'iron'],
+    ['b', 30.33, 4.11, 2.0, 30.45, 4.19, 2.28, 'flame'],
+    ['b', 27.03, 17.96, 1.9, 27.15, 18.0, 2.3, 'iron'],
+    ['b', 27.065, 17.7, 2.25, 27.115, 17.96, 2.3, 'iron'],
+    ['b', 27.03, 17.66, 2.0, 27.15, 17.74, 2.28, 'flame'],
+    ['b', 21.64, 10.5, 0, 22.34, 12.7, 0.9, 'oak'],
+    ['b', 21.74, 10.8, 0.9, 21.99, 11.0, 1.1, 'iron'],
+    ['b', 21.84, 11.925, 0.9, 22.14, 12.075, 0.95, 'tin'],
+    ['b', 21.64, 5.9, 1.5, 21.72, 7.5, 1.56, 'oak'],
+    ['b', 21.68, 5.98, 1.1, 21.76, 6.12, 1.5, 'iron'],
+    ['b', 21.68, 6.26, 1.1, 21.76, 6.36, 1.5, 'iron'],
+    ['b', 21.68, 6.5, 1.1, 21.76, 6.64, 1.5, 'iron'],
+    ['b', 21.68, 6.78, 1.1, 21.76, 6.88, 1.5, 'iron'],
+    ['b', 21.68, 7.02, 1.1, 21.76, 7.16, 1.5, 'iron'],
+    ['b', 21.68, 7.3, 1.1, 21.76, 7.4, 1.5, 'iron'],
+    ['b', 31.94, 8.07, 0, 32.54, 8.13, 1.7, 'iron'],
+    ['b', 32.04, 7.85, 1.05, 32.44, 8.35, 1.55, 'tin'],
+    ['b', 32.14, 7.95, 1.55, 32.39, 8.25, 1.8, 'tin'],
+    ['b', 31.94, 11.17, 0, 32.54, 11.23, 1.7, 'iron'],
+    ['b', 32.04, 10.95, 1.05, 32.44, 11.45, 1.55, 'tin'],
+    ['b', 32.14, 11.05, 1.55, 32.39, 11.35, 1.8, 'tin'],
+    ['b', 22.89, 17.4, 0, 23.69, 18.0, 0.6, 'oak'],
+    ['b', 23.23, 17.45, 0.5, 23.35, 17.9, 1.05, 'stone'],
+    ['b', 22.14, 17.3, 0, 22.84, 18.0, 0.9, 'wood'],
+    ['b', 22.165, 17.35, 0.9, 22.815, 17.95, 0.95, 'linen'],
+    ['b', 21.64, 15.3, 1.7, 21.86, 16.5, 1.73, 'oak'],
+    ['b', 21.69, 15.38, 1.73, 21.83, 15.52, 1.93, 'glass'],
+    ['b', 21.69, 15.65, 1.73, 21.79, 15.75, 1.87, 'copper'],
+    ['b', 21.69, 15.89, 1.73, 21.81, 16.01, 1.83, 'stone'],
+    ['b', 21.69, 16.15, 1.73, 21.79, 16.25, 1.97, 'amber'],
+    ['b', 21.69, 16.36, 1.73, 21.77, 16.44, 1.85, 'ruby'],
+    ['b', 21.69, 3.85, 1.2, 23.69, 3.91, 2.4, 'oak'],
+    ['b', 21.815, 3.91, 2.1, 21.865, 3.93, 2.16, 'gilt'],
+    ['b', 21.74, 3.91, 1.7, 21.94, 3.94, 2.1, 'linen'],
+    ['b', 21.78, 3.94, 1.85, 21.9, 3.95, 1.9, 'black'],
+    ['b', 22.095, 3.91, 2.1, 22.145, 3.93, 2.16, 'gilt'],
+    ['b', 22.02, 3.91, 1.7, 22.22, 3.94, 2.1, 'linen'],
+    ['b', 22.06, 3.94, 1.85, 22.18, 3.95, 1.9, 'black'],
+    ['b', 22.375, 3.91, 2.1, 22.425, 3.93, 2.16, 'gilt'],
+    ['b', 22.3, 3.91, 1.7, 22.5, 3.94, 2.1, 'linen'],
+    ['b', 22.34, 3.94, 1.85, 22.46, 3.95, 1.9, 'black'],
+    ['b', 22.655, 3.91, 2.1, 22.705, 3.93, 2.16, 'gilt'],
+    ['b', 22.58, 3.91, 1.7, 22.78, 3.94, 2.1, 'linen'],
+    ['b', 22.62, 3.94, 1.85, 22.74, 3.95, 1.9, 'black'],
+    ['b', 22.935, 3.91, 2.1, 22.985, 3.93, 2.16, 'gilt'],
+    ['b', 22.86, 3.91, 1.7, 23.06, 3.94, 2.1, 'linen'],
+    ['b', 22.9, 3.94, 1.85, 23.02, 3.95, 1.9, 'black'],
+    ['b', 23.215, 3.91, 2.1, 23.265, 3.93, 2.16, 'gilt'],
+    ['b', 23.14, 3.91, 1.7, 23.34, 3.94, 2.1, 'linen'],
+    ['b', 23.18, 3.94, 1.85, 23.3, 3.95, 1.9, 'black'],
+    ['b', 23.495, 3.91, 2.1, 23.545, 3.93, 2.16, 'gilt'],
+    ['b', 23.42, 3.91, 1.7, 23.62, 3.94, 2.1, 'linen'],
+    ['b', 23.46, 3.94, 1.85, 23.58, 3.95, 1.9, 'black'],
+    ['b', 26.39, 17.55, 0.8, 27.79, 18.0, 1.7, 'oak'],
+    ['b', 26.64, 17.52, 0.95, 26.7, 17.55, 1.0, 'gilt'],
+    ['b', 27.06, 17.52, 0.95, 27.12, 17.55, 1.0, 'gilt'],
+    ['b', 27.48, 17.52, 0.95, 27.54, 17.55, 1.0, 'gilt'],
+    ['b', 26.64, 17.52, 1.15, 26.7, 17.55, 1.2, 'gilt'],
+    ['b', 27.06, 17.52, 1.15, 27.12, 17.55, 1.2, 'gilt'],
+    ['b', 27.48, 17.52, 1.15, 27.54, 17.55, 1.2, 'gilt'],
+    ['b', 26.64, 17.52, 1.35, 26.7, 17.55, 1.4, 'gilt'],
+    ['b', 27.06, 17.52, 1.35, 27.12, 17.55, 1.4, 'gilt'],
+    ['b', 27.48, 17.52, 1.35, 27.54, 17.55, 1.4, 'gilt'],
+    ['b', 26.64, 17.52, 1.55, 26.7, 17.55, 1.6, 'gilt'],
+    ['b', 27.06, 17.52, 1.55, 27.12, 17.55, 1.6, 'gilt'],
+    ['b', 27.48, 17.52, 1.55, 27.54, 17.55, 1.6, 'gilt'],
+    ['b', 25.44, 17.94, 1.6, 25.54, 18.0, 1.7, 'gilt'],
+    ['b', 25.19, 17.92, 0.6, 25.79, 17.94, 1.6, 'wood'],
+    ['b', 25.39, 17.91, 1.3, 25.59, 17.94, 1.45, 'black'],
+    ['b', 21.69, 17.6, 0, 22.09, 18.0, 0.4, 'wood'],
+    ['b', 21.72, 17.66, 0.4, 22.06, 17.98, 0.44, 'dust'],
+    ['b', 32.4, 9.4, 4.0, 32.54, 11.6, 4.2, 'black'],
+    ['b', 32.49, 10.765, 1.4, 32.54, 10.835, 1.77, 'dust'],
+    ['b', 32.49, 10.765, 1.77, 32.54, 10.835, 2.14, 'black'],
+    ['b', 32.49, 10.765, 2.14, 32.54, 10.835, 2.51, 'dust'],
+    ['b', 32.49, 10.765, 2.51, 32.54, 10.835, 2.88, 'black'],
+    ['b', 32.49, 10.765, 2.88, 32.54, 10.835, 3.25, 'dust'],
+    ['b', 32.49, 10.765, 3.25, 32.54, 10.835, 3.62, 'black'],
+    ['b', 32.49, 10.765, 3.62, 32.54, 10.835, 3.99, 'dust'],
+    ['b', 32.4, 10.73, 1.3, 32.54, 10.87, 1.4, 'gilt'],
+    ['b', 23.93, 3.85, 2.1, 24.05, 3.89, 2.4, 'brass'],
+    ['b', 23.965, 3.89, 2.2, 24.015, 4.05, 2.26, 'brass'],
+    ['b', 23.94, 3.99, 2.26, 24.04, 4.09, 2.4, 'linen'],
+    ['b', 23.97, 4.02, 2.4, 24.01, 4.06, 2.5, 'amber'],
+    ['b', 31.63, 3.85, 2.1, 31.75, 3.89, 2.4, 'brass'],
+    ['b', 31.665, 3.89, 2.2, 31.715, 4.05, 2.26, 'brass'],
+    ['b', 31.64, 3.99, 2.26, 31.74, 4.09, 2.4, 'linen'],
+    ['b', 31.67, 4.02, 2.4, 31.71, 4.06, 2.5, 'amber'],
+    ['b', 22.93, 17.96, 2.1, 23.05, 18.0, 2.4, 'brass'],
+    ['b', 22.965, 17.8, 2.2, 23.015, 17.96, 2.26, 'brass'],
+    ['b', 22.94, 17.76, 2.26, 23.04, 17.86, 2.4, 'linen'],
+    ['b', 22.97, 17.79, 2.4, 23.01, 17.83, 2.5, 'amber'],
+    ['b', 28.93, 17.96, 2.1, 29.05, 18.0, 2.4, 'brass'],
+    ['b', 28.965, 17.8, 2.2, 29.015, 17.96, 2.26, 'brass'],
+    ['b', 28.94, 17.76, 2.26, 29.04, 17.86, 2.4, 'linen'],
+    ['b', 28.97, 17.79, 2.4, 29.01, 17.83, 2.5, 'amber'],
+    ['b', 32.5, 5.94, 2.1, 32.54, 6.06, 2.4, 'brass'],
+    ['b', 32.34, 5.975, 2.2, 32.5, 6.025, 2.26, 'brass'],
+    ['b', 32.3, 5.95, 2.26, 32.4, 6.05, 2.4, 'linen'],
+    ['b', 32.33, 5.98, 2.4, 32.37, 6.02, 2.5, 'amber'],
+    ['b', 32.5, 10.94, 2.1, 32.54, 11.06, 2.4, 'brass'],
+    ['b', 32.34, 10.975, 2.2, 32.5, 11.025, 2.26, 'brass'],
+    ['b', 32.3, 10.95, 2.26, 32.4, 11.05, 2.4, 'linen'],
+    ['b', 32.33, 10.98, 2.4, 32.37, 11.02, 2.5, 'amber'],
+    ['b', 21.64, 8.04, 2.1, 21.68, 8.16, 2.4, 'brass'],
+    ['b', 21.68, 8.075, 2.2, 21.84, 8.125, 2.26, 'brass'],
+    ['b', 21.78, 8.05, 2.26, 21.88, 8.15, 2.4, 'linen'],
+    ['b', 21.81, 8.08, 2.4, 21.85, 8.12, 2.5, 'amber'],
+    ['b', 21.64, 14.44, 2.1, 21.68, 14.56, 2.4, 'brass'],
+    ['b', 21.68, 14.475, 2.2, 21.84, 14.525, 2.26, 'brass'],
+    ['b', 21.78, 14.45, 2.26, 21.88, 14.55, 2.4, 'linen'],
+    ['b', 21.81, 14.48, 2.4, 21.85, 14.52, 2.5, 'amber'],
+    ['b', 24.49, 3.85, 1.3, 25.29, 3.89, 2.3, 'gilt'],
+    ['b', 24.53, 3.89, 1.34, 25.25, 3.91, 2.26, 'linen'],
+    ['b', 24.64, 3.91, 1.85, 25.14, 3.92, 1.9, 'black'],
+    ['b', 24.69, 3.91, 1.65, 25.09, 3.92, 1.7, 'black'],
+    ['b', 30.49, 3.85, 1.4, 31.49, 3.89, 2.1, 'gilt'],
+    ['b', 30.53, 3.89, 1.44, 31.45, 3.91, 2.06, 'linen'],
+    ['b', 30.64, 3.91, 1.785, 31.34, 3.92, 1.82, 'ruby'],
+    ['b', 30.69, 3.91, 1.645, 31.29, 3.92, 1.68, 'ruby'],
+    ['b', 23.89, 17.96, 1.4, 25.09, 18.0, 2.3, 'gilt'],
+    ['b', 23.93, 17.94, 1.44, 25.05, 17.96, 2.26, 'linen'],
+    ['b', 24.04, 17.93, 1.895, 24.94, 17.94, 1.94, 'blue'],
+    ['b', 24.09, 17.93, 1.715, 24.89, 17.94, 1.76, 'blue'],
+    ['b', 28.14, 17.96, 1.3, 28.84, 18.0, 2.2, 'gilt'],
+    ['b', 28.18, 17.94, 1.34, 28.8, 17.96, 2.16, 'linen'],
+    ['b', 28.29, 17.93, 1.795, 28.69, 17.94, 1.84, 'black'],
+    ['b', 28.34, 17.93, 1.615, 28.64, 17.94, 1.66, 'black'],
+    ['b', 32.5, 7.2, 1.4, 32.54, 8.0, 2.2, 'gilt'],
+    ['b', 32.48, 7.24, 1.44, 32.5, 7.96, 2.16, 'linen'],
+    ['b', 32.47, 7.35, 1.84, 32.48, 7.85, 1.88, 'black'],
+    ['b', 32.47, 7.4, 1.68, 32.48, 7.8, 1.72, 'black'],
+    ['b', 32.5, 9.5, 1.4, 32.54, 10.7, 2.2, 'gilt'],
+    ['b', 32.48, 9.54, 1.44, 32.5, 10.66, 2.16, 'linen'],
+    ['b', 32.47, 9.65, 1.84, 32.48, 10.55, 1.88, 'ruby'],
+    ['b', 32.47, 9.7, 1.68, 32.48, 10.5, 1.72, 'ruby'],
+    ['b', 32.04, 9.45, 0, 32.54, 10.95, 0.42, 'oak'],
+    ['b', 32.08, 9.5, 0.42, 32.5, 10.9, 0.5, 'dark'],
+    ['b', 32.14, 10.3, 0.5, 32.46, 10.8, 0.56, 'tartan'],
+    ['b', 32.04, 6.45, 0, 32.54, 7.95, 0.42, 'oak'],
+    ['b', 32.08, 6.5, 0.42, 32.5, 7.9, 0.5, 'dark'],
+    ['b', 32.14, 7.3, 0.5, 32.46, 7.8, 0.56, 'tartan'],
+    ['b', 23.04, 3.85, 0, 24.54, 4.35, 0.42, 'oak'],
+    ['b', 23.09, 3.89, 0.42, 24.49, 4.31, 0.5, 'dark'],
+    ['b', 23.89, 3.93, 0.5, 24.39, 4.25, 0.56, 'tartan'],
+    ['b', 23.365, 5.45, 0, 24.215, 6.25, 0.45, 'leather'],
+    ['b', 23.365, 5.45, 0.45, 24.215, 5.65, 1.1, 'leather'],
+    ['b', 23.36, 5.65, 0.45, 23.46, 6.25, 0.65, 'leather'],
+    ['b', 24.12, 5.65, 0.45, 24.22, 6.25, 0.65, 'leather'],
+    ['b', 23.54, 6.4, 0, 24.04, 6.8, 0.3, 'leather'],
+    ['b', 24.49, 5.55, 0, 24.69, 5.75, 0.06, 'oak'],
+    ['b', 24.56, 5.62, 0.06, 24.62, 5.68, 1.5, 'brass'],
+    ['b', 24.47, 5.53, 1.5, 24.71, 5.77, 1.7, 'linen'],
+    ['b', 25.74, 7.95, 0, 25.84, 8.05, 0.88, 'oak'],
+    ['b', 26.59, 7.95, 0, 26.69, 8.05, 0.88, 'oak'],
+    ['b', 25.74, 10.95, 0, 25.84, 11.05, 0.88, 'oak'],
+    ['b', 26.59, 10.95, 0, 26.69, 11.05, 0.88, 'oak'],
+    ['b', 25.64, 7.8, 0.88, 26.74, 11.2, 0.96, 'oak'],
+    ['b', 25.84, 8.35, 0.96, 26.54, 9.05, 1.04, 'tin'],
+    ['b', 25.99, 8.5, 1.04, 26.39, 8.9, 1.12, 'tin'],
+    ['b', 25.94, 9.825, 0.96, 26.34, 10.175, 1.2, 'tin'],
+    ['b', 26.09, 8.525, 1.12, 26.24, 8.875, 1.14, 'linen'],
+    ['b', 26.44, 10.475, 0.96, 26.52, 10.525, 1.0, 'iron'],
+    ['b', 26.44, 10.595, 0.96, 26.52, 10.645, 1.0, 'iron'],
+    ['b', 26.44, 10.715, 0.96, 26.52, 10.765, 1.0, 'iron'],
+    ['b', 26.44, 10.835, 0.96, 26.52, 10.885, 1.0, 'iron'],
+    ['b', 26.44, 10.955, 0.96, 26.52, 11.005, 1.0, 'iron'],
+    ['b', 24.64, 6.75, 0, 25.14, 7.25, 0.55, 'oak'],
+    ['b', 24.54, 6.85, 0.55, 25.24, 7.15, 0.7, 'iron'],
+    ['b', 24.74, 6.6, 0.7, 25.04, 7.4, 0.78, 'iron'],
+    ['b', 24.79, 7.3, 0.7, 24.99, 7.6, 0.76, 'iron'],
+    ['b', 24.64, 14.72, 0, 25.0, 15.08, 0.45, 'oak'],
+    ['b', 27.04, 14.72, 0, 27.4, 15.08, 0.45, 'oak'],
+    ['b', 32.44, 4.0, 0.9, 32.54, 6.0, 0.96, 'oak'],
+    ['b', 32.44, 4.0, 1.9, 32.54, 6.0, 1.96, 'oak'],
+    ['b', 32.47, 4.18, 0.0, 32.52, 4.22, 2.2, 'oak'],
+    ['b', 32.45, 4.12, 2.2, 32.54, 4.28, 2.45, 'tin'],
+    ['b', 32.47, 4.5, 0.0, 32.52, 4.54, 2.2, 'oak'],
+    ['b', 32.45, 4.44, 2.2, 32.54, 4.6, 2.45, 'tin'],
+    ['b', 32.47, 4.82, 0.0, 32.52, 4.86, 2.2, 'oak'],
+    ['b', 32.45, 4.76, 2.2, 32.54, 4.92, 2.45, 'tin'],
+    ['b', 32.47, 5.14, 0.0, 32.52, 5.18, 2.2, 'oak'],
+    ['b', 32.45, 5.08, 2.2, 32.54, 5.24, 2.45, 'tin'],
+    ['b', 32.47, 5.46, 0.0, 32.52, 5.5, 2.2, 'oak'],
+    ['b', 32.45, 5.4, 2.2, 32.54, 5.56, 2.45, 'tin'],
+    ['b', 32.47, 5.78, 0.0, 32.52, 5.82, 2.2, 'oak'],
+    ['b', 32.45, 5.72, 2.2, 32.54, 5.88, 2.45, 'tin'],
+    ['b', 21.64, 10.4, 1.95, 21.72, 12.6, 2.0, 'oak'],
+    ['b', 21.64, 10.49, 1.2, 21.76, 10.91, 1.95, 'tin'],
+    ['b', 21.64, 11.02, 1.2, 21.76, 11.44, 1.95, 'tin'],
+    ['b', 21.64, 11.55, 1.2, 21.76, 11.97, 1.95, 'tin'],
+    ['b', 21.64, 12.08, 1.2, 21.76, 12.5, 1.95, 'tin'],
+    ['b', 30.24, 8.15, 0, 30.34, 8.25, 0.88, 'oak'],
+    ['b', 31.09, 8.15, 0, 31.19, 8.25, 0.88, 'oak'],
+    ['b', 30.24, 11.15, 0, 30.34, 11.25, 0.88, 'oak'],
+    ['b', 31.09, 11.15, 0, 31.19, 11.25, 0.88, 'oak'],
+    ['b', 30.14, 8.0, 0.88, 31.24, 11.4, 0.96, 'oak'],
+    ['b', 30.34, 8.55, 0.96, 31.04, 9.25, 1.04, 'tin'],
+    ['b', 30.49, 8.7, 1.04, 30.89, 9.1, 1.12, 'tin'],
+    ['b', 30.44, 10.025, 0.96, 30.84, 10.375, 1.2, 'tin'],
+    ['b', 30.59, 8.725, 1.12, 30.74, 9.075, 1.14, 'linen'],
+    ['b', 30.94, 10.675, 0.96, 31.02, 10.725, 1.0, 'iron'],
+    ['b', 30.94, 10.795, 0.96, 31.02, 10.845, 1.0, 'iron'],
+    ['b', 30.94, 10.915, 0.96, 31.02, 10.965, 1.0, 'iron'],
+    ['b', 30.94, 11.035, 0.96, 31.02, 11.085, 1.0, 'iron'],
+    ['b', 30.94, 11.155, 0.96, 31.02, 11.205, 1.0, 'iron'],
+    ['b', 25.36, 3.85, 0, 25.42, 4.45, 1.7, 'iron'],
+    ['b', 25.14, 3.95, 1.05, 25.64, 4.35, 1.55, 'tin'],
+    ['b', 25.24, 4.0, 1.55, 25.54, 4.25, 1.8, 'tin'],
+    ['b', 30.36, 3.85, 0, 30.42, 4.45, 1.7, 'iron'],
+    ['b', 30.14, 3.95, 1.05, 30.64, 4.35, 1.55, 'tin'],
+    ['b', 30.24, 4.0, 1.55, 30.54, 4.25, 1.8, 'tin'],
+    ['b', 21.64, 4.85, 0, 21.94, 5.15, 0.05, 'iron'],
+    ['b', 21.76, 4.97, 0.05, 21.82, 5.03, 1.6, 'brass'],
+    ['b', 21.64, 4.85, 1.6, 21.94, 5.15, 1.95, 'linen'],
+    ['b', 21.64, 16.75, 0, 21.94, 17.05, 0.05, 'iron'],
+    ['b', 21.76, 16.87, 0.05, 21.82, 16.93, 1.6, 'brass'],
+    ['b', 21.64, 16.75, 1.6, 21.94, 17.05, 1.95, 'linen'],
+    ['b', 24.91, 8.08, 3.4, 24.95, 8.12, 4.5, 'iron'],
+    ['b', 24.61, 7.8, 3.3, 25.21, 8.4, 3.4, 'brass'],
+    ['b', 24.61, 7.79, 3.0, 24.67, 7.85, 3.3, 'amber'],
+    ['b', 24.61, 8.35, 3.0, 24.67, 8.41, 3.3, 'amber'],
+    ['b', 25.15, 7.79, 3.0, 25.21, 7.85, 3.3, 'amber'],
+    ['b', 25.15, 8.35, 3.0, 25.21, 8.41, 3.3, 'amber'],
+    ['b', 29.23, 8.08, 3.4, 29.27, 8.12, 4.5, 'iron'],
+    ['b', 28.97, 7.8, 3.3, 29.57, 8.4, 3.4, 'brass'],
+    ['b', 29.51, 7.79, 3.0, 29.57, 7.85, 3.3, 'amber'],
+    ['b', 29.51, 8.35, 3.0, 29.57, 8.41, 3.3, 'amber'],
+    ['b', 28.97, 7.79, 3.0, 29.03, 7.85, 3.3, 'amber'],
+    ['b', 28.97, 8.35, 3.0, 29.03, 8.41, 3.3, 'amber'],
+    ['b', 26.91, 13.78, 3.4, 26.95, 13.82, 4.5, 'iron'],
+    ['b', 26.61, 13.5, 3.3, 27.21, 14.1, 3.4, 'brass'],
+    ['b', 26.61, 13.49, 3.0, 26.67, 13.55, 3.3, 'amber'],
+    ['b', 26.61, 14.05, 3.0, 26.67, 14.11, 3.3, 'amber'],
+    ['b', 27.15, 13.49, 3.0, 27.21, 13.55, 3.3, 'amber'],
+    ['b', 27.15, 14.05, 3.0, 27.21, 14.11, 3.3, 'amber'],
+    ['b', 27.23, 13.08, 3.4, 27.27, 13.12, 4.5, 'iron'],
+    ['b', 26.97, 12.8, 3.3, 27.57, 13.4, 3.4, 'brass'],
+    ['b', 27.51, 12.79, 3.0, 27.57, 12.85, 3.3, 'amber'],
+    ['b', 27.51, 13.35, 3.0, 27.57, 13.41, 3.3, 'amber'],
+    ['b', 26.97, 12.79, 3.0, 27.03, 12.85, 3.3, 'amber'],
+    ['b', 26.97, 13.35, 3.0, 27.03, 13.41, 3.3, 'amber'],
+    ['b', 26.64, 3.85, 1.2, 27.54, 3.93, 3.8, 'gilt'],
+    ['b', 26.76, 3.93, 1.32, 27.42, 3.94, 3.68, 'ruby'],
+    ['b', 26.76, 3.94, 1.5, 27.42, 3.95, 1.62, 'gilt'],
+    ['b', 26.76, 3.94, 3.38, 27.42, 3.95, 3.5, 'gilt'],
+    ['b', 26.59, 3.85, 3.8, 27.59, 3.94, 3.84, 'wood'],
+    ['b', 21.94, 17.92, 1.2, 22.84, 18.0, 3.8, 'gilt'],
+    ['b', 22.06, 17.91, 1.32, 22.72, 17.92, 3.68, 'blue'],
+    ['b', 22.06, 17.9, 1.5, 22.72, 17.91, 1.62, 'gilt'],
+    ['b', 22.06, 17.9, 3.38, 22.72, 17.91, 3.5, 'gilt'],
+    ['b', 21.89, 17.91, 3.8, 22.89, 18.0, 3.84, 'wood'],
+    ['b', 32.46, 6.15, 1.0, 32.54, 7.05, 2.2, 'oak'],
+    ['b', 32.45, 6.22, 1.07, 32.46, 6.98, 2.13, 'black'],
+    ['b', 32.44, 6.54, 1.66, 32.45, 6.74, 1.96, 'dust'],
+    ['b', 32.44, 6.4, 1.24, 32.45, 6.8, 1.6, 'linen'],
+    ['b', 32.45, 6.54, 0.93, 32.54, 6.66, 0.97, 'brass'],
+    ['b', 31.59, 3.85, 1.1, 32.39, 3.93, 2.1, 'black'],
+    ['b', 31.66, 3.93, 1.17, 32.32, 3.94, 2.03, 'black'],
+    ['b', 31.93, 3.94, 1.65, 32.13, 3.95, 1.9, 'dust'],
+    ['b', 31.79, 3.94, 1.3, 32.19, 3.95, 1.6, 'linen'],
+    ['b', 31.93, 3.85, 1.03, 32.05, 3.94, 1.07, 'brass'],
+    ['b', 32.46, 8.45, 1.0, 32.54, 9.35, 2.2, 'rope'],
+    ['b', 32.45, 8.52, 1.07, 32.46, 9.28, 2.13, 'black'],
+    ['b', 32.44, 8.84, 1.66, 32.45, 9.04, 1.96, 'dust'],
+    ['b', 32.44, 8.7, 1.24, 32.45, 9.1, 1.6, 'linen'],
+    ['b', 32.45, 8.84, 0.93, 32.54, 8.96, 0.97, 'brass'],
+    ['b', 25.79, 3.85, 1.1, 26.59, 3.93, 2.1, 'gilt'],
+    ['b', 25.86, 3.93, 1.17, 26.52, 3.94, 2.03, 'black'],
+    ['b', 26.13, 3.94, 1.65, 26.33, 3.95, 1.9, 'dust'],
+    ['b', 25.99, 3.94, 1.3, 26.39, 3.95, 1.6, 'linen'],
+    ['b', 26.13, 3.85, 1.03, 26.25, 3.94, 1.07, 'brass'],
+    ['b', 29.49, 3.85, 1.7, 30.29, 3.92, 2.5, 'oak'],
+    ['b', 29.54, 3.92, 1.75, 30.24, 3.94, 2.45, 'ruby'],
+    ['b', 29.78, 3.94, 2.0, 30.0, 3.99, 2.2, 'iron'],
+    ['b', 29.86, 3.92, 1.6, 29.92, 3.95, 2.7, 'wood'],
+    ['b', 29.56, 3.92, 1.7, 29.62, 3.95, 2.6, 'wood'],
+    ['b', 25.89, 17.93, 1.7, 26.69, 18.0, 2.5, 'oak'],
+    ['b', 25.94, 17.91, 1.75, 26.64, 17.93, 2.45, 'blue'],
+    ['b', 26.18, 17.86, 2.0, 26.4, 17.91, 2.2, 'iron'],
+    ['b', 26.26, 17.9, 1.6, 26.32, 17.93, 2.7, 'wood'],
+    ['b', 25.96, 17.9, 1.7, 26.02, 17.93, 2.6, 'wood'],
+    ['b', 21.64, 7.2, 1.7, 21.71, 8.0, 2.5, 'oak'],
+    ['b', 21.71, 7.25, 1.75, 21.73, 7.95, 2.45, 'green'],
+    ['b', 21.73, 7.49, 2.0, 21.78, 7.71, 2.2, 'iron'],
+    ['b', 21.71, 7.57, 1.6, 21.74, 7.63, 2.7, 'wood'],
+    ['b', 21.71, 7.27, 1.7, 21.74, 7.33, 2.6, 'wood'],
+    ['b', 21.64, 13.4, 1.7, 21.71, 14.2, 2.5, 'oak'],
+    ['b', 21.71, 13.45, 1.75, 21.73, 14.15, 2.45, 'tartan'],
+    ['b', 21.73, 13.69, 2.0, 21.78, 13.91, 2.2, 'iron'],
+    ['b', 21.71, 13.77, 1.6, 21.74, 13.83, 2.7, 'wood'],
+    ['b', 21.71, 13.47, 1.7, 21.74, 13.53, 2.6, 'wood'],
+    ['b', 21.64, 16.25, 0, 22.04, 16.75, 0.7, 'oak'],
+    ['b', 21.64, 16.25, 0.7, 22.54, 16.75, 0.76, 'oak'],
+    ['b', 21.64, 16.25, 0.95, 22.54, 16.75, 1.0, 'oak'],
+    ['b', 21.68, 16.29, 0.76, 22.5, 16.71, 0.95, 'leather'],
+    ['b', 22.34, 16.45, 0.76, 22.59, 16.55, 0.84, 'iron'],
+    ['b', 21.64, 16.475, 1.0, 21.69, 16.525, 1.5, 'wood'],
+    ['b', 30.49, 3.85, 0, 31.89, 4.45, 0.55, 'stone'],
+    ['b', 30.57, 3.93, 0.5, 31.81, 4.37, 0.52, 'black'],
+    ['b', 31.565, 3.95, 0.55, 31.615, 4.35, 0.57, 'iron'],
+    ['b', 21.64, 3.95, 0, 22.34, 4.85, 0.7, 'oak'],
+    ['b', 21.69, 4.0, 0.7, 22.29, 4.8, 0.76, 'black'],
+    ['b', 21.69, 3.95, 0.76, 21.74, 4.85, 1.4, 'oak'],
+    ['b', 21.94, 4.675, 0.76, 22.0, 4.725, 1.1, 'iron'],
+    ['b', 24.14, 9.1, 0.0, 26.54, 12.7, 0.016, 'gilt'],
+    ['b', 24.26, 9.22, 0.016, 26.42, 12.58, 0.02, 'tartan'],
+    ['b', 24.98, 10.18, 0.02, 25.7, 11.62, 0.024, 'gilt'],
+    ['b', 25.93, 3.85, 2.1, 26.05, 3.89, 2.4, 'brass'],
+    ['b', 25.965, 3.89, 2.2, 26.015, 4.05, 2.26, 'brass'],
+    ['b', 25.94, 3.99, 2.26, 26.04, 4.09, 2.4, 'linen'],
+    ['b', 25.97, 4.02, 2.4, 26.01, 4.06, 2.5, 'amber'],
+    ['b', 26.43, 3.85, 2.1, 26.55, 3.89, 2.4, 'brass'],
+    ['b', 26.465, 3.89, 2.2, 26.515, 4.05, 2.26, 'brass'],
+    ['b', 26.44, 3.99, 2.26, 26.54, 4.09, 2.4, 'linen'],
+    ['b', 26.47, 4.02, 2.4, 26.51, 4.06, 2.5, 'amber'],
+    ['b', 25.73, 17.96, 2.1, 25.85, 18.0, 2.4, 'brass'],
+    ['b', 25.765, 17.8, 2.2, 25.815, 17.96, 2.26, 'brass'],
+    ['b', 25.74, 17.76, 2.26, 25.84, 17.86, 2.4, 'linen'],
+    ['b', 25.77, 17.79, 2.4, 25.81, 17.83, 2.5, 'amber'],
+    ['b', 27.93, 17.96, 2.1, 28.05, 18.0, 2.4, 'brass'],
+    ['b', 27.965, 17.8, 2.2, 28.015, 17.96, 2.26, 'brass'],
+    ['b', 27.94, 17.76, 2.26, 28.04, 17.86, 2.4, 'linen'],
+    ['b', 27.97, 17.79, 2.4, 28.01, 17.83, 2.5, 'amber'],
+    ['b', 32.5, 8.24, 2.1, 32.54, 8.36, 2.4, 'brass'],
+    ['b', 32.34, 8.275, 2.2, 32.5, 8.325, 2.26, 'brass'],
+    ['b', 32.3, 8.25, 2.26, 32.4, 8.35, 2.4, 'linen'],
+    ['b', 32.33, 8.28, 2.4, 32.37, 8.32, 2.5, 'amber'],
+    ['b', 32.5, 11.24, 2.1, 32.54, 11.36, 2.4, 'brass'],
+    ['b', 32.34, 11.275, 2.2, 32.5, 11.325, 2.26, 'brass'],
+    ['b', 32.3, 11.25, 2.26, 32.4, 11.35, 2.4, 'linen'],
+    ['b', 32.33, 11.28, 2.4, 32.37, 11.32, 2.5, 'amber'],
+    ['b', 21.64, 9.44, 2.1, 21.68, 9.56, 2.4, 'brass'],
+    ['b', 21.68, 9.475, 2.2, 21.84, 9.525, 2.26, 'brass'],
+    ['b', 21.78, 9.45, 2.26, 21.88, 9.55, 2.4, 'linen'],
+    ['b', 21.81, 9.48, 2.4, 21.85, 9.52, 2.5, 'amber'],
+    ['b', 21.64, 12.24, 2.1, 21.68, 12.36, 2.4, 'brass'],
+    ['b', 21.68, 12.275, 2.2, 21.84, 12.325, 2.26, 'brass'],
+    ['b', 21.78, 12.25, 2.26, 21.88, 12.35, 2.4, 'linen'],
+    ['b', 21.81, 12.28, 2.4, 21.85, 12.32, 2.5, 'amber'],
+    ['b', 27.04, 10.875, 3.5, 27.09, 10.925, 4.6, 'iron'],
+    ['b', 26.54, 10.4, 3.35, 27.54, 11.4, 3.45, 'brass'],
+    ['b', 26.74, 10.6, 3.1, 27.34, 11.2, 3.2, 'brass'],
+    ['b', 26.54, 10.37, 3.45, 26.6, 10.43, 3.62, 'linen'],
+    ['b', 26.55, 10.38, 3.62, 26.59, 10.42, 3.7, 'amber'],
+    ['b', 26.54, 11.32, 3.45, 26.6, 11.38, 3.62, 'linen'],
+    ['b', 26.55, 11.33, 3.62, 26.59, 11.37, 3.7, 'amber'],
+    ['b', 27.49, 10.37, 3.45, 27.55, 10.43, 3.62, 'linen'],
+    ['b', 27.5, 10.38, 3.62, 27.54, 10.42, 3.7, 'amber'],
+    ['b', 27.49, 11.32, 3.45, 27.55, 11.38, 3.62, 'linen'],
+    ['b', 27.5, 11.33, 3.62, 27.54, 11.37, 3.7, 'amber'],
+    ['b', 26.54, 10.85, 3.45, 26.6, 10.91, 3.62, 'linen'],
+    ['b', 26.55, 10.86, 3.62, 26.59, 10.9, 3.7, 'amber'],
+    ['b', 27.49, 10.85, 3.45, 27.55, 10.91, 3.62, 'linen'],
+    ['b', 27.5, 10.86, 3.62, 27.54, 10.9, 3.7, 'amber'],
+    ['b', 27.02, 10.37, 3.45, 27.08, 10.43, 3.62, 'linen'],
+    ['b', 27.03, 10.38, 3.62, 27.07, 10.42, 3.7, 'amber'],
+    ['b', 27.02, 11.32, 3.45, 27.08, 11.38, 3.62, 'linen'],
+    ['b', 27.03, 11.33, 3.62, 27.07, 11.37, 3.7, 'amber'],
+    ['b', 26.74, 10.58, 3.2, 26.78, 10.62, 3.32, 'amber'],
+    ['b', 26.74, 11.14, 3.2, 26.78, 11.18, 3.32, 'amber'],
+    ['b', 27.3, 10.58, 3.2, 27.34, 10.62, 3.32, 'amber'],
+    ['b', 27.3, 11.14, 3.2, 27.34, 11.18, 3.32, 'amber'],
+    ['b', 31.04, 10.875, 3.5, 31.09, 10.925, 4.6, 'iron'],
+    ['b', 30.54, 10.4, 3.35, 31.54, 11.4, 3.45, 'brass'],
+    ['b', 30.74, 10.6, 3.1, 31.34, 11.2, 3.2, 'brass'],
+    ['b', 30.54, 10.37, 3.45, 30.6, 10.43, 3.62, 'linen'],
+    ['b', 30.55, 10.38, 3.62, 30.59, 10.42, 3.7, 'amber'],
+    ['b', 30.54, 11.32, 3.45, 30.6, 11.38, 3.62, 'linen'],
+    ['b', 30.55, 11.33, 3.62, 30.59, 11.37, 3.7, 'amber'],
+    ['b', 31.49, 10.37, 3.45, 31.55, 10.43, 3.62, 'linen'],
+    ['b', 31.5, 10.38, 3.62, 31.54, 10.42, 3.7, 'amber'],
+    ['b', 31.49, 11.32, 3.45, 31.55, 11.38, 3.62, 'linen'],
+    ['b', 31.5, 11.33, 3.62, 31.54, 11.37, 3.7, 'amber'],
+    ['b', 30.54, 10.85, 3.45, 30.6, 10.91, 3.62, 'linen'],
+    ['b', 30.55, 10.86, 3.62, 30.59, 10.9, 3.7, 'amber'],
+    ['b', 31.49, 10.85, 3.45, 31.55, 10.91, 3.62, 'linen'],
+    ['b', 31.5, 10.86, 3.62, 31.54, 10.9, 3.7, 'amber'],
+    ['b', 31.02, 10.37, 3.45, 31.08, 10.43, 3.62, 'linen'],
+    ['b', 31.03, 10.38, 3.62, 31.07, 10.42, 3.7, 'amber'],
+    ['b', 31.02, 11.32, 3.45, 31.08, 11.38, 3.62, 'linen'],
+    ['b', 31.03, 11.33, 3.62, 31.07, 11.37, 3.7, 'amber'],
+    ['b', 30.74, 10.58, 3.2, 30.78, 10.62, 3.32, 'amber'],
+    ['b', 30.74, 11.14, 3.2, 30.78, 11.18, 3.32, 'amber'],
+    ['b', 31.3, 10.58, 3.2, 31.34, 10.62, 3.32, 'amber'],
+    ['b', 31.3, 11.14, 3.2, 31.34, 11.18, 3.32, 'amber']]);
+  T['armour-repair-room-3'].lights = (T['armour-repair-room-3'].lights || []).concat([[23.79, 4.15, 2.33, 16757862, 1.1, 8], [30.39, 4.15, 2.33, 16757862, 1.1, 8], [27.09, 17.7, 2.33, 16757862, 1.1, 8]]);
+})(window.SHELL_W5A.things);
+/* HAND2 end armour-repair-room-3 */
+/* HAND2 begin newspaper-room-4 */
+/* Interiors req 2423 sec 14: lamps, framed front page, owl-route map, sloped stands of back issues, clippings table, parcels; req 2532 adds hangings, a dado and a thing to read or pull; req 2543 / row 2658 after Godric 4.27 pm (1 Nov, the 437th): pendants, sconces, framed papers, seats, standard lamps; req 2532 adds hangings, a dado and a thing to read or pull; req 2543 / row 2658 after Godric 4.55 pm (2 Nov, the 438th): tapestries, portraits, chandeliers, rugs, room-use pieces; sited by tools/architect-hand-rooms-1101.py, plain stand-ins (Objects draw the real ones) */
+(function (T) {
+  T['newspaper-room-4'] = T['newspaper-room-4'] || { items: [] };
+  T['newspaper-room-4'].items = T['newspaper-room-4'].items.concat([
+    ['b', 54.13, 3.85, 1.9, 54.25, 3.89, 2.3, 'iron'],
+    ['b', 54.165, 3.89, 2.25, 54.215, 4.15, 2.3, 'iron'],
+    ['b', 54.13, 4.11, 2.0, 54.25, 4.19, 2.28, 'flame'],
+    ['b', 65.33, 3.85, 1.9, 65.45, 3.89, 2.3, 'iron'],
+    ['b', 65.365, 3.89, 2.25, 65.415, 4.15, 2.3, 'iron'],
+    ['b', 65.33, 4.11, 2.0, 65.45, 4.19, 2.28, 'flame'],
+    ['b', 59.73, 17.96, 1.9, 59.85, 18.0, 2.3, 'iron'],
+    ['b', 59.765, 17.7, 2.25, 59.815, 17.96, 2.3, 'iron'],
+    ['b', 59.73, 17.66, 2.0, 59.85, 17.74, 2.28, 'flame'],
+    ['b', 59.29, 3.85, 1.4, 60.29, 3.93, 2.6, 'gilt'],
+    ['b', 59.34, 3.93, 1.45, 60.24, 3.94, 2.55, 'black'],
+    ['b', 51.84, 9.37, 1.57, 51.92, 11.43, 3.03, 'wood'],
+    ['b', 51.92, 9.4, 1.6, 51.94, 11.4, 3.0, 'petals'],
+    ['b', 51.94, 9.88, 1.72, 51.95, 9.92, 2.88, 'black'],
+    ['b', 51.94, 10.38, 1.72, 51.95, 10.42, 2.88, 'black'],
+    ['b', 51.94, 10.88, 1.72, 51.95, 10.92, 2.88, 'black'],
+    ['b', 67.15, 6.6, 0, 67.75, 8.2, 0.8, 'oak'],
+    ['b', 67.2, 6.65, 0.8, 67.7, 8.15, 0.9, 'linen'],
+    ['b', 67.13, 6.6, 0.8, 67.2, 8.2, 1.0, 'oak'],
+    ['b', 67.15, 10.1, 0, 67.75, 11.7, 0.8, 'oak'],
+    ['b', 67.2, 10.15, 0.8, 67.7, 11.65, 0.9, 'linen'],
+    ['b', 67.13, 10.1, 0.8, 67.2, 11.7, 1.0, 'oak'],
+    ['b', 58.09, 17.3, 0, 60.29, 18.0, 0.9, 'oak'],
+    ['b', 58.39, 17.65, 0.9, 58.59, 17.9, 1.1, 'iron'],
+    ['b', 59.515, 17.5, 0.9, 59.665, 17.8, 0.95, 'tin'],
+    ['b', 63.89, 17.4, 0, 64.69, 18.0, 0.4, 'linen'],
+    ['b', 64.09, 17.5, 0.4, 64.69, 17.95, 0.75, 'dust'],
+    ['b', 64.49, 17.6, 0, 64.99, 17.95, 0.35, 'wood'],
+    ['b', 67.35, 14.4, 0, 67.75, 16.0, 0.8, 'oak'],
+    ['b', 67.53, 14.4, 0.8, 67.75, 16.0, 2.0, 'wood'],
+    ['b', 67.45, 14.574, 1.1, 67.53, 14.674, 1.4, 'amber'],
+    ['b', 67.45, 14.958, 1.5, 67.53, 15.058, 1.8, 'amber'],
+    ['b', 67.45, 15.342, 1.1, 67.53, 15.442, 1.4, 'amber'],
+    ['b', 67.45, 15.726, 1.5, 67.53, 15.826, 1.8, 'amber'],
+    ['b', 53.73, 3.85, 2.1, 53.85, 3.89, 2.4, 'brass'],
+    ['b', 53.765, 3.89, 2.2, 53.815, 4.05, 2.26, 'brass'],
+    ['b', 53.74, 3.99, 2.26, 53.84, 4.09, 2.4, 'linen'],
+    ['b', 53.77, 4.02, 2.4, 53.81, 4.06, 2.5, 'amber'],
+    ['b', 66.43, 3.85, 2.1, 66.55, 3.89, 2.4, 'brass'],
+    ['b', 66.465, 3.89, 2.2, 66.515, 4.05, 2.26, 'brass'],
+    ['b', 66.44, 3.99, 2.26, 66.54, 4.09, 2.4, 'linen'],
+    ['b', 66.47, 4.02, 2.4, 66.51, 4.06, 2.5, 'amber'],
+    ['b', 55.33, 17.96, 2.1, 55.45, 18.0, 2.4, 'brass'],
+    ['b', 55.365, 17.8, 2.2, 55.415, 17.96, 2.26, 'brass'],
+    ['b', 55.34, 17.76, 2.26, 55.44, 17.86, 2.4, 'linen'],
+    ['b', 55.37, 17.79, 2.4, 55.41, 17.83, 2.5, 'amber'],
+    ['b', 66.43, 17.96, 2.1, 66.55, 18.0, 2.4, 'brass'],
+    ['b', 66.465, 17.8, 2.2, 66.515, 17.96, 2.26, 'brass'],
+    ['b', 66.44, 17.76, 2.26, 66.54, 17.86, 2.4, 'linen'],
+    ['b', 66.47, 17.79, 2.4, 66.51, 17.83, 2.5, 'amber'],
+    ['b', 67.71, 5.94, 2.1, 67.75, 6.06, 2.4, 'brass'],
+    ['b', 67.55, 5.975, 2.2, 67.71, 6.025, 2.26, 'brass'],
+    ['b', 67.51, 5.95, 2.26, 67.61, 6.05, 2.4, 'linen'],
+    ['b', 67.54, 5.98, 2.4, 67.58, 6.02, 2.5, 'amber'],
+    ['b', 67.71, 10.84, 2.1, 67.75, 10.96, 2.4, 'brass'],
+    ['b', 67.55, 10.875, 2.2, 67.71, 10.925, 2.26, 'brass'],
+    ['b', 67.51, 10.85, 2.26, 67.61, 10.95, 2.4, 'linen'],
+    ['b', 67.54, 10.88, 2.4, 67.58, 10.92, 2.5, 'amber'],
+    ['b', 51.84, 8.04, 2.1, 51.88, 8.16, 2.4, 'brass'],
+    ['b', 51.88, 8.075, 2.2, 52.04, 8.125, 2.26, 'brass'],
+    ['b', 51.98, 8.05, 2.26, 52.08, 8.15, 2.4, 'linen'],
+    ['b', 52.01, 8.08, 2.4, 52.05, 8.12, 2.5, 'amber'],
+    ['b', 51.84, 9.14, 2.1, 51.88, 9.26, 2.4, 'brass'],
+    ['b', 51.88, 9.175, 2.2, 52.04, 9.225, 2.26, 'brass'],
+    ['b', 51.98, 9.15, 2.26, 52.08, 9.25, 2.4, 'linen'],
+    ['b', 52.01, 9.18, 2.4, 52.05, 9.22, 2.5, 'amber'],
+    ['b', 54.34, 3.85, 1.2, 55.24, 3.89, 2.4, 'gilt'],
+    ['b', 54.38, 3.89, 1.24, 55.2, 3.91, 2.36, 'linen'],
+    ['b', 54.49, 3.91, 1.86, 55.09, 3.92, 1.92, 'black'],
+    ['b', 54.54, 3.91, 1.62, 55.04, 3.92, 1.68, 'black'],
+    ['b', 56.54, 3.85, 1.2, 57.44, 3.89, 2.4, 'gilt'],
+    ['b', 56.58, 3.89, 1.24, 57.4, 3.91, 2.36, 'linen'],
+    ['b', 56.69, 3.91, 1.86, 57.29, 3.92, 1.92, 'black'],
+    ['b', 56.74, 3.91, 1.62, 57.24, 3.92, 1.68, 'black'],
+    ['b', 60.34, 3.85, 1.2, 61.24, 3.89, 2.4, 'gilt'],
+    ['b', 60.38, 3.89, 1.24, 61.2, 3.91, 2.36, 'linen'],
+    ['b', 60.49, 3.91, 1.86, 61.09, 3.92, 1.92, 'black'],
+    ['b', 60.54, 3.91, 1.62, 61.04, 3.92, 1.68, 'black'],
+    ['b', 63.34, 3.85, 1.2, 64.24, 3.89, 2.4, 'gilt'],
+    ['b', 63.38, 3.89, 1.24, 64.2, 3.91, 2.36, 'linen'],
+    ['b', 63.49, 3.91, 1.86, 64.09, 3.92, 1.92, 'ruby'],
+    ['b', 63.54, 3.91, 1.62, 64.04, 3.92, 1.68, 'ruby'],
+    ['b', 55.54, 17.96, 1.2, 56.44, 18.0, 2.4, 'gilt'],
+    ['b', 55.58, 17.94, 1.24, 56.4, 17.96, 2.36, 'linen'],
+    ['b', 55.69, 17.93, 1.86, 56.29, 17.94, 1.92, 'black'],
+    ['b', 55.74, 17.93, 1.62, 56.24, 17.94, 1.68, 'black'],
+    ['b', 58.54, 17.96, 1.2, 59.44, 18.0, 2.4, 'gilt'],
+    ['b', 58.58, 17.94, 1.24, 59.4, 17.96, 2.36, 'linen'],
+    ['b', 58.69, 17.93, 1.86, 59.29, 17.94, 1.92, 'black'],
+    ['b', 58.74, 17.93, 1.62, 59.24, 17.94, 1.68, 'black'],
+    ['b', 62.54, 17.96, 1.2, 63.44, 18.0, 2.4, 'gilt'],
+    ['b', 62.58, 17.94, 1.24, 63.4, 17.96, 2.36, 'linen'],
+    ['b', 62.69, 17.93, 1.86, 63.29, 17.94, 1.92, 'blue'],
+    ['b', 62.74, 17.93, 1.62, 63.24, 17.94, 1.68, 'blue'],
+    ['b', 67.71, 7.35, 1.3, 67.75, 8.85, 2.3, 'gilt'],
+    ['b', 67.69, 7.39, 1.34, 67.71, 8.81, 2.26, 'linen'],
+    ['b', 67.68, 7.5, 1.85, 67.69, 8.7, 1.9, 'green'],
+    ['b', 67.68, 7.55, 1.65, 67.69, 8.65, 1.7, 'green'],
+    ['b', 67.71, 13.1, 1.4, 67.75, 14.3, 2.2, 'gilt'],
+    ['b', 67.69, 13.14, 1.44, 67.71, 14.26, 2.16, 'linen'],
+    ['b', 67.68, 13.25, 1.84, 67.69, 14.15, 1.88, 'ruby'],
+    ['b', 67.68, 13.3, 1.68, 67.69, 14.1, 1.72, 'ruby'],
+    ['b', 51.84, 8.3, 1.3, 51.88, 9.1, 2.3, 'gilt'],
+    ['b', 51.88, 8.34, 1.34, 51.9, 9.06, 2.26, 'linen'],
+    ['b', 51.9, 8.45, 1.85, 51.91, 8.95, 1.9, 'black'],
+    ['b', 51.9, 8.5, 1.65, 51.91, 8.9, 1.7, 'black'],
+    ['b', 67.25, 8.55, 0, 67.75, 10.05, 0.42, 'oak'],
+    ['b', 67.29, 8.6, 0.42, 67.71, 10.0, 0.5, 'dark'],
+    ['b', 67.35, 9.4, 0.5, 67.67, 9.9, 0.56, 'tartan'],
+    ['b', 67.25, 12.85, 0, 67.75, 14.35, 0.42, 'oak'],
+    ['b', 67.29, 12.9, 0.42, 67.71, 14.3, 0.5, 'dark'],
+    ['b', 67.35, 13.7, 0.5, 67.67, 14.2, 0.56, 'tartan'],
+    ['b', 60.34, 17.5, 0, 61.84, 18.0, 0.42, 'oak'],
+    ['b', 60.39, 17.54, 0.42, 61.79, 17.96, 0.5, 'dark'],
+    ['b', 61.19, 17.6, 0.5, 61.69, 17.92, 0.56, 'tartan'],
+    ['b', 54.565, 5.45, 0, 55.415, 6.25, 0.45, 'leather'],
+    ['b', 54.565, 5.45, 0.45, 55.415, 5.65, 1.1, 'leather'],
+    ['b', 54.56, 5.65, 0.45, 54.66, 6.25, 0.65, 'leather'],
+    ['b', 55.32, 5.65, 0.45, 55.42, 6.25, 0.65, 'leather'],
+    ['b', 54.74, 6.4, 0, 55.24, 6.8, 0.3, 'leather'],
+    ['b', 55.69, 5.55, 0, 55.89, 5.75, 0.06, 'oak'],
+    ['b', 55.76, 5.62, 0.06, 55.82, 5.68, 1.5, 'brass'],
+    ['b', 55.67, 5.53, 1.5, 55.91, 5.77, 1.7, 'linen'],
+    ['b', 59.365, 15.6, 0, 60.215, 16.4, 0.45, 'leather'],
+    ['b', 59.365, 16.2, 0.45, 60.215, 16.4, 1.1, 'leather'],
+    ['b', 59.36, 15.6, 0.45, 59.46, 16.2, 0.65, 'leather'],
+    ['b', 60.12, 15.6, 0.45, 60.22, 16.2, 0.65, 'leather'],
+    ['b', 59.54, 15.05, 0, 60.04, 15.45, 0.3, 'leather'],
+    ['b', 60.49, 16.1, 0, 60.69, 16.3, 0.06, 'oak'],
+    ['b', 60.56, 16.17, 0.06, 60.62, 16.23, 1.5, 'brass'],
+    ['b', 60.47, 16.08, 1.5, 60.71, 16.32, 1.7, 'linen'],
+    ['b', 65.465, 5.45, 0, 66.315, 6.25, 0.45, 'leather'],
+    ['b', 65.465, 5.45, 0.45, 66.315, 5.65, 1.1, 'leather'],
+    ['b', 65.46, 5.65, 0.45, 65.56, 6.25, 0.65, 'leather'],
+    ['b', 66.22, 5.65, 0.45, 66.32, 6.25, 0.65, 'leather'],
+    ['b', 65.64, 6.4, 0, 66.14, 6.8, 0.3, 'leather'],
+    ['b', 66.59, 5.55, 0, 66.79, 5.75, 0.06, 'oak'],
+    ['b', 66.66, 5.62, 0.06, 66.72, 5.68, 1.5, 'brass'],
+    ['b', 66.57, 5.53, 1.5, 66.81, 5.77, 1.7, 'linen'],
+    ['b', 55.94, 7.9, 0, 56.24, 8.3, 0.9, 'oak'],
+    ['b', 55.84, 7.8, 0.9, 56.34, 8.4, 1.0, 'oak'],
+    ['b', 55.94, 7.87, 1.0, 56.24, 8.33, 1.06, 'white'],
+    ['b', 56.04, 8.36, 0.4, 56.14, 8.4, 1.0, 'iron'],
+    ['b', 56.14, 12.95, 0, 56.74, 13.05, 0.95, 'oak'],
+    ['b', 56.14, 14.95, 0, 56.74, 15.05, 0.95, 'oak'],
+    ['b', 56.14, 12.8, 0.95, 56.74, 15.2, 1.05, 'oak'],
+    ['b', 56.19, 13.1, 1.05, 56.69, 13.9, 1.1, 'linen'],
+    ['b', 56.19, 14.1, 1.05, 56.69, 14.9, 1.1, 'linen'],
+    ['b', 56.39, 13.94, 1.05, 56.49, 14.06, 1.3, 'brass'],
+    ['b', 56.36, 13.91, 1.3, 56.52, 14.09, 1.4, 'amber'],
+    ['b', 58.64, 9.65, 0, 59.24, 9.75, 0.95, 'oak'],
+    ['b', 58.64, 11.65, 0, 59.24, 11.75, 0.95, 'oak'],
+    ['b', 58.64, 9.5, 0.95, 59.24, 11.9, 1.05, 'oak'],
+    ['b', 58.69, 9.8, 1.05, 59.19, 10.6, 1.1, 'linen'],
+    ['b', 58.69, 10.8, 1.05, 59.19, 11.6, 1.1, 'linen'],
+    ['b', 58.89, 10.64, 1.05, 58.99, 10.76, 1.3, 'brass'],
+    ['b', 58.86, 10.61, 1.3, 59.02, 10.79, 1.4, 'amber'],
+    ['b', 58.44, 15.7, 0, 58.74, 16.1, 0.9, 'oak'],
+    ['b', 58.34, 15.6, 0.9, 58.84, 16.2, 1.0, 'oak'],
+    ['b', 58.44, 15.67, 1.0, 58.74, 16.13, 1.06, 'white'],
+    ['b', 58.54, 16.16, 0.4, 58.64, 16.2, 1.0, 'iron'],
+    ['b', 67.35, 4.3, 0, 67.75, 5.9, 2.3, 'oak'],
+    ['b', 67.33, 4.35, 0.2, 67.55, 4.65, 0.45, 'linen'],
+    ['b', 67.33, 4.75, 0.2, 67.55, 5.05, 0.45, 'linen'],
+    ['b', 67.33, 5.15, 0.2, 67.55, 5.45, 0.45, 'linen'],
+    ['b', 67.33, 5.55, 0.2, 67.55, 5.85, 0.45, 'linen'],
+    ['b', 67.33, 4.35, 0.55, 67.55, 4.65, 0.8, 'linen'],
+    ['b', 67.33, 4.75, 0.55, 67.55, 5.05, 0.8, 'linen'],
+    ['b', 67.33, 5.15, 0.55, 67.55, 5.45, 0.8, 'linen'],
+    ['b', 67.33, 5.55, 0.55, 67.55, 5.85, 0.8, 'linen'],
+    ['b', 67.33, 4.35, 0.9, 67.55, 4.65, 1.15, 'linen'],
+    ['b', 67.33, 4.75, 0.9, 67.55, 5.05, 1.15, 'linen'],
+    ['b', 67.33, 5.15, 0.9, 67.55, 5.45, 1.15, 'linen'],
+    ['b', 67.33, 5.55, 0.9, 67.55, 5.85, 1.15, 'linen'],
+    ['b', 67.33, 4.35, 1.25, 67.55, 4.65, 1.5, 'linen'],
+    ['b', 67.33, 4.75, 1.25, 67.55, 5.05, 1.5, 'linen'],
+    ['b', 67.33, 5.15, 1.25, 67.55, 5.45, 1.5, 'linen'],
+    ['b', 67.33, 5.55, 1.25, 67.55, 5.85, 1.5, 'linen'],
+    ['b', 67.33, 4.35, 1.6, 67.55, 4.65, 1.85, 'linen'],
+    ['b', 67.33, 4.75, 1.6, 67.55, 5.05, 1.85, 'linen'],
+    ['b', 67.33, 5.15, 1.6, 67.55, 5.45, 1.85, 'linen'],
+    ['b', 67.33, 5.55, 1.6, 67.55, 5.85, 1.85, 'linen'],
+    ['b', 67.33, 4.35, 1.95, 67.55, 4.65, 2.2, 'linen'],
+    ['b', 67.33, 4.75, 1.95, 67.55, 5.05, 2.2, 'linen'],
+    ['b', 67.33, 5.15, 1.95, 67.55, 5.45, 2.2, 'linen'],
+    ['b', 67.33, 5.55, 1.95, 67.55, 5.85, 2.2, 'linen'],
+    ['b', 61.89, 17.3, 0, 62.89, 18.0, 0.8, 'oak'],
+    ['b', 61.94, 17.35, 0.8, 62.84, 17.95, 0.86, 'dust'],
+    ['b', 61.99, 17.8, 0.86, 62.79, 17.9, 0.9, 'iron'],
+    ['b', 61.99, 17.62, 0.86, 62.79, 17.72, 0.9, 'iron'],
+    ['b', 61.99, 17.44, 0.86, 62.79, 17.54, 0.9, 'iron'],
+    ['b', 62.14, 17.38, 0.9, 62.64, 17.45, 0.98, 'iron'],
+    ['b', 62.47, 17.48, 0.98, 62.51, 17.5, 1.1, 'iron'],
+    ['b', 63.75, 17.82, 0, 63.83, 17.9, 1.2, 'oak'],
+    ['b', 63.54, 17.7, 1.2, 64.04, 18.0, 1.26, 'oak'],
+    ['b', 63.69, 17.76, 1.26, 63.89, 17.94, 1.55, 'dust'],
+    ['b', 63.72, 17.8, 1.55, 63.86, 17.92, 1.68, 'linen'],
+    ['b', 63.54, 17.5, 0, 64.04, 18.0, 0.03, 'linen'],
+    ['b', 67.45, 17.82, 0, 67.53, 17.9, 1.2, 'oak'],
+    ['b', 67.24, 17.7, 1.2, 67.74, 18.0, 1.26, 'oak'],
+    ['b', 67.39, 17.76, 1.26, 67.59, 17.94, 1.55, 'dust'],
+    ['b', 67.42, 17.8, 1.55, 67.56, 17.92, 1.68, 'linen'],
+    ['b', 67.24, 17.5, 0, 67.74, 18.0, 0.03, 'linen'],
+    ['b', 66.15, 3.95, 0, 66.23, 4.03, 1.2, 'oak'],
+    ['b', 65.94, 3.85, 1.2, 66.44, 4.15, 1.26, 'oak'],
+    ['b', 66.09, 3.91, 1.26, 66.29, 4.09, 1.55, 'dust'],
+    ['b', 66.12, 3.93, 1.55, 66.26, 4.05, 1.68, 'linen'],
+    ['b', 65.94, 3.85, 0, 66.44, 4.35, 0.03, 'linen'],
+    ['b', 51.84, 4.85, 0, 52.14, 5.15, 0.05, 'iron'],
+    ['b', 51.96, 4.97, 0.05, 52.02, 5.03, 1.6, 'brass'],
+    ['b', 51.84, 4.85, 1.6, 52.14, 5.15, 1.95, 'linen'],
+    ['b', 51.84, 7.95, 0, 52.14, 8.25, 0.05, 'iron'],
+    ['b', 51.96, 8.07, 0.05, 52.02, 8.13, 1.6, 'brass'],
+    ['b', 51.84, 7.95, 1.6, 52.14, 8.25, 1.95, 'linen'],
+    ['b', 56.085, 8.08, 3.4, 56.125, 8.12, 4.5, 'iron'],
+    ['b', 55.785, 7.8, 3.3, 56.385, 8.4, 3.4, 'brass'],
+    ['b', 55.785, 7.79, 3.0, 55.845, 7.85, 3.3, 'amber'],
+    ['b', 55.785, 8.35, 3.0, 55.845, 8.41, 3.3, 'amber'],
+    ['b', 56.325, 7.79, 3.0, 56.385, 7.85, 3.3, 'amber'],
+    ['b', 56.325, 8.35, 3.0, 56.385, 8.41, 3.3, 'amber'],
+    ['b', 63.465, 8.08, 3.4, 63.505, 8.12, 4.5, 'iron'],
+    ['b', 63.205, 7.8, 3.3, 63.805, 8.4, 3.4, 'brass'],
+    ['b', 63.745, 7.79, 3.0, 63.805, 7.85, 3.3, 'amber'],
+    ['b', 63.745, 8.35, 3.0, 63.805, 8.41, 3.3, 'amber'],
+    ['b', 63.205, 7.79, 3.0, 63.265, 7.85, 3.3, 'amber'],
+    ['b', 63.205, 8.35, 3.0, 63.265, 8.41, 3.3, 'amber'],
+    ['b', 58.085, 13.78, 3.4, 58.125, 13.82, 4.5, 'iron'],
+    ['b', 57.785, 13.5, 3.3, 58.385, 14.1, 3.4, 'brass'],
+    ['b', 57.785, 13.49, 3.0, 57.845, 13.55, 3.3, 'amber'],
+    ['b', 57.785, 14.05, 3.0, 57.845, 14.11, 3.3, 'amber'],
+    ['b', 58.325, 13.49, 3.0, 58.385, 13.55, 3.3, 'amber'],
+    ['b', 58.325, 14.05, 3.0, 58.385, 14.11, 3.3, 'amber'],
+    ['b', 61.465, 13.78, 3.4, 61.505, 13.82, 4.5, 'iron'],
+    ['b', 61.205, 13.5, 3.3, 61.805, 14.1, 3.4, 'brass'],
+    ['b', 61.745, 13.49, 3.0, 61.805, 13.55, 3.3, 'amber'],
+    ['b', 61.745, 14.05, 3.0, 61.805, 14.11, 3.3, 'amber'],
+    ['b', 61.205, 13.49, 3.0, 61.265, 13.55, 3.3, 'amber'],
+    ['b', 61.205, 14.05, 3.0, 61.265, 14.11, 3.3, 'amber'],
+    ['b', 64.34, 3.85, 1.2, 65.24, 3.93, 3.8, 'gilt'],
+    ['b', 64.46, 3.93, 1.32, 65.12, 3.94, 3.68, 'black'],
+    ['b', 64.46, 3.94, 1.5, 65.12, 3.95, 1.62, 'gilt'],
+    ['b', 64.46, 3.94, 3.38, 65.12, 3.95, 3.5, 'gilt'],
+    ['b', 64.29, 3.85, 3.8, 65.29, 3.94, 3.84, 'wood'],
+    ['b', 64.14, 17.92, 1.2, 65.04, 18.0, 3.8, 'gilt'],
+    ['b', 64.26, 17.91, 1.32, 64.92, 17.92, 3.68, 'ruby'],
+    ['b', 64.26, 17.9, 1.5, 64.92, 17.91, 1.62, 'gilt'],
+    ['b', 64.26, 17.9, 3.38, 64.92, 17.91, 3.5, 'gilt'],
+    ['b', 64.09, 17.91, 3.8, 65.09, 18.0, 3.84, 'wood'],
+    ['b', 60.29, 17.92, 1.2, 62.49, 18.0, 3.6, 'gilt'],
+    ['b', 60.41, 17.91, 1.32, 62.37, 17.92, 3.48, 'blue'],
+    ['b', 60.41, 17.9, 1.5, 62.37, 17.91, 1.62, 'dust'],
+    ['b', 60.41, 17.9, 3.18, 62.37, 17.91, 3.3, 'dust'],
+    ['b', 60.24, 17.91, 3.6, 62.54, 18.0, 3.64, 'wood'],
+    ['b', 51.84, 5.9, 1.3, 51.92, 7.9, 3.5, 'gilt'],
+    ['b', 51.92, 6.02, 1.42, 51.93, 7.78, 3.38, 'green'],
+    ['b', 51.93, 6.02, 1.6, 51.94, 7.78, 1.72, 'linen'],
+    ['b', 51.93, 6.02, 3.08, 51.94, 7.78, 3.2, 'linen'],
+    ['b', 51.84, 5.85, 3.5, 51.93, 7.95, 3.54, 'wood'],
+    ['b', 52.54, 3.85, 1.0, 53.44, 3.93, 2.2, 'black'],
+    ['b', 52.61, 3.93, 1.07, 53.37, 3.94, 2.13, 'black'],
+    ['b', 52.93, 3.94, 1.66, 53.13, 3.95, 1.96, 'dust'],
+    ['b', 52.79, 3.94, 1.24, 53.19, 3.95, 1.6, 'linen'],
+    ['b', 52.93, 3.85, 0.93, 53.05, 3.94, 0.97, 'brass'],
+    ['b', 66.49, 3.85, 1.1, 67.29, 3.93, 2.1, 'dust'],
+    ['b', 66.56, 3.93, 1.17, 67.22, 3.94, 2.03, 'black'],
+    ['b', 66.83, 3.94, 1.65, 67.03, 3.95, 1.9, 'dust'],
+    ['b', 66.69, 3.94, 1.3, 67.09, 3.95, 1.6, 'linen'],
+    ['b', 66.83, 3.85, 1.03, 66.95, 3.94, 1.07, 'brass'],
+    ['b', 56.54, 17.92, 1.0, 57.44, 18.0, 2.2, 'gilt'],
+    ['b', 56.61, 17.91, 1.07, 57.37, 17.92, 2.13, 'black'],
+    ['b', 56.93, 17.9, 1.66, 57.13, 17.91, 1.96, 'dust'],
+    ['b', 56.79, 17.9, 1.24, 57.19, 17.91, 1.6, 'linen'],
+    ['b', 56.93, 17.91, 0.93, 57.05, 18.0, 0.97, 'brass'],
+    ['b', 66.19, 17.92, 1.1, 66.99, 18.0, 2.1, 'rope'],
+    ['b', 66.26, 17.91, 1.17, 66.92, 17.92, 2.03, 'black'],
+    ['b', 66.53, 17.9, 1.65, 66.73, 17.91, 1.9, 'dust'],
+    ['b', 66.39, 17.9, 1.3, 66.79, 17.91, 1.6, 'linen'],
+    ['b', 66.53, 17.91, 1.03, 66.65, 18.0, 1.07, 'brass'],
+    ['b', 51.84, 4.05, 1.15, 51.92, 4.75, 2.05, 'gilt'],
+    ['b', 51.92, 4.12, 1.22, 51.93, 4.68, 1.98, 'black'],
+    ['b', 51.93, 4.34, 1.645, 51.94, 4.54, 1.87, 'dust'],
+    ['b', 51.93, 4.2, 1.33, 51.94, 4.6, 1.6, 'linen'],
+    ['b', 51.84, 4.34, 1.08, 51.93, 4.46, 1.12, 'brass'],
+    ['b', 53.64, 3.85, 0, 54.74, 4.75, 0.9, 'iron'],
+    ['b', 53.74, 3.95, 0.9, 54.64, 4.65, 0.98, 'oak'],
+    ['b', 53.89, 4.1, 0.98, 54.49, 4.5, 1.04, 'black'],
+    ['b', 53.94, 4.15, 1.04, 54.44, 4.45, 1.1, 'dust'],
+    ['b', 54.14, 4.25, 1.1, 54.24, 4.35, 1.9, 'iron'],
+    ['b', 53.89, 4.15, 1.9, 54.49, 4.45, 1.96, 'iron'],
+    ['b', 54.19, 4.27, 1.8, 55.99, 4.33, 1.86, 'oak'],
+    ['b', 53.89, 4.15, 1.3, 54.49, 4.45, 1.36, 'iron'],
+    ['b', 61.29, 3.85, 0, 62.89, 4.65, 0.78, 'oak'],
+    ['b', 61.29, 3.85, 0.78, 62.89, 4.35, 1.3, 'wood'],
+    ['b', 61.38, 3.87, 0.9, 61.6, 3.95, 1.25, 'dark'],
+    ['b', 61.68, 3.87, 0.9, 61.9, 3.95, 1.25, 'dark'],
+    ['b', 61.98, 3.87, 0.9, 62.2, 3.95, 1.25, 'dark'],
+    ['b', 62.28, 3.87, 0.9, 62.5, 3.95, 1.25, 'dark'],
+    ['b', 62.58, 3.87, 0.9, 62.8, 3.95, 1.25, 'dark'],
+    ['b', 62.09, 4.35, 0.78, 62.49, 4.55, 0.8, 'linen'],
+    ['b', 62.54, 4.0, 1.3, 62.64, 4.1, 1.6, 'brass'],
+    ['b', 62.44, 3.95, 1.6, 62.74, 4.15, 1.72, 'green'],
+    ['b', 51.84, 10.4, 0, 52.64, 11.4, 0.5, 'dust'],
+    ['b', 51.89, 10.55, 0.5, 52.59, 11.45, 0.95, 'linen'],
+    ['b', 51.83, 10.585, 0, 52.65, 10.615, 0.95, 'wood'],
+    ['b', 51.83, 11.185, 0, 52.65, 11.215, 0.95, 'wood'],
+    ['b', 51.84, 5.1, 0, 52.54, 5.7, 0.8, 'oak'],
+    ['b', 51.84, 5.8, 0, 52.54, 6.4, 0.8, 'oak'],
+    ['b', 52.54, 5.365, 0.35, 52.64, 5.435, 0.45, 'brass'],
+    ['b', 52.54, 5.25, 0.0, 52.74, 5.55, 0.03, 'black'],
+    ['b', 52.54, 6.065, 0.35, 52.64, 6.135, 0.45, 'brass'],
+    ['b', 52.54, 5.95, 0.0, 52.74, 6.25, 0.03, 'black'],
+    ['b', 57.25, 8.2, 0.0, 60.25, 12.2, 0.016, 'gilt'],
+    ['b', 57.37, 8.32, 0.016, 60.13, 12.08, 0.02, 'blue'],
+    ['b', 58.3, 9.4, 0.02, 59.2, 11.0, 0.024, 'gilt'],
+    ['b', 56.33, 3.85, 2.1, 56.45, 3.89, 2.4, 'brass'],
+    ['b', 56.365, 3.89, 2.2, 56.415, 4.05, 2.26, 'brass'],
+    ['b', 56.34, 3.99, 2.26, 56.44, 4.09, 2.4, 'linen'],
+    ['b', 56.37, 4.02, 2.4, 56.41, 4.06, 2.5, 'amber'],
+    ['b', 61.33, 3.85, 2.1, 61.45, 3.89, 2.4, 'brass'],
+    ['b', 61.365, 3.89, 2.2, 61.415, 4.05, 2.26, 'brass'],
+    ['b', 61.34, 3.99, 2.26, 61.44, 4.09, 2.4, 'linen'],
+    ['b', 61.37, 4.02, 2.4, 61.41, 4.06, 2.5, 'amber'],
+    ['b', 58.13, 17.96, 2.1, 58.25, 18.0, 2.4, 'brass'],
+    ['b', 58.165, 17.8, 2.2, 58.215, 17.96, 2.26, 'brass'],
+    ['b', 58.14, 17.76, 2.26, 58.24, 17.86, 2.4, 'linen'],
+    ['b', 58.17, 17.79, 2.4, 58.21, 17.83, 2.5, 'amber'],
+    ['b', 60.13, 17.96, 2.1, 60.25, 18.0, 2.4, 'brass'],
+    ['b', 60.165, 17.8, 2.2, 60.215, 17.96, 2.26, 'brass'],
+    ['b', 60.14, 17.76, 2.26, 60.24, 17.86, 2.4, 'linen'],
+    ['b', 60.17, 17.79, 2.4, 60.21, 17.83, 2.5, 'amber'],
+    ['b', 67.71, 9.44, 2.1, 67.75, 9.56, 2.4, 'brass'],
+    ['b', 67.55, 9.475, 2.2, 67.71, 9.525, 2.26, 'brass'],
+    ['b', 67.51, 9.45, 2.26, 67.61, 9.55, 2.4, 'linen'],
+    ['b', 67.54, 9.48, 2.4, 67.58, 9.52, 2.5, 'amber'],
+    ['b', 67.71, 12.24, 2.1, 67.75, 12.36, 2.4, 'brass'],
+    ['b', 67.55, 12.275, 2.2, 67.71, 12.325, 2.26, 'brass'],
+    ['b', 67.51, 12.25, 2.26, 67.61, 12.35, 2.4, 'linen'],
+    ['b', 67.54, 12.28, 2.4, 67.58, 12.32, 2.5, 'amber'],
+    ['b', 51.84, 5.74, 2.1, 51.88, 5.86, 2.4, 'brass'],
+    ['b', 51.88, 5.775, 2.2, 52.04, 5.825, 2.26, 'brass'],
+    ['b', 51.98, 5.75, 2.26, 52.08, 5.85, 2.4, 'linen'],
+    ['b', 52.01, 5.78, 2.4, 52.05, 5.82, 2.5, 'amber'],
+    ['b', 51.84, 5.54, 2.1, 51.88, 5.66, 2.4, 'brass'],
+    ['b', 51.88, 5.575, 2.2, 52.04, 5.625, 2.26, 'brass'],
+    ['b', 51.98, 5.55, 2.26, 52.08, 5.65, 2.4, 'linen'],
+    ['b', 52.01, 5.58, 2.4, 52.05, 5.62, 2.5, 'amber'],
+    ['b', 59.84, 8.075, 3.5, 59.89, 8.125, 4.6, 'iron'],
+    ['b', 59.34, 7.6, 3.35, 60.34, 8.6, 3.45, 'brass'],
+    ['b', 59.54, 7.8, 3.1, 60.14, 8.4, 3.2, 'brass'],
+    ['b', 59.34, 7.57, 3.45, 59.4, 7.63, 3.62, 'linen'],
+    ['b', 59.35, 7.58, 3.62, 59.39, 7.62, 3.7, 'amber'],
+    ['b', 59.34, 8.52, 3.45, 59.4, 8.58, 3.62, 'linen'],
+    ['b', 59.35, 8.53, 3.62, 59.39, 8.57, 3.7, 'amber'],
+    ['b', 60.29, 7.57, 3.45, 60.35, 7.63, 3.62, 'linen'],
+    ['b', 60.3, 7.58, 3.62, 60.34, 7.62, 3.7, 'amber'],
+    ['b', 60.29, 8.52, 3.45, 60.35, 8.58, 3.62, 'linen'],
+    ['b', 60.3, 8.53, 3.62, 60.34, 8.57, 3.7, 'amber'],
+    ['b', 59.34, 8.05, 3.45, 59.4, 8.11, 3.62, 'linen'],
+    ['b', 59.35, 8.06, 3.62, 59.39, 8.1, 3.7, 'amber'],
+    ['b', 60.29, 8.05, 3.45, 60.35, 8.11, 3.62, 'linen'],
+    ['b', 60.3, 8.06, 3.62, 60.34, 8.1, 3.7, 'amber'],
+    ['b', 59.82, 7.57, 3.45, 59.88, 7.63, 3.62, 'linen'],
+    ['b', 59.83, 7.58, 3.62, 59.87, 7.62, 3.7, 'amber'],
+    ['b', 59.82, 8.52, 3.45, 59.88, 8.58, 3.62, 'linen'],
+    ['b', 59.83, 8.53, 3.62, 59.87, 8.57, 3.7, 'amber'],
+    ['b', 59.54, 7.78, 3.2, 59.58, 7.82, 3.32, 'amber'],
+    ['b', 59.54, 8.34, 3.2, 59.58, 8.38, 3.32, 'amber'],
+    ['b', 60.1, 7.78, 3.2, 60.14, 7.82, 3.32, 'amber'],
+    ['b', 60.1, 8.34, 3.2, 60.14, 8.38, 3.32, 'amber'],
+    ['b', 59.84, 13.775, 3.5, 59.89, 13.825, 4.6, 'iron'],
+    ['b', 59.34, 13.3, 3.35, 60.34, 14.3, 3.45, 'brass'],
+    ['b', 59.54, 13.5, 3.1, 60.14, 14.1, 3.2, 'brass'],
+    ['b', 59.34, 13.27, 3.45, 59.4, 13.33, 3.62, 'linen'],
+    ['b', 59.35, 13.28, 3.62, 59.39, 13.32, 3.7, 'amber'],
+    ['b', 59.34, 14.22, 3.45, 59.4, 14.28, 3.62, 'linen'],
+    ['b', 59.35, 14.23, 3.62, 59.39, 14.27, 3.7, 'amber'],
+    ['b', 60.29, 13.27, 3.45, 60.35, 13.33, 3.62, 'linen'],
+    ['b', 60.3, 13.28, 3.62, 60.34, 13.32, 3.7, 'amber'],
+    ['b', 60.29, 14.22, 3.45, 60.35, 14.28, 3.62, 'linen'],
+    ['b', 60.3, 14.23, 3.62, 60.34, 14.27, 3.7, 'amber'],
+    ['b', 59.34, 13.75, 3.45, 59.4, 13.81, 3.62, 'linen'],
+    ['b', 59.35, 13.76, 3.62, 59.39, 13.8, 3.7, 'amber'],
+    ['b', 60.29, 13.75, 3.45, 60.35, 13.81, 3.62, 'linen'],
+    ['b', 60.3, 13.76, 3.62, 60.34, 13.8, 3.7, 'amber'],
+    ['b', 59.82, 13.27, 3.45, 59.88, 13.33, 3.62, 'linen'],
+    ['b', 59.83, 13.28, 3.62, 59.87, 13.32, 3.7, 'amber'],
+    ['b', 59.82, 14.22, 3.45, 59.88, 14.28, 3.62, 'linen'],
+    ['b', 59.83, 14.23, 3.62, 59.87, 14.27, 3.7, 'amber'],
+    ['b', 59.54, 13.48, 3.2, 59.58, 13.52, 3.32, 'amber'],
+    ['b', 59.54, 14.04, 3.2, 59.58, 14.08, 3.32, 'amber'],
+    ['b', 60.1, 13.48, 3.2, 60.14, 13.52, 3.32, 'amber'],
+    ['b', 60.1, 14.04, 3.2, 60.14, 14.08, 3.32, 'amber']]);
+  T['newspaper-room-4'].lights = (T['newspaper-room-4'].lights || []).concat([[54.19, 4.15, 2.33, 16757862, 1.1, 8], [65.39, 4.15, 2.33, 16757862, 1.1, 8], [59.79, 17.7, 2.33, 16757862, 1.1, 8]]);
+})(window.SHELL_W5A.things);
+/* HAND2 end newspaper-room-4 */
+/* HAND2 begin head-boy-girl-study-5 */
+/* Interiors req 2423 sec 14: hearth, two desk lamps, board of past heads, portrait, bookcase, rota, badges on a cushion; req 2532 adds hangings, a dado and a thing to read or pull; req 2543 / row 2658 after Godric 4.27 pm (1 Nov, the 437th): pendants, sconces, framed papers, seats, standard lamps; req 2532 adds hangings, a dado and a thing to read or pull; req 2543 / row 2658 after Godric 4.55 pm (2 Nov, the 438th): tapestries, portraits, chandeliers, rugs, room-use pieces; sited by tools/architect-hand-rooms-1101.py, plain stand-ins (Objects draw the real ones) */
+(function (T) {
+  T['head-boy-girl-study-5'] = T['head-boy-girl-study-5'] || { items: [] };
+  T['head-boy-girl-study-5'].items = T['head-boy-girl-study-5'].items.concat([
+    ['b', 60.8, 3.85, 0, 62.6, 4.35, 1.3, 'stone'],
+    ['b', 61.2, 3.85, 0.1, 62.2, 4.37, 1.0, 'black'],
+    ['b', 61.45, 3.95, 0.12, 61.95, 4.25, 0.45, 'flame'],
+    ['b', 61.0, 4.35, 0, 62.4, 4.55, 0.18, 'iron'],
+    ['b', 60.65, 3.85, 1.3, 62.75, 4.5, 1.38, 'oak'],
+    ['b', 54.14, 3.85, 1.9, 54.26, 3.89, 2.3, 'iron'],
+    ['b', 54.175, 3.89, 2.25, 54.225, 4.15, 2.3, 'iron'],
+    ['b', 54.14, 4.11, 2.0, 54.26, 4.19, 2.28, 'flame'],
+    ['b', 65.34, 3.85, 1.9, 65.46, 3.89, 2.3, 'iron'],
+    ['b', 65.375, 3.89, 2.25, 65.425, 4.15, 2.3, 'iron'],
+    ['b', 65.34, 4.11, 2.0, 65.46, 4.19, 2.28, 'flame'],
+    ['b', 51.85, 8.0, 0, 52.65, 9.6, 0.78, 'oak'],
+    ['b', 52.0, 9.15, 0.78, 52.1, 9.25, 1.0, 'flame'],
+    ['b', 66.95, 5.9, 0, 67.75, 7.5, 0.78, 'oak'],
+    ['b', 67.5, 7.05, 0.78, 67.6, 7.15, 1.0, 'flame'],
+    ['b', 57.9, 17.92, 1.3, 59.3, 18.0, 2.3, 'gilt'],
+    ['b', 57.95, 17.91, 1.35, 59.25, 17.92, 2.25, 'black'],
+    ['b', 55.45, 3.85, 1.5, 56.15, 3.93, 2.4, 'gilt'],
+    ['b', 55.5, 3.93, 1.55, 56.1, 3.94, 2.35, 'black'],
+    ['b', 51.85, 14.4, 0, 52.25, 16.0, 0.8, 'oak'],
+    ['b', 51.85, 14.4, 0.8, 52.07, 16.0, 2.0, 'wood'],
+    ['b', 52.07, 14.574, 1.1, 52.15, 14.674, 1.4, 'amber'],
+    ['b', 52.07, 14.958, 1.5, 52.15, 15.058, 1.8, 'amber'],
+    ['b', 52.07, 15.342, 1.1, 52.15, 15.442, 1.4, 'amber'],
+    ['b', 52.07, 15.726, 1.5, 52.15, 15.826, 1.8, 'amber'],
+    ['b', 67.67, 14.07, 1.37, 67.75, 14.93, 2.03, 'wood'],
+    ['b', 67.65, 14.1, 1.4, 67.67, 14.9, 2.0, 'linen'],
+    ['b', 67.64, 14.28, 1.52, 67.65, 14.32, 1.88, 'black'],
+    ['b', 67.64, 14.48, 1.52, 67.65, 14.52, 1.88, 'black'],
+    ['b', 67.64, 14.68, 1.52, 67.65, 14.72, 1.88, 'black'],
+    ['b', 67.25, 12.25, 0, 67.75, 12.95, 0.75, 'oak'],
+    ['b', 67.35, 12.4, 0.75, 67.65, 12.8, 0.8, 'ruby'],
+    ['b', 67.47, 12.48, 0.8, 67.55, 12.56, 0.84, 'gilt'],
+    ['b', 67.47, 12.66, 0.8, 67.55, 12.74, 0.84, 'gilt'],
+    ['b', 53.74, 3.85, 2.1, 53.86, 3.89, 2.4, 'brass'],
+    ['b', 53.775, 3.89, 2.2, 53.825, 4.05, 2.26, 'brass'],
+    ['b', 53.75, 3.99, 2.26, 53.85, 4.09, 2.4, 'linen'],
+    ['b', 53.78, 4.02, 2.4, 53.82, 4.06, 2.5, 'amber'],
+    ['b', 66.44, 3.85, 2.1, 66.56, 3.89, 2.4, 'brass'],
+    ['b', 66.475, 3.89, 2.2, 66.525, 4.05, 2.26, 'brass'],
+    ['b', 66.45, 3.99, 2.26, 66.55, 4.09, 2.4, 'linen'],
+    ['b', 66.48, 4.02, 2.4, 66.52, 4.06, 2.5, 'amber'],
+    ['b', 53.74, 17.96, 2.1, 53.86, 18.0, 2.4, 'brass'],
+    ['b', 53.775, 17.8, 2.2, 53.825, 17.96, 2.26, 'brass'],
+    ['b', 53.75, 17.76, 2.26, 53.85, 17.86, 2.4, 'linen'],
+    ['b', 53.78, 17.79, 2.4, 53.82, 17.83, 2.5, 'amber'],
+    ['b', 66.44, 17.96, 2.1, 66.56, 18.0, 2.4, 'brass'],
+    ['b', 66.475, 17.8, 2.2, 66.525, 17.96, 2.26, 'brass'],
+    ['b', 66.45, 17.76, 2.26, 66.55, 17.86, 2.4, 'linen'],
+    ['b', 66.48, 17.79, 2.4, 66.52, 17.83, 2.5, 'amber'],
+    ['b', 67.71, 5.94, 2.1, 67.75, 6.06, 2.4, 'brass'],
+    ['b', 67.55, 5.975, 2.2, 67.71, 6.025, 2.26, 'brass'],
+    ['b', 67.51, 5.95, 2.26, 67.61, 6.05, 2.4, 'linen'],
+    ['b', 67.54, 5.98, 2.4, 67.58, 6.02, 2.5, 'amber'],
+    ['b', 67.71, 10.84, 2.1, 67.75, 10.96, 2.4, 'brass'],
+    ['b', 67.55, 10.875, 2.2, 67.71, 10.925, 2.26, 'brass'],
+    ['b', 67.51, 10.85, 2.26, 67.61, 10.95, 2.4, 'linen'],
+    ['b', 67.54, 10.88, 2.4, 67.58, 10.92, 2.5, 'amber'],
+    ['b', 51.85, 7.64, 2.1, 51.89, 7.76, 2.4, 'brass'],
+    ['b', 51.89, 7.675, 2.2, 52.05, 7.725, 2.26, 'brass'],
+    ['b', 51.99, 7.65, 2.26, 52.09, 7.75, 2.4, 'linen'],
+    ['b', 52.02, 7.68, 2.4, 52.06, 7.72, 2.5, 'amber'],
+    ['b', 51.85, 14.44, 2.1, 51.89, 14.56, 2.4, 'brass'],
+    ['b', 51.89, 14.475, 2.2, 52.05, 14.525, 2.26, 'brass'],
+    ['b', 51.99, 14.45, 2.26, 52.09, 14.55, 2.4, 'linen'],
+    ['b', 52.02, 14.48, 2.4, 52.06, 14.52, 2.5, 'amber'],
+    ['b', 56.25, 3.85, 1.4, 57.75, 3.89, 2.3, 'gilt'],
+    ['b', 56.29, 3.89, 1.44, 57.71, 3.91, 2.26, 'linen'],
+    ['b', 56.4, 3.91, 1.895, 57.6, 3.92, 1.94, 'ruby'],
+    ['b', 56.45, 3.91, 1.715, 57.55, 3.92, 1.76, 'ruby'],
+    ['b', 62.4, 3.85, 1.4, 63.6, 3.89, 2.2, 'gilt'],
+    ['b', 62.44, 3.89, 1.44, 63.56, 3.91, 2.16, 'linen'],
+    ['b', 62.55, 3.91, 1.84, 63.45, 3.92, 1.88, 'ruby'],
+    ['b', 62.6, 3.91, 1.68, 63.4, 3.92, 1.72, 'ruby'],
+    ['b', 52.9, 17.96, 1.4, 53.7, 18.0, 2.2, 'gilt'],
+    ['b', 52.94, 17.94, 1.44, 53.66, 17.96, 2.16, 'linen'],
+    ['b', 53.05, 17.93, 1.84, 53.55, 17.94, 1.88, 'blue'],
+    ['b', 53.1, 17.93, 1.68, 53.5, 17.94, 1.72, 'blue'],
+    ['b', 61.55, 17.96, 1.4, 62.85, 18.0, 2.3, 'gilt'],
+    ['b', 61.59, 17.94, 1.44, 62.81, 17.96, 2.26, 'linen'],
+    ['b', 61.7, 17.93, 1.895, 62.7, 17.94, 1.94, 'green'],
+    ['b', 61.75, 17.93, 1.715, 62.65, 17.94, 1.76, 'green'],
+    ['b', 67.71, 6.95, 1.3, 67.75, 7.65, 2.2, 'gilt'],
+    ['b', 67.69, 6.99, 1.34, 67.71, 7.61, 2.16, 'linen'],
+    ['b', 67.68, 7.1, 1.795, 67.69, 7.5, 1.84, 'black'],
+    ['b', 67.68, 7.15, 1.615, 67.69, 7.45, 1.66, 'black'],
+    ['b', 67.71, 13.2, 1.3, 67.75, 14.0, 2.3, 'gilt'],
+    ['b', 67.69, 13.24, 1.34, 67.71, 13.96, 2.26, 'linen'],
+    ['b', 67.68, 13.35, 1.85, 67.69, 13.85, 1.9, 'black'],
+    ['b', 67.68, 13.4, 1.65, 67.69, 13.8, 1.7, 'black'],
+    ['b', 51.85, 12.25, 1.3, 51.89, 12.95, 2.2, 'gilt'],
+    ['b', 51.89, 12.29, 1.34, 51.91, 12.91, 2.16, 'linen'],
+    ['b', 51.91, 12.4, 1.795, 51.92, 12.8, 1.84, 'black'],
+    ['b', 51.91, 12.45, 1.615, 51.92, 12.75, 1.66, 'black'],
+    ['b', 67.25, 13.05, 0, 67.75, 14.55, 0.42, 'oak'],
+    ['b', 67.29, 13.1, 0.42, 67.71, 14.5, 0.5, 'dark'],
+    ['b', 67.35, 13.9, 0.5, 67.67, 14.4, 0.56, 'tartan'],
+    ['b', 67.25, 14.65, 0, 67.75, 16.15, 0.42, 'oak'],
+    ['b', 67.29, 14.7, 0.42, 67.71, 16.1, 0.5, 'dark'],
+    ['b', 67.35, 15.5, 0.5, 67.67, 16.0, 0.56, 'tartan'],
+    ['b', 53.05, 17.5, 0, 54.55, 18.0, 0.42, 'oak'],
+    ['b', 53.1, 17.54, 0.42, 54.5, 17.96, 0.5, 'dark'],
+    ['b', 53.9, 17.6, 0.5, 54.4, 17.92, 0.56, 'tartan'],
+    ['b', 54.575, 5.45, 0, 55.425, 6.25, 0.45, 'leather'],
+    ['b', 54.575, 5.45, 0.45, 55.425, 5.65, 1.1, 'leather'],
+    ['b', 54.57, 5.65, 0.45, 54.67, 6.25, 0.65, 'leather'],
+    ['b', 55.33, 5.65, 0.45, 55.43, 6.25, 0.65, 'leather'],
+    ['b', 54.75, 6.4, 0, 55.25, 6.8, 0.3, 'leather'],
+    ['b', 55.7, 5.55, 0, 55.9, 5.75, 0.06, 'oak'],
+    ['b', 55.77, 5.62, 0.06, 55.83, 5.68, 1.5, 'brass'],
+    ['b', 55.68, 5.53, 1.5, 55.92, 5.77, 1.7, 'linen'],
+    ['b', 59.375, 15.6, 0, 60.225, 16.4, 0.45, 'leather'],
+    ['b', 59.375, 16.2, 0.45, 60.225, 16.4, 1.1, 'leather'],
+    ['b', 59.37, 15.6, 0.45, 59.47, 16.2, 0.65, 'leather'],
+    ['b', 60.13, 15.6, 0.45, 60.23, 16.2, 0.65, 'leather'],
+    ['b', 59.55, 15.05, 0, 60.05, 15.45, 0.3, 'leather'],
+    ['b', 60.5, 16.1, 0, 60.7, 16.3, 0.06, 'oak'],
+    ['b', 60.57, 16.17, 0.06, 60.63, 16.23, 1.5, 'brass'],
+    ['b', 60.48, 16.08, 1.5, 60.72, 16.32, 1.7, 'linen'],
+    ['b', 59.375, 5.45, 0, 60.225, 6.25, 0.45, 'leather'],
+    ['b', 59.375, 5.45, 0.45, 60.225, 5.65, 1.1, 'leather'],
+    ['b', 59.37, 5.65, 0.45, 59.47, 6.25, 0.65, 'leather'],
+    ['b', 60.13, 5.65, 0.45, 60.23, 6.25, 0.65, 'leather'],
+    ['b', 59.55, 6.4, 0, 60.05, 6.8, 0.3, 'leather'],
+    ['b', 60.5, 5.55, 0, 60.7, 5.75, 0.06, 'oak'],
+    ['b', 60.57, 5.62, 0.06, 60.63, 5.68, 1.5, 'brass'],
+    ['b', 60.48, 5.53, 1.5, 60.72, 5.77, 1.7, 'linen'],
+    ['b', 58.5, 3.95, 0, 58.9, 4.35, 0.12, 'oak'],
+    ['b', 58.67, 4.12, 0.12, 58.73, 4.18, 0.95, 'oak'],
+    ['b', 58.5, 3.95, 0.95, 58.9, 4.35, 1.35, 'blue'],
+    ['b', 58.67, 3.93, 0.95, 58.73, 4.37, 1.35, 'brass'],
+    ['b', 53.925, 5.35, 0.45, 54.475, 5.9, 0.48, 'oak'],
+    ['b', 54.125, 5.55, 0, 54.275, 5.7, 0.45, 'oak'],
+    ['b', 53.95, 5.41, 0.48, 54.45, 5.85, 0.5, 'iron'],
+    ['b', 54.0, 5.47, 0.5, 54.16, 5.63, 0.66, 'white'],
+    ['b', 54.055, 5.41, 0.56, 54.105, 5.47, 0.6, 'white'],
+    ['b', 54.29, 5.55, 0.5, 54.39, 5.65, 0.58, 'white'],
+    ['b', 54.332, 5.59, 0.56, 54.347, 5.61, 0.7, 'gilt'],
+    ['b', 51.85, 4.8, 0, 52.25, 5.2, 0.08, 'oak'],
+    ['b', 52.0, 4.95, 0.08, 52.1, 5.05, 1.9, 'oak'],
+    ['b', 51.87, 4.95, 1.84, 52.23, 5.05, 1.9, 'oak'],
+    ['b', 51.95, 4.725, 0.8, 52.15, 5.275, 1.8, 'black'],
+    ['b', 51.97, 4.85, 1.9, 52.13, 5.15, 2.0, 'black'],
+    ['b', 51.85, 4.35, 0, 52.15, 4.65, 0.05, 'iron'],
+    ['b', 51.97, 4.47, 0.05, 52.03, 4.53, 1.6, 'brass'],
+    ['b', 51.85, 4.35, 1.6, 52.15, 4.65, 1.95, 'linen'],
+    ['b', 51.85, 16.75, 0, 52.15, 17.05, 0.05, 'iron'],
+    ['b', 51.97, 16.87, 0.05, 52.03, 16.93, 1.6, 'brass'],
+    ['b', 51.85, 16.75, 1.6, 52.15, 17.05, 1.95, 'linen'],
+    ['b', 56.095, 8.08, 3.4, 56.135, 8.12, 4.5, 'iron'],
+    ['b', 55.795, 7.8, 3.3, 56.395, 8.4, 3.4, 'brass'],
+    ['b', 55.795, 7.79, 3.0, 55.855, 7.85, 3.3, 'amber'],
+    ['b', 55.795, 8.35, 3.0, 55.855, 8.41, 3.3, 'amber'],
+    ['b', 56.335, 7.79, 3.0, 56.395, 7.85, 3.3, 'amber'],
+    ['b', 56.335, 8.35, 3.0, 56.395, 8.41, 3.3, 'amber'],
+    ['b', 63.465, 8.08, 3.4, 63.505, 8.12, 4.5, 'iron'],
+    ['b', 63.205, 7.8, 3.3, 63.805, 8.4, 3.4, 'brass'],
+    ['b', 63.745, 7.79, 3.0, 63.805, 7.85, 3.3, 'amber'],
+    ['b', 63.745, 8.35, 3.0, 63.805, 8.41, 3.3, 'amber'],
+    ['b', 63.205, 7.79, 3.0, 63.265, 7.85, 3.3, 'amber'],
+    ['b', 63.205, 8.35, 3.0, 63.265, 8.41, 3.3, 'amber'],
+    ['b', 58.095, 13.78, 3.4, 58.135, 13.82, 4.5, 'iron'],
+    ['b', 57.795, 13.5, 3.3, 58.395, 14.1, 3.4, 'brass'],
+    ['b', 57.795, 13.49, 3.0, 57.855, 13.55, 3.3, 'amber'],
+    ['b', 57.795, 14.05, 3.0, 57.855, 14.11, 3.3, 'amber'],
+    ['b', 58.335, 13.49, 3.0, 58.395, 13.55, 3.3, 'amber'],
+    ['b', 58.335, 14.05, 3.0, 58.395, 14.11, 3.3, 'amber'],
+    ['b', 61.465, 13.78, 3.4, 61.505, 13.82, 4.5, 'iron'],
+    ['b', 61.205, 13.5, 3.3, 61.805, 14.1, 3.4, 'brass'],
+    ['b', 61.745, 13.49, 3.0, 61.805, 13.55, 3.3, 'amber'],
+    ['b', 61.745, 14.05, 3.0, 61.805, 14.11, 3.3, 'amber'],
+    ['b', 61.205, 13.49, 3.0, 61.265, 13.55, 3.3, 'amber'],
+    ['b', 61.205, 14.05, 3.0, 61.265, 14.11, 3.3, 'amber'],
+    ['b', 67.67, 3.95, 1.0, 67.75, 5.85, 3.8, 'gilt'],
+    ['b', 67.66, 4.07, 1.12, 67.67, 5.73, 3.68, 'ruby'],
+    ['b', 67.65, 4.07, 1.3, 67.66, 5.73, 1.42, 'gold'],
+    ['b', 67.65, 4.07, 3.38, 67.66, 5.73, 3.5, 'gold'],
+    ['b', 67.66, 3.9, 3.8, 67.75, 5.9, 3.84, 'wood'],
+    ['b', 64.75, 17.92, 1.2, 66.25, 18.0, 3.8, 'gilt'],
+    ['b', 64.87, 17.91, 1.32, 66.13, 17.92, 3.68, 'blue'],
+    ['b', 64.87, 17.9, 1.5, 66.13, 17.91, 1.62, 'dust'],
+    ['b', 64.87, 17.9, 3.38, 66.13, 17.91, 3.5, 'dust'],
+    ['b', 64.7, 17.91, 3.8, 66.3, 18.0, 3.84, 'wood'],
+    ['b', 67.67, 15.05, 1.2, 67.75, 16.55, 3.8, 'gilt'],
+    ['b', 67.66, 15.17, 1.32, 67.67, 16.43, 3.68, 'green'],
+    ['b', 67.65, 15.17, 1.5, 67.66, 16.43, 1.62, 'dust'],
+    ['b', 67.65, 15.17, 3.38, 67.66, 16.43, 3.5, 'dust'],
+    ['b', 67.66, 15.0, 3.8, 67.75, 16.6, 3.84, 'wood'],
+    ['b', 51.85, 6.05, 1.2, 51.93, 7.55, 3.8, 'gilt'],
+    ['b', 51.93, 6.17, 1.32, 51.94, 7.43, 3.68, 'amber'],
+    ['b', 51.94, 6.17, 1.5, 51.95, 7.43, 1.62, 'dust'],
+    ['b', 51.94, 6.17, 3.38, 51.95, 7.43, 3.5, 'dust'],
+    ['b', 51.85, 6.0, 3.8, 51.94, 7.6, 3.84, 'wood'],
+    ['b', 54.45, 3.85, 1.0, 55.35, 3.93, 2.2, 'oak'],
+    ['b', 54.52, 3.93, 1.07, 55.28, 3.94, 2.13, 'black'],
+    ['b', 54.84, 3.94, 1.66, 55.04, 3.95, 1.96, 'dust'],
+    ['b', 54.7, 3.94, 1.24, 55.1, 3.95, 1.6, 'linen'],
+    ['b', 54.84, 3.85, 0.93, 54.96, 3.94, 0.97, 'brass'],
+    ['b', 64.15, 3.85, 1.0, 65.05, 3.93, 2.2, 'black'],
+    ['b', 64.22, 3.93, 1.07, 64.98, 3.94, 2.13, 'black'],
+    ['b', 64.54, 3.94, 1.66, 64.74, 3.95, 1.96, 'dust'],
+    ['b', 64.4, 3.94, 1.24, 64.8, 3.95, 1.6, 'linen'],
+    ['b', 64.54, 3.85, 0.93, 64.66, 3.94, 0.97, 'brass'],
+    ['b', 51.95, 17.92, 1.0, 52.85, 18.0, 2.2, 'gilt'],
+    ['b', 52.02, 17.91, 1.07, 52.78, 17.92, 2.13, 'black'],
+    ['b', 52.34, 17.9, 1.66, 52.54, 17.91, 1.96, 'dust'],
+    ['b', 52.2, 17.9, 1.24, 52.6, 17.91, 1.6, 'linen'],
+    ['b', 52.34, 17.91, 0.93, 52.46, 18.0, 0.97, 'brass'],
+    ['b', 66.65, 17.92, 1.0, 67.55, 18.0, 2.2, 'rope'],
+    ['b', 66.72, 17.91, 1.07, 67.48, 17.92, 2.13, 'black'],
+    ['b', 67.04, 17.9, 1.66, 67.24, 17.91, 1.96, 'dust'],
+    ['b', 66.9, 17.9, 1.24, 67.3, 17.91, 1.6, 'linen'],
+    ['b', 67.04, 17.91, 0.93, 67.16, 18.0, 0.97, 'brass'],
+    ['b', 67.67, 5.9, 1.1, 67.75, 6.7, 2.1, 'black'],
+    ['b', 67.66, 5.97, 1.17, 67.67, 6.63, 2.03, 'black'],
+    ['b', 67.65, 6.24, 1.65, 67.66, 6.44, 1.9, 'dust'],
+    ['b', 67.65, 6.1, 1.3, 67.66, 6.5, 1.6, 'linen'],
+    ['b', 67.66, 6.24, 1.03, 67.75, 6.36, 1.07, 'brass'],
+    ['b', 67.67, 16.6, 1.1, 67.75, 17.4, 2.1, 'dust'],
+    ['b', 67.66, 16.67, 1.17, 67.67, 17.33, 2.03, 'black'],
+    ['b', 67.65, 16.94, 1.65, 67.66, 17.14, 1.9, 'dust'],
+    ['b', 67.65, 16.8, 1.3, 67.66, 17.2, 1.6, 'linen'],
+    ['b', 67.66, 16.94, 1.03, 67.75, 17.06, 1.07, 'brass'],
+    ['b', 51.85, 13.0, 1.1, 51.93, 13.8, 2.1, 'gilt'],
+    ['b', 51.93, 13.07, 1.17, 51.94, 13.73, 2.03, 'black'],
+    ['b', 51.94, 13.34, 1.65, 51.95, 13.54, 1.9, 'dust'],
+    ['b', 51.94, 13.2, 1.3, 51.95, 13.6, 1.6, 'linen'],
+    ['b', 51.85, 13.34, 1.03, 51.94, 13.46, 1.07, 'brass'],
+    ['b', 67.67, 12.3, 1.1, 67.75, 13.1, 2.1, 'gilt'],
+    ['b', 67.66, 12.37, 1.17, 67.67, 13.03, 2.03, 'black'],
+    ['b', 67.65, 12.64, 1.65, 67.66, 12.84, 1.9, 'dust'],
+    ['b', 67.65, 12.5, 1.3, 67.66, 12.9, 1.6, 'linen'],
+    ['b', 67.66, 12.64, 1.03, 67.75, 12.76, 1.07, 'brass'],
+    ['b', 60.49, 17.8, 0, 60.61, 17.9, 0.85, 'oak'],
+    ['b', 60.49, 16.8, 0, 60.61, 16.9, 0.85, 'oak'],
+    ['b', 62.79, 17.8, 0, 62.91, 17.9, 0.85, 'oak'],
+    ['b', 62.79, 16.8, 0, 62.91, 16.9, 0.85, 'oak'],
+    ['b', 60.4, 16.7, 0.85, 63.0, 18.0, 0.92, 'oak'],
+    ['b', 60.55, 16.8, 0.92, 62.85, 17.9, 0.935, 'linen'],
+    ['b', 61.275, 17.1, 0.935, 61.325, 17.7, 0.95, 'green'],
+    ['b', 61.6, 17.3, 0.935, 62.4, 17.5, 0.95, 'blue'],
+    ['b', 62.25, 17.64, 0.95, 62.95, 17.7, 0.97, 'brass'],
+    ['b', 60.61, 17.6, 0.935, 60.79, 17.8, 1.03, 'iron'],
+    ['b', 62.61, 17.6, 0.935, 62.79, 17.8, 1.03, 'iron'],
+    ['b', 52.5, 3.85, 0, 54.1, 4.3, 2.0, 'oak'],
+    ['b', 52.55, 3.9, 0.15, 54.05, 4.28, 1.9, 'dark'],
+    ['b', 52.55, 3.9, 0.6, 54.05, 4.28, 0.63, 'oak'],
+    ['b', 52.55, 3.9, 1.1, 54.05, 4.28, 1.13, 'oak'],
+    ['b', 52.55, 3.9, 1.6, 54.05, 4.28, 1.63, 'oak'],
+    ['b', 52.68, 4.0, 0.18, 52.82, 4.15, 0.55, 'tin'],
+    ['b', 52.68, 4.0, 0.63, 52.82, 4.15, 1.0, 'brass'],
+    ['b', 52.68, 4.0, 1.13, 52.82, 4.15, 1.5, 'tin'],
+    ['b', 53.05, 4.0, 0.18, 53.19, 4.15, 0.55, 'tin'],
+    ['b', 53.05, 4.0, 0.63, 53.19, 4.15, 1.0, 'brass'],
+    ['b', 53.05, 4.0, 1.13, 53.19, 4.15, 1.5, 'tin'],
+    ['b', 53.42, 4.0, 0.18, 53.56, 4.15, 0.55, 'tin'],
+    ['b', 53.42, 4.0, 0.63, 53.56, 4.15, 1.0, 'brass'],
+    ['b', 53.42, 4.0, 1.13, 53.56, 4.15, 1.5, 'tin'],
+    ['b', 53.79, 4.0, 0.18, 53.93, 4.15, 0.55, 'tin'],
+    ['b', 53.79, 4.0, 0.63, 53.93, 4.15, 1.0, 'brass'],
+    ['b', 53.79, 4.0, 1.13, 53.93, 4.15, 1.5, 'tin'],
+    ['b', 53.0, 3.97, 1.63, 53.6, 4.19, 1.85, 'gilt'],
+    ['b', 52.54, 4.3, 0.1, 54.06, 4.32, 1.95, 'glass'],
+    ['b', 65.55, 3.85, 0, 66.65, 4.35, 1.0, 'oak'],
+    ['b', 65.6, 4.35, 0.75, 66.6, 4.8, 0.8, 'wood'],
+    ['b', 65.75, 4.4, 0.8, 66.45, 4.7, 0.82, 'green'],
+    ['b', 65.55, 3.85, 1.0, 66.65, 4.15, 2.0, 'oak'],
+    ['b', 65.59, 3.95, 1.1, 65.81, 4.17, 1.4, 'linen'],
+    ['b', 65.86, 3.95, 1.1, 66.08, 4.17, 1.4, 'linen'],
+    ['b', 66.13, 3.95, 1.1, 66.35, 4.17, 1.4, 'linen'],
+    ['b', 66.4, 3.95, 1.1, 66.62, 4.17, 1.4, 'linen'],
+    ['b', 65.59, 3.95, 1.5, 65.81, 4.17, 1.8, 'linen'],
+    ['b', 65.86, 3.95, 1.5, 66.08, 4.17, 1.8, 'linen'],
+    ['b', 66.13, 3.95, 1.5, 66.35, 4.17, 1.8, 'linen'],
+    ['b', 66.4, 3.95, 1.5, 66.62, 4.17, 1.8, 'linen'],
+    ['b', 65.5, 3.85, 2.0, 66.7, 4.19, 2.08, 'wood'],
+    ['b', 67.35, 8.65, 0, 67.75, 9.15, 2.2, 'oak'],
+    ['b', 67.32, 8.73, 1.6, 67.35, 9.07, 1.95, 'white'],
+    ['b', 67.31, 8.71, 1.58, 67.34, 9.09, 1.97, 'gilt'],
+    ['b', 67.32, 8.8, 0.5, 67.35, 9.0, 1.4, 'glass'],
+    ['b', 67.31, 8.84, 0.6, 67.34, 8.96, 0.72, 'brass'],
+    ['b', 67.3, 8.6, 2.2, 67.75, 9.2, 2.3, 'wood'],
+    ['b', 57.3, 9.85, 0.0, 62.3, 13.45, 0.016, 'gilt'],
+    ['b', 57.42, 9.97, 0.016, 62.18, 13.33, 0.02, 'ruby'],
+    ['b', 58.8, 11.11, 0.02, 60.8, 12.19, 0.024, 'gilt'],
+    ['b', 59.55, 12.3, 0.0, 61.75, 15.3, 0.016, 'gilt'],
+    ['b', 59.67, 12.42, 0.016, 61.63, 15.18, 0.02, 'green'],
+    ['b', 60.32, 13.2, 0.02, 60.98, 14.4, 0.024, 'gilt'],
+    ['b', 58.14, 3.85, 2.1, 58.26, 3.89, 2.4, 'brass'],
+    ['b', 58.175, 3.89, 2.2, 58.225, 4.05, 2.26, 'brass'],
+    ['b', 58.15, 3.99, 2.26, 58.25, 4.09, 2.4, 'linen'],
+    ['b', 58.18, 4.02, 2.4, 58.22, 4.06, 2.5, 'amber'],
+    ['b', 61.34, 3.85, 2.1, 61.46, 3.89, 2.4, 'brass'],
+    ['b', 61.375, 3.89, 2.2, 61.425, 4.05, 2.26, 'brass'],
+    ['b', 61.35, 3.99, 2.26, 61.45, 4.09, 2.4, 'linen'],
+    ['b', 61.38, 4.02, 2.4, 61.42, 4.06, 2.5, 'amber'],
+    ['b', 57.74, 17.96, 2.1, 57.86, 18.0, 2.4, 'brass'],
+    ['b', 57.775, 17.8, 2.2, 57.825, 17.96, 2.26, 'brass'],
+    ['b', 57.75, 17.76, 2.26, 57.85, 17.86, 2.4, 'linen'],
+    ['b', 57.78, 17.79, 2.4, 57.82, 17.83, 2.5, 'amber'],
+    ['b', 61.34, 17.96, 2.1, 61.46, 18.0, 2.4, 'brass'],
+    ['b', 61.375, 17.8, 2.2, 61.425, 17.96, 2.26, 'brass'],
+    ['b', 61.35, 17.76, 2.26, 61.45, 17.86, 2.4, 'linen'],
+    ['b', 61.38, 17.79, 2.4, 61.42, 17.83, 2.5, 'amber'],
+    ['b', 67.71, 9.44, 2.1, 67.75, 9.56, 2.4, 'brass'],
+    ['b', 67.55, 9.475, 2.2, 67.71, 9.525, 2.26, 'brass'],
+    ['b', 67.51, 9.45, 2.26, 67.61, 9.55, 2.4, 'linen'],
+    ['b', 67.54, 9.48, 2.4, 67.58, 9.52, 2.5, 'amber'],
+    ['b', 67.71, 12.24, 2.1, 67.75, 12.36, 2.4, 'brass'],
+    ['b', 67.55, 12.275, 2.2, 67.71, 12.325, 2.26, 'brass'],
+    ['b', 67.51, 12.25, 2.26, 67.61, 12.35, 2.4, 'linen'],
+    ['b', 67.54, 12.28, 2.4, 67.58, 12.32, 2.5, 'amber'],
+    ['b', 51.85, 9.74, 2.1, 51.89, 9.86, 2.4, 'brass'],
+    ['b', 51.89, 9.775, 2.2, 52.05, 9.825, 2.26, 'brass'],
+    ['b', 51.99, 9.75, 2.26, 52.09, 9.85, 2.4, 'linen'],
+    ['b', 52.02, 9.78, 2.4, 52.06, 9.82, 2.5, 'amber'],
+    ['b', 51.85, 12.04, 2.1, 51.89, 12.16, 2.4, 'brass'],
+    ['b', 51.89, 12.075, 2.2, 52.05, 12.125, 2.26, 'brass'],
+    ['b', 51.99, 12.05, 2.26, 52.09, 12.15, 2.4, 'linen'],
+    ['b', 52.02, 12.08, 2.4, 52.06, 12.12, 2.5, 'amber'],
+    ['b', 59.85, 8.075, 3.5, 59.9, 8.125, 4.6, 'iron'],
+    ['b', 59.35, 7.6, 3.35, 60.35, 8.6, 3.45, 'brass'],
+    ['b', 59.55, 7.8, 3.1, 60.15, 8.4, 3.2, 'brass'],
+    ['b', 59.35, 7.57, 3.45, 59.41, 7.63, 3.62, 'linen'],
+    ['b', 59.36, 7.58, 3.62, 59.4, 7.62, 3.7, 'amber'],
+    ['b', 59.35, 8.52, 3.45, 59.41, 8.58, 3.62, 'linen'],
+    ['b', 59.36, 8.53, 3.62, 59.4, 8.57, 3.7, 'amber'],
+    ['b', 60.3, 7.57, 3.45, 60.36, 7.63, 3.62, 'linen'],
+    ['b', 60.31, 7.58, 3.62, 60.35, 7.62, 3.7, 'amber'],
+    ['b', 60.3, 8.52, 3.45, 60.36, 8.58, 3.62, 'linen'],
+    ['b', 60.31, 8.53, 3.62, 60.35, 8.57, 3.7, 'amber'],
+    ['b', 59.35, 8.05, 3.45, 59.41, 8.11, 3.62, 'linen'],
+    ['b', 59.36, 8.06, 3.62, 59.4, 8.1, 3.7, 'amber'],
+    ['b', 60.3, 8.05, 3.45, 60.36, 8.11, 3.62, 'linen'],
+    ['b', 60.31, 8.06, 3.62, 60.35, 8.1, 3.7, 'amber'],
+    ['b', 59.83, 7.57, 3.45, 59.89, 7.63, 3.62, 'linen'],
+    ['b', 59.84, 7.58, 3.62, 59.88, 7.62, 3.7, 'amber'],
+    ['b', 59.83, 8.52, 3.45, 59.89, 8.58, 3.62, 'linen'],
+    ['b', 59.84, 8.53, 3.62, 59.88, 8.57, 3.7, 'amber'],
+    ['b', 59.55, 7.78, 3.2, 59.59, 7.82, 3.32, 'amber'],
+    ['b', 59.55, 8.34, 3.2, 59.59, 8.38, 3.32, 'amber'],
+    ['b', 60.11, 7.78, 3.2, 60.15, 7.82, 3.32, 'amber'],
+    ['b', 60.11, 8.34, 3.2, 60.15, 8.38, 3.32, 'amber'],
+    ['b', 59.85, 13.775, 3.5, 59.9, 13.825, 4.6, 'iron'],
+    ['b', 59.35, 13.3, 3.35, 60.35, 14.3, 3.45, 'brass'],
+    ['b', 59.55, 13.5, 3.1, 60.15, 14.1, 3.2, 'brass'],
+    ['b', 59.35, 13.27, 3.45, 59.41, 13.33, 3.62, 'linen'],
+    ['b', 59.36, 13.28, 3.62, 59.4, 13.32, 3.7, 'amber'],
+    ['b', 59.35, 14.22, 3.45, 59.41, 14.28, 3.62, 'linen'],
+    ['b', 59.36, 14.23, 3.62, 59.4, 14.27, 3.7, 'amber'],
+    ['b', 60.3, 13.27, 3.45, 60.36, 13.33, 3.62, 'linen'],
+    ['b', 60.31, 13.28, 3.62, 60.35, 13.32, 3.7, 'amber'],
+    ['b', 60.3, 14.22, 3.45, 60.36, 14.28, 3.62, 'linen'],
+    ['b', 60.31, 14.23, 3.62, 60.35, 14.27, 3.7, 'amber'],
+    ['b', 59.35, 13.75, 3.45, 59.41, 13.81, 3.62, 'linen'],
+    ['b', 59.36, 13.76, 3.62, 59.4, 13.8, 3.7, 'amber'],
+    ['b', 60.3, 13.75, 3.45, 60.36, 13.81, 3.62, 'linen'],
+    ['b', 60.31, 13.76, 3.62, 60.35, 13.8, 3.7, 'amber'],
+    ['b', 59.83, 13.27, 3.45, 59.89, 13.33, 3.62, 'linen'],
+    ['b', 59.84, 13.28, 3.62, 59.88, 13.32, 3.7, 'amber'],
+    ['b', 59.83, 14.22, 3.45, 59.89, 14.28, 3.62, 'linen'],
+    ['b', 59.84, 14.23, 3.62, 59.88, 14.27, 3.7, 'amber'],
+    ['b', 59.55, 13.48, 3.2, 59.59, 13.52, 3.32, 'amber'],
+    ['b', 59.55, 14.04, 3.2, 59.59, 14.08, 3.32, 'amber'],
+    ['b', 60.11, 13.48, 3.2, 60.15, 13.52, 3.32, 'amber'],
+    ['b', 60.11, 14.04, 3.2, 60.15, 14.08, 3.32, 'amber'],
+    ['b', 59.85, 10.875, 3.5, 59.9, 10.925, 4.6, 'iron'],
+    ['b', 59.35, 10.4, 3.35, 60.35, 11.4, 3.45, 'brass'],
+    ['b', 59.55, 10.6, 3.1, 60.15, 11.2, 3.2, 'brass'],
+    ['b', 59.35, 10.37, 3.45, 59.41, 10.43, 3.62, 'linen'],
+    ['b', 59.36, 10.38, 3.62, 59.4, 10.42, 3.7, 'amber'],
+    ['b', 59.35, 11.32, 3.45, 59.41, 11.38, 3.62, 'linen'],
+    ['b', 59.36, 11.33, 3.62, 59.4, 11.37, 3.7, 'amber'],
+    ['b', 60.3, 10.37, 3.45, 60.36, 10.43, 3.62, 'linen'],
+    ['b', 60.31, 10.38, 3.62, 60.35, 10.42, 3.7, 'amber'],
+    ['b', 60.3, 11.32, 3.45, 60.36, 11.38, 3.62, 'linen'],
+    ['b', 60.31, 11.33, 3.62, 60.35, 11.37, 3.7, 'amber'],
+    ['b', 59.35, 10.85, 3.45, 59.41, 10.91, 3.62, 'linen'],
+    ['b', 59.36, 10.86, 3.62, 59.4, 10.9, 3.7, 'amber'],
+    ['b', 60.3, 10.85, 3.45, 60.36, 10.91, 3.62, 'linen'],
+    ['b', 60.31, 10.86, 3.62, 60.35, 10.9, 3.7, 'amber'],
+    ['b', 59.83, 10.37, 3.45, 59.89, 10.43, 3.62, 'linen'],
+    ['b', 59.84, 10.38, 3.62, 59.88, 10.42, 3.7, 'amber'],
+    ['b', 59.83, 11.32, 3.45, 59.89, 11.38, 3.62, 'linen'],
+    ['b', 59.84, 11.33, 3.62, 59.88, 11.37, 3.7, 'amber'],
+    ['b', 59.55, 10.58, 3.2, 59.59, 10.62, 3.32, 'amber'],
+    ['b', 59.55, 11.14, 3.2, 59.59, 11.18, 3.32, 'amber'],
+    ['b', 60.11, 10.58, 3.2, 60.15, 10.62, 3.32, 'amber'],
+    ['b', 60.11, 11.14, 3.2, 60.15, 11.18, 3.32, 'amber']]);
+  T['head-boy-girl-study-5'].lights = (T['head-boy-girl-study-5'].lights || []).concat([[61.7, 4.1, 0.5, 16757862, 1.1, 8], [54.2, 4.15, 2.33, 16757862, 1.1, 8], [65.4, 4.15, 2.33, 16757862, 1.1, 8], [52.05, 9.2, 1.05, 16757862, 1.1, 8], [67.55, 7.1, 1.05, 16757862, 1.1, 8]]);
+})(window.SHELL_W5A.things);
+/* HAND2 end head-boy-girl-study-5 */
+/* HAND2 begin music-room-5 */
+/* Interiors req 2423 sec 14: piano, harp, music stands, violin, composer portrait, chart of the notes, lamps; req 2532 adds hangings, a dado and a thing to read or pull; req 2543 (2 Nov, the 439th), Godric notes of 1 Nov: sconces, pendants, chandeliers, framed papers, tapestries, portraits, seats, rugs, room-use pieces; sited by tools/architect-hand-rooms-1101.py, plain stand-ins (Objects draw the real ones) */
+(function (T) {
+  T['music-room-5'] = T['music-room-5'] || { items: [] };
+  T['music-room-5'].items = T['music-room-5'].items.concat([
+    ['b', 119.14, 3.85, 1.9, 119.26, 3.89, 2.3, 'iron'],
+    ['b', 119.175, 3.89, 2.25, 119.225, 4.15, 2.3, 'iron'],
+    ['b', 119.14, 4.11, 2.0, 119.26, 4.19, 2.28, 'flame'],
+    ['b', 123.84, 17.96, 1.9, 123.96, 18.0, 2.3, 'iron'],
+    ['b', 123.875, 17.7, 2.25, 123.925, 17.96, 2.3, 'iron'],
+    ['b', 123.84, 17.66, 2.0, 123.96, 17.74, 2.28, 'flame'],
+    ['b', 123.6, 3.85, 0, 125.2, 4.55, 1.15, 'black'],
+    ['b', 123.65, 4.55, 0.7, 125.15, 4.8, 0.78, 'white'],
+    ['b', 124.2, 4.8, 0, 124.6, 4.9, 0.5, 'oak'],
+    ['b', 128.15, 9.54, 0, 128.65, 9.66, 1.6, 'gilt'],
+    ['b', 128.15, 9.54, 1.4, 128.3, 9.66, 1.6, 'gilt'],
+    ['b', 128.15, 9.58, 0.2, 128.65, 9.62, 1.4, 'linen'],
+    ['b', 119.78, 17.96, 0, 119.82, 18.0, 1.2, 'iron'],
+    ['b', 119.6, 17.8, 1.2, 120.0, 18.0, 1.55, 'linen'],
+    ['b', 120.38, 17.96, 0, 120.42, 18.0, 1.2, 'iron'],
+    ['b', 120.2, 17.8, 1.2, 120.6, 18.0, 1.55, 'linen'],
+    ['b', 120.98, 17.96, 0, 121.02, 18.0, 1.2, 'iron'],
+    ['b', 120.8, 17.8, 1.2, 121.2, 18.0, 1.55, 'linen'],
+    ['b', 126.5, 3.85, 1.5, 127.3, 3.93, 2.5, 'gilt'],
+    ['b', 126.55, 3.93, 1.55, 127.25, 3.94, 2.45, 'black'],
+    ['b', 116.85, 12.17, 1.57, 116.93, 13.43, 2.53, 'wood'],
+    ['b', 116.93, 12.2, 1.6, 116.95, 13.4, 2.5, 'linen'],
+    ['b', 116.95, 12.48, 1.72, 116.96, 12.52, 2.38, 'black'],
+    ['b', 116.95, 12.78, 1.72, 116.96, 12.82, 2.38, 'black'],
+    ['b', 116.95, 13.08, 1.72, 116.96, 13.12, 2.38, 'black'],
+    ['b', 116.85, 6.15, 0, 117.35, 6.85, 0.7, 'oak'],
+    ['b', 116.95, 6.25, 0.7, 117.25, 6.75, 0.72, 'tin'],
+    ['b', 117.0, 6.44, 0.72, 117.1, 6.56, 0.85, 'white'],
+    ['b', 125.0, 17.5, 0, 127.6, 18.0, 0.3, 'oak'],
+    ['b', 125.25, 17.6, 0.3, 125.55, 17.9, 0.4, 'wood'],
+    ['b', 125.85, 17.6, 0.3, 126.15, 17.9, 0.4, 'wood'],
+    ['b', 126.45, 17.6, 0.3, 126.75, 17.9, 0.4, 'wood'],
+    ['b', 127.05, 17.6, 0.3, 127.35, 17.9, 0.4, 'wood'],
+    ['b', 125.0, 17.0, 0, 127.6, 17.5, 0.6, 'oak'],
+    ['b', 125.25, 17.1, 0.6, 125.55, 17.4, 0.7, 'wood'],
+    ['b', 125.85, 17.1, 0.6, 126.15, 17.4, 0.7, 'wood'],
+    ['b', 126.45, 17.1, 0.6, 126.75, 17.4, 0.7, 'wood'],
+    ['b', 127.05, 17.1, 0.6, 127.35, 17.4, 0.7, 'wood'],
+    ['b', 125.0, 16.5, 0, 127.6, 17.0, 0.9, 'oak'],
+    ['b', 125.25, 16.6, 0.9, 125.55, 16.9, 1.0, 'wood'],
+    ['b', 125.85, 16.6, 0.9, 126.15, 16.9, 1.0, 'wood'],
+    ['b', 126.45, 16.6, 0.9, 126.75, 16.9, 1.0, 'wood'],
+    ['b', 127.05, 16.6, 0.9, 127.35, 16.9, 1.0, 'wood'],
+    ['b', 118.24, 3.85, 2.1, 118.36, 3.89, 2.4, 'brass'],
+    ['b', 118.275, 3.89, 2.2, 118.325, 4.05, 2.26, 'brass'],
+    ['b', 118.25, 3.99, 2.26, 118.35, 4.09, 2.4, 'linen'],
+    ['b', 118.28, 4.02, 2.4, 118.32, 4.06, 2.5, 'amber'],
+    ['b', 127.64, 3.85, 2.1, 127.76, 3.89, 2.4, 'brass'],
+    ['b', 127.675, 3.89, 2.2, 127.725, 4.05, 2.26, 'brass'],
+    ['b', 127.65, 3.99, 2.26, 127.75, 4.09, 2.4, 'linen'],
+    ['b', 127.68, 4.02, 2.4, 127.72, 4.06, 2.5, 'amber'],
+    ['b', 119.04, 17.96, 2.1, 119.16, 18.0, 2.4, 'brass'],
+    ['b', 119.075, 17.8, 2.2, 119.125, 17.96, 2.26, 'brass'],
+    ['b', 119.05, 17.76, 2.26, 119.15, 17.86, 2.4, 'linen'],
+    ['b', 119.08, 17.79, 2.4, 119.12, 17.83, 2.5, 'amber'],
+    ['b', 127.64, 17.96, 2.1, 127.76, 18.0, 2.4, 'brass'],
+    ['b', 127.675, 17.8, 2.2, 127.725, 17.96, 2.26, 'brass'],
+    ['b', 127.65, 17.76, 2.26, 127.75, 17.86, 2.4, 'linen'],
+    ['b', 127.68, 17.79, 2.4, 127.72, 17.83, 2.5, 'amber'],
+    ['b', 128.61, 5.94, 2.1, 128.65, 6.06, 2.4, 'brass'],
+    ['b', 128.45, 5.975, 2.2, 128.61, 6.025, 2.26, 'brass'],
+    ['b', 128.41, 5.95, 2.26, 128.51, 6.05, 2.4, 'linen'],
+    ['b', 128.44, 5.98, 2.4, 128.48, 6.02, 2.5, 'amber'],
+    ['b', 128.61, 10.84, 2.1, 128.65, 10.96, 2.4, 'brass'],
+    ['b', 128.45, 10.875, 2.2, 128.61, 10.925, 2.26, 'brass'],
+    ['b', 128.41, 10.85, 2.26, 128.51, 10.95, 2.4, 'linen'],
+    ['b', 128.44, 10.88, 2.4, 128.48, 10.92, 2.5, 'amber'],
+    ['b', 116.85, 8.04, 2.1, 116.89, 8.16, 2.4, 'brass'],
+    ['b', 116.89, 8.075, 2.2, 117.05, 8.125, 2.26, 'brass'],
+    ['b', 116.99, 8.05, 2.26, 117.09, 8.15, 2.4, 'linen'],
+    ['b', 117.02, 8.08, 2.4, 117.06, 8.12, 2.5, 'amber'],
+    ['b', 116.85, 14.44, 2.1, 116.89, 14.56, 2.4, 'brass'],
+    ['b', 116.89, 14.475, 2.2, 117.05, 14.525, 2.26, 'brass'],
+    ['b', 116.99, 14.45, 2.26, 117.09, 14.55, 2.4, 'linen'],
+    ['b', 117.02, 14.48, 2.4, 117.06, 14.52, 2.5, 'amber'],
+    ['b', 121.54, 3.85, 2.1, 121.66, 3.89, 2.4, 'brass'],
+    ['b', 121.575, 3.89, 2.2, 121.625, 4.05, 2.26, 'brass'],
+    ['b', 121.55, 3.99, 2.26, 121.65, 4.09, 2.4, 'linen'],
+    ['b', 121.58, 4.02, 2.4, 121.62, 4.06, 2.5, 'amber'],
+    ['b', 123.84, 3.85, 2.1, 123.96, 3.89, 2.4, 'brass'],
+    ['b', 123.875, 3.89, 2.2, 123.925, 4.05, 2.26, 'brass'],
+    ['b', 123.85, 3.99, 2.26, 123.95, 4.09, 2.4, 'linen'],
+    ['b', 123.88, 4.02, 2.4, 123.92, 4.06, 2.5, 'amber'],
+    ['b', 121.54, 17.96, 2.1, 121.66, 18.0, 2.4, 'brass'],
+    ['b', 121.575, 17.8, 2.2, 121.625, 17.96, 2.26, 'brass'],
+    ['b', 121.55, 17.76, 2.26, 121.65, 17.86, 2.4, 'linen'],
+    ['b', 121.58, 17.79, 2.4, 121.62, 17.83, 2.5, 'amber'],
+    ['b', 124.04, 17.96, 2.1, 124.16, 18.0, 2.4, 'brass'],
+    ['b', 124.075, 17.8, 2.2, 124.125, 17.96, 2.26, 'brass'],
+    ['b', 124.05, 17.76, 2.26, 124.15, 17.86, 2.4, 'linen'],
+    ['b', 124.08, 17.79, 2.4, 124.12, 17.83, 2.5, 'amber'],
+    ['b', 128.61, 9.44, 2.1, 128.65, 9.56, 2.4, 'brass'],
+    ['b', 128.45, 9.475, 2.2, 128.61, 9.525, 2.26, 'brass'],
+    ['b', 128.41, 9.45, 2.26, 128.51, 9.55, 2.4, 'linen'],
+    ['b', 128.44, 9.48, 2.4, 128.48, 9.52, 2.5, 'amber'],
+    ['b', 128.61, 12.24, 2.1, 128.65, 12.36, 2.4, 'brass'],
+    ['b', 128.45, 12.275, 2.2, 128.61, 12.325, 2.26, 'brass'],
+    ['b', 128.41, 12.25, 2.26, 128.51, 12.35, 2.4, 'linen'],
+    ['b', 128.44, 12.28, 2.4, 128.48, 12.32, 2.5, 'amber'],
+    ['b', 116.85, 9.44, 2.1, 116.89, 9.56, 2.4, 'brass'],
+    ['b', 116.89, 9.475, 2.2, 117.05, 9.525, 2.26, 'brass'],
+    ['b', 116.99, 9.45, 2.26, 117.09, 9.55, 2.4, 'linen'],
+    ['b', 117.02, 9.48, 2.4, 117.06, 9.52, 2.5, 'amber'],
+    ['b', 116.85, 11.94, 2.1, 116.89, 12.06, 2.4, 'brass'],
+    ['b', 116.89, 11.975, 2.2, 117.05, 12.025, 2.26, 'brass'],
+    ['b', 116.99, 11.95, 2.26, 117.09, 12.05, 2.4, 'linen'],
+    ['b', 117.02, 11.98, 2.4, 117.06, 12.02, 2.5, 'amber'],
+    ['b', 121.75, 17.96, 1.3, 122.45, 18.0, 2.2, 'gilt'],
+    ['b', 121.79, 17.94, 1.34, 122.41, 17.96, 2.16, 'linen'],
+    ['b', 121.9, 17.93, 1.795, 122.3, 17.94, 1.84, 'black'],
+    ['b', 121.95, 17.93, 1.615, 122.25, 17.94, 1.66, 'black'],
+    ['b', 128.61, 7.5, 1.4, 128.65, 8.7, 2.2, 'gilt'],
+    ['b', 128.59, 7.54, 1.44, 128.61, 8.66, 2.16, 'linen'],
+    ['b', 128.58, 7.65, 1.84, 128.59, 8.55, 1.88, 'ruby'],
+    ['b', 128.58, 7.7, 1.68, 128.59, 8.5, 1.72, 'ruby'],
+    ['b', 125.1, 17.96, 1.4, 126.3, 18.0, 2.2, 'gilt'],
+    ['b', 125.14, 17.94, 1.44, 126.26, 17.96, 2.16, 'linen'],
+    ['b', 125.25, 17.93, 1.84, 126.15, 17.94, 1.88, 'ruby'],
+    ['b', 125.3, 17.93, 1.68, 126.1, 17.94, 1.72, 'ruby'],
+    ['b', 128.61, 13.2, 1.3, 128.65, 14.0, 2.3, 'gilt'],
+    ['b', 128.59, 13.24, 1.34, 128.61, 13.96, 2.26, 'linen'],
+    ['b', 128.58, 13.35, 1.85, 128.59, 13.85, 1.9, 'black'],
+    ['b', 128.58, 13.4, 1.65, 128.59, 13.8, 1.7, 'black'],
+    ['b', 117.4, 3.85, 1.3, 118.2, 3.89, 2.3, 'gilt'],
+    ['b', 117.44, 3.89, 1.34, 118.16, 3.91, 2.26, 'linen'],
+    ['b', 117.55, 3.91, 1.85, 118.05, 3.92, 1.9, 'blue'],
+    ['b', 117.6, 3.91, 1.65, 118.0, 3.92, 1.7, 'blue'],
+    ['b', 116.85, 7.9, 1.4, 116.89, 8.9, 2.1, 'gilt'],
+    ['b', 116.89, 7.94, 1.44, 116.91, 8.86, 2.06, 'linen'],
+    ['b', 116.91, 8.05, 1.785, 116.92, 8.75, 1.82, 'black'],
+    ['b', 116.91, 8.1, 1.645, 116.92, 8.7, 1.68, 'black'],
+    ['b', 128.15, 7.95, 0, 128.65, 9.45, 0.42, 'oak'],
+    ['b', 128.19, 8.0, 0.42, 128.61, 9.4, 0.5, 'dark'],
+    ['b', 128.25, 8.8, 0.5, 128.57, 9.3, 0.56, 'tartan'],
+    ['b', 128.15, 15.05, 0, 128.65, 16.55, 0.42, 'oak'],
+    ['b', 128.19, 15.1, 0.42, 128.61, 16.5, 0.5, 'dark'],
+    ['b', 128.25, 15.9, 0.5, 128.57, 16.4, 0.56, 'tartan'],
+    ['b', 118.25, 17.5, 0, 119.75, 18.0, 0.42, 'oak'],
+    ['b', 118.3, 17.54, 0.42, 119.7, 17.96, 0.5, 'dark'],
+    ['b', 119.1, 17.6, 0.5, 119.6, 17.92, 0.56, 'tartan'],
+    ['b', 117.875, 5.45, 0, 118.725, 6.25, 0.45, 'leather'],
+    ['b', 117.875, 5.45, 0.45, 118.725, 5.65, 1.1, 'leather'],
+    ['b', 117.87, 5.65, 0.45, 117.97, 6.25, 0.65, 'leather'],
+    ['b', 118.63, 5.65, 0.45, 118.73, 6.25, 0.65, 'leather'],
+    ['b', 118.05, 6.4, 0, 118.55, 6.8, 0.3, 'leather'],
+    ['b', 119.0, 5.55, 0, 119.2, 5.75, 0.06, 'oak'],
+    ['b', 119.07, 5.62, 0.06, 119.13, 5.68, 1.5, 'brass'],
+    ['b', 118.98, 5.53, 1.5, 119.22, 5.77, 1.7, 'linen'],
+    ['b', 122.375, 15.6, 0, 123.225, 16.4, 0.45, 'leather'],
+    ['b', 122.375, 16.2, 0.45, 123.225, 16.4, 1.1, 'leather'],
+    ['b', 122.37, 15.6, 0.45, 122.47, 16.2, 0.65, 'leather'],
+    ['b', 123.13, 15.6, 0.45, 123.23, 16.2, 0.65, 'leather'],
+    ['b', 122.55, 15.05, 0, 123.05, 15.45, 0.3, 'leather'],
+    ['b', 123.5, 16.1, 0, 123.7, 16.3, 0.06, 'oak'],
+    ['b', 123.57, 16.17, 0.06, 123.63, 16.23, 1.5, 'brass'],
+    ['b', 123.48, 16.08, 1.5, 123.72, 16.32, 1.7, 'linen'],
+    ['b', 116.85, 4.85, 0, 117.15, 5.15, 0.05, 'iron'],
+    ['b', 116.97, 4.97, 0.05, 117.03, 5.03, 1.6, 'brass'],
+    ['b', 116.85, 4.85, 1.6, 117.15, 5.15, 1.95, 'linen'],
+    ['b', 116.85, 16.75, 0, 117.15, 17.05, 0.05, 'iron'],
+    ['b', 116.97, 16.87, 0.05, 117.03, 16.93, 1.6, 'brass'],
+    ['b', 116.85, 16.75, 1.6, 117.15, 17.05, 1.95, 'linen'],
+    ['b', 120.39, 8.08, 3.4, 120.43, 8.12, 4.5, 'iron'],
+    ['b', 120.09, 7.8, 3.3, 120.69, 8.4, 3.4, 'brass'],
+    ['b', 120.09, 7.79, 3.0, 120.15, 7.85, 3.3, 'amber'],
+    ['b', 120.09, 8.35, 3.0, 120.15, 8.41, 3.3, 'amber'],
+    ['b', 120.63, 7.79, 3.0, 120.69, 7.85, 3.3, 'amber'],
+    ['b', 120.63, 8.35, 3.0, 120.69, 8.41, 3.3, 'amber'],
+    ['b', 125.07, 8.08, 3.4, 125.11, 8.12, 4.5, 'iron'],
+    ['b', 124.81, 7.8, 3.3, 125.41, 8.4, 3.4, 'brass'],
+    ['b', 125.35, 7.79, 3.0, 125.41, 7.85, 3.3, 'amber'],
+    ['b', 125.35, 8.35, 3.0, 125.41, 8.41, 3.3, 'amber'],
+    ['b', 124.81, 7.79, 3.0, 124.87, 7.85, 3.3, 'amber'],
+    ['b', 124.81, 8.35, 3.0, 124.87, 8.41, 3.3, 'amber'],
+    ['b', 122.39, 13.78, 3.4, 122.43, 13.82, 4.5, 'iron'],
+    ['b', 122.09, 13.5, 3.3, 122.69, 14.1, 3.4, 'brass'],
+    ['b', 122.09, 13.49, 3.0, 122.15, 13.55, 3.3, 'amber'],
+    ['b', 122.09, 14.05, 3.0, 122.15, 14.11, 3.3, 'amber'],
+    ['b', 122.63, 13.49, 3.0, 122.69, 13.55, 3.3, 'amber'],
+    ['b', 122.63, 14.05, 3.0, 122.69, 14.11, 3.3, 'amber'],
+    ['b', 123.07, 13.78, 3.4, 123.11, 13.82, 4.5, 'iron'],
+    ['b', 122.81, 13.5, 3.3, 123.41, 14.1, 3.4, 'brass'],
+    ['b', 123.35, 13.49, 3.0, 123.41, 13.55, 3.3, 'amber'],
+    ['b', 123.35, 14.05, 3.0, 123.41, 14.11, 3.3, 'amber'],
+    ['b', 122.81, 13.49, 3.0, 122.87, 13.55, 3.3, 'amber'],
+    ['b', 122.81, 14.05, 3.0, 122.87, 14.11, 3.3, 'amber'],
+    ['b', 126.65, 17.92, 1.2, 127.55, 18.0, 3.8, 'gilt'],
+    ['b', 126.77, 17.91, 1.32, 127.43, 17.92, 3.68, 'ruby'],
+    ['b', 126.77, 17.9, 1.5, 127.43, 17.91, 1.62, 'gilt'],
+    ['b', 126.77, 17.9, 3.38, 127.43, 17.91, 3.5, 'gilt'],
+    ['b', 126.6, 17.91, 3.8, 127.6, 18.0, 3.84, 'wood'],
+    ['b', 119.95, 3.85, 1.2, 120.85, 3.93, 3.8, 'gilt'],
+    ['b', 120.07, 3.93, 1.32, 120.73, 3.94, 3.68, 'blue'],
+    ['b', 120.07, 3.94, 1.5, 120.73, 3.95, 1.62, 'gilt'],
+    ['b', 120.07, 3.94, 3.38, 120.73, 3.95, 3.5, 'gilt'],
+    ['b', 119.9, 3.85, 3.8, 120.9, 3.94, 3.84, 'wood'],
+    ['b', 128.57, 3.9, 1.2, 128.65, 5.9, 3.6, 'gilt'],
+    ['b', 128.56, 4.02, 1.32, 128.57, 5.78, 3.48, 'blue'],
+    ['b', 128.55, 4.02, 1.5, 128.56, 5.78, 1.62, 'dust'],
+    ['b', 128.55, 4.02, 3.18, 128.56, 5.78, 3.3, 'dust'],
+    ['b', 128.56, 3.85, 3.6, 128.65, 5.95, 3.64, 'wood'],
+    ['b', 116.85, 14.7, 1.3, 116.93, 16.7, 3.5, 'gilt'],
+    ['b', 116.93, 14.82, 1.42, 116.94, 16.58, 3.38, 'green'],
+    ['b', 116.94, 14.82, 1.6, 116.95, 16.58, 1.72, 'linen'],
+    ['b', 116.94, 14.82, 3.08, 116.95, 16.58, 3.2, 'linen'],
+    ['b', 116.85, 14.65, 3.5, 116.94, 16.75, 3.54, 'wood'],
+    ['b', 125.25, 3.85, 1.0, 126.15, 3.93, 2.2, 'oak'],
+    ['b', 125.32, 3.93, 1.07, 126.08, 3.94, 2.13, 'black'],
+    ['b', 125.64, 3.94, 1.66, 125.84, 3.95, 1.96, 'dust'],
+    ['b', 125.5, 3.94, 1.24, 125.9, 3.95, 1.6, 'linen'],
+    ['b', 125.64, 3.85, 0.93, 125.76, 3.94, 0.97, 'brass'],
+    ['b', 127.6, 17.92, 1.1, 128.4, 18.0, 2.1, 'black'],
+    ['b', 127.67, 17.91, 1.17, 128.33, 17.92, 2.03, 'black'],
+    ['b', 127.94, 17.9, 1.65, 128.14, 17.91, 1.9, 'dust'],
+    ['b', 127.8, 17.9, 1.3, 128.2, 17.91, 1.6, 'linen'],
+    ['b', 127.94, 17.91, 1.03, 128.06, 18.0, 1.07, 'brass'],
+    ['b', 116.85, 5.25, 1.0, 116.93, 6.15, 2.2, 'gilt'],
+    ['b', 116.93, 5.32, 1.07, 116.94, 6.08, 2.13, 'black'],
+    ['b', 116.94, 5.64, 1.66, 116.95, 5.84, 1.96, 'dust'],
+    ['b', 116.94, 5.5, 1.24, 116.95, 5.9, 1.6, 'linen'],
+    ['b', 116.85, 5.64, 0.93, 116.94, 5.76, 0.97, 'brass'],
+    ['b', 128.57, 16.5, 1.1, 128.65, 17.3, 2.1, 'rope'],
+    ['b', 128.56, 16.57, 1.17, 128.57, 17.23, 2.03, 'black'],
+    ['b', 128.55, 16.84, 1.65, 128.56, 17.04, 1.9, 'dust'],
+    ['b', 128.55, 16.7, 1.3, 128.56, 17.1, 1.6, 'linen'],
+    ['b', 128.56, 16.84, 1.03, 128.65, 16.96, 1.07, 'brass'],
+    ['b', 116.85, 17.1, 1.1, 116.93, 17.9, 2.1, 'gilt'],
+    ['b', 116.93, 17.17, 1.17, 116.94, 17.83, 2.03, 'black'],
+    ['b', 116.94, 17.44, 1.65, 116.95, 17.64, 1.9, 'dust'],
+    ['b', 116.94, 17.3, 1.3, 116.95, 17.7, 1.6, 'linen'],
+    ['b', 116.85, 17.44, 1.03, 116.94, 17.56, 1.07, 'brass'],
+    ['b', 122.6, 13.6, 0, 123.0, 13.9, 0.9, 'oak'],
+    ['b', 122.5, 13.5, 0.9, 123.1, 14.0, 1.0, 'oak'],
+    ['b', 122.57, 13.6, 1.0, 123.03, 13.9, 1.06, 'white'],
+    ['b', 123.06, 13.7, 0.4, 123.1, 13.8, 1.0, 'iron'],
+    ['b', 128.15, 6.15, 0, 128.65, 7.25, 1.0, 'oak'],
+    ['b', 127.7, 6.2, 0.75, 128.15, 7.2, 0.8, 'wood'],
+    ['b', 127.8, 6.35, 0.8, 128.1, 7.05, 0.82, 'green'],
+    ['b', 128.35, 6.15, 1.0, 128.65, 7.25, 2.0, 'oak'],
+    ['b', 128.33, 6.19, 1.1, 128.55, 6.41, 1.4, 'linen'],
+    ['b', 128.33, 6.46, 1.1, 128.55, 6.68, 1.4, 'linen'],
+    ['b', 128.33, 6.73, 1.1, 128.55, 6.95, 1.4, 'linen'],
+    ['b', 128.33, 7.0, 1.1, 128.55, 7.22, 1.4, 'linen'],
+    ['b', 128.33, 6.19, 1.5, 128.55, 6.41, 1.8, 'linen'],
+    ['b', 128.33, 6.46, 1.5, 128.55, 6.68, 1.8, 'linen'],
+    ['b', 128.33, 6.73, 1.5, 128.55, 6.95, 1.8, 'linen'],
+    ['b', 128.33, 7.0, 1.5, 128.55, 7.22, 1.8, 'linen'],
+    ['b', 128.31, 6.1, 2.0, 128.65, 7.3, 2.08, 'wood'],
+    ['b', 128.25, 12.45, 0, 128.65, 12.95, 2.2, 'oak'],
+    ['b', 128.22, 12.53, 1.6, 128.25, 12.87, 1.95, 'white'],
+    ['b', 128.21, 12.51, 1.58, 128.24, 12.89, 1.97, 'gilt'],
+    ['b', 128.22, 12.6, 0.5, 128.25, 12.8, 1.4, 'glass'],
+    ['b', 128.21, 12.64, 0.6, 128.24, 12.76, 0.72, 'brass'],
+    ['b', 128.2, 12.4, 2.2, 128.65, 13.0, 2.3, 'wood'],
+    ['b', 117.225, 17.45, 0, 118.175, 18.0, 0.5, 'oak'],
+    ['b', 117.25, 17.47, 0.5, 118.15, 17.98, 0.6, 'wood'],
+    ['b', 117.375, 17.44, 0, 117.425, 18.01, 0.6, 'iron'],
+    ['b', 117.975, 17.44, 0, 118.025, 18.01, 0.6, 'iron'],
+    ['b', 117.65, 17.42, 0.38, 117.75, 17.45, 0.46, 'brass'],
+    ['b', 118.3, 3.85, 1.8, 119.9, 3.91, 1.9, 'oak'],
+    ['b', 118.48, 3.91, 1.78, 118.52, 3.99, 1.84, 'brass'],
+    ['b', 118.78, 3.91, 1.78, 118.82, 3.99, 1.84, 'brass'],
+    ['b', 119.08, 3.91, 1.78, 119.12, 3.99, 1.84, 'brass'],
+    ['b', 119.38, 3.91, 1.78, 119.42, 3.99, 1.84, 'brass'],
+    ['b', 119.68, 3.91, 1.78, 119.72, 3.99, 1.84, 'brass'],
+    ['b', 118.65, 3.91, 0.7, 118.95, 3.97, 1.78, 'dark'],
+    ['b', 119.34, 3.91, 1.3, 119.46, 3.96, 1.78, 'ruby'],
+    ['b', 119.6, 3.91, 1.66, 119.8, 4.01, 1.78, 'tartan'],
+    ['b', 121.85, 8.65, 0.0, 125.05, 13.15, 0.016, 'gilt'],
+    ['b', 121.97, 8.77, 0.016, 124.93, 13.03, 0.02, 'ruby'],
+    ['b', 122.97, 10.0, 0.02, 123.93, 11.8, 0.024, 'gilt'],
+    ['b', 122.75, 8.075, 3.5, 122.8, 8.125, 4.6, 'iron'],
+    ['b', 122.25, 7.6, 3.35, 123.25, 8.6, 3.45, 'brass'],
+    ['b', 122.45, 7.8, 3.1, 123.05, 8.4, 3.2, 'brass'],
+    ['b', 122.25, 7.57, 3.45, 122.31, 7.63, 3.62, 'linen'],
+    ['b', 122.26, 7.58, 3.62, 122.3, 7.62, 3.7, 'amber'],
+    ['b', 122.25, 8.52, 3.45, 122.31, 8.58, 3.62, 'linen'],
+    ['b', 122.26, 8.53, 3.62, 122.3, 8.57, 3.7, 'amber'],
+    ['b', 123.2, 7.57, 3.45, 123.26, 7.63, 3.62, 'linen'],
+    ['b', 123.21, 7.58, 3.62, 123.25, 7.62, 3.7, 'amber'],
+    ['b', 123.2, 8.52, 3.45, 123.26, 8.58, 3.62, 'linen'],
+    ['b', 123.21, 8.53, 3.62, 123.25, 8.57, 3.7, 'amber'],
+    ['b', 122.25, 8.05, 3.45, 122.31, 8.11, 3.62, 'linen'],
+    ['b', 122.26, 8.06, 3.62, 122.3, 8.1, 3.7, 'amber'],
+    ['b', 123.2, 8.05, 3.45, 123.26, 8.11, 3.62, 'linen'],
+    ['b', 123.21, 8.06, 3.62, 123.25, 8.1, 3.7, 'amber'],
+    ['b', 122.73, 7.57, 3.45, 122.79, 7.63, 3.62, 'linen'],
+    ['b', 122.74, 7.58, 3.62, 122.78, 7.62, 3.7, 'amber'],
+    ['b', 122.73, 8.52, 3.45, 122.79, 8.58, 3.62, 'linen'],
+    ['b', 122.74, 8.53, 3.62, 122.78, 8.57, 3.7, 'amber'],
+    ['b', 122.45, 7.78, 3.2, 122.49, 7.82, 3.32, 'amber'],
+    ['b', 122.45, 8.34, 3.2, 122.49, 8.38, 3.32, 'amber'],
+    ['b', 123.01, 7.78, 3.2, 123.05, 7.82, 3.32, 'amber'],
+    ['b', 123.01, 8.34, 3.2, 123.05, 8.38, 3.32, 'amber'],
+    ['b', 122.75, 12.875, 3.5, 122.8, 12.925, 4.6, 'iron'],
+    ['b', 122.25, 12.4, 3.35, 123.25, 13.4, 3.45, 'brass'],
+    ['b', 122.45, 12.6, 3.1, 123.05, 13.2, 3.2, 'brass'],
+    ['b', 122.25, 12.37, 3.45, 122.31, 12.43, 3.62, 'linen'],
+    ['b', 122.26, 12.38, 3.62, 122.3, 12.42, 3.7, 'amber'],
+    ['b', 122.25, 13.32, 3.45, 122.31, 13.38, 3.62, 'linen'],
+    ['b', 122.26, 13.33, 3.62, 122.3, 13.37, 3.7, 'amber'],
+    ['b', 123.2, 12.37, 3.45, 123.26, 12.43, 3.62, 'linen'],
+    ['b', 123.21, 12.38, 3.62, 123.25, 12.42, 3.7, 'amber'],
+    ['b', 123.2, 13.32, 3.45, 123.26, 13.38, 3.62, 'linen'],
+    ['b', 123.21, 13.33, 3.62, 123.25, 13.37, 3.7, 'amber'],
+    ['b', 122.25, 12.85, 3.45, 122.31, 12.91, 3.62, 'linen'],
+    ['b', 122.26, 12.86, 3.62, 122.3, 12.9, 3.7, 'amber'],
+    ['b', 123.2, 12.85, 3.45, 123.26, 12.91, 3.62, 'linen'],
+    ['b', 123.21, 12.86, 3.62, 123.25, 12.9, 3.7, 'amber'],
+    ['b', 122.73, 12.37, 3.45, 122.79, 12.43, 3.62, 'linen'],
+    ['b', 122.74, 12.38, 3.62, 122.78, 12.42, 3.7, 'amber'],
+    ['b', 122.73, 13.32, 3.45, 122.79, 13.38, 3.62, 'linen'],
+    ['b', 122.74, 13.33, 3.62, 122.78, 13.37, 3.7, 'amber'],
+    ['b', 122.45, 12.58, 3.2, 122.49, 12.62, 3.32, 'amber'],
+    ['b', 122.45, 13.14, 3.2, 122.49, 13.18, 3.32, 'amber'],
+    ['b', 123.01, 12.58, 3.2, 123.05, 12.62, 3.32, 'amber'],
+    ['b', 123.01, 13.14, 3.2, 123.05, 13.18, 3.32, 'amber']]);
+  T['music-room-5'].lights = (T['music-room-5'].lights || []).concat([[119.2, 4.15, 2.33, 16757862, 1.1, 8], [123.9, 17.7, 2.33, 16757862, 1.1, 8]]);
+})(window.SHELL_W5A.things);
+/* HAND2 end music-room-5 */
+/* HAND2 begin frog-choir-room-6 */
+/* Interiors req 2423 sec 14: tiered stools, a pond-shaped basin, a blackboard with a staff, baton, chart, lamps; req 2532 adds hangings, a dado and a thing to read or pull; req 2543 (2 Nov, the 439th), Godric notes of 1 Nov: sconces, pendants, chandeliers, framed papers, tapestries, portraits, seats, rugs, room-use pieces; sited by tools/architect-hand-rooms-1101.py, plain stand-ins (Objects draw the real ones) */
+(function (T) {
+  T['frog-choir-room-6'] = T['frog-choir-room-6'] || { items: [] };
+  T['frog-choir-room-6'].items = T['frog-choir-room-6'].items.concat([
+    ['b', 94.54, 3.85, 1.9, 94.66, 3.89, 2.3, 'iron'],
+    ['b', 94.575, 3.89, 2.25, 94.625, 4.15, 2.3, 'iron'],
+    ['b', 94.54, 4.11, 2.0, 94.66, 4.19, 2.28, 'flame'],
+    ['b', 98.14, 17.96, 1.9, 98.26, 18.0, 2.3, 'iron'],
+    ['b', 98.175, 17.7, 2.25, 98.225, 17.96, 2.3, 'iron'],
+    ['b', 98.14, 17.66, 2.0, 98.26, 17.74, 2.28, 'flame'],
+    ['b', 99.0, 3.85, 0.95, 101.6, 3.9, 2.1, 'wood'],
+    ['b', 99.05, 3.9, 1.0, 101.55, 3.93, 2.05, 'black'],
+    ['b', 99.0, 3.9, 0.9, 101.6, 4.05, 0.95, 'wood'],
+    ['b', 99.44, 3.93, 0.95, 99.56, 3.99, 0.97, 'white'],
+    ['b', 99.6, 3.93, 0.95, 99.8, 3.99, 0.96, 'dust'],
+    ['b', 99.4, 17.5, 0, 102.0, 18.0, 0.3, 'oak'],
+    ['b', 99.65, 17.6, 0.3, 99.95, 17.9, 0.4, 'wood'],
+    ['b', 100.25, 17.6, 0.3, 100.55, 17.9, 0.4, 'wood'],
+    ['b', 100.85, 17.6, 0.3, 101.15, 17.9, 0.4, 'wood'],
+    ['b', 101.45, 17.6, 0.3, 101.75, 17.9, 0.4, 'wood'],
+    ['b', 99.4, 17.0, 0, 102.0, 17.5, 0.6, 'oak'],
+    ['b', 99.65, 17.1, 0.6, 99.95, 17.4, 0.7, 'wood'],
+    ['b', 100.25, 17.1, 0.6, 100.55, 17.4, 0.7, 'wood'],
+    ['b', 100.85, 17.1, 0.6, 101.15, 17.4, 0.7, 'wood'],
+    ['b', 101.45, 17.1, 0.6, 101.75, 17.4, 0.7, 'wood'],
+    ['b', 99.4, 16.5, 0, 102.0, 17.0, 0.9, 'oak'],
+    ['b', 99.65, 16.6, 0.9, 99.95, 16.9, 1.0, 'wood'],
+    ['b', 100.25, 16.6, 0.9, 100.55, 16.9, 1.0, 'wood'],
+    ['b', 100.85, 16.6, 0.9, 101.15, 16.9, 1.0, 'wood'],
+    ['b', 101.45, 16.6, 0.9, 101.75, 16.9, 1.0, 'wood'],
+    ['b', 103.05, 10.1, 0, 104.05, 11.7, 0.35, 'stone'],
+    ['b', 103.13, 10.18, 0.3, 103.97, 11.62, 0.36, 'glass'],
+    ['b', 92.25, 12.17, 1.57, 92.33, 13.43, 2.53, 'wood'],
+    ['b', 92.33, 12.2, 1.6, 92.35, 13.4, 2.5, 'linen'],
+    ['b', 92.35, 12.48, 1.72, 92.36, 12.52, 2.38, 'black'],
+    ['b', 92.35, 12.78, 1.72, 92.36, 12.82, 2.38, 'black'],
+    ['b', 92.35, 13.08, 1.72, 92.36, 13.12, 2.38, 'black'],
+    ['b', 92.25, 6.45, 0, 92.6, 6.95, 1.0, 'oak'],
+    ['b', 92.25, 6.4, 1.0, 92.75, 7.0, 1.08, 'linen'],
+    ['b', 93.64, 3.85, 2.1, 93.76, 3.89, 2.4, 'brass'],
+    ['b', 93.675, 3.89, 2.2, 93.725, 4.05, 2.26, 'brass'],
+    ['b', 93.65, 3.99, 2.26, 93.75, 4.09, 2.4, 'linen'],
+    ['b', 93.68, 4.02, 2.4, 93.72, 4.06, 2.5, 'amber'],
+    ['b', 103.04, 3.85, 2.1, 103.16, 3.89, 2.4, 'brass'],
+    ['b', 103.075, 3.89, 2.2, 103.125, 4.05, 2.26, 'brass'],
+    ['b', 103.05, 3.99, 2.26, 103.15, 4.09, 2.4, 'linen'],
+    ['b', 103.08, 4.02, 2.4, 103.12, 4.06, 2.5, 'amber'],
+    ['b', 93.64, 17.96, 2.1, 93.76, 18.0, 2.4, 'brass'],
+    ['b', 93.675, 17.8, 2.2, 93.725, 17.96, 2.26, 'brass'],
+    ['b', 93.65, 17.76, 2.26, 93.75, 17.86, 2.4, 'linen'],
+    ['b', 93.68, 17.79, 2.4, 93.72, 17.83, 2.5, 'amber'],
+    ['b', 103.04, 17.96, 2.1, 103.16, 18.0, 2.4, 'brass'],
+    ['b', 103.075, 17.8, 2.2, 103.125, 17.96, 2.26, 'brass'],
+    ['b', 103.05, 17.76, 2.26, 103.15, 17.86, 2.4, 'linen'],
+    ['b', 103.08, 17.79, 2.4, 103.12, 17.83, 2.5, 'amber'],
+    ['b', 104.01, 5.94, 2.1, 104.05, 6.06, 2.4, 'brass'],
+    ['b', 103.85, 5.975, 2.2, 104.01, 6.025, 2.26, 'brass'],
+    ['b', 103.81, 5.95, 2.26, 103.91, 6.05, 2.4, 'linen'],
+    ['b', 103.84, 5.98, 2.4, 103.88, 6.02, 2.5, 'amber'],
+    ['b', 104.01, 10.84, 2.1, 104.05, 10.96, 2.4, 'brass'],
+    ['b', 103.85, 10.875, 2.2, 104.01, 10.925, 2.26, 'brass'],
+    ['b', 103.81, 10.85, 2.26, 103.91, 10.95, 2.4, 'linen'],
+    ['b', 103.84, 10.88, 2.4, 103.88, 10.92, 2.5, 'amber'],
+    ['b', 92.25, 8.04, 2.1, 92.29, 8.16, 2.4, 'brass'],
+    ['b', 92.29, 8.075, 2.2, 92.45, 8.125, 2.26, 'brass'],
+    ['b', 92.39, 8.05, 2.26, 92.49, 8.15, 2.4, 'linen'],
+    ['b', 92.42, 8.08, 2.4, 92.46, 8.12, 2.5, 'amber'],
+    ['b', 92.25, 14.44, 2.1, 92.29, 14.56, 2.4, 'brass'],
+    ['b', 92.29, 14.475, 2.2, 92.45, 14.525, 2.26, 'brass'],
+    ['b', 92.39, 14.45, 2.26, 92.49, 14.55, 2.4, 'linen'],
+    ['b', 92.42, 14.48, 2.4, 92.46, 14.52, 2.5, 'amber'],
+    ['b', 96.94, 3.85, 2.1, 97.06, 3.89, 2.4, 'brass'],
+    ['b', 96.975, 3.89, 2.2, 97.025, 4.05, 2.26, 'brass'],
+    ['b', 96.95, 3.99, 2.26, 97.05, 4.09, 2.4, 'linen'],
+    ['b', 96.98, 4.02, 2.4, 97.02, 4.06, 2.5, 'amber'],
+    ['b', 99.24, 3.85, 2.1, 99.36, 3.89, 2.4, 'brass'],
+    ['b', 99.275, 3.89, 2.2, 99.325, 4.05, 2.26, 'brass'],
+    ['b', 99.25, 3.99, 2.26, 99.35, 4.09, 2.4, 'linen'],
+    ['b', 99.28, 4.02, 2.4, 99.32, 4.06, 2.5, 'amber'],
+    ['b', 96.94, 17.96, 2.1, 97.06, 18.0, 2.4, 'brass'],
+    ['b', 96.975, 17.8, 2.2, 97.025, 17.96, 2.26, 'brass'],
+    ['b', 96.95, 17.76, 2.26, 97.05, 17.86, 2.4, 'linen'],
+    ['b', 96.98, 17.79, 2.4, 97.02, 17.83, 2.5, 'amber'],
+    ['b', 99.24, 17.96, 2.1, 99.36, 18.0, 2.4, 'brass'],
+    ['b', 99.275, 17.8, 2.2, 99.325, 17.96, 2.26, 'brass'],
+    ['b', 99.25, 17.76, 2.26, 99.35, 17.86, 2.4, 'linen'],
+    ['b', 99.28, 17.79, 2.4, 99.32, 17.83, 2.5, 'amber'],
+    ['b', 104.01, 9.44, 2.1, 104.05, 9.56, 2.4, 'brass'],
+    ['b', 103.85, 9.475, 2.2, 104.01, 9.525, 2.26, 'brass'],
+    ['b', 103.81, 9.45, 2.26, 103.91, 9.55, 2.4, 'linen'],
+    ['b', 103.84, 9.48, 2.4, 103.88, 9.52, 2.5, 'amber'],
+    ['b', 104.01, 12.24, 2.1, 104.05, 12.36, 2.4, 'brass'],
+    ['b', 103.85, 12.275, 2.2, 104.01, 12.325, 2.26, 'brass'],
+    ['b', 103.81, 12.25, 2.26, 103.91, 12.35, 2.4, 'linen'],
+    ['b', 103.84, 12.28, 2.4, 103.88, 12.32, 2.5, 'amber'],
+    ['b', 92.25, 9.44, 2.1, 92.29, 9.56, 2.4, 'brass'],
+    ['b', 92.29, 9.475, 2.2, 92.45, 9.525, 2.26, 'brass'],
+    ['b', 92.39, 9.45, 2.26, 92.49, 9.55, 2.4, 'linen'],
+    ['b', 92.42, 9.48, 2.4, 92.46, 9.52, 2.5, 'amber'],
+    ['b', 92.25, 11.94, 2.1, 92.29, 12.06, 2.4, 'brass'],
+    ['b', 92.29, 11.975, 2.2, 92.45, 12.025, 2.26, 'brass'],
+    ['b', 92.39, 11.95, 2.26, 92.49, 12.05, 2.4, 'linen'],
+    ['b', 92.42, 11.98, 2.4, 92.46, 12.02, 2.5, 'amber'],
+    ['b', 95.2, 17.96, 1.4, 96.4, 18.0, 2.2, 'gilt'],
+    ['b', 95.24, 17.94, 1.44, 96.36, 17.96, 2.16, 'linen'],
+    ['b', 95.35, 17.93, 1.84, 96.25, 17.94, 1.88, 'green'],
+    ['b', 95.4, 17.93, 1.68, 96.2, 17.94, 1.72, 'green'],
+    ['b', 99.9, 17.96, 1.4, 101.1, 18.0, 2.2, 'gilt'],
+    ['b', 99.94, 17.94, 1.44, 101.06, 17.96, 2.16, 'linen'],
+    ['b', 100.05, 17.93, 1.84, 100.95, 17.94, 1.88, 'ruby'],
+    ['b', 100.1, 17.93, 1.68, 100.9, 17.94, 1.72, 'ruby'],
+    ['b', 104.01, 7.7, 1.3, 104.05, 8.5, 2.3, 'gilt'],
+    ['b', 103.99, 7.74, 1.34, 104.01, 8.46, 2.26, 'linen'],
+    ['b', 103.98, 7.85, 1.85, 103.99, 8.35, 1.9, 'black'],
+    ['b', 103.98, 7.9, 1.65, 103.99, 8.3, 1.7, 'black'],
+    ['b', 104.01, 13.4, 1.3, 104.05, 14.2, 2.2, 'gilt'],
+    ['b', 103.99, 13.44, 1.34, 104.01, 14.16, 2.16, 'linen'],
+    ['b', 103.98, 13.55, 1.795, 103.99, 14.05, 1.84, 'black'],
+    ['b', 103.98, 13.6, 1.615, 103.99, 14.0, 1.66, 'black'],
+    ['b', 92.25, 7.0, 1.4, 92.29, 8.0, 2.2, 'gilt'],
+    ['b', 92.29, 7.04, 1.44, 92.31, 7.96, 2.16, 'linen'],
+    ['b', 92.31, 7.15, 1.84, 92.32, 7.85, 1.88, 'blue'],
+    ['b', 92.31, 7.2, 1.68, 92.32, 7.8, 1.72, 'blue'],
+    ['b', 92.8, 3.85, 1.3, 93.6, 3.89, 2.2, 'gilt'],
+    ['b', 92.84, 3.89, 1.34, 93.56, 3.91, 2.16, 'linen'],
+    ['b', 92.95, 3.91, 1.795, 93.45, 3.92, 1.84, 'black'],
+    ['b', 93.0, 3.91, 1.615, 93.4, 3.92, 1.66, 'black'],
+    ['b', 103.55, 8.55, 0, 104.05, 10.05, 0.42, 'oak'],
+    ['b', 103.59, 8.6, 0.42, 104.01, 10.0, 0.5, 'dark'],
+    ['b', 103.65, 9.4, 0.5, 103.97, 9.9, 0.56, 'tartan'],
+    ['b', 103.55, 14.45, 0, 104.05, 15.95, 0.42, 'oak'],
+    ['b', 103.59, 14.5, 0.42, 104.01, 15.9, 0.5, 'dark'],
+    ['b', 103.65, 15.3, 0.5, 103.97, 15.8, 0.56, 'tartan'],
+    ['b', 93.85, 17.5, 0, 95.35, 18.0, 0.42, 'oak'],
+    ['b', 93.9, 17.54, 0.42, 95.3, 17.96, 0.5, 'dark'],
+    ['b', 94.7, 17.6, 0.5, 95.2, 17.92, 0.56, 'tartan'],
+    ['b', 93.275, 5.45, 0, 94.125, 6.25, 0.45, 'leather'],
+    ['b', 93.275, 5.45, 0.45, 94.125, 5.65, 1.1, 'leather'],
+    ['b', 93.27, 5.65, 0.45, 93.37, 6.25, 0.65, 'leather'],
+    ['b', 94.03, 5.65, 0.45, 94.13, 6.25, 0.65, 'leather'],
+    ['b', 93.45, 6.4, 0, 93.95, 6.8, 0.3, 'leather'],
+    ['b', 94.4, 5.55, 0, 94.6, 5.75, 0.06, 'oak'],
+    ['b', 94.47, 5.62, 0.06, 94.53, 5.68, 1.5, 'brass'],
+    ['b', 94.38, 5.53, 1.5, 94.62, 5.77, 1.7, 'linen'],
+    ['b', 99.475, 15.6, 0, 100.325, 16.4, 0.45, 'leather'],
+    ['b', 99.475, 16.2, 0.45, 100.325, 16.4, 1.1, 'leather'],
+    ['b', 99.47, 15.6, 0.45, 99.57, 16.2, 0.65, 'leather'],
+    ['b', 100.23, 15.6, 0.45, 100.33, 16.2, 0.65, 'leather'],
+    ['b', 99.65, 15.05, 0, 100.15, 15.45, 0.3, 'leather'],
+    ['b', 100.6, 16.1, 0, 100.8, 16.3, 0.06, 'oak'],
+    ['b', 100.67, 16.17, 0.06, 100.73, 16.23, 1.5, 'brass'],
+    ['b', 100.58, 16.08, 1.5, 100.82, 16.32, 1.7, 'linen'],
+    ['b', 92.25, 4.85, 0, 92.55, 5.15, 0.05, 'iron'],
+    ['b', 92.37, 4.97, 0.05, 92.43, 5.03, 1.6, 'brass'],
+    ['b', 92.25, 4.85, 1.6, 92.55, 5.15, 1.95, 'linen'],
+    ['b', 92.25, 16.75, 0, 92.55, 17.05, 0.05, 'iron'],
+    ['b', 92.37, 16.87, 0.05, 92.43, 16.93, 1.6, 'brass'],
+    ['b', 92.25, 16.75, 1.6, 92.55, 17.05, 1.95, 'linen'],
+    ['b', 95.79, 8.08, 3.4, 95.83, 8.12, 4.5, 'iron'],
+    ['b', 95.49, 7.8, 3.3, 96.09, 8.4, 3.4, 'brass'],
+    ['b', 95.49, 7.79, 3.0, 95.55, 7.85, 3.3, 'amber'],
+    ['b', 95.49, 8.35, 3.0, 95.55, 8.41, 3.3, 'amber'],
+    ['b', 96.03, 7.79, 3.0, 96.09, 7.85, 3.3, 'amber'],
+    ['b', 96.03, 8.35, 3.0, 96.09, 8.41, 3.3, 'amber'],
+    ['b', 100.47, 8.08, 3.4, 100.51, 8.12, 4.5, 'iron'],
+    ['b', 100.21, 7.8, 3.3, 100.81, 8.4, 3.4, 'brass'],
+    ['b', 100.75, 7.79, 3.0, 100.81, 7.85, 3.3, 'amber'],
+    ['b', 100.75, 8.35, 3.0, 100.81, 8.41, 3.3, 'amber'],
+    ['b', 100.21, 7.79, 3.0, 100.27, 7.85, 3.3, 'amber'],
+    ['b', 100.21, 8.35, 3.0, 100.27, 8.41, 3.3, 'amber'],
+    ['b', 97.79, 13.78, 3.4, 97.83, 13.82, 4.5, 'iron'],
+    ['b', 97.49, 13.5, 3.3, 98.09, 14.1, 3.4, 'brass'],
+    ['b', 97.49, 13.49, 3.0, 97.55, 13.55, 3.3, 'amber'],
+    ['b', 97.49, 14.05, 3.0, 97.55, 14.11, 3.3, 'amber'],
+    ['b', 98.03, 13.49, 3.0, 98.09, 13.55, 3.3, 'amber'],
+    ['b', 98.03, 14.05, 3.0, 98.09, 14.11, 3.3, 'amber'],
+    ['b', 98.47, 13.78, 3.4, 98.51, 13.82, 4.5, 'iron'],
+    ['b', 98.21, 13.5, 3.3, 98.81, 14.1, 3.4, 'brass'],
+    ['b', 98.75, 13.49, 3.0, 98.81, 13.55, 3.3, 'amber'],
+    ['b', 98.75, 14.05, 3.0, 98.81, 14.11, 3.3, 'amber'],
+    ['b', 98.21, 13.49, 3.0, 98.27, 13.55, 3.3, 'amber'],
+    ['b', 98.21, 14.05, 3.0, 98.27, 14.11, 3.3, 'amber'],
+    ['b', 102.05, 17.92, 1.2, 102.95, 18.0, 3.8, 'gilt'],
+    ['b', 102.17, 17.91, 1.32, 102.83, 17.92, 3.68, 'green'],
+    ['b', 102.17, 17.9, 1.5, 102.83, 17.91, 1.62, 'gilt'],
+    ['b', 102.17, 17.9, 3.38, 102.83, 17.91, 3.5, 'gilt'],
+    ['b', 102.0, 17.91, 3.8, 103.0, 18.0, 3.84, 'wood'],
+    ['b', 95.35, 3.85, 1.2, 96.25, 3.93, 3.8, 'gilt'],
+    ['b', 95.47, 3.93, 1.32, 96.13, 3.94, 3.68, 'blue'],
+    ['b', 95.47, 3.94, 1.5, 96.13, 3.95, 1.62, 'gilt'],
+    ['b', 95.47, 3.94, 3.38, 96.13, 3.95, 3.5, 'gilt'],
+    ['b', 95.3, 3.85, 3.8, 96.3, 3.94, 3.84, 'wood'],
+    ['b', 103.97, 14.3, 1.2, 104.05, 16.3, 3.6, 'dust'],
+    ['b', 103.96, 14.42, 1.32, 103.97, 16.18, 3.48, 'green'],
+    ['b', 103.95, 14.42, 1.5, 103.96, 16.18, 1.62, 'petals'],
+    ['b', 103.95, 14.42, 3.18, 103.96, 16.18, 3.3, 'petals'],
+    ['b', 103.96, 14.25, 3.6, 104.05, 16.35, 3.64, 'wood'],
+    ['b', 92.25, 14.7, 1.3, 92.33, 16.7, 3.5, 'gilt'],
+    ['b', 92.33, 14.82, 1.42, 92.34, 16.58, 3.38, 'blue'],
+    ['b', 92.34, 14.82, 1.6, 92.35, 16.58, 1.72, 'linen'],
+    ['b', 92.34, 14.82, 3.08, 92.35, 16.58, 3.2, 'linen'],
+    ['b', 92.25, 14.65, 3.5, 92.34, 16.75, 3.54, 'wood'],
+    ['b', 92.65, 17.92, 1.0, 93.55, 18.0, 2.2, 'oak'],
+    ['b', 92.72, 17.91, 1.07, 93.48, 17.92, 2.13, 'black'],
+    ['b', 93.04, 17.9, 1.66, 93.24, 17.91, 1.96, 'dust'],
+    ['b', 92.9, 17.9, 1.24, 93.3, 17.91, 1.6, 'linen'],
+    ['b', 93.04, 17.91, 0.93, 93.16, 18.0, 0.97, 'brass'],
+    ['b', 103.0, 17.92, 1.1, 103.8, 18.0, 2.1, 'black'],
+    ['b', 103.07, 17.91, 1.17, 103.73, 17.92, 2.03, 'black'],
+    ['b', 103.34, 17.9, 1.65, 103.54, 17.91, 1.9, 'dust'],
+    ['b', 103.2, 17.9, 1.3, 103.6, 17.91, 1.6, 'linen'],
+    ['b', 103.34, 17.91, 1.03, 103.46, 18.0, 1.07, 'brass'],
+    ['b', 92.25, 5.25, 1.0, 92.33, 6.15, 2.2, 'black'],
+    ['b', 92.33, 5.32, 1.07, 92.34, 6.08, 2.13, 'black'],
+    ['b', 92.34, 5.64, 1.66, 92.35, 5.84, 1.96, 'dust'],
+    ['b', 92.34, 5.5, 1.24, 92.35, 5.9, 1.6, 'linen'],
+    ['b', 92.25, 5.64, 0.93, 92.34, 5.76, 0.97, 'brass'],
+    ['b', 103.97, 16.5, 1.1, 104.05, 17.3, 2.1, 'rope'],
+    ['b', 103.96, 16.57, 1.17, 103.97, 17.23, 2.03, 'black'],
+    ['b', 103.95, 16.84, 1.65, 103.96, 17.04, 1.9, 'dust'],
+    ['b', 103.95, 16.7, 1.3, 103.96, 17.1, 1.6, 'linen'],
+    ['b', 103.96, 16.84, 1.03, 104.05, 16.96, 1.07, 'brass'],
+    ['b', 92.25, 17.1, 1.1, 92.33, 17.9, 2.1, 'gilt'],
+    ['b', 92.33, 17.17, 1.17, 92.34, 17.83, 2.03, 'black'],
+    ['b', 92.34, 17.44, 1.65, 92.35, 17.64, 1.9, 'dust'],
+    ['b', 92.34, 17.3, 1.3, 92.35, 17.7, 1.6, 'linen'],
+    ['b', 92.25, 17.44, 1.03, 92.34, 17.56, 1.07, 'brass'],
+    ['b', 98.0, 13.6, 0, 98.4, 13.9, 0.9, 'oak'],
+    ['b', 97.9, 13.5, 0.9, 98.5, 14.0, 1.0, 'oak'],
+    ['b', 97.97, 13.6, 1.0, 98.43, 13.9, 1.06, 'white'],
+    ['b', 98.46, 13.7, 0.4, 98.5, 13.8, 1.0, 'iron'],
+    ['b', 103.6, 6.0, 0, 104.05, 7.6, 2.0, 'oak'],
+    ['b', 103.62, 6.05, 0.15, 104.0, 7.55, 1.9, 'dark'],
+    ['b', 103.62, 6.05, 0.6, 104.0, 7.55, 0.63, 'oak'],
+    ['b', 103.62, 6.05, 1.1, 104.0, 7.55, 1.13, 'oak'],
+    ['b', 103.62, 6.05, 1.6, 104.0, 7.55, 1.63, 'oak'],
+    ['b', 103.75, 6.18, 0.18, 103.9, 6.32, 0.55, 'tin'],
+    ['b', 103.75, 6.18, 0.63, 103.9, 6.32, 1.0, 'brass'],
+    ['b', 103.75, 6.18, 1.13, 103.9, 6.32, 1.5, 'tin'],
+    ['b', 103.75, 6.55, 0.18, 103.9, 6.69, 0.55, 'tin'],
+    ['b', 103.75, 6.55, 0.63, 103.9, 6.69, 1.0, 'brass'],
+    ['b', 103.75, 6.55, 1.13, 103.9, 6.69, 1.5, 'tin'],
+    ['b', 103.75, 6.92, 0.18, 103.9, 7.06, 0.55, 'tin'],
+    ['b', 103.75, 6.92, 0.63, 103.9, 7.06, 1.0, 'brass'],
+    ['b', 103.75, 6.92, 1.13, 103.9, 7.06, 1.5, 'tin'],
+    ['b', 103.75, 7.29, 0.18, 103.9, 7.43, 0.55, 'tin'],
+    ['b', 103.75, 7.29, 0.63, 103.9, 7.43, 1.0, 'brass'],
+    ['b', 103.75, 7.29, 1.13, 103.9, 7.43, 1.5, 'tin'],
+    ['b', 103.71, 6.5, 1.63, 103.93, 7.1, 1.85, 'gilt'],
+    ['b', 103.58, 6.04, 0.1, 103.6, 7.56, 1.95, 'glass'],
+    ['b', 92.825, 17.45, 0, 93.775, 18.0, 0.5, 'oak'],
+    ['b', 92.85, 17.47, 0.5, 93.75, 17.98, 0.6, 'wood'],
+    ['b', 92.975, 17.44, 0, 93.025, 18.01, 0.6, 'iron'],
+    ['b', 93.575, 17.44, 0, 93.625, 18.01, 0.6, 'iron'],
+    ['b', 93.25, 17.42, 0.38, 93.35, 17.45, 0.46, 'brass'],
+    ['b', 103.99, 4.3, 1.8, 104.05, 5.9, 1.9, 'oak'],
+    ['b', 103.91, 4.48, 1.78, 103.99, 4.52, 1.84, 'brass'],
+    ['b', 103.91, 4.78, 1.78, 103.99, 4.82, 1.84, 'brass'],
+    ['b', 103.91, 5.08, 1.78, 103.99, 5.12, 1.84, 'brass'],
+    ['b', 103.91, 5.38, 1.78, 103.99, 5.42, 1.84, 'brass'],
+    ['b', 103.91, 5.68, 1.78, 103.99, 5.72, 1.84, 'brass'],
+    ['b', 103.93, 4.65, 0.7, 103.99, 4.95, 1.78, 'dark'],
+    ['b', 103.94, 5.34, 1.3, 103.99, 5.46, 1.78, 'ruby'],
+    ['b', 103.89, 5.6, 1.66, 103.99, 5.8, 1.78, 'tartan'],
+    ['b', 103.65, 12.45, 0, 104.05, 12.95, 2.2, 'oak'],
+    ['b', 103.62, 12.53, 1.6, 103.65, 12.87, 1.95, 'white'],
+    ['b', 103.61, 12.51, 1.58, 103.64, 12.89, 1.97, 'gilt'],
+    ['b', 103.62, 12.6, 0.5, 103.65, 12.8, 1.4, 'glass'],
+    ['b', 103.61, 12.64, 0.6, 103.64, 12.76, 0.72, 'brass'],
+    ['b', 103.6, 12.4, 2.2, 104.05, 13.0, 2.3, 'wood'],
+    ['b', 92.25, 8.45, 0, 92.75, 9.55, 1.0, 'oak'],
+    ['b', 92.75, 8.5, 0.75, 93.2, 9.5, 0.8, 'wood'],
+    ['b', 92.8, 8.65, 0.8, 93.1, 9.35, 0.82, 'green'],
+    ['b', 92.25, 8.45, 1.0, 92.55, 9.55, 2.0, 'oak'],
+    ['b', 92.35, 8.49, 1.1, 92.57, 8.71, 1.4, 'linen'],
+    ['b', 92.35, 8.76, 1.1, 92.57, 8.98, 1.4, 'linen'],
+    ['b', 92.35, 9.03, 1.1, 92.57, 9.25, 1.4, 'linen'],
+    ['b', 92.35, 9.3, 1.1, 92.57, 9.52, 1.4, 'linen'],
+    ['b', 92.35, 8.49, 1.5, 92.57, 8.71, 1.8, 'linen'],
+    ['b', 92.35, 8.76, 1.5, 92.57, 8.98, 1.8, 'linen'],
+    ['b', 92.35, 9.03, 1.5, 92.57, 9.25, 1.8, 'linen'],
+    ['b', 92.35, 9.3, 1.5, 92.57, 9.52, 1.8, 'linen'],
+    ['b', 92.25, 8.4, 2.0, 92.59, 9.6, 2.08, 'wood'],
+    ['b', 95.85, 8.65, 0.0, 99.05, 13.15, 0.016, 'gilt'],
+    ['b', 95.97, 8.77, 0.016, 98.93, 13.03, 0.02, 'green'],
+    ['b', 96.97, 10.0, 0.02, 97.93, 11.8, 0.024, 'gilt'],
+    ['b', 98.15, 8.075, 3.5, 98.2, 8.125, 4.6, 'iron'],
+    ['b', 97.65, 7.6, 3.35, 98.65, 8.6, 3.45, 'brass'],
+    ['b', 97.85, 7.8, 3.1, 98.45, 8.4, 3.2, 'brass'],
+    ['b', 97.65, 7.57, 3.45, 97.71, 7.63, 3.62, 'linen'],
+    ['b', 97.66, 7.58, 3.62, 97.7, 7.62, 3.7, 'amber'],
+    ['b', 97.65, 8.52, 3.45, 97.71, 8.58, 3.62, 'linen'],
+    ['b', 97.66, 8.53, 3.62, 97.7, 8.57, 3.7, 'amber'],
+    ['b', 98.6, 7.57, 3.45, 98.66, 7.63, 3.62, 'linen'],
+    ['b', 98.61, 7.58, 3.62, 98.65, 7.62, 3.7, 'amber'],
+    ['b', 98.6, 8.52, 3.45, 98.66, 8.58, 3.62, 'linen'],
+    ['b', 98.61, 8.53, 3.62, 98.65, 8.57, 3.7, 'amber'],
+    ['b', 97.65, 8.05, 3.45, 97.71, 8.11, 3.62, 'linen'],
+    ['b', 97.66, 8.06, 3.62, 97.7, 8.1, 3.7, 'amber'],
+    ['b', 98.6, 8.05, 3.45, 98.66, 8.11, 3.62, 'linen'],
+    ['b', 98.61, 8.06, 3.62, 98.65, 8.1, 3.7, 'amber'],
+    ['b', 98.13, 7.57, 3.45, 98.19, 7.63, 3.62, 'linen'],
+    ['b', 98.14, 7.58, 3.62, 98.18, 7.62, 3.7, 'amber'],
+    ['b', 98.13, 8.52, 3.45, 98.19, 8.58, 3.62, 'linen'],
+    ['b', 98.14, 8.53, 3.62, 98.18, 8.57, 3.7, 'amber'],
+    ['b', 97.85, 7.78, 3.2, 97.89, 7.82, 3.32, 'amber'],
+    ['b', 97.85, 8.34, 3.2, 97.89, 8.38, 3.32, 'amber'],
+    ['b', 98.41, 7.78, 3.2, 98.45, 7.82, 3.32, 'amber'],
+    ['b', 98.41, 8.34, 3.2, 98.45, 8.38, 3.32, 'amber'],
+    ['b', 98.15, 12.875, 3.5, 98.2, 12.925, 4.6, 'iron'],
+    ['b', 97.65, 12.4, 3.35, 98.65, 13.4, 3.45, 'brass'],
+    ['b', 97.85, 12.6, 3.1, 98.45, 13.2, 3.2, 'brass'],
+    ['b', 97.65, 12.37, 3.45, 97.71, 12.43, 3.62, 'linen'],
+    ['b', 97.66, 12.38, 3.62, 97.7, 12.42, 3.7, 'amber'],
+    ['b', 97.65, 13.32, 3.45, 97.71, 13.38, 3.62, 'linen'],
+    ['b', 97.66, 13.33, 3.62, 97.7, 13.37, 3.7, 'amber'],
+    ['b', 98.6, 12.37, 3.45, 98.66, 12.43, 3.62, 'linen'],
+    ['b', 98.61, 12.38, 3.62, 98.65, 12.42, 3.7, 'amber'],
+    ['b', 98.6, 13.32, 3.45, 98.66, 13.38, 3.62, 'linen'],
+    ['b', 98.61, 13.33, 3.62, 98.65, 13.37, 3.7, 'amber'],
+    ['b', 97.65, 12.85, 3.45, 97.71, 12.91, 3.62, 'linen'],
+    ['b', 97.66, 12.86, 3.62, 97.7, 12.9, 3.7, 'amber'],
+    ['b', 98.6, 12.85, 3.45, 98.66, 12.91, 3.62, 'linen'],
+    ['b', 98.61, 12.86, 3.62, 98.65, 12.9, 3.7, 'amber'],
+    ['b', 98.13, 12.37, 3.45, 98.19, 12.43, 3.62, 'linen'],
+    ['b', 98.14, 12.38, 3.62, 98.18, 12.42, 3.7, 'amber'],
+    ['b', 98.13, 13.32, 3.45, 98.19, 13.38, 3.62, 'linen'],
+    ['b', 98.14, 13.33, 3.62, 98.18, 13.37, 3.7, 'amber'],
+    ['b', 97.85, 12.58, 3.2, 97.89, 12.62, 3.32, 'amber'],
+    ['b', 97.85, 13.14, 3.2, 97.89, 13.18, 3.32, 'amber'],
+    ['b', 98.41, 12.58, 3.2, 98.45, 12.62, 3.32, 'amber'],
+    ['b', 98.41, 13.14, 3.2, 98.45, 13.18, 3.32, 'amber']]);
+  T['frog-choir-room-6'].lights = (T['frog-choir-room-6'].lights || []).concat([[94.6, 4.15, 2.33, 16757862, 1.1, 8], [98.2, 17.7, 2.33, 16757862, 1.1, 8]]);
+})(window.SHELL_W5A.things);
+/* HAND2 end frog-choir-room-6 */
+/* HAND2 begin guest-rooms-6 */
+/* Interiors req 2423 sec 13: made-up bed, washstand, wardrobe, dressing table, welcome tray, hearth, portrait, pastoral print, lamps; req 2532 adds hangings, a dado and a thing to read or pull; req 2543 (2 Nov, the 440th), Godric notes of 1 Nov: sconces, pendants, chandeliers, framed papers, tapestries, portraits, seats, rugs, room-use pieces; sited by tools/architect-hand-rooms-1101.py, plain stand-ins (Objects draw the real ones) */
+(function (T) {
+  T['guest-rooms-6'] = T['guest-rooms-6'] || { items: [] };
+  T['guest-rooms-6'].items = T['guest-rooms-6'].items.concat([
+    ['b', 107.6, 3.85, 0, 109.4, 4.35, 1.3, 'stone'],
+    ['b', 108.0, 3.85, 0.1, 109.0, 4.37, 1.0, 'black'],
+    ['b', 108.25, 3.95, 0.12, 108.75, 4.25, 0.45, 'flame'],
+    ['b', 107.8, 4.35, 0, 109.2, 4.55, 0.18, 'iron'],
+    ['b', 107.45, 3.85, 1.3, 109.55, 4.5, 1.38, 'oak'],
+    ['b', 106.24, 3.85, 1.9, 106.36, 3.89, 2.3, 'iron'],
+    ['b', 106.275, 3.89, 2.25, 106.325, 4.15, 2.3, 'iron'],
+    ['b', 106.24, 4.11, 2.0, 106.36, 4.19, 2.28, 'flame'],
+    ['b', 110.34, 17.96, 1.9, 110.46, 18.0, 2.3, 'iron'],
+    ['b', 110.375, 17.7, 2.25, 110.425, 17.96, 2.3, 'iron'],
+    ['b', 110.34, 17.66, 2.0, 110.46, 17.74, 2.28, 'flame'],
+    ['b', 104.55, 7.6, 0.25, 106.55, 8.6, 0.5, 'oak'],
+    ['b', 104.6, 7.62, 0.5, 106.5, 8.58, 0.68, 'linen'],
+    ['b', 104.6, 7.75, 0.68, 105.05, 8.45, 0.8, 'white'],
+    ['b', 104.55, 7.6, 0.25, 104.61, 8.6, 1.25, 'iron'],
+    ['b', 105.75, 7.62, 0.68, 106.5, 8.58, 0.72, 'ruby'],
+    ['b', 114.35, 7.6, 0.25, 116.35, 8.6, 0.5, 'oak'],
+    ['b', 114.4, 7.62, 0.5, 116.3, 8.58, 0.68, 'linen'],
+    ['b', 115.85, 7.75, 0.68, 116.3, 8.45, 0.8, 'white'],
+    ['b', 116.29, 7.6, 0.25, 116.35, 8.6, 1.25, 'iron'],
+    ['b', 114.4, 7.62, 0.68, 115.15, 8.58, 0.72, 'ruby'],
+    ['b', 104.975, 17.55, 0, 105.825, 18.0, 0.85, 'oak'],
+    ['b', 105.1, 17.6, 0.85, 105.5, 17.9, 0.93, 'white'],
+    ['b', 105.55, 17.7, 0.85, 105.75, 17.85, 1.15, 'white'],
+    ['b', 112.35, 17.4, 0, 113.65, 18.0, 2.1, 'oak'],
+    ['b', 112.98, 17.38, 0.2, 113.02, 17.4, 2.0, 'black'],
+    ['b', 104.55, 14.65, 0, 105.05, 15.75, 0.78, 'oak'],
+    ['b', 104.57, 14.85, 0.9, 104.61, 15.55, 1.7, 'glass'],
+    ['b', 104.65, 14.85, 0.78, 104.8, 14.95, 0.9, 'tin'],
+    ['b', 115.85, 14.85, 0, 116.35, 15.55, 0.7, 'oak'],
+    ['b', 115.95, 14.95, 0.7, 116.25, 15.45, 0.72, 'tin'],
+    ['b', 116.1, 15.14, 0.72, 116.2, 15.26, 0.85, 'white'],
+    ['b', 113.85, 3.85, 1.5, 114.55, 3.93, 2.4, 'gilt'],
+    ['b', 113.9, 3.93, 1.55, 114.5, 3.94, 2.35, 'black'],
+    ['b', 106.42, 3.85, 1.57, 107.38, 3.93, 2.33, 'wood'],
+    ['b', 106.45, 3.93, 1.6, 107.35, 3.95, 2.3, 'petals'],
+    ['b', 106.655, 3.95, 1.72, 106.695, 3.96, 2.18, 'black'],
+    ['b', 106.88, 3.95, 1.72, 106.92, 3.96, 2.18, 'black'],
+    ['b', 107.105, 3.95, 1.72, 107.145, 3.96, 2.18, 'black'],
+    ['b', 105.94, 3.85, 2.1, 106.06, 3.89, 2.4, 'brass'],
+    ['b', 105.975, 3.89, 2.2, 106.025, 4.05, 2.26, 'brass'],
+    ['b', 105.95, 3.99, 2.26, 106.05, 4.09, 2.4, 'linen'],
+    ['b', 105.98, 4.02, 2.4, 106.02, 4.06, 2.5, 'amber'],
+    ['b', 115.34, 3.85, 2.1, 115.46, 3.89, 2.4, 'brass'],
+    ['b', 115.375, 3.89, 2.2, 115.425, 4.05, 2.26, 'brass'],
+    ['b', 115.35, 3.99, 2.26, 115.45, 4.09, 2.4, 'linen'],
+    ['b', 115.38, 4.02, 2.4, 115.42, 4.06, 2.5, 'amber'],
+    ['b', 105.94, 17.96, 2.1, 106.06, 18.0, 2.4, 'brass'],
+    ['b', 105.975, 17.8, 2.2, 106.025, 17.96, 2.26, 'brass'],
+    ['b', 105.95, 17.76, 2.26, 106.05, 17.86, 2.4, 'linen'],
+    ['b', 105.98, 17.79, 2.4, 106.02, 17.83, 2.5, 'amber'],
+    ['b', 115.34, 17.96, 2.1, 115.46, 18.0, 2.4, 'brass'],
+    ['b', 115.375, 17.8, 2.2, 115.425, 17.96, 2.26, 'brass'],
+    ['b', 115.35, 17.76, 2.26, 115.45, 17.86, 2.4, 'linen'],
+    ['b', 115.38, 17.79, 2.4, 115.42, 17.83, 2.5, 'amber'],
+    ['b', 116.31, 5.94, 2.1, 116.35, 6.06, 2.4, 'brass'],
+    ['b', 116.15, 5.975, 2.2, 116.31, 6.025, 2.26, 'brass'],
+    ['b', 116.11, 5.95, 2.26, 116.21, 6.05, 2.4, 'linen'],
+    ['b', 116.14, 5.98, 2.4, 116.18, 6.02, 2.5, 'amber'],
+    ['b', 116.31, 10.84, 2.1, 116.35, 10.96, 2.4, 'brass'],
+    ['b', 116.15, 10.875, 2.2, 116.31, 10.925, 2.26, 'brass'],
+    ['b', 116.11, 10.85, 2.26, 116.21, 10.95, 2.4, 'linen'],
+    ['b', 116.14, 10.88, 2.4, 116.18, 10.92, 2.5, 'amber'],
+    ['b', 104.55, 8.04, 2.1, 104.59, 8.16, 2.4, 'brass'],
+    ['b', 104.59, 8.075, 2.2, 104.75, 8.125, 2.26, 'brass'],
+    ['b', 104.69, 8.05, 2.26, 104.79, 8.15, 2.4, 'linen'],
+    ['b', 104.72, 8.08, 2.4, 104.76, 8.12, 2.5, 'amber'],
+    ['b', 104.55, 14.44, 2.1, 104.59, 14.56, 2.4, 'brass'],
+    ['b', 104.59, 14.475, 2.2, 104.75, 14.525, 2.26, 'brass'],
+    ['b', 104.69, 14.45, 2.26, 104.79, 14.55, 2.4, 'linen'],
+    ['b', 104.72, 14.48, 2.4, 104.76, 14.52, 2.5, 'amber'],
+    ['b', 109.24, 3.85, 2.1, 109.36, 3.89, 2.4, 'brass'],
+    ['b', 109.275, 3.89, 2.2, 109.325, 4.05, 2.26, 'brass'],
+    ['b', 109.25, 3.99, 2.26, 109.35, 4.09, 2.4, 'linen'],
+    ['b', 109.28, 4.02, 2.4, 109.32, 4.06, 2.5, 'amber'],
+    ['b', 111.54, 3.85, 2.1, 111.66, 3.89, 2.4, 'brass'],
+    ['b', 111.575, 3.89, 2.2, 111.625, 4.05, 2.26, 'brass'],
+    ['b', 111.55, 3.99, 2.26, 111.65, 4.09, 2.4, 'linen'],
+    ['b', 111.58, 4.02, 2.4, 111.62, 4.06, 2.5, 'amber'],
+    ['b', 109.24, 17.96, 2.1, 109.36, 18.0, 2.4, 'brass'],
+    ['b', 109.275, 17.8, 2.2, 109.325, 17.96, 2.26, 'brass'],
+    ['b', 109.25, 17.76, 2.26, 109.35, 17.86, 2.4, 'linen'],
+    ['b', 109.28, 17.79, 2.4, 109.32, 17.83, 2.5, 'amber'],
+    ['b', 111.54, 17.96, 2.1, 111.66, 18.0, 2.4, 'brass'],
+    ['b', 111.575, 17.8, 2.2, 111.625, 17.96, 2.26, 'brass'],
+    ['b', 111.55, 17.76, 2.26, 111.65, 17.86, 2.4, 'linen'],
+    ['b', 111.58, 17.79, 2.4, 111.62, 17.83, 2.5, 'amber'],
+    ['b', 116.31, 9.44, 2.1, 116.35, 9.56, 2.4, 'brass'],
+    ['b', 116.15, 9.475, 2.2, 116.31, 9.525, 2.26, 'brass'],
+    ['b', 116.11, 9.45, 2.26, 116.21, 9.55, 2.4, 'linen'],
+    ['b', 116.14, 9.48, 2.4, 116.18, 9.52, 2.5, 'amber'],
+    ['b', 116.31, 12.24, 2.1, 116.35, 12.36, 2.4, 'brass'],
+    ['b', 116.15, 12.275, 2.2, 116.31, 12.325, 2.26, 'brass'],
+    ['b', 116.11, 12.25, 2.26, 116.21, 12.35, 2.4, 'linen'],
+    ['b', 116.14, 12.28, 2.4, 116.18, 12.32, 2.5, 'amber'],
+    ['b', 104.55, 9.44, 2.1, 104.59, 9.56, 2.4, 'brass'],
+    ['b', 104.59, 9.475, 2.2, 104.75, 9.525, 2.26, 'brass'],
+    ['b', 104.69, 9.45, 2.26, 104.79, 9.55, 2.4, 'linen'],
+    ['b', 104.72, 9.48, 2.4, 104.76, 9.52, 2.5, 'amber'],
+    ['b', 104.55, 12.24, 2.1, 104.59, 12.36, 2.4, 'brass'],
+    ['b', 104.59, 12.275, 2.2, 104.75, 12.325, 2.26, 'brass'],
+    ['b', 104.69, 12.25, 2.26, 104.79, 12.35, 2.4, 'linen'],
+    ['b', 104.72, 12.28, 2.4, 104.76, 12.32, 2.5, 'amber'],
+    ['b', 107.1, 17.96, 1.3, 107.9, 18.0, 2.3, 'gilt'],
+    ['b', 107.14, 17.94, 1.34, 107.86, 17.96, 2.26, 'linen'],
+    ['b', 107.25, 17.93, 1.85, 107.75, 17.94, 1.9, 'black'],
+    ['b', 107.3, 17.93, 1.65, 107.7, 17.94, 1.7, 'black'],
+    ['b', 116.31, 7.7, 1.3, 116.35, 8.5, 2.3, 'gilt'],
+    ['b', 116.29, 7.74, 1.34, 116.31, 8.46, 2.26, 'linen'],
+    ['b', 116.28, 7.85, 1.85, 116.29, 8.35, 1.9, 'black'],
+    ['b', 116.28, 7.9, 1.65, 116.29, 8.3, 1.7, 'black'],
+    ['b', 116.31, 14.4, 1.4, 116.35, 15.6, 2.2, 'gilt'],
+    ['b', 116.29, 14.44, 1.44, 116.31, 15.56, 2.16, 'linen'],
+    ['b', 116.28, 14.55, 1.84, 116.29, 15.45, 1.88, 'blue'],
+    ['b', 116.28, 14.6, 1.68, 116.29, 15.4, 1.72, 'blue'],
+    ['b', 113.7, 17.96, 1.4, 114.7, 18.0, 2.2, 'gilt'],
+    ['b', 113.74, 17.94, 1.44, 114.66, 17.96, 2.16, 'linen'],
+    ['b', 113.85, 17.93, 1.84, 114.55, 17.94, 1.88, 'ruby'],
+    ['b', 113.9, 17.93, 1.68, 114.5, 17.94, 1.72, 'ruby'],
+    ['b', 104.55, 6.35, 1.3, 104.59, 7.05, 2.2, 'gilt'],
+    ['b', 104.59, 6.39, 1.34, 104.61, 7.01, 2.16, 'linen'],
+    ['b', 104.61, 6.5, 1.795, 104.62, 6.9, 1.84, 'black'],
+    ['b', 104.61, 6.55, 1.615, 104.62, 6.85, 1.66, 'black'],
+    ['b', 104.7, 3.85, 1.4, 105.9, 3.89, 2.2, 'gilt'],
+    ['b', 104.74, 3.89, 1.44, 105.86, 3.91, 2.16, 'linen'],
+    ['b', 104.85, 3.91, 1.84, 105.75, 3.92, 1.88, 'green'],
+    ['b', 104.9, 3.91, 1.68, 105.7, 3.92, 1.72, 'green'],
+    ['b', 115.85, 9.05, 0, 116.35, 10.55, 0.42, 'oak'],
+    ['b', 115.89, 9.1, 0.42, 116.31, 10.5, 0.5, 'dark'],
+    ['b', 115.95, 9.9, 0.5, 116.27, 10.4, 0.56, 'tartan'],
+    ['b', 104.55, 15.85, 0, 105.05, 17.35, 0.42, 'oak'],
+    ['b', 104.59, 15.9, 0.42, 105.01, 17.3, 0.5, 'dark'],
+    ['b', 104.63, 16.7, 0.5, 104.95, 17.2, 0.56, 'tartan'],
+    ['b', 105.575, 5.45, 0, 106.425, 6.25, 0.45, 'leather'],
+    ['b', 105.575, 5.45, 0.45, 106.425, 5.65, 1.1, 'leather'],
+    ['b', 105.57, 5.65, 0.45, 105.67, 6.25, 0.65, 'leather'],
+    ['b', 106.33, 5.65, 0.45, 106.43, 6.25, 0.65, 'leather'],
+    ['b', 105.75, 6.4, 0, 106.25, 6.8, 0.3, 'leather'],
+    ['b', 106.7, 5.55, 0, 106.9, 5.75, 0.06, 'oak'],
+    ['b', 106.77, 5.62, 0.06, 106.83, 5.68, 1.5, 'brass'],
+    ['b', 106.68, 5.53, 1.5, 106.92, 5.77, 1.7, 'linen'],
+    ['b', 114.475, 5.45, 0, 115.325, 6.25, 0.45, 'leather'],
+    ['b', 114.475, 5.45, 0.45, 115.325, 5.65, 1.1, 'leather'],
+    ['b', 114.47, 5.65, 0.45, 114.57, 6.25, 0.65, 'leather'],
+    ['b', 115.23, 5.65, 0.45, 115.33, 6.25, 0.65, 'leather'],
+    ['b', 114.65, 6.4, 0, 115.15, 6.8, 0.3, 'leather'],
+    ['b', 115.6, 5.55, 0, 115.8, 5.75, 0.06, 'oak'],
+    ['b', 115.67, 5.62, 0.06, 115.73, 5.68, 1.5, 'brass'],
+    ['b', 115.58, 5.53, 1.5, 115.82, 5.77, 1.7, 'linen'],
+    ['b', 104.55, 4.85, 0, 104.85, 5.15, 0.05, 'iron'],
+    ['b', 104.67, 4.97, 0.05, 104.73, 5.03, 1.6, 'brass'],
+    ['b', 104.55, 4.85, 1.6, 104.85, 5.15, 1.95, 'linen'],
+    ['b', 104.55, 17.35, 0, 104.85, 17.65, 0.05, 'iron'],
+    ['b', 104.67, 17.47, 0.05, 104.73, 17.53, 1.6, 'brass'],
+    ['b', 104.55, 17.35, 1.6, 104.85, 17.65, 1.95, 'linen'],
+    ['b', 108.09, 8.08, 3.4, 108.13, 8.12, 4.5, 'iron'],
+    ['b', 107.79, 7.8, 3.3, 108.39, 8.4, 3.4, 'brass'],
+    ['b', 107.79, 7.79, 3.0, 107.85, 7.85, 3.3, 'amber'],
+    ['b', 107.79, 8.35, 3.0, 107.85, 8.41, 3.3, 'amber'],
+    ['b', 108.33, 7.79, 3.0, 108.39, 7.85, 3.3, 'amber'],
+    ['b', 108.33, 8.35, 3.0, 108.39, 8.41, 3.3, 'amber'],
+    ['b', 112.77, 8.08, 3.4, 112.81, 8.12, 4.5, 'iron'],
+    ['b', 112.51, 7.8, 3.3, 113.11, 8.4, 3.4, 'brass'],
+    ['b', 113.05, 7.79, 3.0, 113.11, 7.85, 3.3, 'amber'],
+    ['b', 113.05, 8.35, 3.0, 113.11, 8.41, 3.3, 'amber'],
+    ['b', 112.51, 7.79, 3.0, 112.57, 7.85, 3.3, 'amber'],
+    ['b', 112.51, 8.35, 3.0, 112.57, 8.41, 3.3, 'amber'],
+    ['b', 110.09, 13.78, 3.4, 110.13, 13.82, 4.5, 'iron'],
+    ['b', 109.79, 13.5, 3.3, 110.39, 14.1, 3.4, 'brass'],
+    ['b', 109.79, 13.49, 3.0, 109.85, 13.55, 3.3, 'amber'],
+    ['b', 109.79, 14.05, 3.0, 109.85, 14.11, 3.3, 'amber'],
+    ['b', 110.33, 13.49, 3.0, 110.39, 13.55, 3.3, 'amber'],
+    ['b', 110.33, 14.05, 3.0, 110.39, 14.11, 3.3, 'amber'],
+    ['b', 110.77, 13.78, 3.4, 110.81, 13.82, 4.5, 'iron'],
+    ['b', 110.51, 13.5, 3.3, 111.11, 14.1, 3.4, 'brass'],
+    ['b', 111.05, 13.49, 3.0, 111.11, 13.55, 3.3, 'amber'],
+    ['b', 111.05, 14.05, 3.0, 111.11, 14.11, 3.3, 'amber'],
+    ['b', 110.51, 13.49, 3.0, 110.57, 13.55, 3.3, 'amber'],
+    ['b', 110.51, 14.05, 3.0, 110.57, 14.11, 3.3, 'amber'],
+    ['b', 110.55, 17.92, 1.2, 111.45, 18.0, 3.8, 'gilt'],
+    ['b', 110.67, 17.91, 1.32, 111.33, 17.92, 3.68, 'blue'],
+    ['b', 110.67, 17.9, 1.5, 111.33, 17.91, 1.62, 'gilt'],
+    ['b', 110.67, 17.9, 3.38, 111.33, 17.91, 3.5, 'gilt'],
+    ['b', 110.5, 17.91, 3.8, 111.5, 18.0, 3.84, 'wood'],
+    ['b', 111.75, 3.85, 1.2, 112.65, 3.93, 3.8, 'gilt'],
+    ['b', 111.87, 3.93, 1.32, 112.53, 3.94, 3.68, 'ruby'],
+    ['b', 111.87, 3.94, 1.5, 112.53, 3.95, 1.62, 'gilt'],
+    ['b', 111.87, 3.94, 3.38, 112.53, 3.95, 3.5, 'gilt'],
+    ['b', 111.7, 3.85, 3.8, 112.7, 3.94, 3.84, 'wood'],
+    ['b', 104.55, 9.9, 1.2, 104.63, 11.9, 3.6, 'dust'],
+    ['b', 104.63, 10.02, 1.32, 104.64, 11.78, 3.48, 'green'],
+    ['b', 104.64, 10.02, 1.5, 104.65, 11.78, 1.62, 'petals'],
+    ['b', 104.64, 10.02, 3.18, 104.65, 11.78, 3.3, 'petals'],
+    ['b', 104.55, 9.85, 3.6, 104.64, 11.95, 3.64, 'wood'],
+    ['b', 116.27, 4.1, 1.3, 116.35, 5.9, 3.5, 'gilt'],
+    ['b', 116.26, 4.22, 1.42, 116.27, 5.78, 3.38, 'blue'],
+    ['b', 116.25, 4.22, 1.6, 116.26, 5.78, 1.72, 'linen'],
+    ['b', 116.25, 4.22, 3.08, 116.26, 5.78, 3.2, 'linen'],
+    ['b', 116.26, 4.05, 3.5, 116.35, 5.95, 3.54, 'wood'],
+    ['b', 105.1, 17.92, 1.1, 105.9, 18.0, 2.1, 'gilt'],
+    ['b', 105.17, 17.91, 1.17, 105.83, 17.92, 2.03, 'black'],
+    ['b', 105.44, 17.9, 1.65, 105.64, 17.91, 1.9, 'dust'],
+    ['b', 105.3, 17.9, 1.3, 105.7, 17.91, 1.6, 'linen'],
+    ['b', 105.44, 17.91, 1.03, 105.56, 18.0, 1.07, 'brass'],
+    ['b', 115.05, 17.92, 1.15, 115.75, 18.0, 2.05, 'gilt'],
+    ['b', 115.12, 17.91, 1.22, 115.68, 17.92, 1.98, 'black'],
+    ['b', 115.34, 17.9, 1.645, 115.54, 17.91, 1.87, 'dust'],
+    ['b', 115.2, 17.9, 1.33, 115.6, 17.91, 1.6, 'linen'],
+    ['b', 115.34, 17.91, 1.08, 115.46, 18.0, 1.12, 'brass'],
+    ['b', 104.55, 5.25, 1.0, 104.63, 6.15, 2.2, 'black'],
+    ['b', 104.63, 5.32, 1.07, 104.64, 6.08, 2.13, 'black'],
+    ['b', 104.64, 5.64, 1.66, 104.65, 5.84, 1.96, 'dust'],
+    ['b', 104.64, 5.5, 1.24, 104.65, 5.9, 1.6, 'linen'],
+    ['b', 104.55, 5.64, 0.93, 104.64, 5.76, 0.97, 'brass'],
+    ['b', 116.27, 16.55, 1.15, 116.35, 17.25, 2.05, 'black'],
+    ['b', 116.26, 16.62, 1.22, 116.27, 17.18, 1.98, 'black'],
+    ['b', 116.25, 16.84, 1.645, 116.26, 17.04, 1.87, 'dust'],
+    ['b', 116.25, 16.7, 1.33, 116.26, 17.1, 1.6, 'linen'],
+    ['b', 116.26, 16.84, 1.08, 116.35, 16.96, 1.12, 'brass'],
+    ['b', 104.55, 16.2, 1.1, 104.63, 17.0, 2.1, 'rope'],
+    ['b', 104.63, 16.27, 1.17, 104.64, 16.93, 2.03, 'black'],
+    ['b', 104.64, 16.54, 1.65, 104.65, 16.74, 1.9, 'dust'],
+    ['b', 104.64, 16.4, 1.3, 104.65, 16.8, 1.6, 'linen'],
+    ['b', 104.55, 16.54, 1.03, 104.64, 16.66, 1.07, 'brass'],
+    ['b', 106.5, 3.85, 0, 107.5, 4.4, 0.9, 'oak'],
+    ['b', 106.55, 4.4, 0.08, 107.45, 4.43, 0.32, 'wood'],
+    ['b', 106.94, 4.43, 0.17, 107.06, 4.45, 0.21, 'brass'],
+    ['b', 106.55, 4.4, 0.36, 107.45, 4.43, 0.6, 'wood'],
+    ['b', 106.94, 4.43, 0.45, 107.06, 4.45, 0.49, 'brass'],
+    ['b', 106.55, 4.4, 0.64, 107.45, 4.43, 0.88, 'wood'],
+    ['b', 106.94, 4.43, 0.73, 107.06, 4.45, 0.77, 'brass'],
+    ['b', 106.6, 3.95, 0.9, 106.9, 4.25, 0.93, 'white'],
+    ['b', 107.17, 3.97, 0.9, 107.39, 4.19, 1.1, 'blue'],
+    ['b', 107.25, 4.05, 1.1, 107.31, 4.11, 1.15, 'linen'],
+    ['b', 112.525, 3.85, 0, 113.475, 4.4, 0.5, 'oak'],
+    ['b', 112.55, 3.87, 0.5, 113.45, 4.38, 0.6, 'wood'],
+    ['b', 112.675, 3.84, 0, 112.725, 4.41, 0.6, 'iron'],
+    ['b', 113.275, 3.84, 0, 113.325, 4.41, 0.6, 'iron'],
+    ['b', 112.95, 4.4, 0.38, 113.05, 4.43, 0.46, 'brass'],
+    ['b', 113.575, 3.85, 0, 114.025, 3.89, 1.4, 'wood'],
+    ['b', 114.075, 3.85, 0, 114.525, 3.89, 1.4, 'wood'],
+    ['b', 114.575, 3.85, 0, 115.025, 3.89, 1.4, 'wood'],
+    ['b', 113.6, 3.85, 0.5, 115.0, 3.89, 0.53, 'wood'],
+    ['b', 113.6, 3.85, 0.9, 115.0, 3.89, 0.93, 'wood'],
+    ['b', 113.6, 3.85, 1.3, 115.0, 3.89, 1.33, 'wood'],
+    ['b', 113.8, 3.83, 0.7, 114.2, 3.91, 1.4, 'linen'],
+    ['b', 114.4, 3.83, 0.55, 114.8, 3.91, 1.3, 'white'],
+    ['b', 104.55, 12.0, 1.8, 104.61, 13.6, 1.9, 'oak'],
+    ['b', 104.61, 12.18, 1.78, 104.69, 12.22, 1.84, 'brass'],
+    ['b', 104.61, 12.48, 1.78, 104.69, 12.52, 1.84, 'brass'],
+    ['b', 104.61, 12.78, 1.78, 104.69, 12.82, 1.84, 'brass'],
+    ['b', 104.61, 13.08, 1.78, 104.69, 13.12, 1.84, 'brass'],
+    ['b', 104.61, 13.38, 1.78, 104.69, 13.42, 1.84, 'brass'],
+    ['b', 104.61, 12.35, 0.7, 104.67, 12.65, 1.78, 'dark'],
+    ['b', 104.61, 13.04, 1.3, 104.66, 13.16, 1.78, 'ruby'],
+    ['b', 104.61, 13.3, 1.66, 104.71, 13.5, 1.78, 'tartan'],
+    ['b', 115.95, 6.15, 0, 116.35, 6.65, 2.2, 'oak'],
+    ['b', 115.92, 6.23, 1.6, 115.95, 6.57, 1.95, 'white'],
+    ['b', 115.91, 6.21, 1.58, 115.94, 6.59, 1.97, 'gilt'],
+    ['b', 115.92, 6.3, 0.5, 115.95, 6.5, 1.4, 'glass'],
+    ['b', 115.91, 6.34, 0.6, 115.94, 6.46, 0.72, 'brass'],
+    ['b', 115.9, 6.1, 2.2, 116.35, 6.7, 2.3, 'wood'],
+    ['b', 109.55, 8.65, 0.0, 112.75, 13.15, 0.016, 'gilt'],
+    ['b', 109.67, 8.77, 0.016, 112.63, 13.03, 0.02, 'ruby'],
+    ['b', 110.67, 10.0, 0.02, 111.63, 11.8, 0.024, 'gilt'],
+    ['b', 110.45, 8.075, 3.5, 110.5, 8.125, 4.6, 'iron'],
+    ['b', 109.95, 7.6, 3.35, 110.95, 8.6, 3.45, 'brass'],
+    ['b', 110.15, 7.8, 3.1, 110.75, 8.4, 3.2, 'brass'],
+    ['b', 109.95, 7.57, 3.45, 110.01, 7.63, 3.62, 'linen'],
+    ['b', 109.96, 7.58, 3.62, 110.0, 7.62, 3.7, 'amber'],
+    ['b', 109.95, 8.52, 3.45, 110.01, 8.58, 3.62, 'linen'],
+    ['b', 109.96, 8.53, 3.62, 110.0, 8.57, 3.7, 'amber'],
+    ['b', 110.9, 7.57, 3.45, 110.96, 7.63, 3.62, 'linen'],
+    ['b', 110.91, 7.58, 3.62, 110.95, 7.62, 3.7, 'amber'],
+    ['b', 110.9, 8.52, 3.45, 110.96, 8.58, 3.62, 'linen'],
+    ['b', 110.91, 8.53, 3.62, 110.95, 8.57, 3.7, 'amber'],
+    ['b', 109.95, 8.05, 3.45, 110.01, 8.11, 3.62, 'linen'],
+    ['b', 109.96, 8.06, 3.62, 110.0, 8.1, 3.7, 'amber'],
+    ['b', 110.9, 8.05, 3.45, 110.96, 8.11, 3.62, 'linen'],
+    ['b', 110.91, 8.06, 3.62, 110.95, 8.1, 3.7, 'amber'],
+    ['b', 110.43, 7.57, 3.45, 110.49, 7.63, 3.62, 'linen'],
+    ['b', 110.44, 7.58, 3.62, 110.48, 7.62, 3.7, 'amber'],
+    ['b', 110.43, 8.52, 3.45, 110.49, 8.58, 3.62, 'linen'],
+    ['b', 110.44, 8.53, 3.62, 110.48, 8.57, 3.7, 'amber'],
+    ['b', 110.15, 7.78, 3.2, 110.19, 7.82, 3.32, 'amber'],
+    ['b', 110.15, 8.34, 3.2, 110.19, 8.38, 3.32, 'amber'],
+    ['b', 110.71, 7.78, 3.2, 110.75, 7.82, 3.32, 'amber'],
+    ['b', 110.71, 8.34, 3.2, 110.75, 8.38, 3.32, 'amber'],
+    ['b', 110.45, 12.875, 3.5, 110.5, 12.925, 4.6, 'iron'],
+    ['b', 109.95, 12.4, 3.35, 110.95, 13.4, 3.45, 'brass'],
+    ['b', 110.15, 12.6, 3.1, 110.75, 13.2, 3.2, 'brass'],
+    ['b', 109.95, 12.37, 3.45, 110.01, 12.43, 3.62, 'linen'],
+    ['b', 109.96, 12.38, 3.62, 110.0, 12.42, 3.7, 'amber'],
+    ['b', 109.95, 13.32, 3.45, 110.01, 13.38, 3.62, 'linen'],
+    ['b', 109.96, 13.33, 3.62, 110.0, 13.37, 3.7, 'amber'],
+    ['b', 110.9, 12.37, 3.45, 110.96, 12.43, 3.62, 'linen'],
+    ['b', 110.91, 12.38, 3.62, 110.95, 12.42, 3.7, 'amber'],
+    ['b', 110.9, 13.32, 3.45, 110.96, 13.38, 3.62, 'linen'],
+    ['b', 110.91, 13.33, 3.62, 110.95, 13.37, 3.7, 'amber'],
+    ['b', 109.95, 12.85, 3.45, 110.01, 12.91, 3.62, 'linen'],
+    ['b', 109.96, 12.86, 3.62, 110.0, 12.9, 3.7, 'amber'],
+    ['b', 110.9, 12.85, 3.45, 110.96, 12.91, 3.62, 'linen'],
+    ['b', 110.91, 12.86, 3.62, 110.95, 12.9, 3.7, 'amber'],
+    ['b', 110.43, 12.37, 3.45, 110.49, 12.43, 3.62, 'linen'],
+    ['b', 110.44, 12.38, 3.62, 110.48, 12.42, 3.7, 'amber'],
+    ['b', 110.43, 13.32, 3.45, 110.49, 13.38, 3.62, 'linen'],
+    ['b', 110.44, 13.33, 3.62, 110.48, 13.37, 3.7, 'amber'],
+    ['b', 110.15, 12.58, 3.2, 110.19, 12.62, 3.32, 'amber'],
+    ['b', 110.15, 13.14, 3.2, 110.19, 13.18, 3.32, 'amber'],
+    ['b', 110.71, 12.58, 3.2, 110.75, 12.62, 3.32, 'amber'],
+    ['b', 110.71, 13.14, 3.2, 110.75, 13.18, 3.32, 'amber']]);
+  T['guest-rooms-6'].lights = (T['guest-rooms-6'].lights || []).concat([[108.5, 4.1, 0.5, 16757862, 1.1, 8], [106.3, 4.15, 2.33, 16757862, 1.1, 8], [110.4, 17.7, 2.33, 16757862, 1.1, 8]]);
+})(window.SHELL_W5A.things);
+/* HAND2 end guest-rooms-6 */
+/* HAND2 begin history-teachers-study */
+/* Interiors req 2423 sec 11: a study, a map-maker of the past: maps, a globe, a desk with inkstand; req 2532 adds hangings, a dado and a thing to read or pull; req 2543 adds an ink cupboard, a pigeonhole cupboard of scrolls, a book trolley, a clock, a frieze of dates, a rug and an hourglass whose sand runs up; sited by tools/architect-hand-rooms-1101.py, plain stand-ins (Objects draw the real ones) */
+(function (T) {
+  T['history-teachers-study'] = T['history-teachers-study'] || { items: [] };
+  T['history-teachers-study'].items = T['history-teachers-study'].items.concat([
+    ['b', 126.6, 3.85, 0, 128.4, 4.35, 1.3, 'stone'],
+    ['b', 127.0, 3.85, 0.1, 128.0, 4.37, 1.0, 'black'],
+    ['b', 127.25, 3.95, 0.12, 127.75, 4.25, 0.45, 'flame'],
+    ['b', 126.8, 4.35, 0, 128.2, 4.55, 0.18, 'iron'],
+    ['b', 126.45, 3.85, 1.3, 128.55, 4.5, 1.38, 'oak'],
+    ['b', 122.14, 3.85, 1.9, 122.26, 3.89, 2.3, 'iron'],
+    ['b', 122.175, 3.89, 2.25, 122.225, 4.15, 2.3, 'iron'],
+    ['b', 122.14, 4.11, 2.0, 122.26, 4.19, 2.28, 'flame'],
+    ['b', 125.54, 17.96, 1.9, 125.66, 18.0, 2.3, 'iron'],
+    ['b', 125.575, 17.7, 2.25, 125.625, 17.96, 2.3, 'iron'],
+    ['b', 125.54, 17.66, 2.0, 125.66, 17.74, 2.28, 'flame'],
+    ['b', 120.25, 7.5, 0, 121.05, 9.1, 0.78, 'oak'],
+    ['b', 120.4, 8.65, 0.78, 120.5, 8.75, 1.0, 'flame'],
+    ['b', 130.52, 6.6, 0, 130.92, 8.2, 0.8, 'oak'],
+    ['b', 130.7, 6.6, 0.8, 130.92, 8.2, 2.0, 'wood'],
+    ['b', 130.62, 6.774, 1.1, 130.7, 6.874, 1.4, 'amber'],
+    ['b', 130.62, 7.158, 1.5, 130.7, 7.258, 1.8, 'amber'],
+    ['b', 130.62, 7.542, 1.1, 130.7, 7.642, 1.4, 'amber'],
+    ['b', 130.62, 7.926, 1.5, 130.7, 8.026, 1.8, 'amber'],
+    ['b', 120.25, 14.4, 0, 120.65, 16.0, 0.8, 'oak'],
+    ['b', 120.25, 14.4, 0.8, 120.47, 16.0, 2.0, 'wood'],
+    ['b', 120.47, 14.574, 1.1, 120.55, 14.674, 1.4, 'amber'],
+    ['b', 120.47, 14.958, 1.5, 120.55, 15.058, 1.8, 'amber'],
+    ['b', 120.47, 15.342, 1.1, 120.55, 15.442, 1.4, 'amber'],
+    ['b', 120.47, 15.726, 1.5, 120.55, 15.826, 1.8, 'amber'],
+    ['b', 128.65, 3.85, 1.5, 129.35, 3.93, 2.4, 'gilt'],
+    ['b', 128.7, 3.93, 1.55, 129.3, 3.94, 2.35, 'black'],
+    ['b', 123.22, 3.85, 1.57, 123.78, 3.93, 2.03, 'wood'],
+    ['b', 123.25, 3.93, 1.6, 123.75, 3.95, 2.0, 'linen'],
+    ['b', 123.355, 3.95, 1.72, 123.395, 3.96, 1.88, 'black'],
+    ['b', 123.48, 3.95, 1.72, 123.52, 3.96, 1.88, 'black'],
+    ['b', 123.605, 3.95, 1.72, 123.645, 3.96, 1.88, 'black'],
+    ['b', 130.84, 13.9, 3.1, 130.92, 15.1, 4.1, 'dust'],
+    ['b', 130.83, 14.0, 3.22, 130.84, 15.0, 3.98, 'stone'],
+    ['b', 130.83, 13.85, 4.1, 130.92, 15.15, 4.14, 'wood'],
+    ['b', 122.05, 17.5, 0, 122.75, 18.0, 0.7, 'oak'],
+    ['b', 122.15, 17.6, 0.7, 122.65, 17.9, 0.72, 'tin'],
+    ['b', 122.34, 17.75, 0.72, 122.46, 17.85, 0.85, 'white'],
+    ['b', 127.5, 17.55, 0, 129.1, 18.0, 2.1, 'oak'],
+    ['b', 127.6, 17.53, 0.7, 129.0, 17.55, 2.0, 'glass'],
+    ['b', 123.07, 17.92, 1.57, 124.93, 18.0, 2.93, 'wood'],
+    ['b', 123.1, 17.9, 1.6, 124.9, 17.92, 2.9, 'petals'],
+    ['b', 123.53, 17.89, 1.72, 123.57, 17.9, 2.78, 'black'],
+    ['b', 123.98, 17.89, 1.72, 124.02, 17.9, 2.78, 'black'],
+    ['b', 124.43, 17.89, 1.72, 124.47, 17.9, 2.78, 'black'],
+    ['b', 130.42, 10.85, 0, 130.92, 11.35, 0.9, 'oak'],
+    ['b', 130.47, 10.875, 0.9, 130.87, 11.325, 1.35, 'gilt'],
+    ['b', 121.9, 3.85, 0, 122.9, 4.3, 0.9, 'oak'],
+    ['b', 121.95, 3.9, 0.9, 122.85, 4.25, 0.93, 'black'],
+    ['b', 121.99, 3.95, 0.93, 122.09, 4.05, 1.03, 'black'],
+    ['b', 122.17, 3.95, 0.93, 122.27, 4.05, 1.03, 'black'],
+    ['b', 122.35, 3.95, 0.93, 122.45, 4.05, 1.03, 'black'],
+    ['b', 122.53, 3.95, 0.93, 122.63, 4.05, 1.03, 'black'],
+    ['b', 122.71, 3.95, 0.93, 122.81, 4.05, 1.03, 'black'],
+    ['b', 122.55, 4.1, 0.93, 122.85, 4.15, 0.96, 'white'],
+    ['b', 130.52, 12.5, 0, 130.92, 13.7, 1.9, 'oak'],
+    ['b', 130.46, 12.55, 0.15, 130.52, 12.75, 0.3, 'linen'],
+    ['b', 130.46, 12.85, 0.15, 130.52, 13.05, 0.3, 'dust'],
+    ['b', 130.46, 13.15, 0.15, 130.52, 13.35, 0.3, 'ruby'],
+    ['b', 130.46, 13.45, 0.15, 130.52, 13.65, 0.3, 'linen'],
+    ['b', 130.46, 12.55, 0.5, 130.52, 12.75, 0.65, 'dust'],
+    ['b', 130.46, 12.85, 0.5, 130.52, 13.05, 0.65, 'ruby'],
+    ['b', 130.46, 13.15, 0.5, 130.52, 13.35, 0.65, 'linen'],
+    ['b', 130.46, 13.45, 0.5, 130.52, 13.65, 0.65, 'dust'],
+    ['b', 130.46, 12.55, 0.85, 130.52, 12.75, 1.0, 'ruby'],
+    ['b', 130.46, 12.85, 0.85, 130.52, 13.05, 1.0, 'linen'],
+    ['b', 130.46, 13.15, 0.85, 130.52, 13.35, 1.0, 'dust'],
+    ['b', 130.46, 13.45, 0.85, 130.52, 13.65, 1.0, 'ruby'],
+    ['b', 130.46, 12.55, 1.2, 130.52, 12.75, 1.35, 'linen'],
+    ['b', 130.46, 12.85, 1.2, 130.52, 13.05, 1.35, 'dust'],
+    ['b', 130.46, 13.15, 1.2, 130.52, 13.35, 1.35, 'ruby'],
+    ['b', 130.46, 13.45, 1.2, 130.52, 13.65, 1.35, 'linen'],
+    ['b', 130.46, 12.55, 1.55, 130.52, 12.75, 1.7, 'dust'],
+    ['b', 130.46, 12.85, 1.55, 130.52, 13.05, 1.7, 'ruby'],
+    ['b', 130.46, 13.15, 1.55, 130.52, 13.35, 1.7, 'linen'],
+    ['b', 130.46, 13.45, 1.55, 130.52, 13.65, 1.7, 'dust'],
+    ['b', 120.25, 13.45, 0.1, 120.75, 14.35, 0.14, 'oak'],
+    ['b', 120.25, 13.45, 0.7, 120.75, 14.35, 0.74, 'oak'],
+    ['b', 120.27, 13.48, 0, 120.73, 13.52, 0.9, 'oak'],
+    ['b', 120.27, 14.28, 0, 120.73, 14.32, 0.9, 'oak'],
+    ['b', 120.35, 13.495, 0.14, 120.65, 13.605, 0.4, 'ruby'],
+    ['b', 120.35, 13.645, 0.14, 120.65, 13.755, 0.44, 'blue'],
+    ['b', 120.35, 13.795, 0.14, 120.65, 13.905, 0.4, 'green'],
+    ['b', 120.35, 13.945, 0.14, 120.65, 14.055, 0.44, 'amber'],
+    ['b', 120.35, 14.095, 0.14, 120.65, 14.205, 0.4, 'dust'],
+    ['b', 120.35, 13.54, 0.74, 120.65, 13.66, 1.0, 'green'],
+    ['b', 120.35, 13.71, 0.74, 120.65, 13.83, 1.0, 'ruby'],
+    ['b', 120.35, 13.88, 0.74, 120.65, 14.0, 1.0, 'dust'],
+    ['b', 120.35, 14.05, 0.74, 120.65, 14.17, 1.0, 'blue'],
+    ['b', 120.25, 5.75, 2.5, 120.33, 6.25, 3.0, 'brass'],
+    ['b', 120.33, 5.79, 2.54, 120.35, 6.21, 2.96, 'white'],
+    ['b', 120.35, 5.99, 2.75, 120.37, 6.01, 2.92, 'black'],
+    ['b', 120.35, 6.0, 2.73, 120.37, 6.12, 2.76, 'black'],
+    ['b', 120.25, 4.9, 1.5, 120.3, 7.9, 2.0, 'wood'],
+    ['b', 120.3, 4.95, 1.54, 120.32, 7.85, 1.96, 'linen'],
+    ['b', 120.32, 5.0, 1.74, 120.33, 7.8, 1.76, 'black'],
+    ['b', 120.32, 5.1, 1.76, 120.34, 5.2, 1.84, 'gilt'],
+    ['b', 120.32, 5.6, 1.76, 120.34, 5.7, 1.9, 'gilt'],
+    ['b', 120.32, 6.1, 1.76, 120.34, 6.2, 1.84, 'gilt'],
+    ['b', 120.32, 6.6, 1.76, 120.34, 6.7, 1.9, 'gilt'],
+    ['b', 120.32, 7.1, 1.76, 120.34, 7.2, 1.84, 'gilt'],
+    ['b', 120.32, 7.6, 1.76, 120.34, 7.7, 1.9, 'gilt'],
+    ['b', 124.25, 12.1, 0, 127.45, 17.5, 0.02, 'gilt'],
+    ['b', 124.37, 12.22, 0.02, 127.33, 17.38, 0.035, 'ruby'],
+    ['b', 124.95, 13.2, 0.035, 126.75, 16.4, 0.05, 'blue'],
+    ['b', 125.45, 14.1, 0.05, 126.25, 15.5, 0.065, 'gilt'],
+    ['b', 128.55, 3.85, 0, 129.05, 4.35, 0.85, 'oak'],
+    ['b', 128.65, 3.95, 0.85, 128.95, 4.25, 0.9, 'brass'],
+    ['b', 128.65, 3.95, 1.3, 128.95, 4.25, 1.35, 'brass'],
+    ['b', 128.76, 4.05, 0.9, 128.84, 4.15, 1.3, 'glass'],
+    ['b', 128.67, 3.97, 1.15, 128.93, 4.23, 1.3, 'amber'],
+    ['b', 128.71, 4.01, 0.9, 128.89, 4.19, 0.95, 'amber']]);
+  T['history-teachers-study'].lights = (T['history-teachers-study'].lights || []).concat([[127.5, 4.1, 0.5, 16757862, 1.1, 8], [122.2, 4.15, 2.33, 16757862, 1.1, 8], [125.6, 17.7, 2.33, 16757862, 1.1, 8], [120.45, 8.7, 1.05, 16757862, 1.1, 8]]);
+})(window.SHELL_W5A.things);
+/* HAND2 end history-teachers-study */
+/* HAND2 begin teachers-study-1 */
+/* Interiors req 2423 sec 11: a study, sheeted furniture and one lamp left on (the unused study); req 2532 adds hangings, a dado and a thing to read or pull; req 2543 adds a sheeted desk, a glass bookcase with a duster working by itself, a cold hob whose kettle boils when anyone enters, a cupboard of corrected exercises, a hat stand, a rolled rug, a clock and coat pegs; sited by tools/architect-hand-rooms-1101.py, plain stand-ins (Objects draw the real ones) */
+(function (T) {
+  T['teachers-study-1'] = T['teachers-study-1'] || { items: [] };
+  T['teachers-study-1'].items = T['teachers-study-1'].items.concat([
+    ['b', 10.7, 59.25, 0, 12.5, 59.75, 1.3, 'stone'],
+    ['b', 11.1, 59.25, 0.1, 12.1, 59.77, 1.0, 'black'],
+    ['b', 11.35, 59.35, 0.12, 11.85, 59.65, 0.45, 'flame'],
+    ['b', 10.9, 59.75, 0, 12.3, 59.95, 0.18, 'iron'],
+    ['b', 10.55, 59.25, 1.3, 12.65, 59.9, 1.38, 'oak'],
+    ['b', 9.64, 59.25, 1.9, 9.76, 59.29, 2.3, 'iron'],
+    ['b', 9.675, 59.29, 2.25, 9.725, 59.55, 2.3, 'iron'],
+    ['b', 9.64, 59.51, 2.0, 9.76, 59.59, 2.28, 'flame'],
+    ['b', 11.54, 69.71, 1.9, 11.66, 69.75, 2.3, 'iron'],
+    ['b', 11.575, 69.45, 2.25, 11.625, 69.71, 2.3, 'iron'],
+    ['b', 11.54, 69.41, 2.0, 11.66, 69.49, 2.28, 'flame'],
+    ['b', 8.65, 62.7, 0, 9.45, 64.3, 0.78, 'oak'],
+    ['b', 8.8, 63.85, 0.78, 8.9, 63.95, 1.0, 'flame'],
+    ['b', 14.15, 61.1, 0, 14.55, 62.7, 0.8, 'oak'],
+    ['b', 14.33, 61.1, 0.8, 14.55, 62.7, 2.0, 'wood'],
+    ['b', 14.25, 61.274, 1.1, 14.33, 61.374, 1.4, 'amber'],
+    ['b', 14.25, 61.658, 1.5, 14.33, 61.758, 1.8, 'amber'],
+    ['b', 14.25, 62.042, 1.1, 14.33, 62.142, 1.4, 'amber'],
+    ['b', 14.25, 62.426, 1.5, 14.33, 62.526, 1.8, 'amber'],
+    ['b', 8.65, 66.9, 0, 9.05, 68.5, 0.8, 'oak'],
+    ['b', 8.65, 66.9, 0.8, 8.87, 68.5, 2.0, 'wood'],
+    ['b', 8.87, 67.074, 1.1, 8.95, 67.174, 1.4, 'amber'],
+    ['b', 8.87, 67.458, 1.5, 8.95, 67.558, 1.8, 'amber'],
+    ['b', 8.87, 67.842, 1.1, 8.95, 67.942, 1.4, 'amber'],
+    ['b', 8.87, 68.226, 1.5, 8.95, 68.326, 1.8, 'amber'],
+    ['b', 13.15, 59.25, 1.5, 13.85, 59.33, 2.4, 'gilt'],
+    ['b', 13.2, 59.33, 1.55, 13.8, 59.34, 2.35, 'black'],
+    ['b', 10.12, 59.25, 1.57, 10.68, 59.33, 2.03, 'wood'],
+    ['b', 10.15, 59.33, 1.6, 10.65, 59.35, 2.0, 'linen'],
+    ['b', 10.255, 59.35, 1.72, 10.295, 59.36, 1.88, 'black'],
+    ['b', 10.38, 59.35, 1.72, 10.42, 59.36, 1.88, 'black'],
+    ['b', 10.505, 59.35, 1.72, 10.545, 59.36, 1.88, 'black'],
+    ['b', 14.47, 66.5, 3.1, 14.55, 67.7, 4.1, 'dust'],
+    ['b', 14.46, 66.6, 3.22, 14.47, 67.6, 3.98, 'stone'],
+    ['b', 14.46, 66.45, 4.1, 14.55, 67.75, 4.14, 'wood'],
+    ['b', 9.45, 69.25, 0, 10.15, 69.75, 0.7, 'oak'],
+    ['b', 9.55, 69.35, 0.7, 10.05, 69.65, 0.72, 'tin'],
+    ['b', 9.74, 69.5, 0.72, 9.86, 69.6, 0.85, 'white'],
+    ['b', 12.3, 69.3, 0, 13.9, 69.75, 2.1, 'oak'],
+    ['b', 12.4, 69.28, 0.7, 13.8, 69.3, 2.0, 'glass'],
+    ['b', 8.65, 59.4, 0, 9.55, 60.6, 0.9, 'linen'],
+    ['b', 8.75, 59.55, 0.9, 9.35, 60.45, 1.1, 'white'],
+    ['b', 13.65, 64.2, 0, 14.55, 65.4, 0.9, 'linen'],
+    ['b', 13.85, 64.35, 0.9, 14.45, 65.25, 1.1, 'white'],
+    ['b', 12.6, 59.25, 0, 14.0, 59.95, 0.78, 'white'],
+    ['b', 12.6, 59.25, 0.78, 14.0, 59.95, 0.82, 'dust'],
+    ['b', 13.7, 59.95, 0.5, 13.8, 60.01, 0.56, 'gilt'],
+    ['b', 8.65, 65.55, 0, 9.05, 66.85, 2.0, 'oak'],
+    ['b', 8.99, 65.615, 0.2, 9.05, 65.745, 0.55, 'green'],
+    ['b', 8.99, 65.785, 0.2, 9.05, 65.915, 0.55, 'dust'],
+    ['b', 8.99, 65.955, 0.2, 9.05, 66.085, 0.55, 'ruby'],
+    ['b', 8.99, 66.125, 0.2, 9.05, 66.255, 0.55, 'blue'],
+    ['b', 8.99, 66.295, 0.2, 9.05, 66.425, 0.55, 'tan'],
+    ['b', 8.99, 66.465, 0.2, 9.05, 66.595, 0.55, 'iron'],
+    ['b', 8.99, 65.615, 0.62, 9.05, 65.745, 0.97, 'dust'],
+    ['b', 8.99, 65.785, 0.62, 9.05, 65.915, 0.97, 'ruby'],
+    ['b', 8.99, 65.955, 0.62, 9.05, 66.085, 0.97, 'blue'],
+    ['b', 8.99, 66.125, 0.62, 9.05, 66.255, 0.97, 'tan'],
+    ['b', 8.99, 66.295, 0.62, 9.05, 66.425, 0.97, 'iron'],
+    ['b', 8.99, 66.465, 0.62, 9.05, 66.595, 0.97, 'green'],
+    ['b', 8.99, 65.615, 1.04, 9.05, 65.745, 1.39, 'ruby'],
+    ['b', 8.99, 65.785, 1.04, 9.05, 65.915, 1.39, 'blue'],
+    ['b', 8.99, 65.955, 1.04, 9.05, 66.085, 1.39, 'tan'],
+    ['b', 8.99, 66.125, 1.04, 9.05, 66.255, 1.39, 'iron'],
+    ['b', 8.99, 66.295, 1.04, 9.05, 66.425, 1.39, 'green'],
+    ['b', 8.99, 66.465, 1.04, 9.05, 66.595, 1.39, 'dust'],
+    ['b', 8.99, 65.615, 1.46, 9.05, 65.745, 1.81, 'blue'],
+    ['b', 8.99, 65.785, 1.46, 9.05, 65.915, 1.81, 'tan'],
+    ['b', 8.99, 65.955, 1.46, 9.05, 66.085, 1.81, 'iron'],
+    ['b', 8.99, 66.125, 1.46, 9.05, 66.255, 1.81, 'green'],
+    ['b', 8.99, 66.295, 1.46, 9.05, 66.425, 1.81, 'dust'],
+    ['b', 8.99, 66.465, 1.46, 9.05, 66.595, 1.81, 'ruby'],
+    ['b', 8.75, 65.85, 2.0, 8.95, 66.15, 2.04, 'dust'],
+    ['b', 8.77, 66.27, 2.04, 8.93, 66.33, 2.4, 'oak'],
+    ['b', 8.75, 66.19, 2.4, 8.97, 66.41, 2.5, 'white'],
+    ['b', 14.05, 60.2, 0, 14.55, 61.0, 0.5, 'iron'],
+    ['b', 14.15, 60.45, 0.5, 14.45, 60.75, 0.78, 'copper'],
+    ['b', 14.25, 60.77, 0.65, 14.35, 60.87, 0.7, 'copper'],
+    ['b', 14.27, 60.85, 0.7, 14.33, 60.91, 1.0, 'white'],
+    ['b', 14.23, 60.54, 0.78, 14.37, 60.66, 0.84, 'iron'],
+    ['b', 11.15, 69.4, 0, 12.25, 69.75, 1.7, 'oak'],
+    ['b', 11.195, 69.39, 0.2, 11.365, 69.45, 0.5, 'white'],
+    ['b', 11.405, 69.39, 0.2, 11.575, 69.45, 0.5, 'white'],
+    ['b', 11.615, 69.39, 0.2, 11.785, 69.45, 0.5, 'white'],
+    ['b', 11.825, 69.39, 0.2, 11.995, 69.45, 0.5, 'white'],
+    ['b', 12.035, 69.39, 0.2, 12.205, 69.45, 0.5, 'white'],
+    ['b', 11.195, 69.39, 0.56, 11.365, 69.45, 0.86, 'white'],
+    ['b', 11.405, 69.39, 0.56, 11.575, 69.45, 0.86, 'white'],
+    ['b', 11.615, 69.39, 0.56, 11.785, 69.45, 0.86, 'white'],
+    ['b', 11.825, 69.39, 0.56, 11.995, 69.45, 0.86, 'ruby'],
+    ['b', 12.035, 69.39, 0.56, 12.205, 69.45, 0.86, 'white'],
+    ['b', 11.195, 69.39, 0.92, 11.365, 69.45, 1.22, 'white'],
+    ['b', 11.405, 69.39, 0.92, 11.575, 69.45, 1.22, 'white'],
+    ['b', 11.615, 69.39, 0.92, 11.785, 69.45, 1.22, 'white'],
+    ['b', 11.825, 69.39, 0.92, 11.995, 69.45, 1.22, 'white'],
+    ['b', 12.035, 69.39, 0.92, 12.205, 69.45, 1.22, 'white'],
+    ['b', 11.195, 69.39, 1.28, 11.365, 69.45, 1.58, 'white'],
+    ['b', 11.405, 69.39, 1.28, 11.575, 69.45, 1.58, 'ruby'],
+    ['b', 11.615, 69.39, 1.28, 11.785, 69.45, 1.58, 'white'],
+    ['b', 11.825, 69.39, 1.28, 11.995, 69.45, 1.58, 'white'],
+    ['b', 12.035, 69.39, 1.28, 12.205, 69.45, 1.58, 'white'],
+    ['b', 10.2, 69.45, 0, 10.6, 69.75, 0.1, 'oak'],
+    ['b', 10.37, 69.57, 0.1, 10.43, 69.63, 1.8, 'oak'],
+    ['b', 10.2, 69.45, 1.4, 10.6, 69.75, 1.8, 'iron'],
+    ['b', 10.28, 69.55, 1.8, 10.52, 69.65, 1.92, 'iron'],
+    ['b', 12.55, 69.67, 2.5, 13.05, 69.75, 3.0, 'brass'],
+    ['b', 12.59, 69.65, 2.54, 13.01, 69.67, 2.96, 'white'],
+    ['b', 12.79, 69.63, 2.75, 12.81, 69.65, 2.92, 'black'],
+    ['b', 12.8, 69.63, 2.73, 12.92, 69.65, 2.76, 'black']]);
+  T['teachers-study-1'].lights = (T['teachers-study-1'].lights || []).concat([[11.6, 59.5, 0.5, 16757862, 1.1, 8], [9.7, 59.55, 2.33, 16757862, 1.1, 8], [11.6, 69.45, 2.33, 16757862, 1.1, 8], [8.85, 63.9, 1.05, 16757862, 1.1, 8]]);
+})(window.SHELL_W5A.things);
+/* HAND2 end teachers-study-1 */
+/* HAND2 begin teachers-office-2-north */
+/* Interiors req 2423 sec 11: a study, a rune-reader: rune charts, a tutor of first years with a sweets jar; sited by tools/architect-hand-rooms-1101.py, plain stand-ins (Objects draw the real ones) */
+(function (T) {
+  T['teachers-office-2-north'] = T['teachers-office-2-north'] || { items: [] };
+  T['teachers-office-2-north'].items = T['teachers-office-2-north'].items.concat([
+    ['b', 110.0, 3.85, 0, 111.8, 4.35, 1.3, 'stone'],
+    ['b', 110.4, 3.85, 0.1, 111.4, 4.37, 1.0, 'black'],
+    ['b', 110.65, 3.95, 0.12, 111.15, 4.25, 0.45, 'flame'],
+    ['b', 110.2, 4.35, 0, 111.6, 4.55, 0.18, 'iron'],
+    ['b', 109.85, 3.85, 1.3, 111.95, 4.5, 1.38, 'oak'],
+    ['b', 106.64, 3.85, 1.9, 106.76, 3.89, 2.3, 'iron'],
+    ['b', 106.675, 3.89, 2.25, 106.725, 4.15, 2.3, 'iron'],
+    ['b', 106.64, 4.11, 2.0, 106.76, 4.19, 2.28, 'flame'],
+    ['b', 110.84, 17.96, 1.9, 110.96, 18.0, 2.3, 'iron'],
+    ['b', 110.875, 17.7, 2.25, 110.925, 17.96, 2.3, 'iron'],
+    ['b', 110.84, 17.66, 2.0, 110.96, 17.74, 2.28, 'flame'],
+    ['b', 104.55, 8.7, 0, 105.35, 10.3, 0.78, 'oak'],
+    ['b', 104.7, 9.85, 0.78, 104.8, 9.95, 1.0, 'flame'],
+    ['b', 115.95, 6.6, 0, 116.35, 8.2, 0.8, 'oak'],
+    ['b', 116.13, 6.6, 0.8, 116.35, 8.2, 2.0, 'wood'],
+    ['b', 116.05, 6.774, 1.1, 116.13, 6.874, 1.4, 'amber'],
+    ['b', 116.05, 7.158, 1.5, 116.13, 7.258, 1.8, 'amber'],
+    ['b', 116.05, 7.542, 1.1, 116.13, 7.642, 1.4, 'amber'],
+    ['b', 116.05, 7.926, 1.5, 116.13, 8.026, 1.8, 'amber'],
+    ['b', 104.55, 14.4, 0, 104.95, 16.0, 0.8, 'oak'],
+    ['b', 104.55, 14.4, 0.8, 104.77, 16.0, 2.0, 'wood'],
+    ['b', 104.77, 14.574, 1.1, 104.85, 14.674, 1.4, 'amber'],
+    ['b', 104.77, 14.958, 1.5, 104.85, 15.058, 1.8, 'amber'],
+    ['b', 104.77, 15.342, 1.1, 104.85, 15.442, 1.4, 'amber'],
+    ['b', 104.77, 15.726, 1.5, 104.85, 15.826, 1.8, 'amber'],
+    ['b', 113.85, 3.85, 1.5, 114.55, 3.93, 2.4, 'gilt'],
+    ['b', 113.9, 3.93, 1.55, 114.5, 3.94, 2.35, 'black'],
+    ['b', 107.52, 3.85, 1.57, 108.08, 3.93, 2.03, 'wood'],
+    ['b', 107.55, 3.93, 1.6, 108.05, 3.95, 2.0, 'linen'],
+    ['b', 107.655, 3.95, 1.72, 107.695, 3.96, 1.88, 'black'],
+    ['b', 107.78, 3.95, 1.72, 107.82, 3.96, 1.88, 'black'],
+    ['b', 107.905, 3.95, 1.72, 107.945, 3.96, 1.88, 'black'],
+    ['b', 116.27, 13.9, 3.1, 116.35, 15.1, 4.1, 'dust'],
+    ['b', 116.26, 14.0, 3.22, 116.27, 15.0, 3.98, 'stone'],
+    ['b', 116.26, 13.85, 4.1, 116.35, 15.15, 4.14, 'wood'],
+    ['b', 108.15, 17.5, 0, 108.85, 18.0, 0.7, 'oak'],
+    ['b', 108.25, 17.6, 0.7, 108.75, 17.9, 0.72, 'tin'],
+    ['b', 108.44, 17.75, 0.72, 108.56, 17.85, 0.85, 'white'],
+    ['b', 112.6, 17.55, 0, 114.2, 18.0, 2.1, 'oak'],
+    ['b', 112.7, 17.53, 0.7, 114.1, 17.55, 2.0, 'glass'],
+    ['b', 108.47, 17.92, 1.57, 109.93, 18.0, 2.63, 'wood'],
+    ['b', 108.5, 17.9, 1.6, 109.9, 17.92, 2.6, 'petals'],
+    ['b', 108.83, 17.89, 1.72, 108.87, 17.9, 2.48, 'black'],
+    ['b', 109.18, 17.89, 1.72, 109.22, 17.9, 2.48, 'black'],
+    ['b', 109.53, 17.89, 1.72, 109.57, 17.9, 2.48, 'black'],
+    ['b', 115.9, 10.675, 0, 116.35, 11.125, 0.8, 'oak'],
+    ['b', 115.95, 10.7, 0.8, 116.3, 11.1, 1.15, 'glass']]);
+  T['teachers-office-2-north'].lights = (T['teachers-office-2-north'].lights || []).concat([[110.9, 4.1, 0.5, 16757862, 1.1, 8], [106.7, 4.15, 2.33, 16757862, 1.1, 8], [110.9, 17.7, 2.33, 16757862, 1.1, 8], [104.75, 9.9, 1.05, 16757862, 1.1, 8]]);
+})(window.SHELL_W5A.things);
+/* HAND2 end teachers-office-2-north */
+/* HAND2 begin teachers-study-2-southeast */
+/* Interiors req 2423 sec 11: a study, a herbalist: hung herbs, a tray of cuttings; req 2532 adds hangings, a dado and a thing to read or pull; req 2543 adds a potting bench where a tin can waters seed pots by itself, a coat-peg rail, an ink cupboard, a clock and a rolled rug; sited by tools/architect-hand-rooms-1101.py, plain stand-ins (Objects draw the real ones) */
+(function (T) {
+  T['teachers-study-2-southeast'] = T['teachers-study-2-southeast'] || { items: [] };
+  T['teachers-study-2-southeast'].items = T['teachers-study-2-southeast'].items.concat([
+    ['b', 154.7, 6.75, 0, 156.5, 7.25, 1.3, 'stone'],
+    ['b', 155.1, 6.75, 0.1, 156.1, 7.27, 1.0, 'black'],
+    ['b', 155.35, 6.85, 0.12, 155.85, 7.15, 0.45, 'flame'],
+    ['b', 154.9, 7.25, 0, 156.3, 7.45, 0.18, 'iron'],
+    ['b', 154.55, 6.75, 1.3, 156.65, 7.4, 1.38, 'oak'],
+    ['b', 154.84, 6.75, 1.9, 154.96, 6.79, 2.3, 'iron'],
+    ['b', 154.875, 6.79, 2.25, 154.925, 7.05, 2.3, 'iron'],
+    ['b', 154.84, 7.01, 2.0, 154.96, 7.09, 2.28, 'flame'],
+    ['b', 155.94, 17.71, 1.9, 156.06, 17.75, 2.3, 'iron'],
+    ['b', 155.975, 17.45, 2.25, 156.025, 17.71, 2.3, 'iron'],
+    ['b', 155.94, 17.41, 2.0, 156.06, 17.49, 2.28, 'flame'],
+    ['b', 153.75, 12.1, 0, 154.55, 13.7, 0.78, 'oak'],
+    ['b', 153.9, 13.25, 0.78, 154.0, 13.35, 1.0, 'flame'],
+    ['b', 159.6, 15.5, 0, 160.0, 17.1, 0.8, 'oak'],
+    ['b', 159.78, 15.5, 0.8, 160.0, 17.1, 2.0, 'wood'],
+    ['b', 159.7, 15.674, 1.1, 159.78, 15.774, 1.4, 'amber'],
+    ['b', 159.7, 16.058, 1.5, 159.78, 16.158, 1.8, 'amber'],
+    ['b', 159.7, 16.442, 1.1, 159.78, 16.542, 1.4, 'amber'],
+    ['b', 159.7, 16.826, 1.5, 159.78, 16.926, 1.8, 'amber'],
+    ['b', 153.75, 14.7, 0, 154.15, 16.3, 0.8, 'oak'],
+    ['b', 153.75, 14.7, 0.8, 153.97, 16.3, 2.0, 'wood'],
+    ['b', 153.97, 14.874, 1.1, 154.05, 14.974, 1.4, 'amber'],
+    ['b', 153.97, 15.258, 1.5, 154.05, 15.358, 1.8, 'amber'],
+    ['b', 153.97, 15.642, 1.1, 154.05, 15.742, 1.4, 'amber'],
+    ['b', 153.97, 16.026, 1.5, 154.05, 16.126, 1.8, 'amber'],
+    ['b', 158.55, 6.75, 1.5, 159.25, 6.83, 2.4, 'gilt'],
+    ['b', 158.6, 6.83, 1.55, 159.2, 6.84, 2.35, 'black'],
+    ['b', 155.32, 6.75, 1.57, 155.88, 6.83, 2.03, 'wood'],
+    ['b', 155.35, 6.83, 1.6, 155.85, 6.85, 2.0, 'linen'],
+    ['b', 155.455, 6.85, 1.72, 155.495, 6.86, 1.88, 'black'],
+    ['b', 155.58, 6.85, 1.72, 155.62, 6.86, 1.88, 'black'],
+    ['b', 155.705, 6.85, 1.72, 155.745, 6.86, 1.88, 'black'],
+    ['b', 159.92, 14.4, 3.1, 160.0, 15.6, 4.1, 'dust'],
+    ['b', 159.91, 14.5, 3.22, 159.92, 15.5, 3.98, 'stone'],
+    ['b', 159.91, 14.35, 4.1, 160.0, 15.65, 4.14, 'wood'],
+    ['b', 154.65, 17.25, 0, 155.35, 17.75, 0.7, 'oak'],
+    ['b', 154.75, 17.35, 0.7, 155.25, 17.65, 0.72, 'tin'],
+    ['b', 154.94, 17.5, 0.72, 155.06, 17.6, 0.85, 'white'],
+    ['b', 157.9, 17.3, 0, 159.5, 17.75, 2.1, 'oak'],
+    ['b', 158.0, 17.28, 0.7, 159.4, 17.3, 2.0, 'glass'],
+    ['b', 153.9, 17.65, 2.45, 155.9, 17.75, 2.48, 'wood'],
+    ['b', 153.93, 17.5, 1.95, 154.07, 17.7, 2.45, 'petals'],
+    ['b', 154.23, 17.5, 1.95, 154.37, 17.7, 2.45, 'linen'],
+    ['b', 154.53, 17.5, 1.95, 154.67, 17.7, 2.45, 'dust'],
+    ['b', 154.83, 17.5, 1.95, 154.97, 17.7, 2.45, 'petals'],
+    ['b', 155.13, 17.5, 1.95, 155.27, 17.7, 2.45, 'linen'],
+    ['b', 155.43, 17.5, 1.95, 155.57, 17.7, 2.45, 'dust'],
+    ['b', 155.73, 17.5, 1.95, 155.87, 17.7, 2.45, 'petals'],
+    ['b', 159.4, 11.9, 0, 160.0, 12.9, 0.8, 'oak'],
+    ['b', 159.7, 11.96, 0.8, 159.88, 12.12, 0.94, 'tan'],
+    ['b', 159.7, 12.2, 0.8, 159.88, 12.36, 0.94, 'tan'],
+    ['b', 159.7, 12.44, 0.8, 159.88, 12.6, 0.94, 'tan'],
+    ['b', 159.7, 12.68, 0.8, 159.88, 12.84, 0.94, 'tan'],
+    ['b', 159.58, 12.37, 0.94, 159.9, 12.63, 1.18, 'iron'],
+    ['b', 159.62, 12.47, 0.8, 159.7, 12.53, 0.94, 'blue'],
+    ['b', 159.94, 12.95, 1.55, 160.0, 14.25, 1.62, 'oak'],
+    ['b', 159.9, 13.1, 1.5, 159.94, 13.14, 1.6, 'iron'],
+    ['b', 159.8, 12.99, 0.7, 159.94, 13.25, 1.5, 'dark'],
+    ['b', 159.9, 13.42, 1.5, 159.94, 13.46, 1.6, 'iron'],
+    ['b', 159.8, 13.31, 0.7, 159.94, 13.57, 1.5, 'dark'],
+    ['b', 159.9, 13.74, 1.5, 159.94, 13.78, 1.6, 'iron'],
+    ['b', 159.9, 14.06, 1.5, 159.94, 14.1, 1.6, 'iron'],
+    ['b', 159.8, 13.95, 0.7, 159.94, 14.21, 1.5, 'dark'],
+    ['b', 159.84, 14.01, 0.9, 159.94, 14.15, 1.5, 'ruby'],
+    ['b', 153.75, 16.4, 0, 154.2, 17.4, 0.9, 'oak'],
+    ['b', 153.8, 16.45, 0.9, 154.15, 17.35, 0.93, 'black'],
+    ['b', 153.85, 16.49, 0.93, 153.95, 16.59, 1.03, 'black'],
+    ['b', 153.85, 16.67, 0.93, 153.95, 16.77, 1.03, 'black'],
+    ['b', 153.85, 16.85, 0.93, 153.95, 16.95, 1.03, 'black'],
+    ['b', 153.85, 17.03, 0.93, 153.95, 17.13, 1.03, 'black'],
+    ['b', 153.85, 17.21, 0.93, 153.95, 17.31, 1.03, 'black'],
+    ['b', 154.0, 17.05, 0.93, 154.05, 17.35, 0.96, 'white'],
+    ['b', 156.65, 6.75, 2.5, 157.15, 6.83, 3.0, 'brass'],
+    ['b', 156.69, 6.83, 2.54, 157.11, 6.85, 2.96, 'white'],
+    ['b', 156.89, 6.85, 2.75, 156.91, 6.87, 2.92, 'black'],
+    ['b', 156.9, 6.85, 2.73, 157.02, 6.87, 2.76, 'black']]);
+  T['teachers-study-2-southeast'].lights = (T['teachers-study-2-southeast'].lights || []).concat([[155.6, 7.0, 0.5, 16757862, 1.1, 8], [154.9, 7.05, 2.33, 16757862, 1.1, 8], [156.0, 17.45, 2.33, 16757862, 1.1, 8], [153.95, 13.3, 1.05, 16757862, 1.1, 8]]);
+})(window.SHELL_W5A.things);
+/* HAND2 end teachers-study-2-southeast */
+/* HAND2 begin teachers-study-2-southwest */
+/* Interiors req 2423 sec 11: a study, a tutor with marking piled high; req 2532 adds hangings, a dado and a thing to read or pull; req 2543 adds trays of marking with a corrected book rising from the pile, a cupboard of corrected exercises, a coat-peg rail, an ink cupboard, a clock and a rolled rug; sited by tools/architect-hand-rooms-1101.py, plain stand-ins (Objects draw the real ones) */
+(function (T) {
+  T['teachers-study-2-southwest'] = T['teachers-study-2-southwest'] || { items: [] };
+  T['teachers-study-2-southwest'].items = T['teachers-study-2-southwest'].items.concat([
+    ['b', 9.2, 59.25, 0, 11.0, 59.75, 1.3, 'stone'],
+    ['b', 9.6, 59.25, 0.1, 10.6, 59.77, 1.0, 'black'],
+    ['b', 9.85, 59.35, 0.12, 10.35, 59.65, 0.45, 'flame'],
+    ['b', 9.4, 59.75, 0, 10.8, 59.95, 0.18, 'iron'],
+    ['b', 9.05, 59.25, 1.3, 11.15, 59.9, 1.38, 'oak'],
+    ['b', 9.24, 59.25, 1.9, 9.36, 59.29, 2.3, 'iron'],
+    ['b', 9.275, 59.29, 2.25, 9.325, 59.55, 2.3, 'iron'],
+    ['b', 9.24, 59.51, 2.0, 9.36, 59.59, 2.28, 'flame'],
+    ['b', 11.04, 71.71, 1.9, 11.16, 71.75, 2.3, 'iron'],
+    ['b', 11.075, 71.45, 2.25, 11.125, 71.71, 2.3, 'iron'],
+    ['b', 11.04, 71.41, 2.0, 11.16, 71.49, 2.28, 'flame'],
+    ['b', 11.8, 70.95, 0, 13.4, 71.75, 0.78, 'oak'],
+    ['b', 12.95, 71.5, 0.78, 13.05, 71.6, 1.0, 'flame'],
+    ['b', 14.35, 59.5, 0, 14.75, 61.1, 0.8, 'oak'],
+    ['b', 14.53, 59.5, 0.8, 14.75, 61.1, 2.0, 'wood'],
+    ['b', 14.45, 59.674, 1.1, 14.53, 59.774, 1.4, 'amber'],
+    ['b', 14.45, 60.058, 1.5, 14.53, 60.158, 1.8, 'amber'],
+    ['b', 14.45, 60.442, 1.1, 14.53, 60.542, 1.4, 'amber'],
+    ['b', 14.45, 60.826, 1.5, 14.53, 60.926, 1.8, 'amber'],
+    ['b', 8.25, 68.4, 0, 8.65, 70.0, 0.8, 'oak'],
+    ['b', 8.25, 68.4, 0.8, 8.47, 70.0, 2.0, 'wood'],
+    ['b', 8.47, 68.574, 1.1, 8.55, 68.674, 1.4, 'amber'],
+    ['b', 8.47, 68.958, 1.5, 8.55, 69.058, 1.8, 'amber'],
+    ['b', 8.47, 69.342, 1.1, 8.55, 69.442, 1.4, 'amber'],
+    ['b', 8.47, 69.726, 1.5, 8.55, 69.826, 1.8, 'amber'],
+    ['b', 13.25, 59.25, 1.5, 13.95, 59.33, 2.4, 'gilt'],
+    ['b', 13.3, 59.33, 1.55, 13.9, 59.34, 2.35, 'black'],
+    ['b', 10.12, 59.25, 1.57, 10.68, 59.33, 2.03, 'wood'],
+    ['b', 10.15, 59.33, 1.6, 10.65, 59.35, 2.0, 'linen'],
+    ['b', 10.255, 59.35, 1.72, 10.295, 59.36, 1.88, 'black'],
+    ['b', 10.38, 59.35, 1.72, 10.42, 59.36, 1.88, 'black'],
+    ['b', 10.505, 59.35, 1.72, 10.545, 59.36, 1.88, 'black'],
+    ['b', 14.67, 68.0, 3.1, 14.75, 69.2, 4.1, 'dust'],
+    ['b', 14.66, 68.1, 3.22, 14.67, 69.1, 3.98, 'stone'],
+    ['b', 14.66, 67.95, 4.1, 14.75, 69.25, 4.14, 'wood'],
+    ['b', 9.15, 71.25, 0, 9.85, 71.75, 0.7, 'oak'],
+    ['b', 9.25, 71.35, 0.7, 9.75, 71.65, 0.72, 'tin'],
+    ['b', 9.44, 71.5, 0.72, 9.56, 71.6, 0.85, 'white'],
+    ['b', 13.0, 59.25, 0, 13.8, 59.85, 0.4, 'linen'],
+    ['b', 13.2, 59.3, 0.4, 13.8, 59.75, 0.75, 'dust'],
+    ['b', 13.6, 59.3, 0, 14.1, 59.65, 0.35, 'wood'],
+    ['b', 10.2, 71.15, 0, 11.2, 71.75, 0.78, 'oak'],
+    ['b', 10.25, 71.25, 0.78, 10.65, 71.65, 0.9, 'tan'],
+    ['b', 10.75, 71.25, 0.78, 11.15, 71.65, 0.9, 'tan'],
+    ['b', 10.35, 71.35, 0.9, 10.55, 71.55, 1.2, 'ruby'],
+    ['b', 10.39, 71.41, 1.2, 10.51, 71.49, 1.26, 'white'],
+    ['b', 8.25, 70.05, 0, 8.6, 71.15, 1.7, 'oak'],
+    ['b', 8.55, 70.095, 0.2, 8.61, 70.265, 0.5, 'white'],
+    ['b', 8.55, 70.305, 0.2, 8.61, 70.475, 0.5, 'white'],
+    ['b', 8.55, 70.515, 0.2, 8.61, 70.685, 0.5, 'white'],
+    ['b', 8.55, 70.725, 0.2, 8.61, 70.895, 0.5, 'white'],
+    ['b', 8.55, 70.935, 0.2, 8.61, 71.105, 0.5, 'white'],
+    ['b', 8.55, 70.095, 0.56, 8.61, 70.265, 0.86, 'white'],
+    ['b', 8.55, 70.305, 0.56, 8.61, 70.475, 0.86, 'white'],
+    ['b', 8.55, 70.515, 0.56, 8.61, 70.685, 0.86, 'white'],
+    ['b', 8.55, 70.725, 0.56, 8.61, 70.895, 0.86, 'ruby'],
+    ['b', 8.55, 70.935, 0.56, 8.61, 71.105, 0.86, 'white'],
+    ['b', 8.55, 70.095, 0.92, 8.61, 70.265, 1.22, 'white'],
+    ['b', 8.55, 70.305, 0.92, 8.61, 70.475, 1.22, 'white'],
+    ['b', 8.55, 70.515, 0.92, 8.61, 70.685, 1.22, 'white'],
+    ['b', 8.55, 70.725, 0.92, 8.61, 70.895, 1.22, 'white'],
+    ['b', 8.55, 70.935, 0.92, 8.61, 71.105, 1.22, 'white'],
+    ['b', 8.55, 70.095, 1.28, 8.61, 70.265, 1.58, 'white'],
+    ['b', 8.55, 70.305, 1.28, 8.61, 70.475, 1.58, 'ruby'],
+    ['b', 8.55, 70.515, 1.28, 8.61, 70.685, 1.58, 'white'],
+    ['b', 8.55, 70.725, 1.28, 8.61, 70.895, 1.58, 'white'],
+    ['b', 8.55, 70.935, 1.28, 8.61, 71.105, 1.58, 'white'],
+    ['b', 8.25, 62.4, 0, 8.7, 63.4, 0.9, 'oak'],
+    ['b', 8.3, 62.45, 0.9, 8.65, 63.35, 0.93, 'black'],
+    ['b', 8.35, 62.49, 0.93, 8.45, 62.59, 1.03, 'black'],
+    ['b', 8.35, 62.67, 0.93, 8.45, 62.77, 1.03, 'black'],
+    ['b', 8.35, 62.85, 0.93, 8.45, 62.95, 1.03, 'black'],
+    ['b', 8.35, 63.03, 0.93, 8.45, 63.13, 1.03, 'black'],
+    ['b', 8.35, 63.21, 0.93, 8.45, 63.31, 1.03, 'black'],
+    ['b', 8.5, 63.05, 0.93, 8.55, 63.35, 0.96, 'white'],
+    ['b', 10.65, 59.25, 2.5, 11.15, 59.33, 3.0, 'brass'],
+    ['b', 10.69, 59.33, 2.54, 11.11, 59.35, 2.96, 'white'],
+    ['b', 10.89, 59.35, 2.75, 10.91, 59.37, 2.92, 'black'],
+    ['b', 10.9, 59.35, 2.73, 11.02, 59.37, 2.76, 'black']]);
+  T['teachers-study-2-southwest'].lights = (T['teachers-study-2-southwest'].lights || []).concat([[10.1, 59.5, 0.5, 16757862, 1.1, 8], [9.3, 59.55, 2.33, 16757862, 1.1, 8], [11.1, 71.45, 2.33, 16757862, 1.1, 8], [13.0, 71.55, 1.05, 16757862, 1.1, 8]]);
+})(window.SHELL_W5A.things);
+/* HAND2 end teachers-study-2-southwest */
+/* HAND2 begin teachers-study-2-west */
+/* Interiors req 2423 sec 11: a study, a tutor of the stars: charts, a telescope on a stand; req 2532 adds hangings, a dado and a thing to read or pull; req 2543 adds a brass orrery whose planets turn by themselves, a coat-peg rail, an ink cupboard, a clock and a rolled rug; sited by tools/architect-hand-rooms-1101.py, plain stand-ins (Objects draw the real ones) */
+(function (T) {
+  T['teachers-study-2-west'] = T['teachers-study-2-west'] || { items: [] };
+  T['teachers-study-2-west'].items = T['teachers-study-2-west'].items.concat([
+    ['b', 6.7, 18.25, 0, 8.5, 18.75, 1.3, 'stone'],
+    ['b', 7.1, 18.25, 0.1, 8.1, 18.77, 1.0, 'black'],
+    ['b', 7.35, 18.35, 0.12, 7.85, 18.65, 0.45, 'flame'],
+    ['b', 6.9, 18.75, 0, 8.3, 18.95, 0.18, 'iron'],
+    ['b', 6.55, 18.25, 1.3, 8.65, 18.9, 1.38, 'oak'],
+    ['b', 2.34, 18.25, 1.9, 2.46, 18.29, 2.3, 'iron'],
+    ['b', 2.375, 18.29, 2.25, 2.425, 18.55, 2.3, 'iron'],
+    ['b', 2.34, 18.51, 2.0, 2.46, 18.59, 2.28, 'flame'],
+    ['b', 6.14, 28.38, 1.9, 6.26, 28.42, 2.3, 'iron'],
+    ['b', 6.175, 28.12, 2.25, 6.225, 28.38, 2.3, 'iron'],
+    ['b', 6.14, 28.08, 2.0, 6.26, 28.16, 2.28, 'flame'],
+    ['b', 0.25, 21.5, 0, 1.05, 23.1, 0.78, 'oak'],
+    ['b', 0.4, 22.65, 0.78, 0.5, 22.75, 1.0, 'flame'],
+    ['b', 11.75, 20.0, 0, 12.15, 21.6, 0.8, 'oak'],
+    ['b', 11.93, 20.0, 0.8, 12.15, 21.6, 2.0, 'wood'],
+    ['b', 11.85, 20.174, 1.1, 11.93, 20.274, 1.4, 'amber'],
+    ['b', 11.85, 20.558, 1.5, 11.93, 20.658, 1.8, 'amber'],
+    ['b', 11.85, 20.942, 1.1, 11.93, 21.042, 1.4, 'amber'],
+    ['b', 11.85, 21.326, 1.5, 11.93, 21.426, 1.8, 'amber'],
+    ['b', 0.25, 25.6, 0, 0.65, 27.2, 0.8, 'oak'],
+    ['b', 0.25, 25.6, 0.8, 0.47, 27.2, 2.0, 'wood'],
+    ['b', 0.47, 25.774, 1.1, 0.55, 25.874, 1.4, 'amber'],
+    ['b', 0.47, 26.158, 1.5, 0.55, 26.258, 1.8, 'amber'],
+    ['b', 0.47, 26.542, 1.1, 0.55, 26.642, 1.4, 'amber'],
+    ['b', 0.47, 26.926, 1.5, 0.55, 27.026, 1.8, 'amber'],
+    ['b', 9.65, 18.25, 1.5, 10.35, 18.33, 2.4, 'gilt'],
+    ['b', 9.7, 18.33, 1.55, 10.3, 18.34, 2.35, 'black'],
+    ['b', 1.72, 18.25, 1.57, 2.28, 18.33, 2.03, 'wood'],
+    ['b', 1.75, 18.33, 1.6, 2.25, 18.35, 2.0, 'linen'],
+    ['b', 1.855, 18.35, 1.72, 1.895, 18.36, 1.88, 'black'],
+    ['b', 1.98, 18.35, 1.72, 2.02, 18.36, 1.88, 'black'],
+    ['b', 2.105, 18.35, 1.72, 2.145, 18.36, 1.88, 'black'],
+    ['b', 12.07, 25.3, 3.1, 12.15, 26.5, 4.1, 'dust'],
+    ['b', 12.06, 25.4, 3.22, 12.07, 26.4, 3.98, 'stone'],
+    ['b', 12.06, 25.25, 4.1, 12.15, 26.55, 4.14, 'wood'],
+    ['b', 2.25, 27.92, 0, 2.95, 28.42, 0.7, 'oak'],
+    ['b', 2.35, 28.02, 0.7, 2.85, 28.32, 0.72, 'tin'],
+    ['b', 2.54, 28.17, 0.72, 2.66, 28.27, 0.85, 'white'],
+    ['b', 8.8, 27.97, 0, 10.4, 28.42, 2.1, 'oak'],
+    ['b', 8.9, 27.95, 0.7, 10.3, 27.97, 2.0, 'glass'],
+    ['b', 4.17, 28.34, 1.57, 5.83, 28.42, 2.83, 'wood'],
+    ['b', 4.2, 28.32, 1.6, 5.8, 28.34, 2.8, 'petals'],
+    ['b', 4.58, 28.31, 1.72, 4.62, 28.32, 2.68, 'black'],
+    ['b', 4.98, 28.31, 1.72, 5.02, 28.32, 2.68, 'black'],
+    ['b', 5.38, 28.31, 1.72, 5.42, 28.32, 2.68, 'black'],
+    ['b', 11.65, 21.95, 0, 12.15, 22.45, 0.9, 'oak'],
+    ['b', 11.7, 21.975, 0.9, 12.1, 22.425, 1.35, 'gilt'],
+    ['b', 8.8, 18.25, 0, 9.4, 18.85, 0.9, 'oak'],
+    ['b', 9.0, 18.45, 0.9, 9.2, 18.65, 1.1, 'gilt'],
+    ['b', 8.58, 18.53, 1.0, 9.12, 18.57, 1.04, 'gilt'],
+    ['b', 8.55, 18.49, 1.02, 8.65, 18.61, 1.12, 'blue'],
+    ['b', 8.8, 18.53, 1.1, 9.12, 18.57, 1.14, 'gilt'],
+    ['b', 8.77, 18.49, 1.12, 8.87, 18.61, 1.22, 'ruby'],
+    ['b', 9.08, 18.53, 0.98, 9.42, 18.57, 1.02, 'gilt'],
+    ['b', 9.35, 18.49, 1.0, 9.45, 18.61, 1.1, 'white'],
+    ['b', 9.08, 18.53, 1.18, 9.62, 18.57, 1.22, 'gilt'],
+    ['b', 9.55, 18.49, 1.2, 9.65, 18.61, 1.3, 'green'],
+    ['b', 9.08, 18.53, 1.28, 9.24, 18.57, 1.32, 'gilt'],
+    ['b', 9.17, 18.49, 1.3, 9.27, 18.61, 1.4, 'tan'],
+    ['b', 1.05, 28.36, 1.55, 2.35, 28.42, 1.62, 'oak'],
+    ['b', 1.2, 28.32, 1.5, 1.24, 28.36, 1.6, 'iron'],
+    ['b', 1.09, 28.22, 0.7, 1.35, 28.36, 1.5, 'dark'],
+    ['b', 1.52, 28.32, 1.5, 1.56, 28.36, 1.6, 'iron'],
+    ['b', 1.41, 28.22, 0.7, 1.67, 28.36, 1.5, 'dark'],
+    ['b', 1.84, 28.32, 1.5, 1.88, 28.36, 1.6, 'iron'],
+    ['b', 2.16, 28.32, 1.5, 2.2, 28.36, 1.6, 'iron'],
+    ['b', 2.05, 28.22, 0.7, 2.31, 28.36, 1.5, 'dark'],
+    ['b', 2.11, 28.26, 0.9, 2.25, 28.36, 1.5, 'ruby'],
+    ['b', 10.5, 27.97, 0, 11.5, 28.42, 0.9, 'oak'],
+    ['b', 10.55, 28.02, 0.9, 11.45, 28.37, 0.93, 'black'],
+    ['b', 10.59, 28.22, 0.93, 10.69, 28.32, 1.03, 'black'],
+    ['b', 10.77, 28.22, 0.93, 10.87, 28.32, 1.03, 'black'],
+    ['b', 10.95, 28.22, 0.93, 11.05, 28.32, 1.03, 'black'],
+    ['b', 11.13, 28.22, 0.93, 11.23, 28.32, 1.03, 'black'],
+    ['b', 11.31, 28.22, 0.93, 11.41, 28.32, 1.03, 'black'],
+    ['b', 11.15, 28.12, 0.93, 11.45, 28.17, 0.96, 'white'],
+    ['b', 12.07, 21.95, 2.5, 12.15, 22.45, 3.0, 'brass'],
+    ['b', 12.05, 21.99, 2.54, 12.07, 22.41, 2.96, 'white'],
+    ['b', 12.03, 22.19, 2.75, 12.05, 22.21, 2.92, 'black'],
+    ['b', 12.03, 22.2, 2.73, 12.05, 22.32, 2.76, 'black'],
+    ['b', 0.25, 19.8, 0, 0.6, 21.4, 0.35, 'ruby'],
+    ['b', 0.25, 20.07, 0, 0.62, 20.13, 0.36, 'tan'],
+    ['b', 0.25, 21.07, 0, 0.62, 21.13, 0.36, 'tan']]);
+  T['teachers-study-2-west'].lights = (T['teachers-study-2-west'].lights || []).concat([[7.6, 18.5, 0.5, 16757862, 1.1, 8], [2.4, 18.55, 2.33, 16757862, 1.1, 8], [6.2, 28.12, 2.33, 16757862, 1.1, 8], [0.45, 22.7, 1.05, 16757862, 1.1, 8]]);
+})(window.SHELL_W5A.things);
+/* HAND2 end teachers-study-2-west */
+/* HAND2 begin drum-back-study-2 */
+/* Interiors req 2423 sec 11: a study, a quiet master of the drum back: maps and a clock; req 2532 adds hangings, a dado and a thing to read or pull; req 2543 card 35 (1 Nov, the 435th): plan table with a self-pouring teapot, banner rack, coat stand, armchair; sited by tools/architect-hand-rooms-1101.py, plain stand-ins (Objects draw the real ones) */
+(function (T) {
+  T['drum-back-study-2'] = T['drum-back-study-2'] || { items: [] };
+  T['drum-back-study-2'].items = T['drum-back-study-2'].items.concat([
+    ['b', 37.84, 8.95, 1.9, 37.96, 8.99, 2.3, 'iron'],
+    ['b', 37.875, 8.99, 2.25, 37.925, 9.25, 2.3, 'iron'],
+    ['b', 37.84, 9.21, 2.0, 37.96, 9.29, 2.28, 'flame'],
+    ['b', 44.84, 8.95, 1.9, 44.96, 8.99, 2.3, 'iron'],
+    ['b', 44.875, 8.99, 2.25, 44.925, 9.25, 2.3, 'iron'],
+    ['b', 44.84, 9.21, 2.0, 44.96, 9.29, 2.28, 'flame'],
+    ['b', 35.55, 9.0, 0, 36.35, 10.6, 0.78, 'oak'],
+    ['b', 35.7, 10.15, 0.78, 35.8, 10.25, 1.0, 'flame'],
+    ['b', 48.45, 9.0, 0, 48.85, 10.6, 0.8, 'oak'],
+    ['b', 48.63, 9.0, 0.8, 48.85, 10.6, 2.0, 'wood'],
+    ['b', 48.55, 9.174, 1.1, 48.63, 9.274, 1.4, 'amber'],
+    ['b', 48.55, 9.558, 1.5, 48.63, 9.658, 1.8, 'amber'],
+    ['b', 48.55, 9.942, 1.1, 48.63, 10.042, 1.4, 'amber'],
+    ['b', 48.55, 10.326, 1.5, 48.63, 10.426, 1.8, 'amber'],
+    ['b', 35.55, 12.4, 0, 35.95, 14.0, 0.8, 'oak'],
+    ['b', 35.55, 12.4, 0.8, 35.77, 14.0, 2.0, 'wood'],
+    ['b', 35.77, 12.574, 1.1, 35.85, 12.674, 1.4, 'amber'],
+    ['b', 35.77, 12.958, 1.5, 35.85, 13.058, 1.8, 'amber'],
+    ['b', 35.77, 13.342, 1.1, 35.85, 13.442, 1.4, 'amber'],
+    ['b', 35.77, 13.726, 1.5, 35.85, 13.826, 1.8, 'amber'],
+    ['b', 46.15, 8.95, 1.5, 46.85, 9.03, 2.4, 'gilt'],
+    ['b', 46.2, 9.03, 1.55, 46.8, 9.04, 2.35, 'black'],
+    ['b', 39.22, 8.95, 1.57, 39.78, 9.03, 2.03, 'wood'],
+    ['b', 39.25, 9.03, 1.6, 39.75, 9.05, 2.0, 'linen'],
+    ['b', 39.355, 9.05, 1.72, 39.395, 9.06, 1.88, 'black'],
+    ['b', 39.48, 9.05, 1.72, 39.52, 9.06, 1.88, 'black'],
+    ['b', 39.605, 9.05, 1.72, 39.645, 9.06, 1.88, 'black'],
+    ['b', 48.77, 12.1, 3.1, 48.85, 13.3, 4.1, 'dust'],
+    ['b', 48.76, 12.2, 3.22, 48.77, 13.2, 3.98, 'stone'],
+    ['b', 48.76, 12.05, 4.1, 48.85, 13.35, 4.14, 'wood'],
+    ['b', 39.65, 13.5, 0, 40.35, 14.0, 0.7, 'oak'],
+    ['b', 39.75, 13.6, 0.7, 40.25, 13.9, 0.72, 'tin'],
+    ['b', 39.94, 13.75, 0.72, 40.06, 13.85, 0.85, 'white'],
+    ['b', 35.87, 8.95, 1.57, 37.73, 9.03, 2.93, 'wood'],
+    ['b', 35.9, 9.03, 1.6, 37.7, 9.05, 2.9, 'petals'],
+    ['b', 36.33, 9.05, 1.72, 36.37, 9.06, 2.78, 'black'],
+    ['b', 36.78, 9.05, 1.72, 36.82, 9.06, 2.78, 'black'],
+    ['b', 37.23, 9.05, 1.72, 37.27, 9.06, 2.78, 'black'],
+    ['b', 47.85, 10.15, 0, 48.35, 10.65, 0.9, 'oak'],
+    ['b', 47.9, 10.175, 0.9, 48.3, 10.625, 1.35, 'gilt'],
+    ['b', 41.04, 11.5, 0, 41.12, 11.56, 0.82, 'oak'],
+    ['b', 41.04, 10.64, 0, 41.12, 10.7, 0.82, 'oak'],
+    ['b', 43.28, 11.5, 0, 43.36, 11.56, 0.82, 'oak'],
+    ['b', 43.28, 10.64, 0, 43.36, 10.7, 0.82, 'oak'],
+    ['b', 41.0, 10.6, 0.82, 43.4, 11.6, 0.86, 'oak'],
+    ['b', 41.15, 10.7, 0.86, 42.85, 11.5, 0.87, 'linen'],
+    ['b', 41.55, 11.0, 0.87, 42.45, 11.3, 0.875, 'ruby'],
+    ['b', 41.17, 11.4, 0.87, 41.23, 11.46, 0.93, 'brass'],
+    ['b', 42.77, 11.4, 0.87, 42.83, 11.46, 0.93, 'brass'],
+    ['b', 41.17, 10.7, 0.87, 41.23, 10.76, 0.93, 'brass'],
+    ['b', 42.77, 10.7, 0.87, 42.83, 10.76, 0.93, 'brass'],
+    ['b', 42.6, 11.05, 0.87, 42.7, 11.15, 0.95, 'black'],
+    ['b', 42.95, 11.05, 0.86, 43.25, 11.35, 0.87, 'tin'],
+    ['b', 43.06, 11.16, 0.87, 43.24, 11.34, 1.0, 'copper'],
+    ['b', 43.12, 11.08, 1.0, 43.18, 11.22, 1.04, 'copper'],
+    ['b', 43.14, 11.08, 0.93, 43.16, 11.1, 1.0, 'amber'],
+    ['b', 43.1, 11.03, 0.87, 43.2, 11.13, 0.93, 'white'],
+    ['b', 39.8, 8.97, 0, 40.4, 9.27, 0.1, 'oak'],
+    ['b', 39.87, 9.08, 0.1, 39.93, 9.16, 2.0, 'oak'],
+    ['b', 39.855, 9.07, 1.2, 39.945, 9.17, 1.9, 'ruby'],
+    ['b', 39.87, 9.08, 2.0, 39.93, 9.16, 2.08, 'gilt'],
+    ['b', 40.0, 9.08, 0.1, 40.06, 9.16, 2.0, 'oak'],
+    ['b', 39.985, 9.07, 1.2, 40.075, 9.17, 1.9, 'green'],
+    ['b', 40.0, 9.08, 2.0, 40.06, 9.16, 2.08, 'gilt'],
+    ['b', 40.14, 9.08, 0.1, 40.2, 9.16, 2.0, 'oak'],
+    ['b', 40.125, 9.07, 1.2, 40.215, 9.17, 1.9, 'tartan'],
+    ['b', 40.14, 9.08, 2.0, 40.2, 9.16, 2.08, 'gilt'],
+    ['b', 40.27, 9.08, 0.1, 40.33, 9.16, 2.0, 'oak'],
+    ['b', 40.255, 9.07, 1.2, 40.345, 9.17, 1.9, 'ruby'],
+    ['b', 40.27, 9.08, 2.0, 40.33, 9.16, 2.08, 'gilt'],
+    ['b', 40.4, 13.6, 0, 40.8, 14.0, 0.08, 'oak'],
+    ['b', 40.55, 13.75, 0.08, 40.65, 13.85, 1.9, 'oak'],
+    ['b', 40.55, 13.62, 1.84, 40.65, 13.98, 1.9, 'oak'],
+    ['b', 40.325, 13.7, 0.8, 40.875, 13.9, 1.8, 'black'],
+    ['b', 40.45, 13.72, 1.9, 40.75, 13.88, 2.0, 'black'],
+    ['b', 43.475, 13.2, 0, 44.325, 14.0, 0.45, 'leather'],
+    ['b', 43.475, 13.8, 0.45, 44.325, 14.0, 1.1, 'leather'],
+    ['b', 43.47, 13.2, 0.45, 43.57, 13.8, 0.65, 'leather'],
+    ['b', 44.23, 13.2, 0.45, 44.33, 13.8, 0.65, 'leather'],
+    ['b', 43.65, 12.65, 0, 44.15, 13.05, 0.3, 'leather'],
+    ['b', 44.6, 13.7, 0, 44.8, 13.9, 0.06, 'oak'],
+    ['b', 44.67, 13.77, 0.06, 44.73, 13.83, 1.5, 'brass'],
+    ['b', 44.58, 13.68, 1.5, 44.82, 13.92, 1.7, 'linen']]);
+  T['drum-back-study-2'].lights = (T['drum-back-study-2'].lights || []).concat([[37.9, 9.25, 2.33, 16757862, 1.1, 8], [44.9, 9.25, 2.33, 16757862, 1.1, 8], [35.75, 10.2, 1.05, 16757862, 1.1, 8]]);
+})(window.SHELL_W5A.things);
+/* HAND2 end drum-back-study-2 */
+/* HAND2 begin teachers-study-3-east */
+/* Interiors req 2423 sec 11: a study, a long thin study: books and a kettle; sited by tools/architect-hand-rooms-1101.py, plain stand-ins (Objects draw the real ones) */
+(function (T) {
+  T['teachers-study-3-east'] = T['teachers-study-3-east'] || { items: [] };
+  T['teachers-study-3-east'].items = T['teachers-study-3-east'].items.concat([
+    ['b', 152.4, 18.25, 0, 154.2, 18.75, 1.3, 'stone'],
+    ['b', 152.8, 18.25, 0.1, 153.8, 18.77, 1.0, 'black'],
+    ['b', 153.05, 18.35, 0.12, 153.55, 18.65, 0.45, 'flame'],
+    ['b', 152.6, 18.75, 0, 154.0, 18.95, 0.18, 'iron'],
+    ['b', 152.25, 18.25, 1.3, 154.35, 18.9, 1.38, 'oak'],
+    ['b', 149.64, 22.21, 1.9, 149.76, 22.25, 2.3, 'iron'],
+    ['b', 149.675, 21.95, 2.25, 149.725, 22.21, 2.3, 'iron'],
+    ['b', 149.64, 21.91, 2.0, 149.76, 21.99, 2.28, 'flame'],
+    ['b', 158.14, 22.21, 1.9, 158.26, 22.25, 2.3, 'iron'],
+    ['b', 158.175, 21.95, 2.25, 158.225, 22.21, 2.3, 'iron'],
+    ['b', 158.14, 21.91, 2.0, 158.26, 21.99, 2.28, 'flame'],
+    ['b', 153.1, 21.45, 0, 154.7, 22.25, 0.78, 'oak'],
+    ['b', 154.25, 22.0, 0.78, 154.35, 22.1, 1.0, 'flame'],
+    ['b', 148.5, 18.25, 0, 150.1, 18.65, 0.8, 'oak'],
+    ['b', 148.5, 18.25, 0.8, 150.1, 18.47, 2.0, 'wood'],
+    ['b', 148.674, 18.47, 1.1, 148.774, 18.55, 1.4, 'amber'],
+    ['b', 149.058, 18.47, 1.5, 149.158, 18.55, 1.8, 'amber'],
+    ['b', 149.442, 18.47, 1.1, 149.542, 18.55, 1.4, 'amber'],
+    ['b', 149.826, 18.47, 1.5, 149.926, 18.55, 1.8, 'amber'],
+    ['b', 156.6, 18.25, 0, 158.2, 18.65, 0.8, 'oak'],
+    ['b', 156.6, 18.25, 0.8, 158.2, 18.47, 2.0, 'wood'],
+    ['b', 156.774, 18.47, 1.1, 156.874, 18.55, 1.4, 'amber'],
+    ['b', 157.158, 18.47, 1.5, 157.258, 18.55, 1.8, 'amber'],
+    ['b', 157.542, 18.47, 1.1, 157.642, 18.55, 1.4, 'amber'],
+    ['b', 157.926, 18.47, 1.5, 158.026, 18.55, 1.8, 'amber'],
+    ['b', 155.05, 18.25, 1.5, 155.75, 18.33, 2.4, 'gilt'],
+    ['b', 155.1, 18.33, 1.55, 155.7, 18.34, 2.35, 'black'],
+    ['b', 151.22, 18.25, 1.57, 151.78, 18.33, 2.03, 'wood'],
+    ['b', 151.25, 18.33, 1.6, 151.75, 18.35, 2.0, 'linen'],
+    ['b', 151.355, 18.35, 1.72, 151.395, 18.36, 1.88, 'black'],
+    ['b', 151.48, 18.35, 1.72, 151.52, 18.36, 1.88, 'black'],
+    ['b', 151.605, 18.35, 1.72, 151.645, 18.36, 1.88, 'black'],
+    ['b', 151.3, 22.17, 3.1, 152.5, 22.25, 4.1, 'dust'],
+    ['b', 151.4, 22.16, 3.22, 152.4, 22.17, 3.98, 'stone'],
+    ['b', 151.25, 22.16, 4.1, 152.55, 22.25, 4.14, 'wood'],
+    ['b', 155.75, 21.75, 0, 156.45, 22.25, 0.7, 'oak'],
+    ['b', 155.85, 21.85, 0.7, 156.35, 22.15, 0.72, 'tin'],
+    ['b', 156.04, 22.0, 0.72, 156.16, 22.1, 0.85, 'white'],
+    ['b', 158.4, 18.25, 0, 160.0, 18.7, 2.1, 'oak'],
+    ['b', 158.5, 18.7, 0.7, 159.9, 18.72, 2.0, 'glass']]);
+  T['teachers-study-3-east'].lights = (T['teachers-study-3-east'].lights || []).concat([[153.3, 18.5, 0.5, 16757862, 1.1, 8], [149.7, 21.95, 2.33, 16757862, 1.1, 8], [158.2, 21.95, 2.33, 16757862, 1.1, 8], [154.3, 22.05, 1.05, 16757862, 1.1, 8]]);
+})(window.SHELL_W5A.things);
+/* HAND2 end teachers-study-3-east */
+/* HAND2 begin teachers-study-3-lake-east */
+/* Interiors req 2423 sec 11: a study, a master of the lake side: charts of the water; sited by tools/architect-hand-rooms-1101.py, plain stand-ins (Objects draw the real ones) */
+(function (T) {
+  T['teachers-study-3-lake-east'] = T['teachers-study-3-lake-east'] || { items: [] };
+  T['teachers-study-3-lake-east'].items = T['teachers-study-3-lake-east'].items.concat([
+    ['b', 148.48, 3.85, 0, 150.28, 4.35, 1.3, 'stone'],
+    ['b', 148.88, 3.85, 0.1, 149.88, 4.37, 1.0, 'black'],
+    ['b', 149.13, 3.95, 0.12, 149.63, 4.25, 0.45, 'flame'],
+    ['b', 148.68, 4.35, 0, 150.08, 4.55, 0.18, 'iron'],
+    ['b', 148.33, 3.85, 1.3, 150.43, 4.5, 1.38, 'oak'],
+    ['b', 143.62, 3.85, 1.9, 143.74, 3.89, 2.3, 'iron'],
+    ['b', 143.655, 3.89, 2.25, 143.705, 4.15, 2.3, 'iron'],
+    ['b', 143.62, 4.11, 2.0, 143.74, 4.19, 2.28, 'flame'],
+    ['b', 147.12, 17.71, 1.9, 147.24, 17.75, 2.3, 'iron'],
+    ['b', 147.155, 17.45, 2.25, 147.205, 17.71, 2.3, 'iron'],
+    ['b', 147.12, 17.41, 2.0, 147.24, 17.49, 2.28, 'flame'],
+    ['b', 141.63, 8.6, 0, 142.43, 10.2, 0.78, 'oak'],
+    ['b', 141.78, 9.75, 0.78, 141.88, 9.85, 1.0, 'flame'],
+    ['b', 152.85, 6.5, 0, 153.25, 8.1, 0.8, 'oak'],
+    ['b', 153.03, 6.5, 0.8, 153.25, 8.1, 2.0, 'wood'],
+    ['b', 152.95, 6.674, 1.1, 153.03, 6.774, 1.4, 'amber'],
+    ['b', 152.95, 7.058, 1.5, 153.03, 7.158, 1.8, 'amber'],
+    ['b', 152.95, 7.442, 1.1, 153.03, 7.542, 1.4, 'amber'],
+    ['b', 152.95, 7.826, 1.5, 153.03, 7.926, 1.8, 'amber'],
+    ['b', 141.63, 14.2, 0, 142.03, 15.8, 0.8, 'oak'],
+    ['b', 141.63, 14.2, 0.8, 141.85, 15.8, 2.0, 'wood'],
+    ['b', 141.85, 14.374, 1.1, 141.93, 14.474, 1.4, 'amber'],
+    ['b', 141.85, 14.758, 1.5, 141.93, 14.858, 1.8, 'amber'],
+    ['b', 141.85, 15.142, 1.1, 141.93, 15.242, 1.4, 'amber'],
+    ['b', 141.85, 15.526, 1.5, 141.93, 15.626, 1.8, 'amber'],
+    ['b', 150.83, 3.85, 1.5, 151.53, 3.93, 2.4, 'gilt'],
+    ['b', 150.88, 3.93, 1.55, 151.48, 3.94, 2.35, 'black'],
+    ['b', 144.8, 3.85, 1.57, 145.36, 3.93, 2.03, 'wood'],
+    ['b', 144.83, 3.93, 1.6, 145.33, 3.95, 2.0, 'linen'],
+    ['b', 144.935, 3.95, 1.72, 144.975, 3.96, 1.88, 'black'],
+    ['b', 145.06, 3.95, 1.72, 145.1, 3.96, 1.88, 'black'],
+    ['b', 145.185, 3.95, 1.72, 145.225, 3.96, 1.88, 'black'],
+    ['b', 153.17, 13.7, 3.1, 153.25, 14.9, 4.1, 'dust'],
+    ['b', 153.16, 13.8, 3.22, 153.17, 14.8, 3.98, 'stone'],
+    ['b', 153.16, 13.65, 4.1, 153.25, 14.95, 4.14, 'wood'],
+    ['b', 143.63, 17.25, 0, 144.33, 17.75, 0.7, 'oak'],
+    ['b', 143.73, 17.35, 0.7, 144.23, 17.65, 0.72, 'tin'],
+    ['b', 143.92, 17.5, 0.72, 144.04, 17.6, 0.85, 'white'],
+    ['b', 151.28, 17.3, 0, 152.88, 17.75, 2.1, 'oak'],
+    ['b', 151.38, 17.28, 0.7, 152.78, 17.3, 2.0, 'glass'],
+    ['b', 143.35, 17.67, 1.57, 145.21, 17.75, 2.93, 'wood'],
+    ['b', 143.38, 17.65, 1.6, 145.18, 17.67, 2.9, 'petals'],
+    ['b', 143.81, 17.64, 1.72, 143.85, 17.65, 2.78, 'black'],
+    ['b', 144.26, 17.64, 1.72, 144.3, 17.65, 2.78, 'black'],
+    ['b', 144.71, 17.64, 1.72, 144.75, 17.65, 2.78, 'black']]);
+  T['teachers-study-3-lake-east'].lights = (T['teachers-study-3-lake-east'].lights || []).concat([[149.38, 4.1, 0.5, 16757862, 1.1, 8], [143.68, 4.15, 2.33, 16757862, 1.1, 8], [147.18, 17.45, 2.33, 16757862, 1.1, 8], [141.83, 9.8, 1.05, 16757862, 1.1, 8]]);
+})(window.SHELL_W5A.things);
+/* HAND2 end teachers-study-3-lake-east */
+/* HAND2 begin teachers-study-3-north */
+/* Interiors req 2423 sec 11: a study, a master of the north range: a tin of biscuits, a tray; sited by tools/architect-hand-rooms-1101.py, plain stand-ins (Objects draw the real ones) */
+(function (T) {
+  T['teachers-study-3-north'] = T['teachers-study-3-north'] || { items: [] };
+  T['teachers-study-3-north'].items = T['teachers-study-3-north'].items.concat([
+    ['b', 103.6, 59.25, 0, 105.4, 59.75, 1.3, 'stone'],
+    ['b', 104.0, 59.25, 0.1, 105.0, 59.77, 1.0, 'black'],
+    ['b', 104.25, 59.35, 0.12, 104.75, 59.65, 0.45, 'flame'],
+    ['b', 103.8, 59.75, 0, 105.2, 59.95, 0.18, 'iron'],
+    ['b', 103.45, 59.25, 1.3, 105.55, 59.9, 1.38, 'oak'],
+    ['b', 102.64, 59.25, 1.9, 102.76, 59.29, 2.3, 'iron'],
+    ['b', 102.675, 59.29, 2.25, 102.725, 59.55, 2.3, 'iron'],
+    ['b', 102.64, 59.51, 2.0, 102.76, 59.59, 2.28, 'flame'],
+    ['b', 105.84, 71.71, 1.9, 105.96, 71.75, 2.3, 'iron'],
+    ['b', 105.875, 71.45, 2.25, 105.925, 71.71, 2.3, 'iron'],
+    ['b', 105.84, 71.41, 2.0, 105.96, 71.49, 2.28, 'flame'],
+    ['b', 100.55, 63.4, 0, 101.35, 65.0, 0.78, 'oak'],
+    ['b', 100.7, 64.55, 0.78, 100.8, 64.65, 1.0, 'flame'],
+    ['b', 111.95, 61.6, 0, 112.35, 63.2, 0.8, 'oak'],
+    ['b', 112.13, 61.6, 0.8, 112.35, 63.2, 2.0, 'wood'],
+    ['b', 112.05, 61.774, 1.1, 112.13, 61.874, 1.4, 'amber'],
+    ['b', 112.05, 62.158, 1.5, 112.13, 62.258, 1.8, 'amber'],
+    ['b', 112.05, 62.542, 1.1, 112.13, 62.642, 1.4, 'amber'],
+    ['b', 112.05, 62.926, 1.5, 112.13, 63.026, 1.8, 'amber'],
+    ['b', 100.55, 68.4, 0, 100.95, 70.0, 0.8, 'oak'],
+    ['b', 100.55, 68.4, 0.8, 100.77, 70.0, 2.0, 'wood'],
+    ['b', 100.77, 68.574, 1.1, 100.85, 68.674, 1.4, 'amber'],
+    ['b', 100.77, 68.958, 1.5, 100.85, 69.058, 1.8, 'amber'],
+    ['b', 100.77, 69.342, 1.1, 100.85, 69.442, 1.4, 'amber'],
+    ['b', 100.77, 69.726, 1.5, 100.85, 69.826, 1.8, 'amber'],
+    ['b', 109.85, 59.25, 1.5, 110.55, 59.33, 2.4, 'gilt'],
+    ['b', 109.9, 59.33, 1.55, 110.5, 59.34, 2.35, 'black'],
+    ['b', 103.82, 59.25, 1.57, 104.38, 59.33, 2.03, 'wood'],
+    ['b', 103.85, 59.33, 1.6, 104.35, 59.35, 2.0, 'linen'],
+    ['b', 103.955, 59.35, 1.72, 103.995, 59.36, 1.88, 'black'],
+    ['b', 104.08, 59.35, 1.72, 104.12, 59.36, 1.88, 'black'],
+    ['b', 104.205, 59.35, 1.72, 104.245, 59.36, 1.88, 'black'],
+    ['b', 112.27, 68.0, 3.1, 112.35, 69.2, 4.1, 'dust'],
+    ['b', 112.26, 68.1, 3.22, 112.27, 69.1, 3.98, 'stone'],
+    ['b', 112.26, 67.95, 4.1, 112.35, 69.25, 4.14, 'wood'],
+    ['b', 104.85, 71.25, 0, 105.55, 71.75, 0.7, 'oak'],
+    ['b', 104.95, 71.35, 0.7, 105.45, 71.65, 0.72, 'tin'],
+    ['b', 105.14, 71.5, 0.72, 105.26, 71.6, 0.85, 'white'],
+    ['b', 108.6, 71.3, 0, 110.2, 71.75, 2.1, 'oak'],
+    ['b', 108.7, 71.28, 0.7, 110.1, 71.3, 2.0, 'glass'],
+    ['b', 111.9, 65.275, 0, 112.35, 65.725, 0.8, 'oak'],
+    ['b', 111.95, 65.3, 0.8, 112.3, 65.7, 1.15, 'glass']]);
+  T['teachers-study-3-north'].lights = (T['teachers-study-3-north'].lights || []).concat([[104.5, 59.5, 0.5, 16757862, 1.1, 8], [102.7, 59.55, 2.33, 16757862, 1.1, 8], [105.9, 71.45, 2.33, 16757862, 1.1, 8], [100.75, 64.6, 1.05, 16757862, 1.1, 8]]);
+})(window.SHELL_W5A.things);
+/* HAND2 end teachers-study-3-north */
+/* HAND2 begin second-years-study-room */
+/* Interiors req 2423 sec 11: study room, long tables with brass lamps, hearth, timetable and rules boards, reference shelf, globe, small essay blackboard; req 2532 adds hangings, a dado and a thing to read or pull; req 2543 card 36 (1 Nov, the 436th): coat pegs, ink cupboard, clock, reader trolley, self-topping ink urn, map stand, hearth rug; req 2532 adds hangings, a dado and a thing to read or pull; req 2543 cards 36 and 37 after Godric 4.27 pm (1 Nov, the 436th): pendant lamps, sconces, framed papers on every wall, window seats, standard lamps; sited by tools/architect-hand-rooms-1101.py, plain stand-ins (Objects draw the real ones) */
+(function (T) {
+  T['second-years-study-room'] = T['second-years-study-room'] || { items: [] };
+  T['second-years-study-room'].items = T['second-years-study-room'].items.concat([
+    ['b', 127.84, 59.25, 1.9, 127.96, 59.29, 2.3, 'iron'],
+    ['b', 127.875, 59.29, 2.25, 127.925, 59.55, 2.3, 'iron'],
+    ['b', 127.84, 59.51, 2.0, 127.96, 59.59, 2.28, 'flame'],
+    ['b', 138.24, 59.25, 1.9, 138.36, 59.29, 2.3, 'iron'],
+    ['b', 138.275, 59.29, 2.25, 138.325, 59.55, 2.3, 'iron'],
+    ['b', 138.24, 59.51, 2.0, 138.36, 59.59, 2.28, 'flame'],
+    ['b', 133.44, 59.25, 1.9, 133.56, 59.29, 2.3, 'iron'],
+    ['b', 133.475, 59.29, 2.25, 133.525, 59.55, 2.3, 'iron'],
+    ['b', 133.44, 59.51, 2.0, 133.56, 59.59, 2.28, 'flame'],
+    ['b', 126.95, 61.7, 0, 127.85, 64.3, 0.78, 'oak'],
+    ['b', 139.45, 61.7, 0, 140.35, 64.3, 0.78, 'oak'],
+    ['b', 127.07, 71.67, 1.57, 128.33, 71.75, 2.53, 'wood'],
+    ['b', 127.1, 71.65, 1.6, 128.3, 71.67, 2.5, 'linen'],
+    ['b', 127.38, 71.64, 1.72, 127.42, 71.65, 2.38, 'black'],
+    ['b', 127.68, 71.64, 1.72, 127.72, 71.65, 2.38, 'black'],
+    ['b', 127.98, 71.64, 1.72, 128.02, 71.65, 2.38, 'black'],
+    ['b', 138.7, 71.67, 1.3, 140.1, 71.75, 2.3, 'gilt'],
+    ['b', 138.75, 71.66, 1.35, 140.05, 71.67, 2.25, 'black'],
+    ['b', 132.45, 59.25, 1.5, 133.15, 59.33, 2.4, 'gilt'],
+    ['b', 132.5, 59.33, 1.55, 133.1, 59.34, 2.35, 'black'],
+    ['b', 139.95, 69.7, 0, 140.35, 71.3, 0.8, 'oak'],
+    ['b', 140.13, 69.7, 0.8, 140.35, 71.3, 2.0, 'wood'],
+    ['b', 140.05, 69.874, 1.1, 140.13, 69.974, 1.4, 'amber'],
+    ['b', 140.05, 70.258, 1.5, 140.13, 70.358, 1.8, 'amber'],
+    ['b', 140.05, 70.642, 1.1, 140.13, 70.742, 1.4, 'amber'],
+    ['b', 140.05, 71.026, 1.5, 140.13, 71.126, 1.8, 'amber'],
+    ['b', 140.3, 67.0, 0.95, 140.35, 69.6, 2.1, 'wood'],
+    ['b', 140.27, 67.05, 1.0, 140.3, 69.55, 2.05, 'black'],
+    ['b', 140.15, 67.0, 0.9, 140.3, 69.6, 0.95, 'wood'],
+    ['b', 140.21, 67.44, 0.95, 140.27, 67.56, 0.97, 'white'],
+    ['b', 140.21, 67.6, 0.95, 140.27, 67.8, 0.96, 'dust'],
+    ['b', 137.75, 59.25, 0, 138.25, 59.75, 0.9, 'oak'],
+    ['b', 137.775, 59.3, 0.9, 138.225, 59.7, 1.35, 'gilt'],
+    ['b', 139.9, 60.0, 0, 140.35, 61.6, 2.1, 'oak'],
+    ['b', 139.88, 60.1, 0.7, 139.9, 61.5, 2.0, 'glass'],
+    ['b', 139.59, 66.27, 0, 139.65, 66.33, 0.74, 'oak'],
+    ['b', 138.99, 66.27, 0, 139.05, 66.33, 0.74, 'oak'],
+    ['b', 139.59, 66.87, 0, 139.65, 66.93, 0.74, 'oak'],
+    ['b', 138.99, 66.87, 0, 139.05, 66.93, 0.74, 'oak'],
+    ['b', 138.95, 66.2, 0.74, 139.75, 67.0, 0.78, 'oak'],
+    ['b', 139.05, 66.3, 0.78, 139.65, 66.9, 0.79, 'green'],
+    ['b', 139.49, 66.36, 0.79, 139.55, 66.42, 0.85, 'black'],
+    ['b', 139.19, 66.36, 0.79, 139.25, 66.42, 0.85, 'white'],
+    ['b', 139.49, 66.5, 0.79, 139.55, 66.56, 0.85, 'black'],
+    ['b', 139.19, 66.5, 0.79, 139.25, 66.56, 0.85, 'white'],
+    ['b', 139.49, 66.64, 0.79, 139.55, 66.7, 0.85, 'black'],
+    ['b', 139.19, 66.64, 0.79, 139.25, 66.7, 0.85, 'white'],
+    ['b', 139.49, 66.78, 0.79, 139.55, 66.84, 0.85, 'black'],
+    ['b', 139.19, 66.78, 0.79, 139.25, 66.84, 0.85, 'white'],
+    ['b', 139.85, 66.425, 0, 140.2, 66.775, 0.45, 'oak'],
+    ['b', 138.15, 66.425, 0, 138.5, 66.775, 0.45, 'oak'],
+    ['b', 132.5, 59.25, 0, 133.5, 59.7, 0.9, 'oak'],
+    ['b', 132.55, 59.3, 0.9, 133.45, 59.65, 0.93, 'black'],
+    ['b', 132.59, 59.35, 0.93, 132.69, 59.45, 1.03, 'black'],
+    ['b', 132.77, 59.35, 0.93, 132.87, 59.45, 1.03, 'black'],
+    ['b', 132.95, 59.35, 0.93, 133.05, 59.45, 1.03, 'black'],
+    ['b', 133.13, 59.35, 0.93, 133.23, 59.45, 1.03, 'black'],
+    ['b', 133.31, 59.35, 0.93, 133.41, 59.45, 1.03, 'black'],
+    ['b', 133.15, 59.5, 0.93, 133.45, 59.55, 0.96, 'white'],
+    ['b', 130.75, 59.25, 2.5, 131.25, 59.33, 3.0, 'brass'],
+    ['b', 130.79, 59.33, 2.54, 131.21, 59.35, 2.96, 'white'],
+    ['b', 130.99, 59.35, 2.75, 131.01, 59.37, 2.92, 'black'],
+    ['b', 131.0, 59.35, 2.73, 131.12, 59.37, 2.76, 'black'],
+    ['b', 127.45, 71.25, 0.1, 128.35, 71.75, 0.14, 'oak'],
+    ['b', 127.45, 71.25, 0.7, 128.35, 71.75, 0.74, 'oak'],
+    ['b', 127.48, 71.27, 0, 127.52, 71.73, 0.9, 'oak'],
+    ['b', 128.28, 71.27, 0, 128.32, 71.73, 0.9, 'oak'],
+    ['b', 127.495, 71.35, 0.14, 127.605, 71.65, 0.4, 'ruby'],
+    ['b', 127.645, 71.35, 0.14, 127.755, 71.65, 0.44, 'blue'],
+    ['b', 127.795, 71.35, 0.14, 127.905, 71.65, 0.4, 'green'],
+    ['b', 127.945, 71.35, 0.14, 128.055, 71.65, 0.44, 'amber'],
+    ['b', 128.095, 71.35, 0.14, 128.205, 71.65, 0.4, 'dust'],
+    ['b', 127.54, 71.35, 0.74, 127.66, 71.65, 1.0, 'green'],
+    ['b', 127.71, 71.35, 0.74, 127.83, 71.65, 1.0, 'ruby'],
+    ['b', 127.88, 71.35, 0.74, 128.0, 71.65, 1.0, 'dust'],
+    ['b', 128.05, 71.35, 0.74, 128.17, 71.65, 1.0, 'blue'],
+    ['b', 127.19, 59.3, 0, 127.25, 59.36, 1.0, 'iron'],
+    ['b', 127.75, 59.3, 0, 127.81, 59.36, 1.0, 'iron'],
+    ['b', 127.19, 59.3, 1.0, 127.81, 59.36, 1.06, 'iron'],
+    ['b', 127.25, 59.25, 1.06, 127.75, 59.65, 1.7, 'copper'],
+    ['b', 127.35, 59.35, 1.7, 127.65, 59.55, 1.78, 'copper'],
+    ['b', 127.46, 59.65, 1.12, 127.54, 59.75, 1.2, 'brass'],
+    ['b', 127.49, 59.69, 1.02, 127.51, 59.71, 1.12, 'black'],
+    ['b', 127.05, 59.55, 0.9, 127.95, 60.15, 0.94, 'oak'],
+    ['b', 127.15, 59.65, 0.94, 127.25, 59.75, 1.02, 'black'],
+    ['b', 127.3, 59.65, 0.94, 127.4, 59.75, 1.02, 'black'],
+    ['b', 127.45, 59.65, 0.94, 127.55, 59.75, 1.02, 'black'],
+    ['b', 127.6, 59.65, 0.94, 127.7, 59.75, 1.02, 'black'],
+    ['b', 126.95, 66.35, 0, 127.35, 67.05, 0.12, 'oak'],
+    ['b', 127.05, 66.4, 0.12, 127.13, 66.52, 0.9, 'linen'],
+    ['b', 127.04, 66.39, 0.7, 127.14, 66.53, 0.74, 'ruby'],
+    ['b', 127.05, 66.56, 0.12, 127.13, 66.68, 0.9, 'ruby'],
+    ['b', 127.04, 66.55, 0.7, 127.14, 66.69, 0.74, 'ruby'],
+    ['b', 127.05, 66.72, 0.12, 127.13, 66.84, 0.9, 'linen'],
+    ['b', 127.04, 66.71, 0.7, 127.14, 66.85, 0.74, 'ruby'],
+    ['b', 127.05, 66.88, 0.12, 127.13, 67.0, 0.9, 'green'],
+    ['b', 127.04, 66.87, 0.7, 127.14, 67.01, 0.74, 'ruby'],
+    ['b', 131.0, 66.15, 0, 136.4, 69.35, 0.02, 'gilt'],
+    ['b', 131.12, 66.27, 0.02, 136.28, 69.23, 0.035, 'ruby'],
+    ['b', 132.1, 66.85, 0.035, 135.3, 68.65, 0.05, 'blue'],
+    ['b', 133.0, 67.35, 0.05, 134.4, 68.15, 0.065, 'gilt'],
+    ['b', 128.54, 59.25, 2.1, 128.66, 59.29, 2.4, 'brass'],
+    ['b', 128.575, 59.29, 2.2, 128.625, 59.45, 2.26, 'brass'],
+    ['b', 128.55, 59.39, 2.26, 128.65, 59.49, 2.4, 'linen'],
+    ['b', 128.58, 59.42, 2.4, 128.62, 59.46, 2.5, 'amber'],
+    ['b', 133.64, 59.25, 2.1, 133.76, 59.29, 2.4, 'brass'],
+    ['b', 133.675, 59.29, 2.2, 133.725, 59.45, 2.26, 'brass'],
+    ['b', 133.65, 59.39, 2.26, 133.75, 59.49, 2.4, 'linen'],
+    ['b', 133.68, 59.42, 2.4, 133.72, 59.46, 2.5, 'amber'],
+    ['b', 138.54, 59.25, 2.1, 138.66, 59.29, 2.4, 'brass'],
+    ['b', 138.575, 59.29, 2.2, 138.625, 59.45, 2.26, 'brass'],
+    ['b', 138.55, 59.39, 2.26, 138.65, 59.49, 2.4, 'linen'],
+    ['b', 138.58, 59.42, 2.4, 138.62, 59.46, 2.5, 'amber'],
+    ['b', 128.54, 71.71, 2.1, 128.66, 71.75, 2.4, 'brass'],
+    ['b', 128.575, 71.55, 2.2, 128.625, 71.71, 2.26, 'brass'],
+    ['b', 128.55, 71.51, 2.26, 128.65, 71.61, 2.4, 'linen'],
+    ['b', 128.58, 71.54, 2.4, 128.62, 71.58, 2.5, 'amber'],
+    ['b', 133.64, 71.71, 2.1, 133.76, 71.75, 2.4, 'brass'],
+    ['b', 133.675, 71.55, 2.2, 133.725, 71.71, 2.26, 'brass'],
+    ['b', 133.65, 71.51, 2.26, 133.75, 71.61, 2.4, 'linen'],
+    ['b', 133.68, 71.54, 2.4, 133.72, 71.58, 2.5, 'amber'],
+    ['b', 138.54, 71.71, 2.1, 138.66, 71.75, 2.4, 'brass'],
+    ['b', 138.575, 71.55, 2.2, 138.625, 71.71, 2.26, 'brass'],
+    ['b', 138.55, 71.51, 2.26, 138.65, 71.61, 2.4, 'linen'],
+    ['b', 138.58, 71.54, 2.4, 138.62, 71.58, 2.5, 'amber'],
+    ['b', 140.31, 61.04, 2.1, 140.35, 61.16, 2.4, 'brass'],
+    ['b', 140.15, 61.075, 2.2, 140.31, 61.125, 2.26, 'brass'],
+    ['b', 140.11, 61.05, 2.26, 140.21, 61.15, 2.4, 'linen'],
+    ['b', 140.14, 61.08, 2.4, 140.18, 61.12, 2.5, 'amber'],
+    ['b', 140.31, 64.44, 2.1, 140.35, 64.56, 2.4, 'brass'],
+    ['b', 140.15, 64.475, 2.2, 140.31, 64.525, 2.26, 'brass'],
+    ['b', 140.11, 64.45, 2.26, 140.21, 64.55, 2.4, 'linen'],
+    ['b', 140.14, 64.48, 2.4, 140.18, 64.52, 2.5, 'amber'],
+    ['b', 126.95, 62.94, 2.1, 126.99, 63.06, 2.4, 'brass'],
+    ['b', 126.99, 62.975, 2.2, 127.15, 63.025, 2.26, 'brass'],
+    ['b', 127.09, 62.95, 2.26, 127.19, 63.05, 2.4, 'linen'],
+    ['b', 127.12, 62.98, 2.4, 127.16, 63.02, 2.5, 'amber'],
+    ['b', 126.95, 68.54, 2.1, 126.99, 68.66, 2.4, 'brass'],
+    ['b', 126.99, 68.575, 2.2, 127.15, 68.625, 2.26, 'brass'],
+    ['b', 127.09, 68.55, 2.26, 127.19, 68.65, 2.4, 'linen'],
+    ['b', 127.12, 68.58, 2.4, 127.16, 68.62, 2.5, 'amber'],
+    ['b', 126.95, 70.9, 1.4, 126.99, 71.7, 2.2, 'gilt'],
+    ['b', 126.99, 70.94, 1.44, 127.01, 71.66, 2.16, 'linen'],
+    ['b', 127.01, 71.05, 1.84, 127.02, 71.55, 1.88, 'blue'],
+    ['b', 127.01, 71.1, 1.68, 127.02, 71.5, 1.72, 'blue'],
+    ['b', 140.31, 63.05, 1.4, 140.35, 64.35, 2.3, 'gilt'],
+    ['b', 140.29, 63.09, 1.44, 140.31, 64.31, 2.26, 'linen'],
+    ['b', 140.28, 63.2, 1.895, 140.29, 64.2, 1.94, 'green'],
+    ['b', 140.28, 63.25, 1.715, 140.29, 64.15, 1.76, 'green'],
+    ['b', 140.31, 62.2, 1.3, 140.35, 63.0, 2.3, 'gilt'],
+    ['b', 140.29, 62.24, 1.34, 140.31, 62.96, 2.26, 'linen'],
+    ['b', 140.28, 62.35, 1.85, 140.29, 62.85, 1.9, 'black'],
+    ['b', 140.28, 62.4, 1.65, 140.29, 62.8, 1.7, 'black'],
+    ['b', 126.95, 63.95, 1.3, 126.99, 64.65, 2.2, 'gilt'],
+    ['b', 126.99, 63.99, 1.34, 127.01, 64.61, 2.16, 'linen'],
+    ['b', 127.01, 64.1, 1.795, 127.02, 64.5, 1.84, 'black'],
+    ['b', 127.01, 64.15, 1.615, 127.02, 64.45, 1.66, 'black'],
+    ['b', 139.85, 66.85, 0, 140.35, 68.35, 0.42, 'oak'],
+    ['b', 139.89, 66.9, 0.42, 140.31, 68.3, 0.5, 'dark'],
+    ['b', 139.95, 67.7, 0.5, 140.27, 68.2, 0.56, 'tartan'],
+    ['b', 127.475, 69.35, 0, 128.325, 70.15, 0.45, 'leather'],
+    ['b', 127.475, 69.95, 0.45, 128.325, 70.15, 1.1, 'leather'],
+    ['b', 127.47, 69.35, 0.45, 127.57, 69.95, 0.65, 'leather'],
+    ['b', 128.23, 69.35, 0.45, 128.33, 69.95, 0.65, 'leather'],
+    ['b', 127.65, 68.8, 0, 128.15, 69.2, 0.3, 'leather'],
+    ['b', 128.6, 69.85, 0, 128.8, 70.05, 0.06, 'oak'],
+    ['b', 128.67, 69.92, 0.06, 128.73, 69.98, 1.5, 'brass'],
+    ['b', 128.58, 69.83, 1.5, 128.82, 70.07, 1.7, 'linen'],
+    ['b', 126.95, 60.15, 0, 127.25, 60.45, 0.05, 'iron'],
+    ['b', 127.07, 60.27, 0.05, 127.13, 60.33, 1.6, 'brass'],
+    ['b', 126.95, 60.15, 1.6, 127.25, 60.45, 1.95, 'linen'],
+    ['b', 126.95, 70.55, 0, 127.25, 70.85, 0.05, 'iron'],
+    ['b', 127.07, 70.67, 0.05, 127.13, 70.73, 1.6, 'brass'],
+    ['b', 126.95, 70.55, 1.6, 127.25, 70.85, 1.95, 'linen'],
+    ['b', 131.45, 62.98, 3.4, 131.49, 63.02, 4.5, 'iron'],
+    ['b', 131.15, 62.7, 3.3, 131.75, 63.3, 3.4, 'brass'],
+    ['b', 131.15, 62.69, 3.0, 131.21, 62.75, 3.3, 'amber'],
+    ['b', 131.15, 63.25, 3.0, 131.21, 63.31, 3.3, 'amber'],
+    ['b', 131.69, 62.69, 3.0, 131.75, 62.75, 3.3, 'amber'],
+    ['b', 131.69, 63.25, 3.0, 131.75, 63.31, 3.3, 'amber'],
+    ['b', 135.81, 62.98, 3.4, 135.85, 63.02, 4.5, 'iron'],
+    ['b', 135.55, 62.7, 3.3, 136.15, 63.3, 3.4, 'brass'],
+    ['b', 136.09, 62.69, 3.0, 136.15, 62.75, 3.3, 'amber'],
+    ['b', 136.09, 63.25, 3.0, 136.15, 63.31, 3.3, 'amber'],
+    ['b', 135.55, 62.69, 3.0, 135.61, 62.75, 3.3, 'amber'],
+    ['b', 135.55, 63.25, 3.0, 135.61, 63.31, 3.3, 'amber'],
+    ['b', 133.95, 67.38, 3.4, 133.99, 67.42, 4.5, 'iron'],
+    ['b', 133.65, 67.1, 3.3, 134.25, 67.7, 3.4, 'brass'],
+    ['b', 133.65, 67.09, 3.0, 133.71, 67.15, 3.3, 'amber'],
+    ['b', 133.65, 67.65, 3.0, 133.71, 67.71, 3.3, 'amber'],
+    ['b', 134.19, 67.09, 3.0, 134.25, 67.15, 3.3, 'amber'],
+    ['b', 134.19, 67.65, 3.0, 134.25, 67.71, 3.3, 'amber'],
+    ['b', 133.31, 66.68, 3.4, 133.35, 66.72, 4.5, 'iron'],
+    ['b', 133.05, 66.4, 3.3, 133.65, 67.0, 3.4, 'brass'],
+    ['b', 133.59, 66.39, 3.0, 133.65, 66.45, 3.3, 'amber'],
+    ['b', 133.59, 66.95, 3.0, 133.65, 67.01, 3.3, 'amber'],
+    ['b', 133.05, 66.39, 3.0, 133.11, 66.45, 3.3, 'amber'],
+    ['b', 133.05, 66.95, 3.0, 133.11, 67.01, 3.3, 'amber']]);
+  T['second-years-study-room'].lights = (T['second-years-study-room'].lights || []).concat([[127.9, 59.55, 2.33, 16757862, 1.1, 8], [138.3, 59.55, 2.33, 16757862, 1.1, 8], [133.5, 59.55, 2.33, 16757862, 1.1, 8]]);
+})(window.SHELL_W5A.things);
+/* HAND2 end second-years-study-room */
+/* HAND2 begin study-room-2-west */
+/* Interiors req 2423 sec 11: study room, long tables with brass lamps, hearth, timetable and rules boards, reference shelf, globe, small essay blackboard; req 2532 adds hangings, a dado and a thing to read or pull; req 2543 card 37 (1 Nov, the 436th): globe, ink cupboard, clock, reader trolley, map stand, self-rolling blotter desk, green rug; req 2532 adds hangings, a dado and a thing to read or pull; req 2543 cards 36 and 37 after Godric 4.27 pm (1 Nov, the 436th): pendant lamps, sconces, framed papers on every wall, window seats, standard lamps; sited by tools/architect-hand-rooms-1101.py, plain stand-ins (Objects draw the real ones) */
+(function (T) {
+  T['study-room-2-west'] = T['study-room-2-west'] || { items: [] };
+  T['study-room-2-west'].items = T['study-room-2-west'].items.concat([
+    ['b', 7.3, 28.92, 0, 9.1, 29.42, 1.3, 'stone'],
+    ['b', 7.7, 28.92, 0.1, 8.7, 29.44, 1.0, 'black'],
+    ['b', 7.95, 29.02, 0.12, 8.45, 29.32, 0.45, 'flame'],
+    ['b', 7.5, 29.42, 0, 8.9, 29.62, 0.18, 'iron'],
+    ['b', 7.15, 28.92, 1.3, 9.25, 29.57, 1.38, 'oak'],
+    ['b', 1.94, 28.92, 1.9, 2.06, 28.96, 2.3, 'iron'],
+    ['b', 1.975, 28.96, 2.25, 2.025, 29.22, 2.3, 'iron'],
+    ['b', 1.94, 29.18, 2.0, 2.06, 29.26, 2.28, 'flame'],
+    ['b', 10.34, 28.92, 1.9, 10.46, 28.96, 2.3, 'iron'],
+    ['b', 10.375, 28.96, 2.25, 10.425, 29.22, 2.3, 'iron'],
+    ['b', 10.34, 29.18, 2.0, 10.46, 29.26, 2.28, 'flame'],
+    ['b', 4.84, 39.04, 1.9, 4.96, 39.08, 2.3, 'iron'],
+    ['b', 4.875, 38.78, 2.25, 4.925, 39.04, 2.3, 'iron'],
+    ['b', 4.84, 38.74, 2.0, 4.96, 38.82, 2.28, 'flame'],
+    ['b', 0.25, 30.47, 0, 1.15, 33.07, 0.78, 'oak'],
+    ['b', 11.25, 30.47, 0, 12.15, 33.07, 0.78, 'oak'],
+    ['b', 2.57, 39.0, 1.57, 3.83, 39.08, 2.53, 'wood'],
+    ['b', 2.6, 38.98, 1.6, 3.8, 39.0, 2.5, 'linen'],
+    ['b', 2.88, 38.97, 1.72, 2.92, 38.98, 2.38, 'black'],
+    ['b', 3.18, 38.97, 1.72, 3.22, 38.98, 2.38, 'black'],
+    ['b', 3.48, 38.97, 1.72, 3.52, 38.98, 2.38, 'black'],
+    ['b', 9.6, 39.0, 1.3, 11.0, 39.08, 2.3, 'gilt'],
+    ['b', 9.65, 38.99, 1.35, 10.95, 39.0, 2.25, 'black'],
+    ['b', 1.15, 28.92, 1.5, 1.85, 29.0, 2.4, 'gilt'],
+    ['b', 1.2, 29.0, 1.55, 1.8, 29.01, 2.35, 'black'],
+    ['b', 0.25, 36.27, 0, 0.65, 37.87, 0.8, 'oak'],
+    ['b', 0.25, 36.27, 0.8, 0.47, 37.87, 2.0, 'wood'],
+    ['b', 0.47, 36.444, 1.1, 0.55, 36.544, 1.4, 'amber'],
+    ['b', 0.47, 36.828, 1.5, 0.55, 36.928, 1.8, 'amber'],
+    ['b', 0.47, 37.212, 1.1, 0.55, 37.312, 1.4, 'amber'],
+    ['b', 0.47, 37.596, 1.5, 0.55, 37.696, 1.8, 'amber'],
+    ['b', 12.1, 35.27, 0.95, 12.15, 37.87, 2.1, 'wood'],
+    ['b', 12.07, 35.32, 1.0, 12.1, 37.82, 2.05, 'black'],
+    ['b', 11.95, 35.27, 0.9, 12.1, 37.87, 0.95, 'wood'],
+    ['b', 12.01, 35.71, 0.95, 12.07, 35.83, 0.97, 'white'],
+    ['b', 12.01, 35.87, 0.95, 12.07, 36.07, 0.96, 'dust'],
+    ['b', 9.35, 28.92, 0, 9.85, 29.42, 0.9, 'oak'],
+    ['b', 9.375, 28.97, 0.9, 9.825, 29.37, 1.35, 'gilt'],
+    ['b', 10.5, 28.92, 0, 12.1, 29.37, 2.1, 'oak'],
+    ['b', 10.6, 29.37, 0.7, 12.0, 29.39, 2.0, 'glass'],
+    ['b', 2.0, 29.02, 0, 2.4, 29.42, 0.12, 'oak'],
+    ['b', 2.17, 29.19, 0.12, 2.23, 29.25, 0.95, 'oak'],
+    ['b', 2.0, 29.02, 0.95, 2.4, 29.42, 1.35, 'blue'],
+    ['b', 2.17, 29.0, 0.95, 2.23, 29.44, 1.35, 'brass'],
+    ['b', 0.9, 28.92, 0, 1.9, 29.37, 0.9, 'oak'],
+    ['b', 0.95, 28.97, 0.9, 1.85, 29.32, 0.93, 'black'],
+    ['b', 0.99, 29.02, 0.93, 1.09, 29.12, 1.03, 'black'],
+    ['b', 1.17, 29.02, 0.93, 1.27, 29.12, 1.03, 'black'],
+    ['b', 1.35, 29.02, 0.93, 1.45, 29.12, 1.03, 'black'],
+    ['b', 1.53, 29.02, 0.93, 1.63, 29.12, 1.03, 'black'],
+    ['b', 1.71, 29.02, 0.93, 1.81, 29.12, 1.03, 'black'],
+    ['b', 1.55, 29.17, 0.93, 1.85, 29.22, 0.96, 'white'],
+    ['b', 5.95, 28.92, 2.5, 6.45, 29.0, 3.0, 'brass'],
+    ['b', 5.99, 29.0, 2.54, 6.41, 29.02, 2.96, 'white'],
+    ['b', 6.19, 29.02, 2.75, 6.21, 29.04, 2.92, 'black'],
+    ['b', 6.2, 29.02, 2.73, 6.32, 29.04, 2.76, 'black'],
+    ['b', 1.55, 38.58, 0.1, 2.45, 39.08, 0.14, 'oak'],
+    ['b', 1.55, 38.58, 0.7, 2.45, 39.08, 0.74, 'oak'],
+    ['b', 1.58, 38.6, 0, 1.62, 39.06, 0.9, 'oak'],
+    ['b', 2.38, 38.6, 0, 2.42, 39.06, 0.9, 'oak'],
+    ['b', 1.595, 38.68, 0.14, 1.705, 38.98, 0.4, 'ruby'],
+    ['b', 1.745, 38.68, 0.14, 1.855, 38.98, 0.44, 'blue'],
+    ['b', 1.895, 38.68, 0.14, 2.005, 38.98, 0.4, 'green'],
+    ['b', 2.045, 38.68, 0.14, 2.155, 38.98, 0.44, 'amber'],
+    ['b', 2.195, 38.68, 0.14, 2.305, 38.98, 0.4, 'dust'],
+    ['b', 1.64, 38.68, 0.74, 1.76, 38.98, 1.0, 'green'],
+    ['b', 1.81, 38.68, 0.74, 1.93, 38.98, 1.0, 'ruby'],
+    ['b', 1.98, 38.68, 0.74, 2.1, 38.98, 1.0, 'dust'],
+    ['b', 2.15, 38.68, 0.74, 2.27, 38.98, 1.0, 'blue'],
+    ['b', 0.25, 34.92, 0, 0.65, 35.62, 0.12, 'oak'],
+    ['b', 0.35, 34.97, 0.12, 0.43, 35.09, 0.9, 'linen'],
+    ['b', 0.34, 34.96, 0.7, 0.44, 35.1, 0.74, 'ruby'],
+    ['b', 0.35, 35.13, 0.12, 0.43, 35.25, 0.9, 'ruby'],
+    ['b', 0.34, 35.12, 0.7, 0.44, 35.26, 0.74, 'ruby'],
+    ['b', 0.35, 35.29, 0.12, 0.43, 35.41, 0.9, 'linen'],
+    ['b', 0.34, 35.28, 0.7, 0.44, 35.42, 0.74, 'ruby'],
+    ['b', 0.35, 35.45, 0.12, 0.43, 35.57, 0.9, 'green'],
+    ['b', 0.34, 35.44, 0.7, 0.44, 35.58, 0.74, 'ruby'],
+    ['b', 9.62, 38.87, 0, 9.68, 38.93, 0.78, 'oak'],
+    ['b', 9.62, 38.27, 0, 9.68, 38.33, 0.78, 'oak'],
+    ['b', 10.52, 38.87, 0, 10.58, 38.93, 0.78, 'oak'],
+    ['b', 10.52, 38.27, 0, 10.58, 38.33, 0.78, 'oak'],
+    ['b', 9.55, 38.23, 0.78, 10.65, 38.98, 0.82, 'oak'],
+    ['b', 9.7, 38.33, 0.82, 10.5, 38.88, 0.83, 'linen'],
+    ['b', 9.72, 38.68, 0.83, 10.48, 38.86, 0.835, 'black'],
+    ['b', 9.69, 38.48, 0.83, 10.51, 38.62, 0.93, 'brass'],
+    ['b', 9.66, 38.48, 0.83, 9.7, 38.62, 0.9, 'iron'],
+    ['b', 10.5, 38.48, 0.83, 10.54, 38.62, 0.9, 'iron'],
+    ['b', 4.5, 34.28, 0, 7.9, 36.68, 0.02, 'gilt'],
+    ['b', 4.62, 34.4, 0.02, 7.78, 36.56, 0.03, 'green'],
+    ['b', 5.6, 35.18, 0.03, 6.8, 35.78, 0.04, 'linen'],
+    ['b', 2.14, 28.92, 2.1, 2.26, 28.96, 2.4, 'brass'],
+    ['b', 2.175, 28.96, 2.2, 2.225, 29.12, 2.26, 'brass'],
+    ['b', 2.15, 29.06, 2.26, 2.25, 29.16, 2.4, 'linen'],
+    ['b', 2.18, 29.09, 2.4, 2.22, 29.13, 2.5, 'amber'],
+    ['b', 6.14, 28.92, 2.1, 6.26, 28.96, 2.4, 'brass'],
+    ['b', 6.175, 28.96, 2.2, 6.225, 29.12, 2.26, 'brass'],
+    ['b', 6.15, 29.06, 2.26, 6.25, 29.16, 2.4, 'linen'],
+    ['b', 6.18, 29.09, 2.4, 6.22, 29.13, 2.5, 'amber'],
+    ['b', 11.14, 28.92, 2.1, 11.26, 28.96, 2.4, 'brass'],
+    ['b', 11.175, 28.96, 2.2, 11.225, 29.12, 2.26, 'brass'],
+    ['b', 11.15, 29.06, 2.26, 11.25, 29.16, 2.4, 'linen'],
+    ['b', 11.18, 29.09, 2.4, 11.22, 29.13, 2.5, 'amber'],
+    ['b', 1.64, 39.04, 2.1, 1.76, 39.08, 2.4, 'brass'],
+    ['b', 1.675, 38.88, 2.2, 1.725, 39.04, 2.26, 'brass'],
+    ['b', 1.65, 38.84, 2.26, 1.75, 38.94, 2.4, 'linen'],
+    ['b', 1.68, 38.87, 2.4, 1.72, 38.91, 2.5, 'amber'],
+    ['b', 6.14, 39.04, 2.1, 6.26, 39.08, 2.4, 'brass'],
+    ['b', 6.175, 38.88, 2.2, 6.225, 39.04, 2.26, 'brass'],
+    ['b', 6.15, 38.84, 2.26, 6.25, 38.94, 2.4, 'linen'],
+    ['b', 6.18, 38.87, 2.4, 6.22, 38.91, 2.5, 'amber'],
+    ['b', 11.14, 39.04, 2.1, 11.26, 39.08, 2.4, 'brass'],
+    ['b', 11.175, 38.88, 2.2, 11.225, 39.04, 2.26, 'brass'],
+    ['b', 11.15, 38.84, 2.26, 11.25, 38.94, 2.4, 'linen'],
+    ['b', 11.18, 38.87, 2.4, 11.22, 38.91, 2.5, 'amber'],
+    ['b', 12.11, 30.41, 2.1, 12.15, 30.53, 2.4, 'brass'],
+    ['b', 11.95, 30.445, 2.2, 12.11, 30.495, 2.26, 'brass'],
+    ['b', 11.91, 30.42, 2.26, 12.01, 30.52, 2.4, 'linen'],
+    ['b', 11.94, 30.45, 2.4, 11.98, 30.49, 2.5, 'amber'],
+    ['b', 12.11, 33.01, 2.1, 12.15, 33.13, 2.4, 'brass'],
+    ['b', 11.95, 33.045, 2.2, 12.11, 33.095, 2.26, 'brass'],
+    ['b', 11.91, 33.02, 2.26, 12.01, 33.12, 2.4, 'linen'],
+    ['b', 11.94, 33.05, 2.4, 11.98, 33.09, 2.5, 'amber'],
+    ['b', 0.25, 31.91, 2.1, 0.29, 32.03, 2.4, 'brass'],
+    ['b', 0.29, 31.945, 2.2, 0.45, 31.995, 2.26, 'brass'],
+    ['b', 0.39, 31.92, 2.26, 0.49, 32.02, 2.4, 'linen'],
+    ['b', 0.42, 31.95, 2.4, 0.46, 31.99, 2.5, 'amber'],
+    ['b', 0.25, 36.51, 2.1, 0.29, 36.63, 2.4, 'brass'],
+    ['b', 0.29, 36.545, 2.2, 0.45, 36.595, 2.26, 'brass'],
+    ['b', 0.39, 36.52, 2.26, 0.49, 36.62, 2.4, 'linen'],
+    ['b', 0.42, 36.55, 2.4, 0.46, 36.59, 2.5, 'amber'],
+    ['b', 7.15, 28.92, 1.4, 8.05, 28.96, 2.1, 'gilt'],
+    ['b', 7.19, 28.96, 1.44, 8.01, 28.98, 2.06, 'linen'],
+    ['b', 7.3, 28.98, 1.785, 7.9, 28.99, 1.82, 'black'],
+    ['b', 7.35, 28.98, 1.645, 7.85, 28.99, 1.68, 'black'],
+    ['b', 8.1, 28.92, 1.4, 9.3, 28.96, 2.2, 'gilt'],
+    ['b', 8.14, 28.96, 1.44, 9.26, 28.98, 2.16, 'linen'],
+    ['b', 8.25, 28.98, 1.84, 9.15, 28.99, 1.88, 'ruby'],
+    ['b', 8.3, 28.98, 1.68, 9.1, 28.99, 1.72, 'ruby'],
+    ['b', 3.9, 39.04, 1.4, 4.7, 39.08, 2.2, 'gilt'],
+    ['b', 3.94, 39.02, 1.44, 4.66, 39.04, 2.16, 'linen'],
+    ['b', 4.05, 39.01, 1.84, 4.55, 39.02, 1.88, 'blue'],
+    ['b', 4.1, 39.01, 1.68, 4.5, 39.02, 1.72, 'blue'],
+    ['b', 0.25, 39.04, 1.4, 1.55, 39.08, 2.3, 'gilt'],
+    ['b', 0.29, 39.02, 1.44, 1.51, 39.04, 2.26, 'linen'],
+    ['b', 0.4, 39.01, 1.895, 1.4, 39.02, 1.94, 'green'],
+    ['b', 0.45, 39.01, 1.715, 1.35, 39.02, 1.76, 'green'],
+    ['b', 12.11, 37.97, 1.3, 12.15, 38.77, 2.3, 'gilt'],
+    ['b', 12.09, 38.01, 1.34, 12.11, 38.73, 2.26, 'linen'],
+    ['b', 12.08, 38.12, 1.85, 12.09, 38.62, 1.9, 'black'],
+    ['b', 12.08, 38.17, 1.65, 12.09, 38.57, 1.7, 'black'],
+    ['b', 0.25, 32.42, 1.3, 0.29, 33.12, 2.2, 'gilt'],
+    ['b', 0.29, 32.46, 1.34, 0.31, 33.08, 2.16, 'linen'],
+    ['b', 0.31, 32.57, 1.795, 0.32, 32.97, 1.84, 'black'],
+    ['b', 0.31, 32.62, 1.615, 0.32, 32.92, 1.66, 'black'],
+    ['b', 0.25, 37.97, 1.4, 0.29, 38.97, 2.1, 'gilt'],
+    ['b', 0.29, 38.01, 1.44, 0.31, 38.93, 2.06, 'linen'],
+    ['b', 0.31, 38.12, 1.785, 0.32, 38.82, 1.82, 'black'],
+    ['b', 0.31, 38.17, 1.645, 0.32, 38.77, 1.68, 'black'],
+    ['b', 11.65, 34.92, 0, 12.15, 36.42, 0.42, 'oak'],
+    ['b', 11.69, 34.97, 0.42, 12.11, 36.37, 0.5, 'dark'],
+    ['b', 11.75, 35.77, 0.5, 12.07, 36.27, 0.56, 'tartan'],
+    ['b', 11.65, 36.52, 0, 12.15, 38.02, 0.42, 'oak'],
+    ['b', 11.69, 36.57, 0.42, 12.11, 37.97, 0.5, 'dark'],
+    ['b', 11.75, 37.37, 0.5, 12.07, 37.87, 0.56, 'tartan'],
+    ['b', 2.55, 38.58, 0, 4.05, 39.08, 0.42, 'oak'],
+    ['b', 2.6, 38.62, 0.42, 4.0, 39.04, 0.5, 'dark'],
+    ['b', 3.4, 38.68, 0.5, 3.9, 39.0, 0.56, 'tartan'],
+    ['b', 2.075, 30.52, 0, 2.925, 31.32, 0.45, 'leather'],
+    ['b', 2.075, 30.52, 0.45, 2.925, 30.72, 1.1, 'leather'],
+    ['b', 2.07, 30.72, 0.45, 2.17, 31.32, 0.65, 'leather'],
+    ['b', 2.83, 30.72, 0.45, 2.93, 31.32, 0.65, 'leather'],
+    ['b', 2.25, 31.47, 0, 2.75, 31.87, 0.3, 'leather'],
+    ['b', 3.2, 30.62, 0, 3.4, 30.82, 0.06, 'oak'],
+    ['b', 3.27, 30.69, 0.06, 3.33, 30.75, 1.5, 'brass'],
+    ['b', 3.18, 30.6, 1.5, 3.42, 30.84, 1.7, 'linen'],
+    ['b', 2.075, 36.68, 0, 2.925, 37.48, 0.45, 'leather'],
+    ['b', 2.075, 37.28, 0.45, 2.925, 37.48, 1.1, 'leather'],
+    ['b', 2.07, 36.68, 0.45, 2.17, 37.28, 0.65, 'leather'],
+    ['b', 2.83, 36.68, 0.45, 2.93, 37.28, 0.65, 'leather'],
+    ['b', 2.25, 36.13, 0, 2.75, 36.53, 0.3, 'leather'],
+    ['b', 3.2, 37.18, 0, 3.4, 37.38, 0.06, 'oak'],
+    ['b', 3.27, 37.25, 0.06, 3.33, 37.31, 1.5, 'brass'],
+    ['b', 3.18, 37.16, 1.5, 3.42, 37.4, 1.7, 'linen'],
+    ['b', 9.275, 30.52, 0, 10.125, 31.32, 0.45, 'leather'],
+    ['b', 9.275, 30.52, 0.45, 10.125, 30.72, 1.1, 'leather'],
+    ['b', 9.27, 30.72, 0.45, 9.37, 31.32, 0.65, 'leather'],
+    ['b', 10.03, 30.72, 0.45, 10.13, 31.32, 0.65, 'leather'],
+    ['b', 9.45, 31.47, 0, 9.95, 31.87, 0.3, 'leather'],
+    ['b', 10.4, 30.62, 0, 10.6, 30.82, 0.06, 'oak'],
+    ['b', 10.47, 30.69, 0.06, 10.53, 30.75, 1.5, 'brass'],
+    ['b', 10.38, 30.6, 1.5, 10.62, 30.84, 1.7, 'linen'],
+    ['b', 0.25, 29.62, 0, 0.55, 29.92, 0.05, 'iron'],
+    ['b', 0.37, 29.74, 0.05, 0.43, 29.8, 1.6, 'brass'],
+    ['b', 0.25, 29.62, 1.6, 0.55, 29.92, 1.95, 'linen'],
+    ['b', 0.25, 35.92, 0, 0.55, 36.22, 0.05, 'iron'],
+    ['b', 0.37, 36.04, 0.05, 0.43, 36.1, 1.6, 'brass'],
+    ['b', 0.25, 35.92, 1.6, 0.55, 36.22, 1.95, 'linen'],
+    ['b', 4.05, 31.95, 3.4, 4.09, 31.99, 4.5, 'iron'],
+    ['b', 3.75, 31.67, 3.3, 4.35, 32.27, 3.4, 'brass'],
+    ['b', 3.75, 31.66, 3.0, 3.81, 31.72, 3.3, 'amber'],
+    ['b', 3.75, 32.22, 3.0, 3.81, 32.28, 3.3, 'amber'],
+    ['b', 4.29, 31.66, 3.0, 4.35, 31.72, 3.3, 'amber'],
+    ['b', 4.29, 32.22, 3.0, 4.35, 32.28, 3.3, 'amber'],
+    ['b', 8.31, 31.95, 3.4, 8.35, 31.99, 4.5, 'iron'],
+    ['b', 8.05, 31.67, 3.3, 8.65, 32.27, 3.4, 'brass'],
+    ['b', 8.59, 31.66, 3.0, 8.65, 31.72, 3.3, 'amber'],
+    ['b', 8.59, 32.22, 3.0, 8.65, 32.28, 3.3, 'amber'],
+    ['b', 8.05, 31.66, 3.0, 8.11, 31.72, 3.3, 'amber'],
+    ['b', 8.05, 32.22, 3.0, 8.11, 32.28, 3.3, 'amber'],
+    ['b', 6.25, 36.05, 3.4, 6.29, 36.09, 4.5, 'iron'],
+    ['b', 5.95, 35.77, 3.3, 6.55, 36.37, 3.4, 'brass'],
+    ['b', 5.95, 35.76, 3.0, 6.01, 35.82, 3.3, 'amber'],
+    ['b', 5.95, 36.32, 3.0, 6.01, 36.38, 3.3, 'amber'],
+    ['b', 6.49, 35.76, 3.0, 6.55, 35.82, 3.3, 'amber'],
+    ['b', 6.49, 36.32, 3.0, 6.55, 36.38, 3.3, 'amber'],
+    ['b', 6.11, 35.35, 3.4, 6.15, 35.39, 4.5, 'iron'],
+    ['b', 5.85, 35.07, 3.3, 6.45, 35.67, 3.4, 'brass'],
+    ['b', 6.39, 35.06, 3.0, 6.45, 35.12, 3.3, 'amber'],
+    ['b', 6.39, 35.62, 3.0, 6.45, 35.68, 3.3, 'amber'],
+    ['b', 5.85, 35.06, 3.0, 5.91, 35.12, 3.3, 'amber'],
+    ['b', 5.85, 35.62, 3.0, 5.91, 35.68, 3.3, 'amber']]);
+  T['study-room-2-west'].lights = (T['study-room-2-west'].lights || []).concat([[8.2, 29.17, 0.5, 16757862, 1.1, 8], [2.0, 29.22, 2.33, 16757862, 1.1, 8], [10.4, 29.22, 2.33, 16757862, 1.1, 8], [4.9, 38.78, 2.33, 16757862, 1.1, 8]]);
+})(window.SHELL_W5A.things);
+/* HAND2 end study-room-2-west */
+/* HAND2 begin study-room-3-lake */
+/* Interiors req 2423 sec 11: study room, long tables with brass lamps, hearth, timetable and rules boards, reference shelf, globe, small essay blackboard; sited by tools/architect-hand-rooms-1101.py, plain stand-ins (Objects draw the real ones) */
+(function (T) {
+  T['study-room-3-lake'] = T['study-room-3-lake'] || { items: [] };
+  T['study-room-3-lake'].items = T['study-room-3-lake'].items.concat([
+    ['b', 124.24, 3.85, 0, 126.04, 4.35, 1.3, 'stone'],
+    ['b', 124.64, 3.85, 0.1, 125.64, 4.37, 1.0, 'black'],
+    ['b', 124.89, 3.95, 0.12, 125.39, 4.25, 0.45, 'flame'],
+    ['b', 124.44, 4.35, 0, 125.84, 4.55, 0.18, 'iron'],
+    ['b', 124.09, 3.85, 1.3, 126.19, 4.5, 1.38, 'oak'],
+    ['b', 119.08, 3.85, 1.9, 119.2, 3.89, 2.3, 'iron'],
+    ['b', 119.115, 3.89, 2.25, 119.165, 4.15, 2.3, 'iron'],
+    ['b', 119.08, 4.11, 2.0, 119.2, 4.19, 2.28, 'flame'],
+    ['b', 127.18, 3.85, 1.9, 127.3, 3.89, 2.3, 'iron'],
+    ['b', 127.215, 3.89, 2.25, 127.265, 4.15, 2.3, 'iron'],
+    ['b', 127.18, 4.11, 2.0, 127.3, 4.19, 2.28, 'flame'],
+    ['b', 123.18, 17.96, 1.9, 123.3, 18.0, 2.3, 'iron'],
+    ['b', 123.215, 17.7, 2.25, 123.265, 17.96, 2.3, 'iron'],
+    ['b', 123.18, 17.66, 2.0, 123.3, 17.74, 2.28, 'flame'],
+    ['b', 117.39, 6.8, 0, 118.29, 9.4, 0.78, 'oak'],
+    ['b', 128.11, 6.8, 0, 129.01, 9.4, 0.78, 'oak'],
+    ['b', 121.51, 17.92, 1.57, 122.77, 18.0, 2.53, 'wood'],
+    ['b', 121.54, 17.9, 1.6, 122.74, 17.92, 2.5, 'linen'],
+    ['b', 121.82, 17.89, 1.72, 121.86, 17.9, 2.38, 'black'],
+    ['b', 122.12, 17.89, 1.72, 122.16, 17.9, 2.38, 'black'],
+    ['b', 122.42, 17.89, 1.72, 122.46, 17.9, 2.38, 'black'],
+    ['b', 125.44, 17.92, 1.3, 126.84, 18.0, 2.3, 'gilt'],
+    ['b', 125.49, 17.91, 1.35, 126.79, 17.92, 2.25, 'black'],
+    ['b', 119.99, 3.85, 1.5, 120.69, 3.93, 2.4, 'gilt'],
+    ['b', 120.04, 3.93, 1.55, 120.64, 3.94, 2.35, 'black'],
+    ['b', 117.39, 14.4, 0, 117.79, 16.0, 0.8, 'oak'],
+    ['b', 117.39, 14.4, 0.8, 117.61, 16.0, 2.0, 'wood'],
+    ['b', 117.61, 14.574, 1.1, 117.69, 14.674, 1.4, 'amber'],
+    ['b', 117.61, 14.958, 1.5, 117.69, 15.058, 1.8, 'amber'],
+    ['b', 117.61, 15.342, 1.1, 117.69, 15.442, 1.4, 'amber'],
+    ['b', 117.61, 15.726, 1.5, 117.69, 15.826, 1.8, 'amber'],
+    ['b', 128.96, 13.2, 0.95, 129.01, 15.8, 2.1, 'wood'],
+    ['b', 128.93, 13.25, 1.0, 128.96, 15.75, 2.05, 'black'],
+    ['b', 128.81, 13.2, 0.9, 128.96, 15.8, 0.95, 'wood'],
+    ['b', 128.87, 13.64, 0.95, 128.93, 13.76, 0.97, 'white'],
+    ['b', 128.87, 13.8, 0.95, 128.93, 14.0, 0.96, 'dust'],
+    ['b', 126.29, 3.85, 0, 126.79, 4.35, 0.9, 'oak'],
+    ['b', 126.315, 3.9, 0.9, 126.765, 4.3, 1.35, 'gilt'],
+    ['b', 128.56, 10.1, 0, 129.01, 11.7, 2.1, 'oak'],
+    ['b', 128.54, 10.2, 0.7, 128.56, 11.6, 2.0, 'glass']]);
+  T['study-room-3-lake'].lights = (T['study-room-3-lake'].lights || []).concat([[125.14, 4.1, 0.5, 16757862, 1.1, 8], [119.14, 4.15, 2.33, 16757862, 1.1, 8], [127.24, 4.15, 2.33, 16757862, 1.1, 8], [123.24, 17.7, 2.33, 16757862, 1.1, 8]]);
+})(window.SHELL_W5A.things);
+/* HAND2 end study-room-3-lake */
+/* HAND2 begin third-years-study-room-3 */
+/* Interiors req 2423 sec 11: study room, long tables with brass lamps, hearth, timetable and rules boards, reference shelf, globe, small essay blackboard; sited by tools/architect-hand-rooms-1101.py, plain stand-ins (Objects draw the real ones) */
+(function (T) {
+  T['third-years-study-room-3'] = T['third-years-study-room-3'] || { items: [] };
+  T['third-years-study-room-3'].items = T['third-years-study-room-3'].items.concat([
+    ['b', 100.0, 3.85, 0, 101.8, 4.35, 1.3, 'stone'],
+    ['b', 100.4, 3.85, 0.1, 101.4, 4.37, 1.0, 'black'],
+    ['b', 100.65, 3.95, 0.12, 101.15, 4.25, 0.45, 'flame'],
+    ['b', 100.2, 4.35, 0, 101.6, 4.55, 0.18, 'iron'],
+    ['b', 99.85, 3.85, 1.3, 101.95, 4.5, 1.38, 'oak'],
+    ['b', 94.84, 3.85, 1.9, 94.96, 3.89, 2.3, 'iron'],
+    ['b', 94.875, 3.89, 2.25, 94.925, 4.15, 2.3, 'iron'],
+    ['b', 94.84, 4.11, 2.0, 94.96, 4.19, 2.28, 'flame'],
+    ['b', 102.94, 3.85, 1.9, 103.06, 3.89, 2.3, 'iron'],
+    ['b', 102.975, 3.89, 2.25, 103.025, 4.15, 2.3, 'iron'],
+    ['b', 102.94, 4.11, 2.0, 103.06, 4.19, 2.28, 'flame'],
+    ['b', 98.94, 17.96, 1.9, 99.06, 18.0, 2.3, 'iron'],
+    ['b', 98.975, 17.7, 2.25, 99.025, 17.96, 2.3, 'iron'],
+    ['b', 98.94, 17.66, 2.0, 99.06, 17.74, 2.28, 'flame'],
+    ['b', 93.15, 6.8, 0, 94.05, 9.4, 0.78, 'oak'],
+    ['b', 103.87, 6.8, 0, 104.77, 9.4, 0.78, 'oak'],
+    ['b', 97.27, 17.92, 1.57, 98.53, 18.0, 2.53, 'wood'],
+    ['b', 97.3, 17.9, 1.6, 98.5, 17.92, 2.5, 'linen'],
+    ['b', 97.58, 17.89, 1.72, 97.62, 17.9, 2.38, 'black'],
+    ['b', 97.88, 17.89, 1.72, 97.92, 17.9, 2.38, 'black'],
+    ['b', 98.18, 17.89, 1.72, 98.22, 17.9, 2.38, 'black'],
+    ['b', 101.2, 17.92, 1.3, 102.6, 18.0, 2.3, 'gilt'],
+    ['b', 101.25, 17.91, 1.35, 102.55, 17.92, 2.25, 'black'],
+    ['b', 95.75, 3.85, 1.5, 96.45, 3.93, 2.4, 'gilt'],
+    ['b', 95.8, 3.93, 1.55, 96.4, 3.94, 2.35, 'black'],
+    ['b', 93.15, 14.4, 0, 93.55, 16.0, 0.8, 'oak'],
+    ['b', 93.15, 14.4, 0.8, 93.37, 16.0, 2.0, 'wood'],
+    ['b', 93.37, 14.574, 1.1, 93.45, 14.674, 1.4, 'amber'],
+    ['b', 93.37, 14.958, 1.5, 93.45, 15.058, 1.8, 'amber'],
+    ['b', 93.37, 15.342, 1.1, 93.45, 15.442, 1.4, 'amber'],
+    ['b', 93.37, 15.726, 1.5, 93.45, 15.826, 1.8, 'amber'],
+    ['b', 104.72, 13.2, 0.95, 104.77, 15.8, 2.1, 'wood'],
+    ['b', 104.69, 13.25, 1.0, 104.72, 15.75, 2.05, 'black'],
+    ['b', 104.57, 13.2, 0.9, 104.72, 15.8, 0.95, 'wood'],
+    ['b', 104.63, 13.64, 0.95, 104.69, 13.76, 0.97, 'white'],
+    ['b', 104.63, 13.8, 0.95, 104.69, 14.0, 0.96, 'dust'],
+    ['b', 102.05, 3.85, 0, 102.55, 4.35, 0.9, 'oak'],
+    ['b', 102.075, 3.9, 0.9, 102.525, 4.3, 1.35, 'gilt'],
+    ['b', 104.32, 10.1, 0, 104.77, 11.7, 2.1, 'oak'],
+    ['b', 104.3, 10.2, 0.7, 104.32, 11.6, 2.0, 'glass']]);
+  T['third-years-study-room-3'].lights = (T['third-years-study-room-3'].lights || []).concat([[100.9, 4.1, 0.5, 16757862, 1.1, 8], [94.9, 4.15, 2.33, 16757862, 1.1, 8], [103.0, 4.15, 2.33, 16757862, 1.1, 8], [99.0, 17.7, 2.33, 16757862, 1.1, 8]]);
+})(window.SHELL_W5A.things);
+/* HAND2 end third-years-study-room-3 */
+/* HAND2 begin disused-classroom-2-east */
+/* Interiors req 2423 sec 11: disused classroom, dust-sheeted, a ghost of the last lesson, a cold grate, one thing to find: a bird in a glass dome; req 2532 adds hangings, a dado and a thing to read or pull; req 2543 card 33 (1 Nov, the 434th): stacked sheeted desks, slate desk, chalk bin, map rail, cold stove, a board whose duster wipes the scrawl by itself, pegs, stopped clock; sited by tools/architect-hand-rooms-1101.py, plain stand-ins (Objects draw the real ones) */
+(function (T) {
+  T['disused-classroom-2-east'] = T['disused-classroom-2-east'] || { items: [] };
+  T['disused-classroom-2-east'].items = T['disused-classroom-2-east'].items.concat([
+    ['b', 147.8, 59.25, 0, 149.6, 59.75, 1.3, 'stone'],
+    ['b', 148.2, 59.25, 0.1, 149.2, 59.77, 1.0, 'black'],
+    ['b', 148.45, 59.35, 0.12, 148.95, 59.65, 0.45, 'flame'],
+    ['b', 148.0, 59.75, 0, 149.4, 59.95, 0.18, 'iron'],
+    ['b', 147.65, 59.25, 1.3, 149.75, 59.9, 1.38, 'oak'],
+    ['b', 142.54, 59.25, 1.9, 142.66, 59.29, 2.3, 'iron'],
+    ['b', 142.575, 59.29, 2.25, 142.625, 59.55, 2.3, 'iron'],
+    ['b', 142.54, 59.51, 2.0, 142.66, 59.59, 2.28, 'flame'],
+    ['b', 145.3, 71.95, 0.95, 147.9, 72.0, 2.1, 'wood'],
+    ['b', 145.35, 71.92, 1.0, 147.85, 71.95, 2.05, 'black'],
+    ['b', 145.3, 71.8, 0.9, 147.9, 71.95, 0.95, 'wood'],
+    ['b', 145.74, 71.86, 0.95, 145.86, 71.92, 0.97, 'white'],
+    ['b', 145.9, 71.86, 0.95, 146.1, 71.92, 0.96, 'dust'],
+    ['b', 140.85, 62.35, 0, 141.55, 62.85, 0.75, 'oak'],
+    ['b', 140.85, 62.85, 0, 141.55, 63.35, 0.75, 'oak'],
+    ['b', 140.85, 63.35, 0, 141.55, 63.85, 0.75, 'oak'],
+    ['b', 140.9, 62.45, 0.75, 141.45, 63.75, 1.2, 'oak'],
+    ['b', 151.35, 62.5, 0, 152.25, 63.7, 0.9, 'linen'],
+    ['b', 151.55, 62.65, 0.9, 152.15, 63.55, 1.1, 'white'],
+    ['b', 149.87, 59.25, 1.57, 151.13, 59.33, 2.53, 'wood'],
+    ['b', 149.9, 59.33, 1.6, 151.1, 59.35, 2.5, 'linen'],
+    ['b', 150.18, 59.35, 1.72, 150.22, 59.36, 2.38, 'black'],
+    ['b', 150.48, 59.35, 1.72, 150.52, 59.36, 2.38, 'black'],
+    ['b', 150.78, 59.35, 1.72, 150.82, 59.36, 2.38, 'black'],
+    ['b', 152.17, 69.05, 1.5, 152.25, 69.75, 2.4, 'gilt'],
+    ['b', 152.16, 69.1, 1.55, 152.17, 69.7, 2.35, 'black'],
+    ['b', 140.85, 68.85, 0, 141.45, 69.95, 0.55, 'wood'],
+    ['b', 140.85, 69.36, 0, 141.47, 69.44, 0.55, 'iron'],
+    ['b', 142.375, 71.55, 0, 142.825, 72.0, 0.8, 'oak'],
+    ['b', 142.4, 71.6, 0.8, 142.8, 71.95, 1.15, 'glass'],
+    ['b', 144.09, 62.52, 0, 144.15, 62.6, 0.72, 'oak'],
+    ['b', 144.6, 62.52, 0, 144.66, 62.6, 0.72, 'oak'],
+    ['b', 144.09, 63.6, 0, 144.15, 63.68, 0.72, 'oak'],
+    ['b', 144.6, 63.6, 0, 144.66, 63.68, 0.72, 'oak'],
+    ['b', 144.05, 62.5, 0.72, 144.7, 63.7, 0.78, 'oak'],
+    ['b', 144.02, 62.47, 0.38, 144.73, 63.73, 0.84, 'linen'],
+    ['b', 144.13, 62.58, 0.84, 144.62, 63.62, 0.88, 'linen'],
+    ['b', 144.02, 63.23, 0.3, 144.15, 63.57, 0.38, 'dust'],
+    ['b', 144.09, 64.42, 0, 144.15, 64.5, 0.72, 'oak'],
+    ['b', 144.6, 64.42, 0, 144.66, 64.5, 0.72, 'oak'],
+    ['b', 144.09, 65.5, 0, 144.15, 65.58, 0.72, 'oak'],
+    ['b', 144.6, 65.5, 0, 144.66, 65.58, 0.72, 'oak'],
+    ['b', 144.05, 64.4, 0.72, 144.7, 65.6, 0.78, 'oak'],
+    ['b', 144.02, 64.37, 0.38, 144.73, 65.63, 0.84, 'linen'],
+    ['b', 144.13, 64.48, 0.84, 144.62, 65.52, 0.88, 'linen'],
+    ['b', 144.02, 65.13, 0.3, 144.15, 65.47, 0.38, 'dust'],
+    ['b', 144.09, 66.32, 0, 144.15, 66.4, 0.72, 'oak'],
+    ['b', 144.6, 66.32, 0, 144.66, 66.4, 0.72, 'oak'],
+    ['b', 144.09, 67.4, 0, 144.15, 67.48, 0.72, 'oak'],
+    ['b', 144.6, 67.4, 0, 144.66, 67.48, 0.72, 'oak'],
+    ['b', 144.05, 66.3, 0.72, 144.7, 67.5, 0.78, 'oak'],
+    ['b', 144.02, 66.27, 0.38, 144.73, 67.53, 0.84, 'linen'],
+    ['b', 144.13, 66.38, 0.84, 144.62, 67.42, 0.88, 'linen'],
+    ['b', 144.02, 67.03, 0.3, 144.15, 67.37, 0.38, 'dust'],
+    ['b', 146.29, 62.52, 0, 146.35, 62.6, 0.72, 'oak'],
+    ['b', 146.8, 62.52, 0, 146.86, 62.6, 0.72, 'oak'],
+    ['b', 146.29, 63.6, 0, 146.35, 63.68, 0.72, 'oak'],
+    ['b', 146.8, 63.6, 0, 146.86, 63.68, 0.72, 'oak'],
+    ['b', 146.25, 62.5, 0.72, 146.9, 63.7, 0.78, 'oak'],
+    ['b', 146.22, 62.47, 0.38, 146.93, 63.73, 0.84, 'linen'],
+    ['b', 146.33, 62.58, 0.84, 146.82, 63.62, 0.88, 'linen'],
+    ['b', 146.22, 63.23, 0.3, 146.35, 63.57, 0.38, 'dust'],
+    ['b', 146.29, 64.42, 0, 146.35, 64.5, 0.72, 'oak'],
+    ['b', 146.8, 64.42, 0, 146.86, 64.5, 0.72, 'oak'],
+    ['b', 146.29, 65.5, 0, 146.35, 65.58, 0.72, 'oak'],
+    ['b', 146.8, 65.5, 0, 146.86, 65.58, 0.72, 'oak'],
+    ['b', 146.25, 64.4, 0.72, 146.9, 65.6, 0.78, 'oak'],
+    ['b', 146.22, 64.37, 0.38, 146.93, 65.63, 0.84, 'linen'],
+    ['b', 146.33, 64.48, 0.84, 146.82, 65.52, 0.88, 'linen'],
+    ['b', 146.22, 65.13, 0.3, 146.35, 65.47, 0.38, 'dust'],
+    ['b', 146.29, 66.32, 0, 146.35, 66.4, 0.72, 'oak'],
+    ['b', 146.8, 66.32, 0, 146.86, 66.4, 0.72, 'oak'],
+    ['b', 146.29, 67.4, 0, 146.35, 67.48, 0.72, 'oak'],
+    ['b', 146.8, 67.4, 0, 146.86, 67.48, 0.72, 'oak'],
+    ['b', 146.25, 66.3, 0.72, 146.9, 67.5, 0.78, 'oak'],
+    ['b', 146.22, 66.27, 0.38, 146.93, 67.53, 0.84, 'linen'],
+    ['b', 146.33, 66.38, 0.84, 146.82, 67.42, 0.88, 'linen'],
+    ['b', 146.22, 67.03, 0.3, 146.35, 67.37, 0.38, 'dust'],
+    ['b', 144.05, 63.89, 0.44, 144.47, 64.31, 0.49, 'oak'],
+    ['b', 144.43, 63.89, 0.49, 144.47, 64.31, 0.95, 'oak'],
+    ['b', 144.07, 63.895, 0, 144.12, 63.945, 0.44, 'oak'],
+    ['b', 144.07, 64.255, 0, 144.12, 64.305, 0.44, 'oak'],
+    ['b', 144.41, 63.895, 0, 144.46, 63.945, 0.44, 'oak'],
+    ['b', 144.41, 64.255, 0, 144.46, 64.305, 0.44, 'oak'],
+    ['b', 146.25, 67.69, 0.44, 146.67, 68.11, 0.49, 'oak'],
+    ['b', 146.63, 67.69, 0.49, 146.67, 68.11, 0.95, 'oak'],
+    ['b', 146.27, 67.695, 0, 146.32, 67.745, 0.44, 'oak'],
+    ['b', 146.27, 68.055, 0, 146.32, 68.105, 0.44, 'oak'],
+    ['b', 146.61, 67.695, 0, 146.66, 67.745, 0.44, 'oak'],
+    ['b', 146.61, 68.055, 0, 146.66, 68.105, 0.44, 'oak'],
+    ['b', 140.9, 61.2, 0, 141.7, 62.2, 0.9, 'oak'],
+    ['b', 140.95, 61.25, 0.9, 141.65, 62.15, 1.1, 'oak'],
+    ['b', 140.85, 61.16, 0.0, 141.75, 62.24, 1.0, 'linen'],
+    ['b', 140.85, 61.2, 1.0, 141.75, 62.2, 1.25, 'linen'],
+    ['b', 140.9, 67.0, 0, 141.7, 68.0, 0.9, 'oak'],
+    ['b', 140.95, 67.05, 0.9, 141.65, 67.95, 1.1, 'oak'],
+    ['b', 140.85, 66.96, 0.0, 141.75, 68.04, 1.0, 'linen'],
+    ['b', 140.85, 67.0, 1.0, 141.75, 68.0, 1.25, 'linen'],
+    ['b', 143.7, 71.35, 0.72, 144.9, 72.0, 0.78, 'oak'],
+    ['b', 143.71, 71.9, 0, 143.79, 71.96, 0.72, 'oak'],
+    ['b', 143.71, 71.39, 0, 143.79, 71.45, 0.72, 'oak'],
+    ['b', 144.81, 71.9, 0, 144.89, 71.96, 0.72, 'oak'],
+    ['b', 144.81, 71.39, 0, 144.89, 71.45, 0.72, 'oak'],
+    ['b', 143.82, 71.5, 0.78, 144.18, 71.9, 0.81, 'black'],
+    ['b', 143.82, 71.5, 0.81, 144.18, 71.9, 0.84, 'black'],
+    ['b', 143.82, 71.5, 0.84, 144.18, 71.9, 0.87, 'black'],
+    ['b', 143.82, 71.5, 0.87, 144.18, 71.9, 0.9, 'black'],
+    ['b', 144.55, 71.7, 0.78, 144.65, 71.8, 0.86, 'ink'],
+    ['b', 144.64, 71.5, 0.78, 144.84, 71.88, 0.8, 'dust'],
+    ['b', 142.3, 59.25, 0, 142.9, 59.7, 0.55, 'oak'],
+    ['b', 142.33, 59.28, 0.55, 142.87, 59.67, 0.6, 'white'],
+    ['b', 142.45, 59.25, 0.6, 142.95, 59.55, 0.66, 'oak'],
+    ['b', 152.17, 64.2, 1.9, 152.25, 65.8, 1.96, 'oak'],
+    ['b', 152.17, 64.3, 1.84, 152.25, 65.7, 1.9, 'petals'],
+    ['b', 152.2, 64.45, 0.9, 152.23, 65.55, 1.84, 'dust'],
+    ['b', 152.15, 64.4, 0.84, 152.25, 65.6, 0.9, 'oak'],
+    ['b', 151.35, 69.4, 0, 152.25, 70.4, 0.05, 'dust'],
+    ['b', 151.55, 69.6, 0.05, 152.15, 70.2, 0.9, 'iron'],
+    ['b', 152.15, 69.81, 0.9, 152.25, 69.99, 2.4, 'iron'],
+    ['b', 151.53, 69.75, 0.3, 151.63, 70.05, 0.5, 'black'],
+    ['b', 151.7, 70.425, 0, 152.05, 70.775, 0.4, 'iron'],
+    ['b', 146.37, 59.75, 0, 146.43, 59.81, 1.7, 'oak'],
+    ['b', 147.37, 59.75, 0, 147.43, 59.81, 1.7, 'oak'],
+    ['b', 146.25, 59.77, 0.7, 147.55, 59.85, 1.7, 'oak'],
+    ['b', 146.3, 59.85, 0.76, 147.5, 59.89, 1.64, 'black'],
+    ['b', 146.325, 59.89, 1.0, 146.875, 59.895, 1.4, 'dust'],
+    ['b', 146.95, 59.89, 1.4, 147.45, 59.895, 1.42, 'white'],
+    ['b', 146.99, 59.89, 1.3, 147.41, 59.895, 1.32, 'white'],
+    ['b', 147.05, 59.89, 1.2, 147.35, 59.895, 1.22, 'white'],
+    ['b', 146.82, 59.89, 1.22, 147.02, 59.99, 1.34, 'oak'],
+    ['b', 146.82, 59.89, 1.34, 147.02, 59.99, 1.38, 'linen'],
+    ['b', 146.3, 59.75, 0.7, 147.5, 59.95, 0.76, 'oak'],
+    ['b', 148.75, 71.94, 1.55, 150.05, 72.0, 1.62, 'oak'],
+    ['b', 148.9, 71.9, 1.5, 148.94, 71.94, 1.6, 'iron'],
+    ['b', 148.79, 71.8, 0.7, 149.05, 71.94, 1.5, 'dark'],
+    ['b', 149.22, 71.9, 1.5, 149.26, 71.94, 1.6, 'iron'],
+    ['b', 149.11, 71.8, 0.7, 149.37, 71.94, 1.5, 'dark'],
+    ['b', 149.54, 71.9, 1.5, 149.58, 71.94, 1.6, 'iron'],
+    ['b', 149.86, 71.9, 1.5, 149.9, 71.94, 1.6, 'iron'],
+    ['b', 149.75, 71.8, 0.7, 150.01, 71.94, 1.5, 'dark'],
+    ['b', 149.81, 71.84, 0.9, 149.95, 71.94, 1.5, 'ruby'],
+    ['b', 140.85, 70.45, 2.5, 140.93, 70.95, 3.0, 'brass'],
+    ['b', 140.93, 70.49, 2.54, 140.95, 70.91, 2.96, 'white'],
+    ['b', 140.95, 70.69, 2.75, 140.97, 70.71, 2.92, 'black'],
+    ['b', 140.95, 70.7, 2.73, 140.97, 70.82, 2.76, 'black']]);
+  T['disused-classroom-2-east'].lights = (T['disused-classroom-2-east'].lights || []).concat([[148.7, 59.5, 0.5, 16757862, 1.1, 8], [142.6, 59.55, 2.33, 16757862, 1.1, 8]]);
+})(window.SHELL_W5A.things);
+/* HAND2 end disused-classroom-2-east */
+/* HAND2 begin disused-classroom-2-northwest */
+/* Interiors req 2423 sec 11: disused classroom, dust-sheeted, a ghost of the last lesson, a cold grate, one thing to find: a broken orrery; req 2532 adds hangings, a dado and a thing to read or pull; req 2543 card 34 (1 Nov, the 434th): single sheeted desks, hat stand with a forgotten bowler, cold stove, chalk bin, map rail, a board whose duster wipes a half-wiped sum, pegs, clock; 1101ze (435th): six single sheeted desks in two columns, 1.7 m gaps; sited by tools/architect-hand-rooms-1101.py, plain stand-ins (Objects draw the real ones) */
+(function (T) {
+  T['disused-classroom-2-northwest'] = T['disused-classroom-2-northwest'] || { items: [] };
+  T['disused-classroom-2-northwest'].items = T['disused-classroom-2-northwest'].items.concat([
+    ['b', 8.7, 3.85, 0, 10.5, 4.35, 1.3, 'stone'],
+    ['b', 9.1, 3.85, 0.1, 10.1, 4.37, 1.0, 'black'],
+    ['b', 9.35, 3.95, 0.12, 9.85, 4.25, 0.45, 'flame'],
+    ['b', 8.9, 4.35, 0, 10.3, 4.55, 0.18, 'iron'],
+    ['b', 8.55, 3.85, 1.3, 10.65, 4.5, 1.38, 'oak'],
+    ['b', 8.44, 3.85, 1.9, 8.56, 3.89, 2.3, 'iron'],
+    ['b', 8.475, 3.89, 2.25, 8.525, 4.15, 2.3, 'iron'],
+    ['b', 8.44, 4.11, 2.0, 8.56, 4.19, 2.28, 'flame'],
+    ['b', 10.2, 17.7, 0.95, 12.8, 17.75, 2.1, 'wood'],
+    ['b', 10.25, 17.67, 1.0, 12.75, 17.7, 2.05, 'black'],
+    ['b', 10.2, 17.55, 0.9, 12.8, 17.7, 0.95, 'wood'],
+    ['b', 10.64, 17.61, 0.95, 10.76, 17.67, 0.97, 'white'],
+    ['b', 10.8, 17.61, 0.95, 11.0, 17.67, 0.96, 'dust'],
+    ['b', 14.85, 7.4, 0, 15.75, 8.6, 0.9, 'linen'],
+    ['b', 15.05, 7.55, 0.9, 15.65, 8.45, 1.1, 'white'],
+    ['b', 13.87, 3.85, 1.57, 15.13, 3.93, 2.53, 'wood'],
+    ['b', 13.9, 3.93, 1.6, 15.1, 3.95, 2.5, 'linen'],
+    ['b', 14.18, 3.95, 1.72, 14.22, 3.96, 2.38, 'black'],
+    ['b', 14.48, 3.95, 1.72, 14.52, 3.96, 2.38, 'black'],
+    ['b', 14.78, 3.95, 1.72, 14.82, 3.96, 2.38, 'black'],
+    ['b', 15.67, 14.45, 1.5, 15.75, 15.15, 2.4, 'gilt'],
+    ['b', 15.66, 14.5, 1.55, 15.67, 15.1, 2.35, 'black'],
+    ['b', 7.25, 14.45, 0, 7.85, 15.55, 0.55, 'wood'],
+    ['b', 7.25, 14.96, 0, 7.87, 15.04, 0.55, 'iron'],
+    ['b', 8.65, 17.25, 0, 9.15, 17.75, 0.9, 'oak'],
+    ['b', 8.675, 17.3, 0.9, 9.125, 17.7, 1.35, 'gilt'],
+    ['b', 8.15, 17.45, 0, 8.45, 17.75, 0.06, 'oak'],
+    ['b', 8.25, 17.55, 0.06, 8.35, 17.65, 1.7, 'oak'],
+    ['b', 8.2, 17.5, 1.7, 8.4, 17.7, 1.76, 'oak'],
+    ['b', 8.21, 17.51, 1.76, 8.39, 17.69, 1.86, 'black'],
+    ['b', 8.15, 17.47, 1.74, 8.45, 17.73, 1.77, 'black'],
+    ['b', 8.25, 17.5, 1.0, 8.35, 17.55, 1.5, 'dust'],
+    ['b', 14.85, 8.5, 0, 15.75, 9.5, 0.05, 'dust'],
+    ['b', 15.05, 8.7, 0.05, 15.65, 9.3, 0.9, 'iron'],
+    ['b', 15.65, 8.91, 0.9, 15.75, 9.09, 2.4, 'iron'],
+    ['b', 15.03, 8.85, 0.3, 15.13, 9.15, 0.5, 'black'],
+    ['b', 15.2, 9.525, 0, 15.55, 9.875, 0.4, 'iron'],
+    ['b', 8.0, 3.85, 0, 8.6, 4.3, 0.55, 'oak'],
+    ['b', 8.03, 3.88, 0.55, 8.57, 4.27, 0.6, 'white'],
+    ['b', 8.15, 3.85, 0.6, 8.65, 4.15, 0.66, 'oak'],
+    ['b', 15.67, 12.1, 1.9, 15.75, 13.7, 1.96, 'oak'],
+    ['b', 15.67, 12.2, 1.84, 15.75, 13.6, 1.9, 'petals'],
+    ['b', 15.7, 12.35, 0.9, 15.73, 13.45, 1.84, 'dust'],
+    ['b', 15.65, 12.3, 0.84, 15.75, 13.5, 0.9, 'oak'],
+    ['b', 12.47, 4.35, 0, 12.53, 4.41, 1.7, 'oak'],
+    ['b', 13.47, 4.35, 0, 13.53, 4.41, 1.7, 'oak'],
+    ['b', 12.35, 4.37, 0.7, 13.65, 4.45, 1.7, 'oak'],
+    ['b', 12.4, 4.45, 0.76, 13.6, 4.49, 1.64, 'black'],
+    ['b', 12.425, 4.49, 1.0, 12.975, 4.495, 1.4, 'dust'],
+    ['b', 13.05, 4.49, 1.4, 13.55, 4.495, 1.42, 'white'],
+    ['b', 13.09, 4.49, 1.3, 13.51, 4.495, 1.32, 'white'],
+    ['b', 13.15, 4.49, 1.2, 13.45, 4.495, 1.22, 'white'],
+    ['b', 12.92, 4.49, 1.22, 13.12, 4.59, 1.34, 'oak'],
+    ['b', 12.92, 4.49, 1.34, 13.12, 4.59, 1.38, 'linen'],
+    ['b', 12.4, 4.35, 0.7, 13.6, 4.55, 0.76, 'oak'],
+    ['b', 7.25, 15.45, 2.5, 7.33, 15.95, 3.0, 'brass'],
+    ['b', 7.33, 15.49, 2.54, 7.35, 15.91, 2.96, 'white'],
+    ['b', 7.35, 15.69, 2.75, 7.37, 15.71, 2.92, 'black'],
+    ['b', 7.35, 15.7, 2.73, 7.37, 15.82, 2.76, 'black'],
+    ['b', 9.49, 5.82, 0, 9.55, 5.9, 0.72, 'oak'],
+    ['b', 10.0, 5.82, 0, 10.06, 5.9, 0.72, 'oak'],
+    ['b', 9.49, 6.9, 0, 9.55, 6.98, 0.72, 'oak'],
+    ['b', 10.0, 6.9, 0, 10.06, 6.98, 0.72, 'oak'],
+    ['b', 9.45, 5.8, 0.72, 10.1, 7.0, 0.78, 'oak'],
+    ['b', 9.42, 5.77, 0.38, 10.13, 7.03, 0.84, 'linen'],
+    ['b', 9.53, 5.88, 0.84, 10.02, 6.92, 0.88, 'linen'],
+    ['b', 9.42, 6.53, 0.3, 9.55, 6.87, 0.38, 'dust'],
+    ['b', 9.49, 8.82, 0, 9.55, 8.9, 0.72, 'oak'],
+    ['b', 10.0, 8.82, 0, 10.06, 8.9, 0.72, 'oak'],
+    ['b', 9.49, 9.9, 0, 9.55, 9.98, 0.72, 'oak'],
+    ['b', 10.0, 9.9, 0, 10.06, 9.98, 0.72, 'oak'],
+    ['b', 9.45, 8.8, 0.72, 10.1, 10.0, 0.78, 'oak'],
+    ['b', 9.42, 8.77, 0.38, 10.13, 10.03, 0.84, 'linen'],
+    ['b', 9.53, 8.88, 0.84, 10.02, 9.92, 0.88, 'linen'],
+    ['b', 9.42, 9.53, 0.3, 9.55, 9.87, 0.38, 'dust'],
+    ['b', 9.49, 11.82, 0, 9.55, 11.9, 0.72, 'oak'],
+    ['b', 10.0, 11.82, 0, 10.06, 11.9, 0.72, 'oak'],
+    ['b', 9.49, 12.9, 0, 9.55, 12.98, 0.72, 'oak'],
+    ['b', 10.0, 12.9, 0, 10.06, 12.98, 0.72, 'oak'],
+    ['b', 9.45, 11.8, 0.72, 10.1, 13.0, 0.78, 'oak'],
+    ['b', 9.42, 11.77, 0.38, 10.13, 13.03, 0.84, 'linen'],
+    ['b', 9.53, 11.88, 0.84, 10.02, 12.92, 0.88, 'linen'],
+    ['b', 9.42, 12.53, 0.3, 9.55, 12.87, 0.38, 'dust'],
+    ['b', 11.89, 7.32, 0, 11.95, 7.4, 0.72, 'oak'],
+    ['b', 12.4, 7.32, 0, 12.46, 7.4, 0.72, 'oak'],
+    ['b', 11.89, 8.4, 0, 11.95, 8.48, 0.72, 'oak'],
+    ['b', 12.4, 8.4, 0, 12.46, 8.48, 0.72, 'oak'],
+    ['b', 11.85, 7.3, 0.72, 12.5, 8.5, 0.78, 'oak'],
+    ['b', 11.82, 7.27, 0.38, 12.53, 8.53, 0.84, 'linen'],
+    ['b', 11.93, 7.38, 0.84, 12.42, 8.42, 0.88, 'linen'],
+    ['b', 11.82, 8.03, 0.3, 11.95, 8.37, 0.38, 'dust'],
+    ['b', 11.89, 10.32, 0, 11.95, 10.4, 0.72, 'oak'],
+    ['b', 12.4, 10.32, 0, 12.46, 10.4, 0.72, 'oak'],
+    ['b', 11.89, 11.4, 0, 11.95, 11.48, 0.72, 'oak'],
+    ['b', 12.4, 11.4, 0, 12.46, 11.48, 0.72, 'oak'],
+    ['b', 11.85, 10.3, 0.72, 12.5, 11.5, 0.78, 'oak'],
+    ['b', 11.82, 10.27, 0.38, 12.53, 11.53, 0.84, 'linen'],
+    ['b', 11.93, 10.38, 0.84, 12.42, 11.42, 0.88, 'linen'],
+    ['b', 11.82, 11.03, 0.3, 11.95, 11.37, 0.38, 'dust'],
+    ['b', 11.89, 13.32, 0, 11.95, 13.4, 0.72, 'oak'],
+    ['b', 12.4, 13.32, 0, 12.46, 13.4, 0.72, 'oak'],
+    ['b', 11.89, 14.4, 0, 11.95, 14.48, 0.72, 'oak'],
+    ['b', 12.4, 14.4, 0, 12.46, 14.48, 0.72, 'oak'],
+    ['b', 11.85, 13.3, 0.72, 12.5, 14.5, 0.78, 'oak'],
+    ['b', 11.82, 13.27, 0.38, 12.53, 14.53, 0.84, 'linen'],
+    ['b', 11.93, 13.38, 0.84, 12.42, 14.42, 0.88, 'linen'],
+    ['b', 11.82, 14.03, 0.3, 11.95, 14.37, 0.38, 'dust'],
+    ['b', 10.55, 9.39, 0.44, 10.97, 9.81, 0.49, 'oak'],
+    ['b', 10.93, 9.39, 0.49, 10.97, 9.81, 0.95, 'oak'],
+    ['b', 10.57, 9.395, 0, 10.62, 9.445, 0.44, 'oak'],
+    ['b', 10.57, 9.755, 0, 10.62, 9.805, 0.44, 'oak'],
+    ['b', 10.91, 9.395, 0, 10.96, 9.445, 0.44, 'oak'],
+    ['b', 10.91, 9.755, 0, 10.96, 9.805, 0.44, 'oak']]);
+  T['disused-classroom-2-northwest'].lights = (T['disused-classroom-2-northwest'].lights || []).concat([[9.6, 4.1, 0.5, 16757862, 1.1, 8], [8.5, 4.15, 2.33, 16757862, 1.1, 8]]);
+})(window.SHELL_W5A.things);
+/* HAND2 end disused-classroom-2-northwest */
+/* HAND2 begin disused-classroom-3-lake */
+/* Interiors req 2423 sec 11 + Architect req 2532: disused classroom, dust-sheeted, faded hangings, a post of cut heights and initials; sited by tools/architect-hand-rooms-1101.py, plain stand-ins (Objects draw the real ones) */
+(function (T) {
+  T['disused-classroom-3-lake'] = T['disused-classroom-3-lake'] || { items: [] };
+  T['disused-classroom-3-lake'].items = T['disused-classroom-3-lake'].items.concat([
+    ['b', 136.36, 3.85, 0, 138.16, 4.35, 1.3, 'stone'],
+    ['b', 136.76, 3.85, 0.1, 137.76, 4.37, 1.0, 'black'],
+    ['b', 137.01, 3.95, 0.12, 137.51, 4.25, 0.45, 'flame'],
+    ['b', 136.56, 4.35, 0, 137.96, 4.55, 0.18, 'iron'],
+    ['b', 136.21, 3.85, 1.3, 138.31, 4.5, 1.38, 'oak'],
+    ['b', 131.2, 3.85, 1.9, 131.32, 3.89, 2.3, 'iron'],
+    ['b', 131.235, 3.89, 2.25, 131.285, 4.15, 2.3, 'iron'],
+    ['b', 131.2, 4.11, 2.0, 131.32, 4.19, 2.28, 'flame'],
+    ['b', 136.86, 17.95, 0.95, 139.46, 18.0, 2.1, 'wood'],
+    ['b', 136.91, 17.92, 1.0, 139.41, 17.95, 2.05, 'black'],
+    ['b', 136.86, 17.8, 0.9, 139.46, 17.95, 0.95, 'wood'],
+    ['b', 137.3, 17.86, 0.95, 137.42, 17.92, 0.97, 'white'],
+    ['b', 137.46, 17.86, 0.95, 137.66, 17.92, 0.96, 'dust'],
+    ['b', 129.51, 7.35, 0, 130.21, 7.85, 0.75, 'oak'],
+    ['b', 129.51, 7.85, 0, 130.21, 8.35, 0.75, 'oak'],
+    ['b', 129.51, 8.35, 0, 130.21, 8.85, 0.75, 'oak'],
+    ['b', 129.56, 7.45, 0.75, 130.11, 8.75, 1.2, 'oak'],
+    ['b', 140.23, 7.5, 0, 141.13, 8.7, 0.9, 'linen'],
+    ['b', 140.43, 7.65, 0.9, 141.03, 8.55, 1.1, 'white'],
+    ['b', 138.43, 3.85, 1.57, 139.69, 3.93, 2.53, 'wood'],
+    ['b', 138.46, 3.93, 1.6, 139.66, 3.95, 2.5, 'linen'],
+    ['b', 138.74, 3.95, 1.72, 138.78, 3.96, 2.38, 'black'],
+    ['b', 139.04, 3.95, 1.72, 139.08, 3.96, 2.38, 'black'],
+    ['b', 139.34, 3.95, 1.72, 139.38, 3.96, 2.38, 'black'],
+    ['b', 141.05, 14.85, 1.5, 141.13, 15.55, 2.4, 'gilt'],
+    ['b', 141.04, 14.9, 1.55, 141.05, 15.5, 2.35, 'black'],
+    ['b', 129.51, 14.65, 0, 130.11, 15.75, 0.55, 'wood'],
+    ['b', 129.51, 15.16, 0, 130.13, 15.24, 0.55, 'iron'],
+    ['b', 131.86, 3.85, 2.3, 133.66, 3.93, 4.0, 'dust'],
+    ['b', 131.98, 3.93, 2.42, 133.54, 3.94, 3.88, 'linen'],
+    ['b', 131.98, 3.94, 2.6, 133.54, 3.95, 2.72, 'petals'],
+    ['b', 131.98, 3.94, 3.58, 133.54, 3.95, 3.7, 'petals'],
+    ['b', 132.51, 3.94, 2.85, 133.01, 3.96, 3.45, 'petals'],
+    ['b', 132.63, 3.96, 3.0, 132.89, 3.97, 3.3, 'dust'],
+    ['b', 131.81, 3.85, 4.0, 133.71, 3.94, 4.04, 'wood'],
+    ['b', 132.135, 3.94, 2.18, 132.185, 3.95, 2.32, 'dust'],
+    ['b', 132.435, 3.94, 2.18, 132.485, 3.95, 2.32, 'dust'],
+    ['b', 132.735, 3.94, 2.18, 132.785, 3.95, 2.32, 'dust'],
+    ['b', 133.035, 3.94, 2.18, 133.085, 3.95, 2.32, 'dust'],
+    ['b', 133.335, 3.94, 2.18, 133.385, 3.95, 2.32, 'dust'],
+    ['b', 136.56, 3.85, 2.3, 138.36, 3.93, 4.0, 'dust'],
+    ['b', 136.68, 3.93, 2.42, 138.24, 3.94, 3.88, 'petals'],
+    ['b', 136.68, 3.94, 2.6, 138.24, 3.95, 2.72, 'linen'],
+    ['b', 136.68, 3.94, 3.58, 138.24, 3.95, 3.7, 'linen'],
+    ['b', 137.21, 3.94, 2.85, 137.71, 3.96, 3.45, 'linen'],
+    ['b', 137.33, 3.96, 3.0, 137.59, 3.97, 3.3, 'dust'],
+    ['b', 136.51, 3.85, 4.0, 138.41, 3.94, 4.04, 'wood'],
+    ['b', 136.835, 3.94, 2.18, 136.885, 3.95, 2.32, 'dust'],
+    ['b', 137.135, 3.94, 2.18, 137.185, 3.95, 2.32, 'dust'],
+    ['b', 137.435, 3.94, 2.18, 137.485, 3.95, 2.32, 'dust'],
+    ['b', 137.735, 3.94, 2.18, 137.785, 3.95, 2.32, 'dust'],
+    ['b', 138.035, 3.94, 2.18, 138.085, 3.95, 2.32, 'dust'],
+    ['b', 141.05, 10.0, 2.3, 141.13, 11.8, 4.0, 'dust'],
+    ['b', 141.04, 10.12, 2.42, 141.05, 11.68, 3.88, 'linen'],
+    ['b', 141.03, 10.12, 2.6, 141.04, 11.68, 2.72, 'petals'],
+    ['b', 141.03, 10.12, 3.58, 141.04, 11.68, 3.7, 'petals'],
+    ['b', 141.02, 10.65, 2.85, 141.04, 11.15, 3.45, 'petals'],
+    ['b', 141.01, 10.77, 3.0, 141.02, 11.03, 3.3, 'dust'],
+    ['b', 141.04, 9.95, 4.0, 141.13, 11.85, 4.04, 'wood'],
+    ['b', 141.03, 10.275, 2.18, 141.04, 10.325, 2.32, 'dust'],
+    ['b', 141.03, 10.575, 2.18, 141.04, 10.625, 2.32, 'dust'],
+    ['b', 141.03, 10.875, 2.18, 141.04, 10.925, 2.32, 'dust'],
+    ['b', 141.03, 11.175, 2.18, 141.04, 11.225, 2.32, 'dust'],
+    ['b', 141.03, 11.475, 2.18, 141.04, 11.525, 2.32, 'dust'],
+    ['b', 130.36, 3.85, 0.1, 133.36, 3.9, 1.05, 'oak'],
+    ['b', 130.36, 3.85, 1.05, 133.36, 3.93, 1.13, 'wood'],
+    ['b', 130.36, 3.85, 0, 133.36, 3.93, 0.1, 'wood'],
+    ['b', 129.76, 17.95, 0.1, 132.76, 18.0, 1.05, 'oak'],
+    ['b', 129.76, 17.92, 1.05, 132.76, 18.0, 1.13, 'wood'],
+    ['b', 129.76, 17.92, 0, 132.76, 18.0, 0.1, 'wood'],
+    ['b', 141.08, 4.4, 0.1, 141.13, 7.4, 1.05, 'oak'],
+    ['b', 141.05, 4.4, 1.05, 141.13, 7.4, 1.13, 'wood'],
+    ['b', 141.05, 4.4, 0, 141.13, 7.4, 0.1, 'wood'],
+    ['b', 141.08, 14.4, 0.1, 141.13, 17.4, 1.05, 'oak'],
+    ['b', 141.05, 14.4, 1.05, 141.13, 17.4, 1.13, 'wood'],
+    ['b', 141.05, 14.4, 0, 141.13, 17.4, 0.1, 'wood'],
+    ['b', 129.51, 17.625, 0, 129.61, 17.975, 2.2, 'oak'],
+    ['b', 129.61, 17.67, 0.5, 129.63, 17.77, 0.53, 'black'],
+    ['b', 129.61, 17.81, 0.67, 129.63, 17.95, 0.7, 'black'],
+    ['b', 129.61, 17.63, 0.84, 129.63, 17.81, 0.87, 'black'],
+    ['b', 129.61, 17.83, 1.01, 129.63, 17.93, 1.04, 'black'],
+    ['b', 129.61, 17.65, 1.18, 129.63, 17.79, 1.21, 'black'],
+    ['b', 129.61, 17.79, 1.35, 129.63, 17.97, 1.38, 'black'],
+    ['b', 129.61, 17.67, 1.52, 129.63, 17.77, 1.55, 'black'],
+    ['b', 129.61, 17.81, 1.69, 129.63, 17.95, 1.72, 'black'],
+    ['b', 129.61, 17.63, 1.86, 129.63, 17.81, 1.89, 'black'],
+    ['b', 129.61, 17.71, 0.62, 129.63, 17.89, 0.7, 'dust'],
+    ['b', 129.61, 17.71, 1.0, 129.63, 17.89, 1.08, 'dust'],
+    ['b', 129.61, 17.71, 1.38, 129.63, 17.89, 1.46, 'dust'],
+    ['b', 129.61, 17.71, 1.76, 129.63, 17.89, 1.84, 'dust']]);
+  T['disused-classroom-3-lake'].lights = (T['disused-classroom-3-lake'].lights || []).concat([[137.26, 4.1, 0.5, 16757862, 1.1, 8], [131.26, 4.15, 2.33, 16757862, 1.1, 8]]);
+})(window.SHELL_W5A.things);
+/* HAND2 end disused-classroom-3-lake */
+/* HAND2 begin chandelier-classroom */
+/* Interiors req 2423 sec 11: classroom, benches, a blackboard, a cabinet of spell objects; req 2532 adds hangings, a dado and a thing to read or pull; req 2543 adds a coat-peg rail, an ink cupboard, a globe, a book trolley, a wall clock, a dunce stool and a slate on an easel with chalk writing a lesson itself; sited by tools/architect-hand-rooms-1101.py, plain stand-ins (Objects draw the real ones) */
+(function (T) {
+  T['chandelier-classroom'] = T['chandelier-classroom'] || { items: [] };
+  T['chandelier-classroom'].items = T['chandelier-classroom'].items.concat([
+    ['b', 5.3, 18.25, 0, 7.1, 18.75, 1.3, 'stone'],
+    ['b', 5.7, 18.25, 0.1, 6.7, 18.77, 1.0, 'black'],
+    ['b', 5.95, 18.35, 0.12, 6.45, 18.65, 0.45, 'flame'],
+    ['b', 5.5, 18.75, 0, 6.9, 18.95, 0.18, 'iron'],
+    ['b', 5.15, 18.25, 1.3, 7.25, 18.9, 1.38, 'oak'],
+    ['b', 1.64, 18.25, 1.9, 1.76, 18.29, 2.3, 'iron'],
+    ['b', 1.675, 18.29, 2.25, 1.725, 18.55, 2.3, 'iron'],
+    ['b', 1.64, 18.51, 2.0, 1.76, 18.59, 2.28, 'flame'],
+    ['b', 10.64, 18.25, 1.9, 10.76, 18.29, 2.3, 'iron'],
+    ['b', 10.675, 18.29, 2.25, 10.725, 18.55, 2.3, 'iron'],
+    ['b', 10.64, 18.51, 2.0, 10.76, 18.59, 2.28, 'flame'],
+    ['b', 4.9, 28.37, 0.95, 7.5, 28.42, 2.1, 'wood'],
+    ['b', 4.95, 28.34, 1.0, 7.45, 28.37, 2.05, 'black'],
+    ['b', 4.9, 28.22, 0.9, 7.5, 28.37, 0.95, 'wood'],
+    ['b', 5.34, 28.28, 0.95, 5.46, 28.34, 0.97, 'white'],
+    ['b', 5.5, 28.28, 0.95, 5.7, 28.34, 0.96, 'dust'],
+    ['b', 0.25, 20.0, 0, 1.15, 22.6, 0.78, 'oak'],
+    ['b', 11.25, 19.7, 0, 12.15, 22.3, 0.78, 'oak'],
+    ['b', 1.9, 18.25, 3.1, 3.3, 18.33, 4.1, 'dust'],
+    ['b', 2.0, 18.33, 3.22, 3.2, 18.34, 3.98, 'stone'],
+    ['b', 1.85, 18.25, 4.1, 3.35, 18.34, 4.14, 'wood'],
+    ['b', 9.45, 18.25, 1.5, 10.15, 18.33, 2.4, 'gilt'],
+    ['b', 9.5, 18.33, 1.55, 10.1, 18.34, 2.35, 'black'],
+    ['b', 0.25, 25.6, 0, 0.7, 27.2, 2.1, 'oak'],
+    ['b', 0.7, 25.7, 0.7, 0.72, 27.1, 2.0, 'glass'],
+    ['b', 11.89, 25.6, 1.3, 12.15, 27.2, 1.33, 'oak'],
+    ['b', 11.89, 25.6, 1.85, 12.15, 27.2, 1.88, 'oak'],
+    ['b', 11.89, 25.6, 1.3, 12.15, 25.64, 1.88, 'oak'],
+    ['b', 11.89, 27.16, 1.3, 12.15, 27.2, 1.88, 'oak'],
+    ['b', 12.03, 25.77, 1.33, 12.09, 25.83, 1.53, 'white'],
+    ['b', 12.01, 25.91, 1.33, 12.09, 25.99, 1.43, 'tin'],
+    ['b', 12.0, 26.105, 1.33, 12.09, 26.195, 1.42, 'amber'],
+    ['b', 12.02, 26.315, 1.33, 12.09, 26.385, 1.47, 'wood'],
+    ['b', 11.99, 26.55, 1.33, 12.09, 26.65, 1.43, 'copper'],
+    ['b', 12.01, 26.81, 1.33, 12.09, 26.89, 1.45, 'stone'],
+    ['b', 12.03, 27.02, 1.33, 12.09, 27.08, 1.43, 'white'],
+    ['b', 11.97, 25.74, 1.88, 12.09, 25.86, 2.04, 'linen'],
+    ['b', 11.99, 26.05, 1.88, 12.09, 26.15, 2.1, 'ruby'],
+    ['b', 11.95, 26.33, 1.88, 12.09, 26.47, 2.02, 'glass'],
+    ['b', 12.01, 26.66, 1.88, 12.09, 26.74, 1.98, 'iron'],
+    ['b', 11.97, 26.94, 1.88, 12.09, 27.06, 2.06, 'petals'],
+    ['b', 0.25, 18.35, 1.55, 0.31, 19.65, 1.62, 'oak'],
+    ['b', 0.31, 18.5, 1.5, 0.35, 18.54, 1.6, 'iron'],
+    ['b', 0.31, 18.39, 0.7, 0.45, 18.65, 1.5, 'dark'],
+    ['b', 0.31, 18.82, 1.5, 0.35, 18.86, 1.6, 'iron'],
+    ['b', 0.31, 18.71, 0.7, 0.45, 18.97, 1.5, 'dark'],
+    ['b', 0.31, 19.14, 1.5, 0.35, 19.18, 1.6, 'iron'],
+    ['b', 0.31, 19.46, 1.5, 0.35, 19.5, 1.6, 'iron'],
+    ['b', 0.31, 19.35, 0.7, 0.45, 19.61, 1.5, 'dark'],
+    ['b', 0.31, 19.41, 0.9, 0.41, 19.55, 1.5, 'ruby'],
+    ['b', 0.9, 27.97, 0, 1.9, 28.42, 0.9, 'oak'],
+    ['b', 0.95, 28.02, 0.9, 1.85, 28.37, 0.93, 'black'],
+    ['b', 0.99, 28.22, 0.93, 1.09, 28.32, 1.03, 'black'],
+    ['b', 1.17, 28.22, 0.93, 1.27, 28.32, 1.03, 'black'],
+    ['b', 1.35, 28.22, 0.93, 1.45, 28.32, 1.03, 'black'],
+    ['b', 1.53, 28.22, 0.93, 1.63, 28.32, 1.03, 'black'],
+    ['b', 1.71, 28.22, 0.93, 1.81, 28.32, 1.03, 'black'],
+    ['b', 1.55, 28.12, 0.93, 1.85, 28.17, 0.96, 'white'],
+    ['b', 10.8, 27.92, 0, 11.2, 28.32, 0.12, 'oak'],
+    ['b', 10.97, 28.09, 0.12, 11.03, 28.15, 0.95, 'oak'],
+    ['b', 10.8, 27.92, 0.95, 11.2, 28.32, 1.35, 'blue'],
+    ['b', 10.97, 27.9, 0.95, 11.03, 28.34, 1.35, 'brass'],
+    ['b', 11.65, 24.35, 0.1, 12.15, 25.25, 0.14, 'oak'],
+    ['b', 11.65, 24.35, 0.7, 12.15, 25.25, 0.74, 'oak'],
+    ['b', 11.67, 24.38, 0, 12.13, 24.42, 0.9, 'oak'],
+    ['b', 11.67, 25.18, 0, 12.13, 25.22, 0.9, 'oak'],
+    ['b', 11.75, 24.395, 0.14, 12.05, 24.505, 0.4, 'ruby'],
+    ['b', 11.75, 24.545, 0.14, 12.05, 24.655, 0.44, 'blue'],
+    ['b', 11.75, 24.695, 0.14, 12.05, 24.805, 0.4, 'green'],
+    ['b', 11.75, 24.845, 0.14, 12.05, 24.955, 0.44, 'amber'],
+    ['b', 11.75, 24.995, 0.14, 12.05, 25.105, 0.4, 'dust'],
+    ['b', 11.75, 24.44, 0.74, 12.05, 24.56, 1.0, 'green'],
+    ['b', 11.75, 24.61, 0.74, 12.05, 24.73, 1.0, 'ruby'],
+    ['b', 11.75, 24.78, 0.74, 12.05, 24.9, 1.0, 'dust'],
+    ['b', 11.75, 24.95, 0.74, 12.05, 25.07, 1.0, 'blue'],
+    ['b', 12.07, 19.55, 2.5, 12.15, 20.05, 3.0, 'brass'],
+    ['b', 12.05, 19.59, 2.54, 12.07, 20.01, 2.96, 'white'],
+    ['b', 12.03, 19.79, 2.75, 12.05, 19.81, 2.92, 'black'],
+    ['b', 12.03, 19.8, 2.73, 12.05, 19.92, 2.76, 'black'],
+    ['b', 0.3, 27.9, 0.8, 0.7, 28.3, 0.86, 'oak'],
+    ['b', 0.33, 27.925, 0, 0.39, 27.975, 0.8, 'oak'],
+    ['b', 0.33, 28.225, 0, 0.39, 28.275, 0.8, 'oak'],
+    ['b', 0.6, 28.075, 0, 0.66, 28.125, 0.8, 'oak'],
+    ['b', 0.35, 27.95, 0.86, 0.65, 28.25, 1.0, 'dust'],
+    ['b', 0.43, 28.03, 1.0, 0.57, 28.17, 1.25, 'dust'],
+    ['b', 3.17, 28.26, 0, 3.23, 28.32, 1.6, 'oak'],
+    ['b', 3.97, 28.26, 0, 4.03, 28.32, 1.6, 'oak'],
+    ['b', 3.1, 28.22, 0.8, 4.1, 28.3, 1.5, 'oak'],
+    ['b', 3.15, 28.18, 0.85, 4.05, 28.22, 1.45, 'black'],
+    ['b', 3.22, 28.175, 1.36, 3.92, 28.18, 1.38, 'white'],
+    ['b', 3.22, 28.175, 1.22, 3.84, 28.18, 1.24, 'white'],
+    ['b', 3.22, 28.175, 1.08, 3.96, 28.18, 1.1, 'white'],
+    ['b', 3.22, 28.175, 0.94, 3.52, 28.18, 0.96, 'white'],
+    ['b', 3.507, 28.12, 1.17, 3.533, 28.18, 1.28, 'white'],
+    ['b', 3.15, 28.12, 0.8, 4.05, 28.32, 0.86, 'oak']]);
+  T['chandelier-classroom'].lights = (T['chandelier-classroom'].lights || []).concat([[6.2, 18.5, 0.5, 16757862, 1.1, 8], [1.7, 18.55, 2.33, 16757862, 1.1, 8], [10.7, 18.55, 2.33, 16757862, 1.1, 8]]);
+})(window.SHELL_W5A.things);
+/* HAND2 end chandelier-classroom */
+/* HAND2 begin history-of-magic-classroom */
+/* Interiors req 2423 sec 11: classroom, blackboard, maps, a lecture desk; req 2532 adds hangings, a dado and a thing to read or pull; req 2543 adds a scroll cupboard, an ink cupboard, a coat-peg rail, a wall clock, a plinth with an hourglass whose sand runs up, a chalk-writing slate and a timeline frieze; sited by tools/architect-hand-rooms-1101.py, plain stand-ins (Objects draw the real ones) */
+(function (T) {
+  T['history-of-magic-classroom'] = T['history-of-magic-classroom'] || { items: [] };
+  T['history-of-magic-classroom'].items = T['history-of-magic-classroom'].items.concat([
+    ['b', 130.55, 63.4, 0, 132.35, 63.9, 1.3, 'stone'],
+    ['b', 130.95, 63.4, 0.1, 131.95, 63.92, 1.0, 'black'],
+    ['b', 131.2, 63.5, 0.12, 131.7, 63.8, 0.45, 'flame'],
+    ['b', 130.75, 63.9, 0, 132.15, 64.1, 0.18, 'iron'],
+    ['b', 130.4, 63.4, 1.3, 132.5, 64.05, 1.38, 'oak'],
+    ['b', 125.29, 63.4, 1.9, 125.41, 63.44, 2.3, 'iron'],
+    ['b', 125.325, 63.44, 2.25, 125.375, 63.7, 2.3, 'iron'],
+    ['b', 125.29, 63.66, 2.0, 125.41, 63.74, 2.28, 'flame'],
+    ['b', 133.59, 63.4, 1.9, 133.71, 63.44, 2.3, 'iron'],
+    ['b', 133.625, 63.44, 2.25, 133.675, 63.7, 2.3, 'iron'],
+    ['b', 133.59, 63.66, 2.0, 133.71, 63.74, 2.28, 'flame'],
+    ['b', 128.15, 71.35, 0.95, 130.75, 71.4, 2.1, 'wood'],
+    ['b', 128.2, 71.32, 1.0, 130.7, 71.35, 2.05, 'black'],
+    ['b', 128.15, 71.2, 0.9, 130.75, 71.35, 0.95, 'wood'],
+    ['b', 128.59, 71.26, 0.95, 128.71, 71.32, 0.97, 'white'],
+    ['b', 128.75, 71.26, 0.95, 128.95, 71.32, 0.96, 'dust'],
+    ['b', 124.0, 63.85, 0, 124.9, 66.45, 0.78, 'oak'],
+    ['b', 134.1, 64.45, 0, 135.0, 67.05, 0.78, 'oak'],
+    ['b', 125.55, 63.4, 3.1, 126.95, 63.48, 4.1, 'dust'],
+    ['b', 125.65, 63.48, 3.22, 126.85, 63.49, 3.98, 'stone'],
+    ['b', 125.5, 63.4, 4.1, 127.0, 63.49, 4.14, 'wood'],
+    ['b', 132.5, 63.4, 1.5, 133.2, 63.48, 2.4, 'gilt'],
+    ['b', 132.55, 63.48, 1.55, 133.15, 63.49, 2.35, 'black'],
+    ['b', 124.0, 69.05, 0, 124.45, 70.65, 2.1, 'oak'],
+    ['b', 124.45, 69.15, 0.7, 124.47, 70.55, 2.0, 'glass'],
+    ['b', 134.74, 64.25, 1.3, 135.0, 65.85, 1.33, 'oak'],
+    ['b', 134.74, 64.25, 1.85, 135.0, 65.85, 1.88, 'oak'],
+    ['b', 134.74, 64.25, 1.3, 135.0, 64.29, 1.88, 'oak'],
+    ['b', 134.74, 65.81, 1.3, 135.0, 65.85, 1.88, 'oak'],
+    ['b', 134.88, 64.42, 1.33, 134.94, 64.48, 1.53, 'white'],
+    ['b', 134.86, 64.56, 1.33, 134.94, 64.64, 1.43, 'tin'],
+    ['b', 134.85, 64.755, 1.33, 134.94, 64.845, 1.42, 'amber'],
+    ['b', 134.87, 64.965, 1.33, 134.94, 65.035, 1.47, 'wood'],
+    ['b', 134.84, 65.2, 1.33, 134.94, 65.3, 1.43, 'copper'],
+    ['b', 134.86, 65.46, 1.33, 134.94, 65.54, 1.45, 'stone'],
+    ['b', 134.88, 65.67, 1.33, 134.94, 65.73, 1.43, 'white'],
+    ['b', 134.82, 64.39, 1.88, 134.94, 64.51, 2.04, 'linen'],
+    ['b', 134.84, 64.7, 1.88, 134.94, 64.8, 2.1, 'ruby'],
+    ['b', 134.8, 64.98, 1.88, 134.94, 65.12, 2.02, 'glass'],
+    ['b', 134.86, 65.31, 1.88, 134.94, 65.39, 1.98, 'iron'],
+    ['b', 134.82, 65.59, 1.88, 134.94, 65.71, 2.06, 'petals'],
+    ['b', 124.72, 71.32, 1.57, 126.58, 71.4, 2.93, 'wood'],
+    ['b', 124.75, 71.3, 1.6, 126.55, 71.32, 2.9, 'petals'],
+    ['b', 125.18, 71.29, 1.72, 125.22, 71.3, 2.78, 'black'],
+    ['b', 125.63, 71.29, 1.72, 125.67, 71.3, 2.78, 'black'],
+    ['b', 126.08, 71.29, 1.72, 126.12, 71.3, 2.78, 'black'],
+    ['b', 134.2, 67.15, 0, 135.0, 68.75, 0.78, 'oak'],
+    ['b', 134.75, 68.3, 0.78, 134.85, 68.4, 1.0, 'flame'],
+    ['b', 124.95, 63.4, 0, 125.95, 63.85, 0.9, 'oak'],
+    ['b', 125.0, 63.45, 0.9, 125.9, 63.8, 0.93, 'black'],
+    ['b', 125.04, 63.5, 0.93, 125.14, 63.6, 1.03, 'black'],
+    ['b', 125.22, 63.5, 0.93, 125.32, 63.6, 1.03, 'black'],
+    ['b', 125.4, 63.5, 0.93, 125.5, 63.6, 1.03, 'black'],
+    ['b', 125.58, 63.5, 0.93, 125.68, 63.6, 1.03, 'black'],
+    ['b', 125.76, 63.5, 0.93, 125.86, 63.6, 1.03, 'black'],
+    ['b', 125.6, 63.65, 0.93, 125.9, 63.7, 0.96, 'white'],
+    ['b', 133.55, 71.0, 0, 134.75, 71.4, 1.9, 'oak'],
+    ['b', 133.6, 70.94, 0.15, 133.8, 71.0, 0.3, 'linen'],
+    ['b', 133.9, 70.94, 0.15, 134.1, 71.0, 0.3, 'dust'],
+    ['b', 134.2, 70.94, 0.15, 134.4, 71.0, 0.3, 'ruby'],
+    ['b', 134.5, 70.94, 0.15, 134.7, 71.0, 0.3, 'linen'],
+    ['b', 133.6, 70.94, 0.5, 133.8, 71.0, 0.65, 'dust'],
+    ['b', 133.9, 70.94, 0.5, 134.1, 71.0, 0.65, 'ruby'],
+    ['b', 134.2, 70.94, 0.5, 134.4, 71.0, 0.65, 'linen'],
+    ['b', 134.5, 70.94, 0.5, 134.7, 71.0, 0.65, 'dust'],
+    ['b', 133.6, 70.94, 0.85, 133.8, 71.0, 1.0, 'ruby'],
+    ['b', 133.9, 70.94, 0.85, 134.1, 71.0, 1.0, 'linen'],
+    ['b', 134.2, 70.94, 0.85, 134.4, 71.0, 1.0, 'dust'],
+    ['b', 134.5, 70.94, 0.85, 134.7, 71.0, 1.0, 'ruby'],
+    ['b', 133.6, 70.94, 1.2, 133.8, 71.0, 1.35, 'linen'],
+    ['b', 133.9, 70.94, 1.2, 134.1, 71.0, 1.35, 'dust'],
+    ['b', 134.2, 70.94, 1.2, 134.4, 71.0, 1.35, 'ruby'],
+    ['b', 134.5, 70.94, 1.2, 134.7, 71.0, 1.35, 'linen'],
+    ['b', 133.6, 70.94, 1.55, 133.8, 71.0, 1.7, 'dust'],
+    ['b', 133.9, 70.94, 1.55, 134.1, 71.0, 1.7, 'ruby'],
+    ['b', 134.2, 70.94, 1.55, 134.4, 71.0, 1.7, 'linen'],
+    ['b', 134.5, 70.94, 1.55, 134.7, 71.0, 1.7, 'dust'],
+    ['b', 134.92, 64.3, 2.5, 135.0, 64.8, 3.0, 'brass'],
+    ['b', 134.9, 64.34, 2.54, 134.92, 64.76, 2.96, 'white'],
+    ['b', 134.88, 64.54, 2.75, 134.9, 64.56, 2.92, 'black'],
+    ['b', 134.88, 64.55, 2.73, 134.9, 64.67, 2.76, 'black'],
+    ['b', 132.3, 70.9, 0, 132.8, 71.4, 0.85, 'oak'],
+    ['b', 132.4, 71.0, 0.85, 132.7, 71.3, 0.9, 'brass'],
+    ['b', 132.4, 71.0, 1.3, 132.7, 71.3, 1.35, 'brass'],
+    ['b', 132.51, 71.1, 0.9, 132.59, 71.2, 1.3, 'glass'],
+    ['b', 132.42, 71.02, 1.15, 132.68, 71.28, 1.3, 'amber'],
+    ['b', 132.46, 71.06, 0.9, 132.64, 71.24, 0.95, 'amber'],
+    ['b', 126.82, 71.24, 0, 126.88, 71.3, 1.6, 'oak'],
+    ['b', 127.62, 71.24, 0, 127.68, 71.3, 1.6, 'oak'],
+    ['b', 126.75, 71.2, 0.8, 127.75, 71.28, 1.5, 'oak'],
+    ['b', 126.8, 71.16, 0.85, 127.7, 71.2, 1.45, 'black'],
+    ['b', 126.87, 71.155, 1.36, 127.57, 71.16, 1.38, 'white'],
+    ['b', 126.87, 71.155, 1.22, 127.49, 71.16, 1.24, 'white'],
+    ['b', 126.87, 71.155, 1.08, 127.61, 71.16, 1.1, 'white'],
+    ['b', 126.87, 71.155, 0.94, 127.17, 71.16, 0.96, 'white'],
+    ['b', 127.157, 71.1, 1.17, 127.183, 71.16, 1.28, 'white'],
+    ['b', 126.8, 71.1, 0.8, 127.7, 71.3, 0.86, 'oak'],
+    ['b', 125.55, 63.4, 1.5, 128.55, 63.45, 2.0, 'wood'],
+    ['b', 125.6, 63.45, 1.54, 128.5, 63.47, 1.96, 'linen'],
+    ['b', 125.65, 63.47, 1.74, 128.45, 63.48, 1.76, 'black'],
+    ['b', 125.75, 63.47, 1.76, 125.85, 63.49, 1.84, 'gilt'],
+    ['b', 126.25, 63.47, 1.76, 126.35, 63.49, 1.9, 'gilt'],
+    ['b', 126.75, 63.47, 1.76, 126.85, 63.49, 1.84, 'gilt'],
+    ['b', 127.25, 63.47, 1.76, 127.35, 63.49, 1.9, 'gilt'],
+    ['b', 127.75, 63.47, 1.76, 127.85, 63.49, 1.84, 'gilt'],
+    ['b', 128.25, 63.47, 1.76, 128.35, 63.49, 1.9, 'gilt']]);
+  T['history-of-magic-classroom'].lights = (T['history-of-magic-classroom'].lights || []).concat([[131.45, 63.65, 0.5, 16757862, 1.1, 8], [125.35, 63.7, 2.33, 16757862, 1.1, 8], [133.65, 63.7, 2.33, 16757862, 1.1, 8], [134.8, 68.35, 1.05, 16757862, 1.1, 8]]);
+})(window.SHELL_W5A.things);
+/* HAND2 end history-of-magic-classroom */
+/* HAND2 begin newt-transfiguration-classroom */
+/* Interiors req 2423 sec 11: classroom, a table of changes chalked, a bell jar, the teapot that was a tortoise; req 2532 adds hangings, a dado and a thing to read or pull; req 2543 adds a coat-peg rail, an ink cupboard, a book trolley, a clock, a tortoise that is half a teapot, a tray of matchsticks half turned to needles and a chalk slate; sited by tools/architect-hand-rooms-1101.py, plain stand-ins (Objects draw the real ones) */
+(function (T) {
+  T['newt-transfiguration-classroom'] = T['newt-transfiguration-classroom'] || { items: [] };
+  T['newt-transfiguration-classroom'].items = T['newt-transfiguration-classroom'].items.concat([
+    ['b', 97.1, 59.25, 0, 98.9, 59.75, 1.3, 'stone'],
+    ['b', 97.5, 59.25, 0.1, 98.5, 59.77, 1.0, 'black'],
+    ['b', 97.75, 59.35, 0.12, 98.25, 59.65, 0.45, 'flame'],
+    ['b', 97.3, 59.75, 0, 98.7, 59.95, 0.18, 'iron'],
+    ['b', 96.95, 59.25, 1.3, 99.05, 59.9, 1.38, 'oak'],
+    ['b', 94.34, 59.25, 1.9, 94.46, 59.29, 2.3, 'iron'],
+    ['b', 94.375, 59.29, 2.25, 94.425, 59.55, 2.3, 'iron'],
+    ['b', 94.34, 59.51, 2.0, 94.46, 59.59, 2.28, 'flame'],
+    ['b', 102.34, 59.25, 1.9, 102.46, 59.29, 2.3, 'iron'],
+    ['b', 102.375, 59.29, 2.25, 102.425, 59.55, 2.3, 'iron'],
+    ['b', 102.34, 59.51, 2.0, 102.46, 59.59, 2.28, 'flame'],
+    ['b', 99.6, 71.95, 0.95, 102.2, 72.0, 2.1, 'wood'],
+    ['b', 99.65, 71.92, 1.0, 102.15, 71.95, 2.05, 'black'],
+    ['b', 99.6, 71.8, 0.9, 102.2, 71.95, 0.95, 'wood'],
+    ['b', 100.04, 71.86, 0.95, 100.16, 71.92, 0.97, 'white'],
+    ['b', 100.2, 71.86, 0.95, 100.4, 71.92, 0.96, 'dust'],
+    ['b', 92.25, 65.0, 0, 93.15, 67.6, 0.78, 'oak'],
+    ['b', 102.85, 61.8, 0, 103.75, 64.4, 0.78, 'oak'],
+    ['b', 93.8, 59.25, 3.1, 95.2, 59.33, 4.1, 'dust'],
+    ['b', 93.9, 59.33, 3.22, 95.1, 59.34, 3.98, 'stone'],
+    ['b', 93.75, 59.25, 4.1, 95.25, 59.34, 4.14, 'wood'],
+    ['b', 101.15, 59.25, 1.5, 101.85, 59.33, 2.4, 'gilt'],
+    ['b', 101.2, 59.33, 1.55, 101.8, 59.34, 2.35, 'black'],
+    ['b', 92.25, 68.6, 0, 92.7, 70.2, 2.1, 'oak'],
+    ['b', 92.7, 68.7, 0.7, 92.72, 70.1, 2.0, 'glass'],
+    ['b', 103.49, 68.8, 1.3, 103.75, 70.4, 1.33, 'oak'],
+    ['b', 103.49, 68.8, 1.85, 103.75, 70.4, 1.88, 'oak'],
+    ['b', 103.49, 68.8, 1.3, 103.75, 68.84, 1.88, 'oak'],
+    ['b', 103.49, 70.36, 1.3, 103.75, 70.4, 1.88, 'oak'],
+    ['b', 103.63, 68.97, 1.33, 103.69, 69.03, 1.53, 'white'],
+    ['b', 103.61, 69.11, 1.33, 103.69, 69.19, 1.43, 'tin'],
+    ['b', 103.6, 69.305, 1.33, 103.69, 69.395, 1.42, 'amber'],
+    ['b', 103.62, 69.515, 1.33, 103.69, 69.585, 1.47, 'wood'],
+    ['b', 103.59, 69.75, 1.33, 103.69, 69.85, 1.43, 'copper'],
+    ['b', 103.61, 70.01, 1.33, 103.69, 70.09, 1.45, 'stone'],
+    ['b', 103.63, 70.22, 1.33, 103.69, 70.28, 1.43, 'white'],
+    ['b', 103.57, 68.94, 1.88, 103.69, 69.06, 2.04, 'linen'],
+    ['b', 103.59, 69.25, 1.88, 103.69, 69.35, 2.1, 'ruby'],
+    ['b', 103.55, 69.53, 1.88, 103.69, 69.67, 2.02, 'glass'],
+    ['b', 103.61, 69.86, 1.88, 103.69, 69.94, 1.98, 'iron'],
+    ['b', 103.57, 70.14, 1.88, 103.69, 70.26, 2.06, 'petals'],
+    ['b', 93.775, 71.55, 0, 94.225, 72.0, 0.8, 'oak'],
+    ['b', 93.8, 71.6, 0.8, 94.2, 71.95, 1.15, 'glass'],
+    ['b', 102.27, 71.92, 1.57, 103.73, 72.0, 2.63, 'wood'],
+    ['b', 102.3, 71.9, 1.6, 103.7, 71.92, 2.6, 'linen'],
+    ['b', 102.63, 71.89, 1.72, 102.67, 71.9, 2.48, 'black'],
+    ['b', 102.98, 71.89, 1.72, 103.02, 71.9, 2.48, 'black'],
+    ['b', 103.33, 71.89, 1.72, 103.37, 71.9, 2.48, 'black'],
+    ['b', 92.25, 63.65, 1.55, 92.31, 64.95, 1.62, 'oak'],
+    ['b', 92.31, 63.8, 1.5, 92.35, 63.84, 1.6, 'iron'],
+    ['b', 92.31, 63.69, 0.7, 92.45, 63.95, 1.5, 'dark'],
+    ['b', 92.31, 64.12, 1.5, 92.35, 64.16, 1.6, 'iron'],
+    ['b', 92.31, 64.01, 0.7, 92.45, 64.27, 1.5, 'dark'],
+    ['b', 92.31, 64.44, 1.5, 92.35, 64.48, 1.6, 'iron'],
+    ['b', 92.31, 64.76, 1.5, 92.35, 64.8, 1.6, 'iron'],
+    ['b', 92.31, 64.65, 0.7, 92.45, 64.91, 1.5, 'dark'],
+    ['b', 92.31, 64.71, 0.9, 92.41, 64.85, 1.5, 'ruby'],
+    ['b', 94.3, 59.25, 0, 95.3, 59.7, 0.9, 'oak'],
+    ['b', 94.35, 59.3, 0.9, 95.25, 59.65, 0.93, 'black'],
+    ['b', 94.39, 59.35, 0.93, 94.49, 59.45, 1.03, 'black'],
+    ['b', 94.57, 59.35, 0.93, 94.67, 59.45, 1.03, 'black'],
+    ['b', 94.75, 59.35, 0.93, 94.85, 59.45, 1.03, 'black'],
+    ['b', 94.93, 59.35, 0.93, 95.03, 59.45, 1.03, 'black'],
+    ['b', 95.11, 59.35, 0.93, 95.21, 59.45, 1.03, 'black'],
+    ['b', 94.95, 59.5, 0.93, 95.25, 59.55, 0.96, 'white'],
+    ['b', 103.25, 68.85, 0.1, 103.75, 69.75, 0.14, 'oak'],
+    ['b', 103.25, 68.85, 0.7, 103.75, 69.75, 0.74, 'oak'],
+    ['b', 103.27, 68.88, 0, 103.73, 68.92, 0.9, 'oak'],
+    ['b', 103.27, 69.68, 0, 103.73, 69.72, 0.9, 'oak'],
+    ['b', 103.35, 68.895, 0.14, 103.65, 69.005, 0.4, 'ruby'],
+    ['b', 103.35, 69.045, 0.14, 103.65, 69.155, 0.44, 'blue'],
+    ['b', 103.35, 69.195, 0.14, 103.65, 69.305, 0.4, 'green'],
+    ['b', 103.35, 69.345, 0.14, 103.65, 69.455, 0.44, 'amber'],
+    ['b', 103.35, 69.495, 0.14, 103.65, 69.605, 0.4, 'dust'],
+    ['b', 103.35, 68.94, 0.74, 103.65, 69.06, 1.0, 'green'],
+    ['b', 103.35, 69.11, 0.74, 103.65, 69.23, 1.0, 'ruby'],
+    ['b', 103.35, 69.28, 0.74, 103.65, 69.4, 1.0, 'dust'],
+    ['b', 103.35, 69.45, 0.74, 103.65, 69.57, 1.0, 'blue'],
+    ['b', 103.67, 60.95, 2.5, 103.75, 61.45, 3.0, 'brass'],
+    ['b', 103.65, 60.99, 2.54, 103.67, 61.41, 2.96, 'white'],
+    ['b', 103.63, 61.19, 2.75, 103.65, 61.21, 2.92, 'black'],
+    ['b', 103.63, 61.2, 2.73, 103.65, 61.32, 2.76, 'black'],
+    ['b', 95.3, 71.4, 0, 96.1, 72.0, 0.7, 'oak'],
+    ['b', 95.45, 71.52, 0.7, 95.95, 71.88, 0.76, 'green'],
+    ['b', 95.47, 71.5, 0.76, 95.93, 71.9, 0.98, 'white'],
+    ['b', 95.46, 71.5, 0.82, 95.94, 71.9, 0.86, 'blue'],
+    ['b', 95.46, 71.5, 0.92, 95.94, 71.9, 0.96, 'blue'],
+    ['b', 95.6, 71.58, 0.98, 95.8, 71.82, 1.06, 'white'],
+    ['b', 95.675, 71.67, 1.06, 95.725, 71.73, 1.12, 'gilt'],
+    ['b', 95.93, 71.66, 0.8, 96.03, 71.8, 0.95, 'white'],
+    ['b', 95.36, 71.6, 0.78, 95.44, 71.8, 0.9, 'white'],
+    ['b', 95.64, 71.34, 0.7, 95.76, 71.5, 0.86, 'green'],
+    ['b', 99.3, 71.65, 0.78, 100.1, 72.0, 0.82, 'oak'],
+    ['b', 99.365, 71.7, 0.82, 99.395, 71.9, 0.84, 'iron'],
+    ['b', 99.455, 71.7, 0.82, 99.485, 71.9, 0.84, 'iron'],
+    ['b', 99.545, 71.7, 0.82, 99.575, 71.9, 0.84, 'iron'],
+    ['b', 99.635, 71.7, 0.82, 99.665, 71.9, 0.84, 'iron'],
+    ['b', 99.725, 71.7, 0.82, 99.755, 71.9, 0.84, 'dust'],
+    ['b', 99.815, 71.7, 0.82, 99.845, 71.9, 0.84, 'dust'],
+    ['b', 99.905, 71.7, 0.82, 99.935, 71.9, 0.84, 'dust'],
+    ['b', 99.995, 71.7, 0.82, 100.025, 71.9, 0.84, 'dust'],
+    ['b', 99.543, 71.7, 0.84, 99.557, 71.9, 0.86, 'white'],
+    ['b', 94.37, 71.84, 0, 94.43, 71.9, 1.6, 'oak'],
+    ['b', 95.17, 71.84, 0, 95.23, 71.9, 1.6, 'oak'],
+    ['b', 94.3, 71.8, 0.8, 95.3, 71.88, 1.5, 'oak'],
+    ['b', 94.35, 71.76, 0.85, 95.25, 71.8, 1.45, 'black'],
+    ['b', 94.42, 71.755, 1.36, 95.12, 71.76, 1.38, 'white'],
+    ['b', 94.42, 71.755, 1.22, 95.04, 71.76, 1.24, 'white'],
+    ['b', 94.42, 71.755, 1.08, 95.16, 71.76, 1.1, 'white'],
+    ['b', 94.42, 71.755, 0.94, 94.72, 71.76, 0.96, 'white'],
+    ['b', 94.707, 71.7, 1.17, 94.733, 71.76, 1.28, 'white'],
+    ['b', 94.35, 71.7, 0.8, 95.25, 71.9, 0.86, 'oak']]);
+  T['newt-transfiguration-classroom'].lights = (T['newt-transfiguration-classroom'].lights || []).concat([[98.0, 59.5, 0.5, 16757862, 1.1, 8], [94.4, 59.55, 2.33, 16757862, 1.1, 8], [102.4, 59.55, 2.33, 16757862, 1.1, 8]]);
+})(window.SHELL_W5A.things);
+/* HAND2 end newt-transfiguration-classroom */
+/* HAND2 begin transfiguration-classroom */
+/* Interiors req 2423 sec 11: classroom, benches of matchsticks, a stuffed fox mid-change, a case of kept objects; req 2532 adds hangings, a dado and a thing to read or pull; req 2543 adds a tray of beetles halfway to buttons (CoS 6), a coat-peg rail, an ink cupboard, a book trolley, a clock and a chalk slate; sited by tools/architect-hand-rooms-1101.py, plain stand-ins (Objects draw the real ones) */
+(function (T) {
+  T['transfiguration-classroom'] = T['transfiguration-classroom'] || { items: [] };
+  T['transfiguration-classroom'].items = T['transfiguration-classroom'].items.concat([
+    ['b', 144.65, 63.4, 0, 146.45, 63.9, 1.3, 'stone'],
+    ['b', 145.05, 63.4, 0.1, 146.05, 63.92, 1.0, 'black'],
+    ['b', 145.3, 63.5, 0.12, 145.8, 63.8, 0.45, 'flame'],
+    ['b', 144.85, 63.9, 0, 146.25, 64.1, 0.18, 'iron'],
+    ['b', 144.5, 63.4, 1.3, 146.6, 64.05, 1.38, 'oak'],
+    ['b', 140.99, 63.4, 1.9, 141.11, 63.44, 2.3, 'iron'],
+    ['b', 141.025, 63.44, 2.25, 141.075, 63.7, 2.3, 'iron'],
+    ['b', 140.99, 63.66, 2.0, 141.11, 63.74, 2.28, 'flame'],
+    ['b', 150.09, 63.4, 1.9, 150.21, 63.44, 2.3, 'iron'],
+    ['b', 150.125, 63.44, 2.25, 150.175, 63.7, 2.3, 'iron'],
+    ['b', 150.09, 63.66, 2.0, 150.21, 63.74, 2.28, 'flame'],
+    ['b', 144.25, 71.35, 0.95, 146.85, 71.4, 2.1, 'wood'],
+    ['b', 144.3, 71.32, 1.0, 146.8, 71.35, 2.05, 'black'],
+    ['b', 144.25, 71.2, 0.9, 146.85, 71.35, 0.95, 'wood'],
+    ['b', 144.69, 71.26, 0.95, 144.81, 71.32, 0.97, 'white'],
+    ['b', 144.85, 71.26, 0.95, 145.05, 71.32, 0.96, 'dust'],
+    ['b', 139.6, 63.75, 0, 140.5, 66.35, 0.78, 'oak'],
+    ['b', 150.7, 64.45, 0, 151.6, 67.05, 0.78, 'oak'],
+    ['b', 141.25, 63.4, 3.1, 142.65, 63.48, 4.1, 'dust'],
+    ['b', 141.35, 63.48, 3.22, 142.55, 63.49, 3.98, 'stone'],
+    ['b', 141.2, 63.4, 4.1, 142.7, 63.49, 4.14, 'wood'],
+    ['b', 150.3, 63.4, 1.5, 151.0, 63.48, 2.4, 'gilt'],
+    ['b', 150.35, 63.48, 1.55, 150.95, 63.49, 2.35, 'black'],
+    ['b', 139.6, 69.05, 0, 140.05, 70.65, 2.1, 'oak'],
+    ['b', 140.05, 69.15, 0.7, 140.07, 70.55, 2.0, 'glass'],
+    ['b', 151.34, 64.25, 1.3, 151.6, 65.85, 1.33, 'oak'],
+    ['b', 151.34, 64.25, 1.85, 151.6, 65.85, 1.88, 'oak'],
+    ['b', 151.34, 64.25, 1.3, 151.6, 64.29, 1.88, 'oak'],
+    ['b', 151.34, 65.81, 1.3, 151.6, 65.85, 1.88, 'oak'],
+    ['b', 151.48, 64.42, 1.33, 151.54, 64.48, 1.53, 'white'],
+    ['b', 151.46, 64.56, 1.33, 151.54, 64.64, 1.43, 'tin'],
+    ['b', 151.45, 64.755, 1.33, 151.54, 64.845, 1.42, 'amber'],
+    ['b', 151.47, 64.965, 1.33, 151.54, 65.035, 1.47, 'wood'],
+    ['b', 151.44, 65.2, 1.33, 151.54, 65.3, 1.43, 'copper'],
+    ['b', 151.46, 65.46, 1.33, 151.54, 65.54, 1.45, 'stone'],
+    ['b', 151.48, 65.67, 1.33, 151.54, 65.73, 1.43, 'white'],
+    ['b', 151.42, 64.39, 1.88, 151.54, 64.51, 2.04, 'linen'],
+    ['b', 151.44, 64.7, 1.88, 151.54, 64.8, 2.1, 'ruby'],
+    ['b', 151.4, 64.98, 1.88, 151.54, 65.12, 2.02, 'glass'],
+    ['b', 151.46, 65.31, 1.88, 151.54, 65.39, 1.98, 'iron'],
+    ['b', 151.42, 65.59, 1.88, 151.54, 65.71, 2.06, 'petals'],
+    ['b', 140.55, 70.95, 0, 142.15, 71.4, 2.1, 'oak'],
+    ['b', 140.65, 70.93, 0.7, 142.05, 70.95, 2.0, 'glass'],
+    ['b', 145.05, 70.8, 0, 146.05, 71.4, 0.74, 'oak'],
+    ['b', 145.1, 70.84, 0.74, 146.0, 71.36, 0.8, 'tan'],
+    ['b', 145.16, 71.16, 0.8, 145.26, 71.28, 0.84, 'white'],
+    ['b', 145.28, 71.16, 0.8, 145.38, 71.28, 0.84, 'white'],
+    ['b', 145.4, 71.16, 0.8, 145.5, 71.28, 0.84, 'white'],
+    ['b', 145.61, 71.1, 0.8, 145.73, 71.26, 0.84, 'white'],
+    ['b', 145.65, 71.1, 0.84, 145.69, 71.26, 0.88, 'iron'],
+    ['b', 145.78, 70.94, 0.8, 145.92, 71.1, 0.86, 'iron'],
+    ['b', 145.8, 70.96, 0.86, 145.9, 71.08, 0.9, 'white'],
+    ['b', 145.73, 70.92, 0.8, 145.77, 71.12, 0.82, 'iron'],
+    ['b', 145.93, 70.92, 0.8, 145.97, 71.12, 0.82, 'iron'],
+    ['b', 141.9, 63.4, 1.55, 143.2, 63.46, 1.62, 'oak'],
+    ['b', 142.05, 63.46, 1.5, 142.09, 63.5, 1.6, 'iron'],
+    ['b', 141.94, 63.46, 0.7, 142.2, 63.6, 1.5, 'dark'],
+    ['b', 142.37, 63.46, 1.5, 142.41, 63.5, 1.6, 'iron'],
+    ['b', 142.26, 63.46, 0.7, 142.52, 63.6, 1.5, 'dark'],
+    ['b', 142.69, 63.46, 1.5, 142.73, 63.5, 1.6, 'iron'],
+    ['b', 143.01, 63.46, 1.5, 143.05, 63.5, 1.6, 'iron'],
+    ['b', 142.9, 63.46, 0.7, 143.16, 63.6, 1.5, 'dark'],
+    ['b', 142.96, 63.46, 0.9, 143.1, 63.56, 1.5, 'ruby'],
+    ['b', 146.65, 63.4, 0, 147.65, 63.85, 0.9, 'oak'],
+    ['b', 146.7, 63.45, 0.9, 147.6, 63.8, 0.93, 'black'],
+    ['b', 146.74, 63.5, 0.93, 146.84, 63.6, 1.03, 'black'],
+    ['b', 146.92, 63.5, 0.93, 147.02, 63.6, 1.03, 'black'],
+    ['b', 147.1, 63.5, 0.93, 147.2, 63.6, 1.03, 'black'],
+    ['b', 147.28, 63.5, 0.93, 147.38, 63.6, 1.03, 'black'],
+    ['b', 147.46, 63.5, 0.93, 147.56, 63.6, 1.03, 'black'],
+    ['b', 147.3, 63.65, 0.93, 147.6, 63.7, 0.96, 'white'],
+    ['b', 142.2, 70.9, 0.1, 143.1, 71.4, 0.14, 'oak'],
+    ['b', 142.2, 70.9, 0.7, 143.1, 71.4, 0.74, 'oak'],
+    ['b', 142.23, 70.92, 0, 142.27, 71.38, 0.9, 'oak'],
+    ['b', 143.03, 70.92, 0, 143.07, 71.38, 0.9, 'oak'],
+    ['b', 142.245, 71.0, 0.14, 142.355, 71.3, 0.4, 'ruby'],
+    ['b', 142.395, 71.0, 0.14, 142.505, 71.3, 0.44, 'blue'],
+    ['b', 142.545, 71.0, 0.14, 142.655, 71.3, 0.4, 'green'],
+    ['b', 142.695, 71.0, 0.14, 142.805, 71.3, 0.44, 'amber'],
+    ['b', 142.845, 71.0, 0.14, 142.955, 71.3, 0.4, 'dust'],
+    ['b', 142.29, 71.0, 0.74, 142.41, 71.3, 1.0, 'green'],
+    ['b', 142.46, 71.0, 0.74, 142.58, 71.3, 1.0, 'ruby'],
+    ['b', 142.63, 71.0, 0.74, 142.75, 71.3, 1.0, 'dust'],
+    ['b', 142.8, 71.0, 0.74, 142.92, 71.3, 1.0, 'blue'],
+    ['b', 149.2, 71.32, 2.5, 149.7, 71.4, 3.0, 'brass'],
+    ['b', 149.24, 71.3, 2.54, 149.66, 71.32, 2.96, 'white'],
+    ['b', 149.44, 71.28, 2.75, 149.46, 71.3, 2.92, 'black'],
+    ['b', 149.45, 71.28, 2.73, 149.57, 71.3, 2.76, 'black']]);
+  T['transfiguration-classroom'].lights = (T['transfiguration-classroom'].lights || []).concat([[145.55, 63.65, 0.5, 16757862, 1.1, 8], [141.05, 63.7, 2.33, 16757862, 1.1, 8], [150.15, 63.7, 2.33, 16757862, 1.1, 8]]);
+})(window.SHELL_W5A.things);
+/* HAND2 end transfiguration-classroom */
+/* HAND2 begin charms-classroom-3-west */
+/* Interiors req 2423 sec 11: classroom, a chalked swish and flick, a feather and candle on each bench, cushions; req 2532 adds hangings, a dado and a thing to read or pull; req 2543 adds a bench with a feather held over it on nothing, a book trolley, a coat-peg rail, an ink cupboard, a clock and a rolled rug; sited by tools/architect-hand-rooms-1101.py, plain stand-ins (Objects draw the real ones) */
+(function (T) {
+  T['charms-classroom-3-west'] = T['charms-classroom-3-west'] || { items: [] };
+  T['charms-classroom-3-west'].items = T['charms-classroom-3-west'].items.concat([
+    ['b', 125.6, 59.65, 0, 127.4, 60.15, 1.3, 'stone'],
+    ['b', 126.0, 59.65, 0.1, 127.0, 60.17, 1.0, 'black'],
+    ['b', 126.25, 59.75, 0.12, 126.75, 60.05, 0.45, 'flame'],
+    ['b', 125.8, 60.15, 0, 127.2, 60.35, 0.18, 'iron'],
+    ['b', 125.45, 59.65, 1.3, 127.55, 60.3, 1.38, 'oak'],
+    ['b', 122.14, 59.65, 1.9, 122.26, 59.69, 2.3, 'iron'],
+    ['b', 122.175, 59.69, 2.25, 122.225, 59.95, 2.3, 'iron'],
+    ['b', 122.14, 59.91, 2.0, 122.26, 59.99, 2.28, 'flame'],
+    ['b', 134.64, 59.65, 1.9, 134.76, 59.69, 2.3, 'iron'],
+    ['b', 134.675, 59.69, 2.25, 134.725, 59.95, 2.3, 'iron'],
+    ['b', 134.64, 59.91, 2.0, 134.76, 59.99, 2.28, 'flame'],
+    ['b', 125.0, 69.8, 0.95, 127.6, 69.85, 2.1, 'wood'],
+    ['b', 125.05, 69.77, 1.0, 127.55, 69.8, 2.05, 'black'],
+    ['b', 125.0, 69.65, 0.9, 127.6, 69.8, 0.95, 'wood'],
+    ['b', 125.44, 69.71, 0.95, 125.56, 69.77, 0.97, 'white'],
+    ['b', 125.6, 69.71, 0.95, 125.8, 69.77, 0.96, 'dust'],
+    ['b', 120.25, 61.4, 0, 121.15, 64.0, 0.78, 'oak'],
+    ['b', 135.75, 61.4, 0, 136.65, 64.0, 0.78, 'oak'],
+    ['b', 122.8, 59.65, 3.1, 124.2, 59.73, 4.1, 'dust'],
+    ['b', 122.9, 59.73, 3.22, 124.1, 59.74, 3.98, 'stone'],
+    ['b', 122.75, 59.65, 4.1, 124.25, 59.74, 4.14, 'wood'],
+    ['b', 133.05, 59.65, 1.5, 133.75, 59.73, 2.4, 'gilt'],
+    ['b', 133.1, 59.73, 1.55, 133.7, 59.74, 2.35, 'black'],
+    ['b', 120.25, 67.0, 0, 120.7, 68.6, 2.1, 'oak'],
+    ['b', 120.7, 67.1, 0.7, 120.72, 68.5, 2.0, 'glass'],
+    ['b', 136.39, 67.0, 1.3, 136.65, 68.6, 1.33, 'oak'],
+    ['b', 136.39, 67.0, 1.85, 136.65, 68.6, 1.88, 'oak'],
+    ['b', 136.39, 67.0, 1.3, 136.65, 67.04, 1.88, 'oak'],
+    ['b', 136.39, 68.56, 1.3, 136.65, 68.6, 1.88, 'oak'],
+    ['b', 136.53, 67.17, 1.33, 136.59, 67.23, 1.53, 'white'],
+    ['b', 136.51, 67.31, 1.33, 136.59, 67.39, 1.43, 'tin'],
+    ['b', 136.5, 67.505, 1.33, 136.59, 67.595, 1.42, 'amber'],
+    ['b', 136.52, 67.715, 1.33, 136.59, 67.785, 1.47, 'wood'],
+    ['b', 136.49, 67.95, 1.33, 136.59, 68.05, 1.43, 'copper'],
+    ['b', 136.51, 68.21, 1.33, 136.59, 68.29, 1.45, 'stone'],
+    ['b', 136.53, 68.42, 1.33, 136.59, 68.48, 1.43, 'white'],
+    ['b', 136.47, 67.14, 1.88, 136.59, 67.26, 2.04, 'linen'],
+    ['b', 136.49, 67.45, 1.88, 136.59, 67.55, 2.1, 'ruby'],
+    ['b', 136.45, 67.73, 1.88, 136.59, 67.87, 2.02, 'glass'],
+    ['b', 136.51, 68.06, 1.88, 136.59, 68.14, 1.98, 'iron'],
+    ['b', 136.47, 68.34, 1.88, 136.59, 68.46, 2.06, 'petals'],
+    ['b', 121.9, 69.45, 0, 123.5, 69.85, 0.8, 'oak'],
+    ['b', 121.9, 69.63, 0.8, 123.5, 69.85, 2.0, 'wood'],
+    ['b', 122.074, 69.55, 1.1, 122.174, 69.63, 1.4, 'amber'],
+    ['b', 122.458, 69.55, 1.5, 122.558, 69.63, 1.8, 'amber'],
+    ['b', 122.842, 69.55, 1.1, 122.942, 69.63, 1.4, 'amber'],
+    ['b', 123.226, 69.55, 1.5, 123.326, 69.63, 1.8, 'amber'],
+    ['b', 126.55, 69.25, 0, 127.65, 69.85, 0.8, 'oak'],
+    ['b', 127.25, 69.4, 0.8, 127.55, 69.7, 0.83, 'linen'],
+    ['b', 126.875, 69.55, 0.8, 126.925, 69.6, 1.1, 'glass'],
+    ['b', 126.775, 69.5, 1.1, 127.025, 69.65, 1.14, 'white'],
+    ['b', 126.885, 69.55, 1.14, 126.915, 69.57, 1.3, 'white'],
+    ['b', 124.65, 59.65, 0.1, 125.55, 60.15, 0.14, 'oak'],
+    ['b', 124.65, 59.65, 0.7, 125.55, 60.15, 0.74, 'oak'],
+    ['b', 124.68, 59.67, 0, 124.72, 60.13, 0.9, 'oak'],
+    ['b', 125.48, 59.67, 0, 125.52, 60.13, 0.9, 'oak'],
+    ['b', 124.695, 59.75, 0.14, 124.805, 60.05, 0.4, 'ruby'],
+    ['b', 124.845, 59.75, 0.14, 124.955, 60.05, 0.44, 'blue'],
+    ['b', 124.995, 59.75, 0.14, 125.105, 60.05, 0.4, 'green'],
+    ['b', 125.145, 59.75, 0.14, 125.255, 60.05, 0.44, 'amber'],
+    ['b', 125.295, 59.75, 0.14, 125.405, 60.05, 0.4, 'dust'],
+    ['b', 124.74, 59.75, 0.74, 124.86, 60.05, 1.0, 'green'],
+    ['b', 124.91, 59.75, 0.74, 125.03, 60.05, 1.0, 'ruby'],
+    ['b', 125.08, 59.75, 0.74, 125.2, 60.05, 1.0, 'dust'],
+    ['b', 125.25, 59.75, 0.74, 125.37, 60.05, 1.0, 'blue'],
+    ['b', 120.25, 65.65, 1.55, 120.31, 66.95, 1.62, 'oak'],
+    ['b', 120.31, 65.8, 1.5, 120.35, 65.84, 1.6, 'iron'],
+    ['b', 120.31, 65.69, 0.7, 120.45, 65.95, 1.5, 'dark'],
+    ['b', 120.31, 66.12, 1.5, 120.35, 66.16, 1.6, 'iron'],
+    ['b', 120.31, 66.01, 0.7, 120.45, 66.27, 1.5, 'dark'],
+    ['b', 120.31, 66.44, 1.5, 120.35, 66.48, 1.6, 'iron'],
+    ['b', 120.31, 66.76, 1.5, 120.35, 66.8, 1.6, 'iron'],
+    ['b', 120.31, 66.65, 0.7, 120.45, 66.91, 1.5, 'dark'],
+    ['b', 120.31, 66.71, 0.9, 120.41, 66.85, 1.5, 'ruby'],
+    ['b', 136.2, 60.3, 0, 136.65, 61.3, 0.9, 'oak'],
+    ['b', 136.25, 60.35, 0.9, 136.6, 61.25, 0.93, 'black'],
+    ['b', 136.45, 60.39, 0.93, 136.55, 60.49, 1.03, 'black'],
+    ['b', 136.45, 60.57, 0.93, 136.55, 60.67, 1.03, 'black'],
+    ['b', 136.45, 60.75, 0.93, 136.55, 60.85, 1.03, 'black'],
+    ['b', 136.45, 60.93, 0.93, 136.55, 61.03, 1.03, 'black'],
+    ['b', 136.45, 61.11, 0.93, 136.55, 61.21, 1.03, 'black'],
+    ['b', 136.35, 60.95, 0.93, 136.4, 61.25, 0.96, 'white'],
+    ['b', 132.35, 59.65, 2.5, 132.85, 59.73, 3.0, 'brass'],
+    ['b', 132.39, 59.73, 2.54, 132.81, 59.75, 2.96, 'white'],
+    ['b', 132.59, 59.75, 2.75, 132.61, 59.77, 2.92, 'black'],
+    ['b', 132.6, 59.75, 2.73, 132.72, 59.77, 2.76, 'black'],
+    ['b', 136.3, 67.0, 0, 136.65, 68.6, 0.35, 'ruby'],
+    ['b', 136.28, 67.27, 0, 136.65, 67.33, 0.36, 'tan'],
+    ['b', 136.28, 68.27, 0, 136.65, 68.33, 0.36, 'tan']]);
+  T['charms-classroom-3-west'].lights = (T['charms-classroom-3-west'].lights || []).concat([[126.5, 59.9, 0.5, 16757862, 1.1, 8], [122.2, 59.95, 2.33, 16757862, 1.1, 8], [134.7, 59.95, 2.33, 16757862, 1.1, 8]]);
+})(window.SHELL_W5A.things);
+/* HAND2 end charms-classroom-3-west */
+/* HAND2 begin defence-teachers-bedroom-3 */
+/* Interiors req 2423 sec 13: a staff bedroom, a scarred trunk and a stack of notes; req 2532 adds hangings, a dado and a thing to read or pull; req 2543 adds a bedside table with a pocket sneakoscope on its point, a bed chest, a coat-peg rail, an ink cupboard, a clock and a rolled rug; req 2532 adds hangings, a dado and a thing to read or pull; the second bed dropped for a low settle, the rug made green (Fawkes, 1 Nov 2.31 pm); sited by tools/architect-hand-rooms-1101.py, plain stand-ins (Objects draw the real ones) */
+(function (T) {
+  T['defence-teachers-bedroom-3'] = T['defence-teachers-bedroom-3'] || { items: [] };
+  T['defence-teachers-bedroom-3'].items = T['defence-teachers-bedroom-3'].items.concat([
+    ['b', 95.2, 59.25, 0, 97.0, 59.75, 1.3, 'stone'],
+    ['b', 95.6, 59.25, 0.1, 96.6, 59.77, 1.0, 'black'],
+    ['b', 95.85, 59.35, 0.12, 96.35, 59.65, 0.45, 'flame'],
+    ['b', 95.4, 59.75, 0, 96.8, 59.95, 0.18, 'iron'],
+    ['b', 95.05, 59.25, 1.3, 97.15, 59.9, 1.38, 'oak'],
+    ['b', 89.94, 59.25, 1.9, 90.06, 59.29, 2.3, 'iron'],
+    ['b', 89.975, 59.29, 2.25, 90.025, 59.55, 2.3, 'iron'],
+    ['b', 89.94, 59.51, 2.0, 90.06, 59.59, 2.28, 'flame'],
+    ['b', 94.14, 71.96, 1.9, 94.26, 72.0, 2.3, 'iron'],
+    ['b', 94.175, 71.7, 2.25, 94.225, 71.96, 2.3, 'iron'],
+    ['b', 94.14, 71.66, 2.0, 94.26, 71.74, 2.28, 'flame'],
+    ['b', 90.95, 71.4, 0, 92.25, 72.0, 2.1, 'oak'],
+    ['b', 91.58, 71.38, 0.2, 91.62, 71.4, 2.0, 'black'],
+    ['b', 97.15, 71.5, 0, 98.25, 72.0, 0.78, 'oak'],
+    ['b', 97.35, 71.94, 0.9, 98.05, 71.98, 1.7, 'glass'],
+    ['b', 97.35, 71.75, 0.78, 97.45, 71.9, 0.9, 'tin'],
+    ['b', 99.6, 62.675, 0, 100.05, 63.525, 0.85, 'oak'],
+    ['b', 99.65, 62.8, 0.85, 99.95, 63.2, 0.93, 'white'],
+    ['b', 99.75, 63.25, 0.85, 99.9, 63.45, 1.15, 'white'],
+    ['b', 97.55, 59.25, 1.5, 98.25, 59.33, 2.4, 'gilt'],
+    ['b', 97.6, 59.33, 1.55, 98.2, 59.34, 2.35, 'black'],
+    ['b', 90.12, 59.25, 1.57, 91.08, 59.33, 2.33, 'wood'],
+    ['b', 90.15, 59.33, 1.6, 91.05, 59.35, 2.3, 'petals'],
+    ['b', 90.355, 59.35, 1.72, 90.395, 59.36, 2.18, 'black'],
+    ['b', 90.58, 59.35, 1.72, 90.62, 59.36, 2.18, 'black'],
+    ['b', 90.805, 59.35, 1.72, 90.845, 59.36, 2.18, 'black'],
+    ['b', 99.45, 68.25, 0, 100.05, 69.35, 0.55, 'wood'],
+    ['b', 99.43, 68.76, 0, 100.05, 68.84, 0.55, 'iron'],
+    ['b', 88.25, 68.55, 0, 88.6, 69.05, 1.0, 'oak'],
+    ['b', 88.25, 68.5, 1.0, 88.75, 69.1, 1.08, 'linen'],
+    ['b', 88.25, 65.35, 0, 88.75, 65.85, 0.7, 'oak'],
+    ['b', 88.3, 65.4, 0.7, 88.7, 65.8, 0.73, 'brass'],
+    ['b', 88.43, 65.53, 0.73, 88.57, 65.67, 0.88, 'glass'],
+    ['b', 88.37, 65.47, 0.88, 88.63, 65.73, 1.0, 'glass'],
+    ['b', 88.45, 65.55, 0.88, 88.55, 65.65, 0.98, 'white'],
+    ['b', 88.35, 65.45, 1.0, 88.65, 65.75, 1.04, 'amber'],
+    ['b', 99.55, 63.6, 0, 100.05, 64.6, 0.55, 'oak'],
+    ['b', 99.53, 64.06, 0, 100.05, 64.14, 0.56, 'iron'],
+    ['b', 99.53, 64.36, 0, 100.05, 64.44, 0.56, 'iron'],
+    ['b', 91.65, 62.9, 0, 94.85, 68.3, 0.02, 'rope'],
+    ['b', 91.77, 63.02, 0.02, 94.73, 68.18, 0.035, 'green'],
+    ['b', 92.35, 64.0, 0.035, 94.15, 67.2, 0.05, 'books3'],
+    ['b', 96.0, 71.5, 0, 97.0, 72.0, 0.55, 'oak'],
+    ['b', 96.46, 71.48, 0, 96.54, 72.0, 0.56, 'iron'],
+    ['b', 96.76, 71.48, 0, 96.84, 72.0, 0.56, 'iron'],
+    ['b', 92.35, 71.94, 1.55, 93.65, 72.0, 1.62, 'oak'],
+    ['b', 92.5, 71.9, 1.5, 92.54, 71.94, 1.6, 'iron'],
+    ['b', 92.39, 71.8, 0.7, 92.65, 71.94, 1.5, 'dark'],
+    ['b', 92.82, 71.9, 1.5, 92.86, 71.94, 1.6, 'iron'],
+    ['b', 92.71, 71.8, 0.7, 92.97, 71.94, 1.5, 'dark'],
+    ['b', 93.14, 71.9, 1.5, 93.18, 71.94, 1.6, 'iron'],
+    ['b', 93.46, 71.9, 1.5, 93.5, 71.94, 1.6, 'iron'],
+    ['b', 93.35, 71.8, 0.7, 93.61, 71.94, 1.5, 'dark'],
+    ['b', 93.41, 71.84, 0.9, 93.55, 71.94, 1.5, 'ruby'],
+    ['b', 90.1, 59.25, 0, 91.1, 59.7, 0.9, 'oak'],
+    ['b', 90.15, 59.3, 0.9, 91.05, 59.65, 0.93, 'black'],
+    ['b', 90.19, 59.35, 0.93, 90.29, 59.45, 1.03, 'black'],
+    ['b', 90.37, 59.35, 0.93, 90.47, 59.45, 1.03, 'black'],
+    ['b', 90.55, 59.35, 0.93, 90.65, 59.45, 1.03, 'black'],
+    ['b', 90.73, 59.35, 0.93, 90.83, 59.45, 1.03, 'black'],
+    ['b', 90.91, 59.35, 0.93, 91.01, 59.45, 1.03, 'black'],
+    ['b', 90.75, 59.5, 0.93, 91.05, 59.55, 0.96, 'white'],
+    ['b', 96.25, 59.25, 2.5, 96.75, 59.33, 3.0, 'brass'],
+    ['b', 96.29, 59.33, 2.54, 96.71, 59.35, 2.96, 'white'],
+    ['b', 96.49, 59.35, 2.75, 96.51, 59.37, 2.92, 'black'],
+    ['b', 96.5, 59.35, 2.73, 96.62, 59.37, 2.76, 'black'],
+    ['b', 88.25, 69.1, 0, 88.6, 70.7, 0.35, 'ruby'],
+    ['b', 88.25, 69.37, 0, 88.62, 69.43, 0.36, 'tan'],
+    ['b', 88.25, 70.37, 0, 88.62, 70.43, 0.36, 'tan'],
+    ['b', 88.25, 63.1, 0, 88.75, 64.7, 0.42, 'oak'],
+    ['b', 88.27, 63.15, 0.42, 88.71, 64.65, 0.47, 'rush'],
+    ['b', 88.25, 63.1, 0.47, 88.35, 64.7, 0.85, 'oak'],
+    ['b', 88.4, 64.15, 0.47, 88.65, 64.65, 0.55, 'cloth']]);
+  T['defence-teachers-bedroom-3'].lights = (T['defence-teachers-bedroom-3'].lights || []).concat([[96.1, 59.5, 0.5, 16757862, 1.1, 8], [90.0, 59.55, 2.33, 16757862, 1.1, 8], [94.2, 71.7, 2.33, 16757862, 1.1, 8]]);
+})(window.SHELL_W5A.things);
+/* HAND2 end defence-teachers-bedroom-3 */
+/* HAND2 begin staff-bedroom-4-east */
+/* Interiors req 2423 sec 13: a staff bedroom, a quiet sleeper; req 2532 adds hangings, a dado and a thing to read or pull; furnished past the shared bedroom template as the quiet sleeper's own room (card 48, 1 Nov, the 429th); sited by tools/architect-hand-rooms-1101.py, plain stand-ins (Objects draw the real ones) */
+(function (T) {
+  T['staff-bedroom-4-east'] = T['staff-bedroom-4-east'] || { items: [] };
+  T['staff-bedroom-4-east'].items = T['staff-bedroom-4-east'].items.concat([
+    ['b', 153.0, 28.92, 0, 154.8, 29.42, 1.3, 'stone'],
+    ['b', 153.4, 28.92, 0.1, 154.4, 29.44, 1.0, 'black'],
+    ['b', 153.65, 29.02, 0.12, 154.15, 29.32, 0.45, 'flame'],
+    ['b', 153.2, 29.42, 0, 154.6, 29.62, 0.18, 'iron'],
+    ['b', 152.85, 28.92, 1.3, 154.95, 29.57, 1.38, 'oak'],
+    ['b', 149.64, 28.92, 1.9, 149.76, 28.96, 2.3, 'iron'],
+    ['b', 149.675, 28.96, 2.25, 149.725, 29.22, 2.3, 'iron'],
+    ['b', 149.64, 29.18, 2.0, 149.76, 29.26, 2.28, 'flame'],
+    ['b', 153.84, 39.04, 1.9, 153.96, 39.08, 2.3, 'iron'],
+    ['b', 153.875, 38.78, 2.25, 153.925, 39.04, 2.3, 'iron'],
+    ['b', 153.84, 38.74, 2.0, 153.96, 38.82, 2.28, 'flame'],
+    ['b', 147.85, 31.47, 0.25, 149.85, 32.47, 0.5, 'oak'],
+    ['b', 147.9, 31.49, 0.5, 149.8, 32.45, 0.68, 'linen'],
+    ['b', 147.9, 31.62, 0.68, 148.35, 32.32, 0.8, 'white'],
+    ['b', 147.85, 31.47, 0.25, 147.91, 32.47, 1.25, 'iron'],
+    ['b', 149.05, 31.49, 0.68, 149.8, 32.45, 0.72, 'ruby'],
+    ['b', 149.05, 38.48, 0, 150.35, 39.08, 2.1, 'oak'],
+    ['b', 149.68, 38.46, 0.2, 149.72, 38.48, 2.0, 'black'],
+    ['b', 157.05, 38.58, 0, 158.15, 39.08, 0.78, 'oak'],
+    ['b', 157.25, 39.02, 0.9, 157.95, 39.06, 1.7, 'glass'],
+    ['b', 157.25, 38.83, 0.78, 157.35, 38.98, 0.9, 'tin'],
+    ['b', 159.55, 31.545, 0, 160.0, 32.395, 0.85, 'oak'],
+    ['b', 159.6, 31.67, 0.85, 159.9, 32.07, 0.93, 'white'],
+    ['b', 159.7, 32.12, 0.85, 159.85, 32.32, 1.15, 'white'],
+    ['b', 157.45, 28.92, 1.5, 158.15, 29.0, 2.4, 'gilt'],
+    ['b', 157.5, 29.0, 1.55, 158.1, 29.01, 2.35, 'black'],
+    ['b', 149.82, 28.92, 1.57, 150.78, 29.0, 2.33, 'wood'],
+    ['b', 149.85, 29.0, 1.6, 150.75, 29.02, 2.3, 'petals'],
+    ['b', 150.055, 29.02, 1.72, 150.095, 29.03, 2.18, 'black'],
+    ['b', 150.28, 29.02, 1.72, 150.32, 29.03, 2.18, 'black'],
+    ['b', 150.505, 29.02, 1.72, 150.545, 29.03, 2.18, 'black'],
+    ['b', 159.4, 35.22, 0, 160.0, 36.32, 0.55, 'wood'],
+    ['b', 159.38, 35.73, 0, 160.0, 35.81, 0.55, 'iron'],
+    ['b', 148.5, 33.08, 0, 152.3, 35.68, 0.02, 'rope'],
+    ['b', 148.62, 33.2, 0.02, 152.18, 35.56, 0.035, 'ruby'],
+    ['b', 149.4, 33.78, 0.035, 151.4, 34.98, 0.05, 'books3'],
+    ['b', 154.875, 30.92, 0, 154.925, 31.42, 0.05, 'oak'],
+    ['b', 154.875, 31.12, 0, 154.925, 31.17, 1.3, 'oak'],
+    ['b', 155.875, 30.92, 0, 155.925, 31.42, 0.05, 'oak'],
+    ['b', 155.875, 31.12, 0, 155.925, 31.17, 1.3, 'oak'],
+    ['b', 154.875, 31.12, 0.5, 155.925, 31.17, 0.54, 'oak'],
+    ['b', 154.875, 31.12, 0.85, 155.925, 31.17, 0.89, 'oak'],
+    ['b', 154.875, 31.12, 1.25, 155.925, 31.17, 1.29, 'oak'],
+    ['b', 155.0, 31.06, 0.55, 155.4, 31.22, 1.25, 'linen'],
+    ['b', 155.475, 31.06, 0.9, 155.825, 31.22, 1.25, 'petals'],
+    ['b', 157.3, 33.12, 0, 157.6, 33.42, 0.04, 'iron'],
+    ['b', 157.42, 33.24, 0.04, 157.48, 33.3, 1.4, 'gilt'],
+    ['b', 157.34, 33.16, 1.4, 157.56, 33.38, 1.55, 'glass'],
+    ['b', 157.32, 33.14, 1.55, 157.58, 33.4, 1.72, 'green'],
+    ['b', 159.3, 30.07, 0.7, 160.0, 31.47, 0.76, 'oak'],
+    ['b', 159.88, 30.11, 0, 159.96, 30.19, 0.7, 'oak'],
+    ['b', 159.34, 30.11, 0, 159.42, 30.19, 0.7, 'oak'],
+    ['b', 159.88, 31.35, 0, 159.96, 31.43, 0.7, 'oak'],
+    ['b', 159.34, 31.35, 0, 159.42, 31.43, 0.7, 'oak'],
+    ['b', 159.6, 30.12, 0.76, 159.9, 30.42, 0.84, 'books3'],
+    ['b', 159.64, 30.14, 0.84, 159.88, 30.4, 0.9, 'linen'],
+    ['b', 159.6, 30.845, 0.76, 159.65, 30.895, 0.84, 'black'],
+    ['b', 159.62, 30.86, 0.84, 159.64, 30.88, 1.0, 'white'],
+    ['b', 159.74, 31.19, 0.76, 159.8, 31.25, 0.9, 'gilt'],
+    ['b', 159.76, 31.21, 0.9, 159.78, 31.23, 0.96, 'flame'],
+    ['b', 158.75, 30.56, 0, 159.15, 30.98, 0.45, 'oak'],
+    ['b', 158.75, 30.56, 0.45, 158.81, 30.98, 0.95, 'oak'],
+    ['b', 152.65, 38.76, 0, 153.75, 39.08, 2.2, 'oak'],
+    ['b', 152.7, 38.78, 0.15, 153.7, 38.98, 0.45, 'ruby'],
+    ['b', 152.7, 38.78, 0.55, 153.7, 38.98, 0.85, 'books3'],
+    ['b', 152.7, 38.78, 0.95, 153.7, 38.98, 1.25, 'green'],
+    ['b', 152.7, 38.78, 1.35, 153.7, 38.98, 1.65, 'ruby'],
+    ['b', 152.7, 38.78, 1.75, 153.7, 38.98, 2.05, 'books3'],
+    ['b', 147.85, 36.02, 0, 148.17, 37.12, 2.2, 'oak'],
+    ['b', 147.95, 36.07, 0.15, 148.15, 37.07, 0.45, 'ruby'],
+    ['b', 147.95, 36.07, 0.55, 148.15, 37.07, 0.85, 'books3'],
+    ['b', 147.95, 36.07, 0.95, 148.15, 37.07, 1.25, 'green'],
+    ['b', 147.95, 36.07, 1.35, 148.15, 37.07, 1.65, 'ruby'],
+    ['b', 147.95, 36.07, 1.75, 148.15, 37.07, 2.05, 'books3'],
+    ['b', 147.85, 30.745, 0, 148.25, 31.195, 0.6, 'oak'],
+    ['b', 147.89, 30.765, 0.6, 148.21, 31.175, 0.62, 'oak'],
+    ['b', 147.95, 30.82, 0.62, 148.07, 30.92, 0.66, 'books3'],
+    ['b', 147.95, 31.03, 0.62, 148.03, 31.11, 0.72, 'gilt'],
+    ['b', 148.11, 30.945, 0.62, 148.16, 30.995, 0.68, 'gilt'],
+    ['b', 148.12, 30.958, 0.68, 148.15, 30.983, 0.82, 'white'],
+    ['b', 148.12, 30.958, 0.82, 148.15, 30.983, 0.86, 'flame'],
+    ['b', 154.75, 38.23, 0, 156.05, 38.98, 0.5, 'copper'],
+    ['b', 154.83, 38.31, 0.35, 155.97, 38.9, 0.5, 'linen'],
+    ['b', 154.9, 38.18, 0, 155.9, 38.3, 1.6, 'oak'],
+    ['b', 154.93, 38.2, 0.15, 155.87, 38.28, 1.5, 'linen'],
+    ['b', 156.2, 38.68, 0, 156.4, 38.88, 0.4, 'gilt'],
+    ['b', 156.275, 38.88, 0.1, 156.325, 38.96, 0.34, 'gilt'],
+    ['b', 159.7, 37.92, 0, 160.0, 38.82, 0.04, 'oak'],
+    ['b', 159.7, 37.92, 0.3, 160.0, 38.82, 0.34, 'oak'],
+    ['b', 159.96, 37.97, 0, 160.0, 38.01, 0.34, 'oak'],
+    ['b', 159.96, 38.73, 0, 160.0, 38.77, 0.34, 'oak'],
+    ['b', 159.74, 37.99, 0.04, 159.96, 38.19, 0.28, 'black'],
+    ['b', 159.74, 37.99, 0.34, 159.96, 38.19, 0.4, 'black'],
+    ['b', 159.74, 38.27, 0.04, 159.96, 38.47, 0.28, 'black'],
+    ['b', 159.74, 38.27, 0.34, 159.96, 38.47, 0.4, 'black'],
+    ['b', 159.74, 38.55, 0.04, 159.96, 38.75, 0.28, 'black'],
+    ['b', 159.74, 38.55, 0.34, 159.96, 38.75, 0.4, 'black'],
+    ['b', 159.7, 38.87, 0, 159.95, 38.97, 0.04, 'iron'],
+    ['b', 151.6, 28.92, 1.5, 152.6, 28.96, 1.6, 'oak'],
+    ['b', 151.685, 28.96, 1.5, 151.715, 29.02, 1.54, 'iron'],
+    ['b', 151.955, 28.96, 1.5, 151.985, 29.02, 1.54, 'iron'],
+    ['b', 152.215, 28.96, 1.5, 152.245, 29.02, 1.54, 'iron'],
+    ['b', 152.485, 28.96, 1.5, 152.515, 29.02, 1.54, 'iron'],
+    ['b', 151.53, 28.97, 0.5, 151.87, 29.08, 1.5, 'cloth'],
+    ['b', 151.92, 28.97, 1.0, 152.02, 29.02, 1.5, 'ruby'],
+    ['b', 152.39, 28.97, 1.55, 152.61, 29.12, 1.7, 'black'],
+    ['b', 159.94, 34.37, 0.15, 160.0, 35.17, 1.75, 'oak'],
+    ['b', 159.93, 34.44, 0.25, 159.94, 35.1, 1.65, 'glass'],
+    ['b', 159.55, 34.385, 0, 160.0, 34.455, 0.12, 'oak'],
+    ['b', 159.55, 35.085, 0, 160.0, 35.155, 0.12, 'oak'],
+    ['b', 155.66, 29.02, 0, 155.74, 29.1, 1.2, 'oak'],
+    ['b', 155.45, 28.92, 1.2, 155.95, 29.22, 1.26, 'oak'],
+    ['b', 155.6, 28.98, 1.26, 155.8, 29.16, 1.55, 'dust'],
+    ['b', 155.63, 29.0, 1.55, 155.77, 29.12, 1.68, 'linen'],
+    ['b', 155.45, 28.92, 0, 155.95, 29.42, 0.03, 'linen'],
+    ['b', 151.025, 28.92, 0.45, 151.575, 29.47, 0.48, 'oak'],
+    ['b', 151.225, 29.12, 0, 151.375, 29.27, 0.45, 'oak'],
+    ['b', 151.05, 28.98, 0.48, 151.55, 29.42, 0.5, 'iron'],
+    ['b', 151.1, 29.04, 0.5, 151.26, 29.2, 0.66, 'white'],
+    ['b', 151.155, 28.98, 0.56, 151.205, 29.04, 0.6, 'white'],
+    ['b', 151.39, 29.12, 0.5, 151.49, 29.22, 0.58, 'white'],
+    ['b', 151.433, 29.16, 0.56, 151.447, 29.18, 0.7, 'gilt']]);
+  T['staff-bedroom-4-east'].lights = (T['staff-bedroom-4-east'].lights || []).concat([[153.9, 29.17, 0.5, 16757862, 1.1, 8], [149.7, 29.22, 2.33, 16757862, 1.1, 8], [153.9, 38.78, 2.33, 16757862, 1.1, 8], [159.77, 31.22, 1.01, 16757862, 1.1, 8], [148.13, 30.97, 0.91, 16757862, 1.1, 8]]);
+})(window.SHELL_W5A.things);
+/* HAND2 end staff-bedroom-4-east */
+/* HAND2 begin staff-bedroom-5-west */
+/* Interiors req 2423 sec 13: a staff bedroom, a quiet sleeper; req 2532 adds hangings, a dado and a thing to read or pull; furnished past the shared bedroom template with 1101v's pieces and one of its own sleeper's (cards 49, 52, 54, 1 Nov, the 429th); req 2532 adds hangings, a dado and a thing to read or pull; north table group replaced by two armchairs and a tea table on the rug, a narrow writing bureau with its own lamp on the north wall by the east corner (card 49, 1 Nov, the 433rd); sited by tools/architect-hand-rooms-1101.py, plain stand-ins (Objects draw the real ones) */
+(function (T) {
+  T['staff-bedroom-5-west'] = T['staff-bedroom-5-west'] || { items: [] };
+  T['staff-bedroom-5-west'].items = T['staff-bedroom-5-west'].items.concat([
+    ['b', 12.5, 3.85, 0, 14.3, 4.35, 1.3, 'stone'],
+    ['b', 12.9, 3.85, 0.1, 13.9, 4.37, 1.0, 'black'],
+    ['b', 13.15, 3.95, 0.12, 13.65, 4.25, 0.45, 'flame'],
+    ['b', 12.7, 4.35, 0, 14.1, 4.55, 0.18, 'iron'],
+    ['b', 12.35, 3.85, 1.3, 14.45, 4.5, 1.38, 'oak'],
+    ['b', 11.74, 3.85, 1.9, 11.86, 3.89, 2.3, 'iron'],
+    ['b', 11.775, 3.89, 2.25, 11.825, 4.15, 2.3, 'iron'],
+    ['b', 11.74, 4.11, 2.0, 11.86, 4.19, 2.28, 'flame'],
+    ['b', 15.24, 17.71, 1.9, 15.36, 17.75, 2.3, 'iron'],
+    ['b', 15.275, 17.45, 2.25, 15.325, 17.71, 2.3, 'iron'],
+    ['b', 15.24, 17.41, 2.0, 15.36, 17.49, 2.28, 'flame'],
+    ['b', 10.25, 5.4, 0.25, 12.25, 6.4, 0.5, 'oak'],
+    ['b', 10.3, 5.42, 0.5, 12.2, 6.38, 0.68, 'linen'],
+    ['b', 10.3, 5.55, 0.68, 10.75, 6.25, 0.8, 'white'],
+    ['b', 10.25, 5.4, 0.25, 10.31, 6.4, 1.25, 'iron'],
+    ['b', 11.45, 5.42, 0.68, 12.2, 6.38, 0.72, 'ruby'],
+    ['b', 11.15, 17.15, 0, 12.45, 17.75, 2.1, 'oak'],
+    ['b', 11.78, 17.13, 0.2, 11.82, 17.15, 2.0, 'black'],
+    ['b', 17.75, 17.25, 0, 18.85, 17.75, 0.78, 'oak'],
+    ['b', 17.95, 17.69, 0.9, 18.65, 17.73, 1.7, 'glass'],
+    ['b', 17.95, 17.5, 0.78, 18.05, 17.65, 0.9, 'tin'],
+    ['b', 19.9, 5.675, 0, 20.35, 6.525, 0.85, 'oak'],
+    ['b', 19.95, 5.8, 0.85, 20.25, 6.2, 0.93, 'white'],
+    ['b', 20.05, 6.25, 0.85, 20.2, 6.45, 1.15, 'white'],
+    ['b', 18.15, 3.85, 1.5, 18.85, 3.93, 2.4, 'gilt'],
+    ['b', 18.2, 3.93, 1.55, 18.8, 3.94, 2.35, 'black'],
+    ['b', 11.92, 3.85, 1.57, 12.88, 3.93, 2.33, 'wood'],
+    ['b', 11.95, 3.93, 1.6, 12.85, 3.95, 2.3, 'petals'],
+    ['b', 12.155, 3.95, 1.72, 12.195, 3.96, 2.18, 'black'],
+    ['b', 12.38, 3.95, 1.72, 12.42, 3.96, 2.18, 'black'],
+    ['b', 12.605, 3.95, 1.72, 12.645, 3.96, 2.18, 'black'],
+    ['b', 19.75, 14.15, 0, 20.35, 15.25, 0.55, 'wood'],
+    ['b', 19.73, 14.66, 0, 20.35, 14.74, 0.55, 'iron'],
+    ['b', 13.4, 7.25, 0, 17.2, 9.85, 0.02, 'rope'],
+    ['b', 13.52, 7.37, 0.02, 17.08, 9.73, 0.035, 'ruby'],
+    ['b', 14.3, 7.95, 0.035, 16.3, 9.15, 0.05, 'books3'],
+    ['b', 20.03, 4.45, 0, 20.35, 5.55, 2.2, 'oak'],
+    ['b', 20.05, 4.5, 0.15, 20.25, 5.5, 0.45, 'ruby'],
+    ['b', 20.05, 4.5, 0.55, 20.25, 5.5, 0.85, 'books3'],
+    ['b', 20.05, 4.5, 0.95, 20.25, 5.5, 1.25, 'green'],
+    ['b', 20.05, 4.5, 1.35, 20.25, 5.5, 1.65, 'ruby'],
+    ['b', 20.05, 4.5, 1.75, 20.25, 5.5, 2.05, 'books3'],
+    ['b', 10.25, 14.15, 0, 10.57, 15.25, 2.2, 'oak'],
+    ['b', 10.35, 14.2, 0.15, 10.55, 15.2, 0.45, 'ruby'],
+    ['b', 10.35, 14.2, 0.55, 10.55, 15.2, 0.85, 'books3'],
+    ['b', 10.35, 14.2, 0.95, 10.55, 15.2, 1.25, 'green'],
+    ['b', 10.35, 14.2, 1.35, 10.55, 15.2, 1.65, 'ruby'],
+    ['b', 10.35, 14.2, 1.75, 10.55, 15.2, 2.05, 'books3'],
+    ['b', 10.25, 7.775, 0, 10.65, 8.225, 0.6, 'oak'],
+    ['b', 10.29, 7.795, 0.6, 10.61, 8.205, 0.62, 'oak'],
+    ['b', 10.35, 7.85, 0.62, 10.47, 7.95, 0.66, 'books3'],
+    ['b', 10.35, 8.06, 0.62, 10.43, 8.14, 0.72, 'gilt'],
+    ['b', 10.51, 7.975, 0.62, 10.56, 8.025, 0.68, 'gilt'],
+    ['b', 10.52, 7.987, 0.68, 10.55, 8.012, 0.82, 'white'],
+    ['b', 10.52, 7.987, 0.82, 10.55, 8.012, 0.86, 'flame'],
+    ['b', 10.35, 15.75, 0, 11.1, 17.05, 0.5, 'copper'],
+    ['b', 10.43, 15.83, 0.35, 11.02, 16.97, 0.5, 'linen'],
+    ['b', 11.03, 15.9, 0, 11.15, 16.9, 1.6, 'oak'],
+    ['b', 11.05, 15.93, 0.15, 11.13, 16.87, 1.5, 'linen'],
+    ['b', 10.45, 17.2, 0, 10.65, 17.4, 0.4, 'gilt'],
+    ['b', 10.37, 17.275, 0.1, 10.45, 17.325, 0.34, 'gilt'],
+    ['b', 10.8, 3.85, 1.5, 11.8, 3.89, 1.6, 'oak'],
+    ['b', 10.885, 3.89, 1.5, 10.915, 3.95, 1.54, 'iron'],
+    ['b', 11.155, 3.89, 1.5, 11.185, 3.95, 1.54, 'iron'],
+    ['b', 11.415, 3.89, 1.5, 11.445, 3.95, 1.54, 'iron'],
+    ['b', 11.685, 3.89, 1.5, 11.715, 3.95, 1.54, 'iron'],
+    ['b', 10.73, 3.9, 0.5, 11.07, 4.01, 1.5, 'cloth'],
+    ['b', 11.12, 3.9, 1.0, 11.22, 3.95, 1.5, 'ruby'],
+    ['b', 11.59, 3.9, 1.55, 11.81, 4.05, 1.7, 'black'],
+    ['b', 20.29, 15.5, 0.15, 20.35, 16.3, 1.75, 'oak'],
+    ['b', 20.28, 15.57, 0.25, 20.29, 16.23, 1.65, 'glass'],
+    ['b', 19.9, 15.515, 0, 20.35, 15.585, 0.12, 'oak'],
+    ['b', 19.9, 16.215, 0, 20.35, 16.285, 0.12, 'oak'],
+    ['b', 16.76, 3.95, 0, 16.84, 4.03, 1.2, 'oak'],
+    ['b', 16.55, 3.85, 1.2, 17.05, 4.15, 1.26, 'oak'],
+    ['b', 16.7, 3.91, 1.26, 16.9, 4.09, 1.55, 'dust'],
+    ['b', 16.73, 3.93, 1.55, 16.87, 4.05, 1.68, 'linen'],
+    ['b', 16.55, 3.85, 0, 17.05, 4.35, 0.03, 'linen'],
+    ['b', 16.975, 5.85, 0, 17.025, 6.35, 0.05, 'oak'],
+    ['b', 16.975, 6.05, 0, 17.025, 6.1, 1.3, 'oak'],
+    ['b', 17.975, 5.85, 0, 18.025, 6.35, 0.05, 'oak'],
+    ['b', 17.975, 6.05, 0, 18.025, 6.1, 1.3, 'oak'],
+    ['b', 16.975, 6.05, 0.5, 18.025, 6.1, 0.54, 'oak'],
+    ['b', 16.975, 6.05, 0.85, 18.025, 6.1, 0.89, 'oak'],
+    ['b', 16.975, 6.05, 1.25, 18.025, 6.1, 1.29, 'oak'],
+    ['b', 17.1, 5.99, 0.55, 17.5, 6.15, 1.25, 'linen'],
+    ['b', 17.575, 5.99, 0.9, 17.925, 6.15, 1.25, 'petals'],
+    ['b', 20.1, 12.9, 1.1, 20.35, 14.3, 1.14, 'oak'],
+    ['b', 20.15, 12.975, 0.85, 20.35, 13.025, 1.1, 'iron'],
+    ['b', 20.15, 14.175, 0.85, 20.35, 14.225, 1.1, 'iron'],
+    ['b', 20.15, 12.98, 1.14, 20.3, 13.12, 1.26, 'copper'],
+    ['b', 20.18, 13.01, 1.26, 20.27, 13.09, 1.4, 'green'],
+    ['b', 20.15, 13.2, 1.14, 20.3, 13.34, 1.26, 'copper'],
+    ['b', 20.18, 13.23, 1.26, 20.27, 13.31, 1.4, 'green'],
+    ['b', 20.15, 13.42, 1.14, 20.3, 13.56, 1.26, 'copper'],
+    ['b', 20.18, 13.45, 1.26, 20.27, 13.53, 1.4, 'green'],
+    ['b', 20.15, 13.64, 1.14, 20.3, 13.78, 1.26, 'copper'],
+    ['b', 20.18, 13.67, 1.26, 20.27, 13.75, 1.4, 'green'],
+    ['b', 20.15, 13.86, 1.14, 20.3, 14.0, 1.26, 'copper'],
+    ['b', 20.18, 13.89, 1.26, 20.27, 13.97, 1.4, 'green'],
+    ['b', 20.15, 14.08, 1.14, 20.3, 14.22, 1.26, 'copper'],
+    ['b', 20.18, 14.11, 1.26, 20.27, 14.19, 1.4, 'green'],
+    ['b', 15.025, 7.25, 0.0, 15.575, 7.8, 0.46, 'oak'],
+    ['b', 15.09, 7.35, 0.46, 15.31, 7.65, 0.55, 'books3'],
+    ['b', 15.39, 7.45, 0.46, 15.45, 7.55, 0.58, 'gilt'],
+    ['b', 15.41, 7.47, 0.58, 15.43, 7.53, 0.64, 'flame'],
+    ['b', 13.95, 7.13, 0.0, 14.75, 7.93, 0.44, 'leather'],
+    ['b', 13.93, 7.13, 0.44, 14.09, 7.93, 0.95, 'leather'],
+    ['b', 13.95, 7.13, 0.44, 14.75, 7.27, 0.66, 'leather'],
+    ['b', 13.95, 7.79, 0.44, 14.75, 7.93, 0.66, 'leather'],
+    ['b', 14.25, 7.33, 0.44, 14.65, 7.73, 0.52, 'amber'],
+    ['b', 15.85, 7.13, 0.0, 16.65, 7.93, 0.44, 'leather'],
+    ['b', 16.51, 7.13, 0.44, 16.67, 7.93, 0.95, 'leather'],
+    ['b', 15.85, 7.13, 0.44, 16.65, 7.27, 0.66, 'leather'],
+    ['b', 15.85, 7.79, 0.44, 16.65, 7.93, 0.66, 'leather'],
+    ['b', 15.95, 7.33, 0.44, 16.35, 7.73, 0.52, 'amber'],
+    ['b', 17.05, 3.85, 0.78, 18.75, 4.6, 0.84, 'oak'],
+    ['b', 17.1, 3.89, 0, 17.2, 3.99, 0.78, 'oak'],
+    ['b', 17.1, 4.46, 0, 17.2, 4.56, 0.78, 'oak'],
+    ['b', 18.6, 3.89, 0, 18.7, 3.99, 0.78, 'oak'],
+    ['b', 18.6, 4.46, 0, 18.7, 4.56, 0.78, 'oak'],
+    ['b', 17.15, 3.95, 0.3, 18.65, 4.5, 0.34, 'oak'],
+    ['b', 17.1, 3.95, 0.84, 17.3, 4.15, 0.97, 'brick'],
+    ['b', 17.14, 3.97, 0.97, 17.26, 4.13, 1.12, 'green'],
+    ['b', 17.38, 4.15, 0.84, 17.58, 4.35, 0.97, 'brick'],
+    ['b', 17.42, 4.17, 0.97, 17.54, 4.33, 1.12, 'green'],
+    ['b', 17.66, 3.95, 0.84, 17.86, 4.15, 0.97, 'brick'],
+    ['b', 17.7, 3.97, 0.97, 17.82, 4.13, 1.12, 'green'],
+    ['b', 17.94, 4.15, 0.84, 18.14, 4.35, 0.97, 'brick'],
+    ['b', 17.98, 4.17, 0.97, 18.1, 4.33, 1.12, 'green'],
+    ['b', 18.22, 3.95, 0.84, 18.42, 4.15, 0.97, 'brick'],
+    ['b', 18.26, 3.97, 0.97, 18.38, 4.13, 1.12, 'green'],
+    ['b', 18.5, 4.15, 0.84, 18.7, 4.35, 0.97, 'brick'],
+    ['b', 18.54, 4.17, 0.97, 18.66, 4.33, 1.12, 'green'],
+    ['b', 18.37, 4.3, 0.84, 18.53, 4.5, 0.88, 'iron'],
+    ['b', 18.6, 4.35, 0.88, 18.64, 4.43, 1.15, 'iron'],
+    ['b', 16.9, 4.05, 0.84, 17.2, 4.37, 0.98, 'tallow'],
+    ['b', 17.725, 4.75, 0, 18.075, 5.1, 0.42, 'oak'],
+    ['b', 18.8, 3.85, 0.7, 19.8, 4.45, 0.76, 'oak'],
+    ['b', 18.84, 3.89, 0, 18.92, 3.95, 0.7, 'oak'],
+    ['b', 18.84, 4.35, 0, 18.92, 4.41, 0.7, 'oak'],
+    ['b', 19.68, 3.89, 0, 19.76, 3.95, 0.7, 'oak'],
+    ['b', 19.68, 4.35, 0, 19.76, 4.41, 0.7, 'oak'],
+    ['b', 19.38, 3.93, 0.76, 19.72, 4.35, 0.86, 'books3'],
+    ['b', 19.4, 3.95, 0.86, 19.7, 4.31, 0.9, 'linen'],
+    ['b', 19.225, 4.15, 0.76, 19.275, 4.19, 0.84, 'black'],
+    ['b', 19.24, 4.16, 0.84, 19.26, 4.18, 1.0, 'white'],
+    ['b', 18.92, 4.05, 0.76, 19.08, 4.21, 0.8, 'iron'],
+    ['b', 18.96, 4.09, 0.8, 19.04, 4.17, 1.0, 'amber'],
+    ['b', 18.9, 4.03, 1.0, 19.1, 4.23, 1.2, 'green'],
+    ['b', 19.09, 4.6, 0, 19.51, 5.0, 0.45, 'oak'],
+    ['b', 19.09, 4.94, 0.45, 19.51, 5.0, 0.95, 'oak']]);
+  T['staff-bedroom-5-west'].lights = (T['staff-bedroom-5-west'].lights || []).concat([[13.4, 4.1, 0.5, 16757862, 1.1, 8], [11.8, 4.15, 2.33, 16757862, 1.1, 8], [15.3, 17.45, 2.33, 16757862, 1.1, 8], [10.54, 8.0, 0.91, 16757862, 1.1, 8], [15.42, 7.5, 0.69, 16757862, 1.1, 8]]);
+})(window.SHELL_W5A.things);
+/* HAND2 end staff-bedroom-5-west */
+/* HAND2 begin staff-bedroom-6-west */
+/* Interiors req 2423 sec 13: a staff bedroom, a quiet sleeper; req 2532 adds hangings, a dado and a thing to read or pull; furnished past the shared bedroom template with 1101v's pieces and one of its own sleeper's (cards 49, 52, 54, 1 Nov, the 429th); req 2532 adds hangings, a dado and a thing to read or pull; a long practice table with four chairs on the centre rug (card 52, 1 Nov, the 433rd); sited by tools/architect-hand-rooms-1101.py, plain stand-ins (Objects draw the real ones) */
+(function (T) {
+  T['staff-bedroom-6-west'] = T['staff-bedroom-6-west'] || { items: [] };
+  T['staff-bedroom-6-west'].items = T['staff-bedroom-6-west'].items.concat([
+    ['b', 13.2, 59.25, 0, 15.0, 59.75, 1.3, 'stone'],
+    ['b', 13.6, 59.25, 0.1, 14.6, 59.77, 1.0, 'black'],
+    ['b', 13.85, 59.35, 0.12, 14.35, 59.65, 0.45, 'flame'],
+    ['b', 13.4, 59.75, 0, 14.8, 59.95, 0.18, 'iron'],
+    ['b', 13.05, 59.25, 1.3, 15.15, 59.9, 1.38, 'oak'],
+    ['b', 10.54, 59.25, 1.9, 10.66, 59.29, 2.3, 'iron'],
+    ['b', 10.575, 59.29, 2.25, 10.625, 59.55, 2.3, 'iron'],
+    ['b', 10.54, 59.51, 2.0, 10.66, 59.59, 2.28, 'flame'],
+    ['b', 16.44, 71.96, 1.9, 16.56, 72.0, 2.3, 'iron'],
+    ['b', 16.475, 71.7, 2.25, 16.525, 71.96, 2.3, 'iron'],
+    ['b', 16.44, 71.66, 2.0, 16.56, 71.74, 2.28, 'flame'],
+    ['b', 8.25, 62.6, 0.25, 10.25, 63.6, 0.5, 'oak'],
+    ['b', 8.3, 62.62, 0.5, 10.2, 63.58, 0.68, 'linen'],
+    ['b', 8.3, 62.75, 0.68, 8.75, 63.45, 0.8, 'white'],
+    ['b', 8.25, 62.6, 0.25, 8.31, 63.6, 1.25, 'iron'],
+    ['b', 9.45, 62.62, 0.68, 10.2, 63.58, 0.72, 'ruby'],
+    ['b', 9.45, 71.4, 0, 10.75, 72.0, 2.1, 'oak'],
+    ['b', 10.08, 71.38, 0.2, 10.12, 71.4, 2.0, 'black'],
+    ['b', 20.05, 71.5, 0, 21.15, 72.0, 0.78, 'oak'],
+    ['b', 20.25, 71.94, 0.9, 20.95, 71.98, 1.7, 'glass'],
+    ['b', 20.25, 71.75, 0.78, 20.35, 71.9, 0.9, 'tin'],
+    ['b', 23.3, 62.675, 0, 23.75, 63.525, 0.85, 'oak'],
+    ['b', 23.35, 62.8, 0.85, 23.65, 63.2, 0.93, 'white'],
+    ['b', 23.45, 63.25, 0.85, 23.6, 63.45, 1.15, 'white'],
+    ['b', 20.65, 59.25, 1.5, 21.35, 59.33, 2.4, 'gilt'],
+    ['b', 20.7, 59.33, 1.55, 21.3, 59.34, 2.35, 'black'],
+    ['b', 10.72, 59.25, 1.57, 11.68, 59.33, 2.33, 'wood'],
+    ['b', 10.75, 59.33, 1.6, 11.65, 59.35, 2.3, 'petals'],
+    ['b', 10.955, 59.35, 1.72, 10.995, 59.36, 2.18, 'black'],
+    ['b', 11.18, 59.35, 1.72, 11.22, 59.36, 2.18, 'black'],
+    ['b', 11.405, 59.35, 1.72, 11.445, 59.36, 2.18, 'black'],
+    ['b', 23.15, 70.85, 0, 23.75, 71.95, 0.55, 'wood'],
+    ['b', 23.13, 71.36, 0, 23.75, 71.44, 0.55, 'iron'],
+    ['b', 15.75, 71.65, 0, 16.25, 72.0, 1.0, 'oak'],
+    ['b', 15.7, 71.5, 1.0, 16.3, 72.0, 1.08, 'linen'],
+    ['b', 14.1, 66.0, 0, 17.9, 68.6, 0.02, 'rope'],
+    ['b', 14.22, 66.12, 0.02, 17.78, 68.48, 0.035, 'ruby'],
+    ['b', 15.0, 66.7, 0.035, 17.0, 67.9, 0.05, 'books3'],
+    ['b', 23.05, 61.2, 0.7, 23.75, 62.6, 0.76, 'oak'],
+    ['b', 23.63, 61.24, 0, 23.71, 61.32, 0.7, 'oak'],
+    ['b', 23.09, 61.24, 0, 23.17, 61.32, 0.7, 'oak'],
+    ['b', 23.63, 62.48, 0, 23.71, 62.56, 0.7, 'oak'],
+    ['b', 23.09, 62.48, 0, 23.17, 62.56, 0.7, 'oak'],
+    ['b', 23.35, 61.25, 0.76, 23.65, 61.55, 0.84, 'books3'],
+    ['b', 23.39, 61.27, 0.84, 23.63, 61.53, 0.9, 'linen'],
+    ['b', 23.35, 61.975, 0.76, 23.4, 62.025, 0.84, 'black'],
+    ['b', 23.37, 61.99, 0.84, 23.39, 62.01, 1.0, 'white'],
+    ['b', 23.49, 62.32, 0.76, 23.55, 62.38, 0.9, 'gilt'],
+    ['b', 23.51, 62.34, 0.9, 23.53, 62.36, 0.96, 'flame'],
+    ['b', 22.5, 61.69, 0, 22.9, 62.11, 0.45, 'oak'],
+    ['b', 22.5, 61.69, 0.45, 22.56, 62.11, 0.95, 'oak'],
+    ['b', 16.65, 71.68, 0, 17.75, 72.0, 2.2, 'oak'],
+    ['b', 16.7, 71.7, 0.15, 17.7, 71.9, 0.45, 'ruby'],
+    ['b', 16.7, 71.7, 0.55, 17.7, 71.9, 0.85, 'books3'],
+    ['b', 16.7, 71.7, 0.95, 17.7, 71.9, 1.25, 'green'],
+    ['b', 16.7, 71.7, 1.35, 17.7, 71.9, 1.65, 'ruby'],
+    ['b', 16.7, 71.7, 1.75, 17.7, 71.9, 2.05, 'books3'],
+    ['b', 8.25, 68.25, 0, 8.57, 69.35, 2.2, 'oak'],
+    ['b', 8.35, 68.3, 0.15, 8.55, 69.3, 0.45, 'ruby'],
+    ['b', 8.35, 68.3, 0.55, 8.55, 69.3, 0.85, 'books3'],
+    ['b', 8.35, 68.3, 0.95, 8.55, 69.3, 1.25, 'green'],
+    ['b', 8.35, 68.3, 1.35, 8.55, 69.3, 1.65, 'ruby'],
+    ['b', 8.35, 68.3, 1.75, 8.55, 69.3, 2.05, 'books3'],
+    ['b', 8.25, 60.175, 0, 8.65, 60.625, 0.6, 'oak'],
+    ['b', 8.29, 60.195, 0.6, 8.61, 60.605, 0.62, 'oak'],
+    ['b', 8.35, 60.25, 0.62, 8.47, 60.35, 0.66, 'books3'],
+    ['b', 8.35, 60.46, 0.62, 8.43, 60.54, 0.72, 'gilt'],
+    ['b', 8.51, 60.375, 0.62, 8.56, 60.425, 0.68, 'gilt'],
+    ['b', 8.52, 60.387, 0.68, 8.55, 60.413, 0.82, 'white'],
+    ['b', 8.52, 60.387, 0.82, 8.55, 60.413, 0.86, 'flame'],
+    ['b', 17.85, 71.15, 0, 19.15, 71.9, 0.5, 'copper'],
+    ['b', 17.93, 71.23, 0.35, 19.07, 71.82, 0.5, 'linen'],
+    ['b', 18.0, 71.1, 0, 19.0, 71.22, 1.6, 'oak'],
+    ['b', 18.03, 71.12, 0.15, 18.97, 71.2, 1.5, 'linen'],
+    ['b', 19.3, 71.6, 0, 19.5, 71.8, 0.4, 'gilt'],
+    ['b', 19.375, 71.8, 0.1, 19.425, 71.88, 0.34, 'gilt'],
+    ['b', 23.45, 60.25, 0, 23.75, 61.15, 0.04, 'oak'],
+    ['b', 23.45, 60.25, 0.3, 23.75, 61.15, 0.34, 'oak'],
+    ['b', 23.71, 60.3, 0, 23.75, 60.34, 0.34, 'oak'],
+    ['b', 23.71, 61.06, 0, 23.75, 61.1, 0.34, 'oak'],
+    ['b', 23.49, 60.32, 0.04, 23.71, 60.52, 0.28, 'black'],
+    ['b', 23.49, 60.32, 0.34, 23.71, 60.52, 0.4, 'black'],
+    ['b', 23.49, 60.6, 0.04, 23.71, 60.8, 0.28, 'black'],
+    ['b', 23.49, 60.6, 0.34, 23.71, 60.8, 0.4, 'black'],
+    ['b', 23.49, 60.88, 0.04, 23.71, 61.08, 0.28, 'black'],
+    ['b', 23.49, 60.88, 0.34, 23.71, 61.08, 0.4, 'black'],
+    ['b', 23.45, 61.2, 0, 23.7, 61.3, 0.04, 'iron'],
+    ['b', 12.6, 59.25, 1.5, 13.6, 59.29, 1.6, 'oak'],
+    ['b', 12.685, 59.29, 1.5, 12.715, 59.35, 1.54, 'iron'],
+    ['b', 12.955, 59.29, 1.5, 12.985, 59.35, 1.54, 'iron'],
+    ['b', 13.215, 59.29, 1.5, 13.245, 59.35, 1.54, 'iron'],
+    ['b', 13.485, 59.29, 1.5, 13.515, 59.35, 1.54, 'iron'],
+    ['b', 12.53, 59.3, 0.5, 12.87, 59.41, 1.5, 'cloth'],
+    ['b', 12.92, 59.3, 1.0, 13.02, 59.35, 1.5, 'ruby'],
+    ['b', 13.39, 59.3, 1.55, 13.61, 59.45, 1.7, 'black'],
+    ['b', 23.69, 63.8, 0.15, 23.75, 64.6, 1.75, 'oak'],
+    ['b', 23.68, 63.87, 0.25, 23.69, 64.53, 1.65, 'glass'],
+    ['b', 23.3, 63.815, 0, 23.75, 63.885, 0.12, 'oak'],
+    ['b', 23.3, 64.515, 0, 23.75, 64.585, 0.12, 'oak'],
+    ['b', 17.26, 59.35, 0, 17.34, 59.43, 1.2, 'oak'],
+    ['b', 17.05, 59.25, 1.2, 17.55, 59.55, 1.26, 'oak'],
+    ['b', 17.2, 59.31, 1.26, 17.4, 59.49, 1.55, 'dust'],
+    ['b', 17.23, 59.33, 1.55, 17.37, 59.45, 1.68, 'linen'],
+    ['b', 17.05, 59.25, 0, 17.55, 59.75, 0.03, 'linen'],
+    ['b', 12.225, 59.25, 0.45, 12.775, 59.8, 0.48, 'oak'],
+    ['b', 12.425, 59.45, 0, 12.575, 59.6, 0.45, 'oak'],
+    ['b', 12.25, 59.31, 0.48, 12.75, 59.75, 0.5, 'iron'],
+    ['b', 12.3, 59.37, 0.5, 12.46, 59.53, 0.66, 'white'],
+    ['b', 12.355, 59.31, 0.56, 12.405, 59.37, 0.6, 'white'],
+    ['b', 12.59, 59.45, 0.5, 12.69, 59.55, 0.58, 'white'],
+    ['b', 12.633, 59.49, 0.56, 12.648, 59.51, 0.7, 'gilt'],
+    ['b', 18.875, 61.25, 0, 18.925, 61.75, 0.05, 'oak'],
+    ['b', 18.875, 61.45, 0, 18.925, 61.5, 1.3, 'oak'],
+    ['b', 19.875, 61.25, 0, 19.925, 61.75, 0.05, 'oak'],
+    ['b', 19.875, 61.45, 0, 19.925, 61.5, 1.3, 'oak'],
+    ['b', 18.875, 61.45, 0.5, 19.925, 61.5, 0.54, 'oak'],
+    ['b', 18.875, 61.45, 0.85, 19.925, 61.5, 0.89, 'oak'],
+    ['b', 18.875, 61.45, 1.25, 19.925, 61.5, 1.29, 'oak'],
+    ['b', 19.0, 61.39, 0.55, 19.4, 61.55, 1.25, 'linen'],
+    ['b', 19.475, 61.39, 0.9, 19.825, 61.55, 1.25, 'petals'],
+    ['b', 21.05, 63.55, 0, 21.35, 63.85, 0.04, 'iron'],
+    ['b', 21.17, 63.67, 0.04, 21.23, 63.73, 1.4, 'gilt'],
+    ['b', 21.09, 63.59, 1.4, 21.31, 63.81, 1.55, 'glass'],
+    ['b', 21.07, 63.57, 1.55, 21.33, 63.83, 1.72, 'green'],
+    ['b', 8.25, 65.1, 0, 8.8, 66.1, 0.5, 'oak'],
+    ['b', 8.3, 65.15, 0.5, 8.75, 66.05, 0.54, 'ruby'],
+    ['b', 8.37, 65.35, 0.54, 8.65, 65.65, 0.6, 'amber'],
+    ['b', 8.45, 65.84, 0.54, 8.47, 65.86, 0.58, 'iron'],
+    ['b', 8.45, 66.3, 0, 8.75, 66.6, 0.04, 'iron'],
+    ['b', 8.57, 66.435, 0.04, 8.63, 66.465, 1.3, 'iron'],
+    ['b', 8.47, 66.25, 1.2, 8.71, 66.65, 1.5, 'linen'],
+    ['b', 14.7, 66.85, 0.74, 17.3, 67.75, 0.8, 'oak'],
+    ['b', 14.81, 67.57, 0, 14.89, 67.65, 0.74, 'oak'],
+    ['b', 17.11, 67.57, 0, 17.19, 67.65, 0.74, 'oak'],
+    ['b', 14.81, 66.92, 0, 14.89, 67.0, 0.74, 'oak'],
+    ['b', 17.11, 66.92, 0, 17.19, 67.0, 0.74, 'oak'],
+    ['b', 15.32, 67.25, 0.8, 15.48, 67.4, 0.84, 'iron'],
+    ['b', 15.34, 67.27, 0.84, 15.46, 67.38, 1.1, 'tallow'],
+    ['b', 15.25, 67.23, 1.1, 15.55, 67.42, 1.3, 'books3'],
+    ['b', 16.25, 67.2, 0.8, 16.55, 67.55, 0.95, 'petals'],
+    ['b', 16.28, 67.25, 0.95, 16.52, 67.5, 1.0, 'mahog'],
+    ['b', 16.725, 67.05, 0.8, 17.075, 67.35, 0.82, 'ink'],
+    ['b', 15.19, 67.81, 0.44, 15.61, 68.23, 0.49, 'oak'],
+    ['b', 15.19, 68.19, 0.49, 15.61, 68.23, 0.95, 'oak'],
+    ['b', 15.195, 68.16, 0, 15.245, 68.21, 0.44, 'oak'],
+    ['b', 15.555, 68.16, 0, 15.605, 68.21, 0.44, 'oak'],
+    ['b', 15.195, 67.82, 0, 15.245, 67.87, 0.44, 'oak'],
+    ['b', 15.555, 67.82, 0, 15.605, 67.87, 0.44, 'oak'],
+    ['b', 15.19, 66.38, 0.44, 15.61, 66.8, 0.49, 'oak'],
+    ['b', 15.19, 66.38, 0.49, 15.61, 66.42, 0.95, 'oak'],
+    ['b', 15.195, 66.73, 0, 15.245, 66.78, 0.44, 'oak'],
+    ['b', 15.555, 66.73, 0, 15.605, 66.78, 0.44, 'oak'],
+    ['b', 15.195, 66.39, 0, 15.245, 66.44, 0.44, 'oak'],
+    ['b', 15.555, 66.39, 0, 15.605, 66.44, 0.44, 'oak'],
+    ['b', 16.39, 67.81, 0.44, 16.81, 68.23, 0.49, 'oak'],
+    ['b', 16.39, 68.19, 0.49, 16.81, 68.23, 0.95, 'oak'],
+    ['b', 16.395, 68.16, 0, 16.445, 68.21, 0.44, 'oak'],
+    ['b', 16.755, 68.16, 0, 16.805, 68.21, 0.44, 'oak'],
+    ['b', 16.395, 67.82, 0, 16.445, 67.87, 0.44, 'oak'],
+    ['b', 16.755, 67.82, 0, 16.805, 67.87, 0.44, 'oak'],
+    ['b', 16.39, 66.38, 0.44, 16.81, 66.8, 0.49, 'oak'],
+    ['b', 16.39, 66.38, 0.49, 16.81, 66.42, 0.95, 'oak'],
+    ['b', 16.395, 66.73, 0, 16.445, 66.78, 0.44, 'oak'],
+    ['b', 16.755, 66.73, 0, 16.805, 66.78, 0.44, 'oak'],
+    ['b', 16.395, 66.39, 0, 16.445, 66.44, 0.44, 'oak'],
+    ['b', 16.755, 66.39, 0, 16.805, 66.44, 0.44, 'oak']]);
+  T['staff-bedroom-6-west'].lights = (T['staff-bedroom-6-west'].lights || []).concat([[14.1, 59.5, 0.5, 16757862, 1.1, 8], [10.6, 59.55, 2.33, 16757862, 1.1, 8], [16.5, 71.7, 2.33, 16757862, 1.1, 8], [23.52, 62.35, 1.01, 16757862, 1.1, 8], [8.54, 60.4, 0.91, 16757862, 1.1, 8]]);
+})(window.SHELL_W5A.things);
+/* HAND2 end staff-bedroom-6-west */
+/* HAND2 begin staff-bedrooms-7 */
+/* Interiors req 2423 sec 13: a staff bedroom, a quiet sleeper; req 2532 adds hangings, a dado and a thing to read or pull; furnished past the shared bedroom template with 1101v's pieces and one of its own sleeper's (cards 49, 52, 54, 1 Nov, the 429th); req 2532 adds hangings, a dado and a thing to read or pull; second sleeper's settee, globe, desk, bookcase, rug and tea table added (card 54, 1 Nov, the 430th); req 2532 adds hangings, a dado and a thing to read or pull; settee toned to dull lavender, a reading table with four chairs, a wardrobe and a hat stand added (card 54, 1 Nov, the 431st); sited by tools/architect-hand-rooms-1101.py, plain stand-ins (Objects draw the real ones) */
+(function (T) {
+  T['staff-bedrooms-7'] = T['staff-bedrooms-7'] || { items: [] };
+  T['staff-bedrooms-7'].items = T['staff-bedrooms-7'].items.concat([
+    ['b', 25.79, 3.85, 0, 27.59, 4.35, 1.3, 'stone'],
+    ['b', 26.19, 3.85, 0.1, 27.19, 4.37, 1.0, 'black'],
+    ['b', 26.44, 3.95, 0.12, 26.94, 4.25, 0.45, 'flame'],
+    ['b', 25.99, 4.35, 0, 27.39, 4.55, 0.18, 'iron'],
+    ['b', 25.64, 3.85, 1.3, 27.74, 4.5, 1.38, 'oak'],
+    ['b', 23.63, 3.85, 1.9, 23.75, 3.89, 2.3, 'iron'],
+    ['b', 23.665, 3.89, 2.25, 23.715, 4.15, 2.3, 'iron'],
+    ['b', 23.63, 4.11, 2.0, 23.75, 4.19, 2.28, 'flame'],
+    ['b', 28.53, 17.96, 1.9, 28.65, 18.0, 2.3, 'iron'],
+    ['b', 28.565, 17.7, 2.25, 28.615, 17.96, 2.3, 'iron'],
+    ['b', 28.53, 17.66, 2.0, 28.65, 17.74, 2.28, 'flame'],
+    ['b', 21.64, 7.7, 0.25, 23.64, 8.7, 0.5, 'oak'],
+    ['b', 21.69, 7.72, 0.5, 23.59, 8.68, 0.68, 'linen'],
+    ['b', 21.69, 7.85, 0.68, 22.14, 8.55, 0.8, 'white'],
+    ['b', 21.64, 7.7, 0.25, 21.7, 8.7, 1.25, 'iron'],
+    ['b', 22.84, 7.72, 0.68, 23.59, 8.68, 0.72, 'ruby'],
+    ['b', 28.74, 17.4, 0, 30.04, 18.0, 2.1, 'oak'],
+    ['b', 29.37, 17.38, 0.2, 29.41, 17.4, 2.0, 'black'],
+    ['b', 31.94, 17.5, 0, 33.04, 18.0, 0.78, 'oak'],
+    ['b', 32.14, 17.94, 0.9, 32.84, 17.98, 1.7, 'glass'],
+    ['b', 32.14, 17.75, 0.78, 32.24, 17.9, 0.9, 'tin'],
+    ['b', 35.09, 7.675, 0, 35.54, 8.525, 0.85, 'oak'],
+    ['b', 35.14, 7.8, 0.85, 35.44, 8.2, 0.93, 'white'],
+    ['b', 35.24, 8.25, 0.85, 35.39, 8.45, 1.15, 'white'],
+    ['b', 32.64, 3.85, 1.5, 33.34, 3.93, 2.4, 'gilt'],
+    ['b', 32.69, 3.93, 1.55, 33.29, 3.94, 2.35, 'black'],
+    ['b', 23.81, 3.85, 1.57, 24.77, 3.93, 2.33, 'wood'],
+    ['b', 23.84, 3.93, 1.6, 24.74, 3.95, 2.3, 'petals'],
+    ['b', 24.045, 3.95, 1.72, 24.085, 3.96, 2.18, 'black'],
+    ['b', 24.27, 3.95, 1.72, 24.31, 3.96, 2.18, 'black'],
+    ['b', 24.495, 3.95, 1.72, 24.535, 3.96, 2.18, 'black'],
+    ['b', 34.94, 13.95, 0, 35.54, 15.05, 0.55, 'wood'],
+    ['b', 34.92, 14.46, 0, 35.54, 14.54, 0.55, 'iron'],
+    ['b', 33.54, 11.8, 0.25, 35.54, 12.8, 0.5, 'oak'],
+    ['b', 33.59, 11.82, 0.5, 35.49, 12.78, 0.68, 'linen'],
+    ['b', 35.04, 11.95, 0.68, 35.49, 12.65, 0.8, 'white'],
+    ['b', 35.48, 11.8, 0.25, 35.54, 12.8, 1.25, 'iron'],
+    ['b', 33.59, 11.82, 0.68, 34.34, 12.78, 0.72, 'ruby'],
+    ['b', 26.69, 12.0, 0, 30.49, 14.6, 0.02, 'rope'],
+    ['b', 26.81, 12.12, 0.02, 30.37, 14.48, 0.035, 'ruby'],
+    ['b', 27.59, 12.7, 0.035, 29.59, 13.9, 0.05, 'books3'],
+    ['b', 34.84, 10.3, 0.7, 35.54, 11.7, 0.76, 'oak'],
+    ['b', 35.42, 10.34, 0, 35.5, 10.42, 0.7, 'oak'],
+    ['b', 34.88, 10.34, 0, 34.96, 10.42, 0.7, 'oak'],
+    ['b', 35.42, 11.58, 0, 35.5, 11.66, 0.7, 'oak'],
+    ['b', 34.88, 11.58, 0, 34.96, 11.66, 0.7, 'oak'],
+    ['b', 35.14, 10.35, 0.76, 35.44, 10.65, 0.84, 'books3'],
+    ['b', 35.18, 10.37, 0.84, 35.42, 10.63, 0.9, 'linen'],
+    ['b', 35.14, 11.075, 0.76, 35.19, 11.125, 0.84, 'black'],
+    ['b', 35.16, 11.09, 0.84, 35.18, 11.11, 1.0, 'white'],
+    ['b', 35.28, 11.42, 0.76, 35.34, 11.48, 0.9, 'gilt'],
+    ['b', 35.3, 11.44, 0.9, 35.32, 11.46, 0.96, 'flame'],
+    ['b', 34.29, 10.79, 0, 34.69, 11.21, 0.45, 'oak'],
+    ['b', 34.29, 10.79, 0.45, 34.35, 11.21, 0.95, 'oak'],
+    ['b', 30.14, 17.68, 0, 31.24, 18.0, 2.2, 'oak'],
+    ['b', 30.19, 17.7, 0.15, 31.19, 17.9, 0.45, 'ruby'],
+    ['b', 30.19, 17.7, 0.55, 31.19, 17.9, 0.85, 'books3'],
+    ['b', 30.19, 17.7, 0.95, 31.19, 17.9, 1.25, 'green'],
+    ['b', 30.19, 17.7, 1.35, 31.19, 17.9, 1.65, 'ruby'],
+    ['b', 30.19, 17.7, 1.75, 31.19, 17.9, 2.05, 'books3'],
+    ['b', 21.64, 13.95, 0, 21.96, 15.05, 2.2, 'oak'],
+    ['b', 21.74, 14.0, 0.15, 21.94, 15.0, 0.45, 'ruby'],
+    ['b', 21.74, 14.0, 0.55, 21.94, 15.0, 0.85, 'books3'],
+    ['b', 21.74, 14.0, 0.95, 21.94, 15.0, 1.25, 'green'],
+    ['b', 21.74, 14.0, 1.35, 21.94, 15.0, 1.65, 'ruby'],
+    ['b', 21.74, 14.0, 1.75, 21.94, 15.0, 2.05, 'books3'],
+    ['b', 21.64, 5.875, 0, 22.04, 6.325, 0.6, 'oak'],
+    ['b', 21.68, 5.895, 0.6, 22.0, 6.305, 0.62, 'oak'],
+    ['b', 21.74, 5.95, 0.62, 21.86, 6.05, 0.66, 'books3'],
+    ['b', 21.74, 6.16, 0.62, 21.82, 6.24, 0.72, 'gilt'],
+    ['b', 21.9, 6.075, 0.62, 21.95, 6.125, 0.68, 'gilt'],
+    ['b', 21.91, 6.087, 0.68, 21.94, 6.112, 0.82, 'white'],
+    ['b', 21.91, 6.087, 0.82, 21.94, 6.112, 0.86, 'flame'],
+    ['b', 32.84, 3.95, 0, 34.14, 4.7, 0.5, 'copper'],
+    ['b', 32.92, 4.03, 0.35, 34.06, 4.62, 0.5, 'linen'],
+    ['b', 32.99, 4.63, 0, 33.99, 4.75, 1.6, 'oak'],
+    ['b', 33.02, 4.65, 0.15, 33.96, 4.73, 1.5, 'linen'],
+    ['b', 34.29, 4.05, 0, 34.49, 4.25, 0.4, 'gilt'],
+    ['b', 34.365, 3.97, 0.1, 34.415, 4.05, 0.34, 'gilt'],
+    ['b', 35.24, 5.15, 0, 35.54, 6.05, 0.04, 'oak'],
+    ['b', 35.24, 5.15, 0.3, 35.54, 6.05, 0.34, 'oak'],
+    ['b', 35.5, 5.2, 0, 35.54, 5.24, 0.34, 'oak'],
+    ['b', 35.5, 5.96, 0, 35.54, 6.0, 0.34, 'oak'],
+    ['b', 35.28, 5.22, 0.04, 35.5, 5.42, 0.28, 'black'],
+    ['b', 35.28, 5.22, 0.34, 35.5, 5.42, 0.4, 'black'],
+    ['b', 35.28, 5.5, 0.04, 35.5, 5.7, 0.28, 'black'],
+    ['b', 35.28, 5.5, 0.34, 35.5, 5.7, 0.4, 'black'],
+    ['b', 35.28, 5.78, 0.04, 35.5, 5.98, 0.28, 'black'],
+    ['b', 35.28, 5.78, 0.34, 35.5, 5.98, 0.4, 'black'],
+    ['b', 35.24, 6.1, 0, 35.49, 6.2, 0.04, 'iron'],
+    ['b', 25.19, 3.85, 1.5, 26.19, 3.89, 1.6, 'oak'],
+    ['b', 25.275, 3.89, 1.5, 25.305, 3.95, 1.54, 'iron'],
+    ['b', 25.545, 3.89, 1.5, 25.575, 3.95, 1.54, 'iron'],
+    ['b', 25.805, 3.89, 1.5, 25.835, 3.95, 1.54, 'iron'],
+    ['b', 26.075, 3.89, 1.5, 26.105, 3.95, 1.54, 'iron'],
+    ['b', 25.12, 3.9, 0.5, 25.46, 4.01, 1.5, 'cloth'],
+    ['b', 25.51, 3.9, 1.0, 25.61, 3.95, 1.5, 'ruby'],
+    ['b', 25.98, 3.9, 1.55, 26.2, 4.05, 1.7, 'black'],
+    ['b', 35.48, 15.7, 0.15, 35.54, 16.5, 1.75, 'oak'],
+    ['b', 35.47, 15.77, 0.25, 35.48, 16.43, 1.65, 'glass'],
+    ['b', 35.09, 15.715, 0, 35.54, 15.785, 0.12, 'oak'],
+    ['b', 35.09, 16.415, 0, 35.54, 16.485, 0.12, 'oak'],
+    ['b', 30.65, 3.95, 0, 30.73, 4.03, 1.2, 'oak'],
+    ['b', 30.44, 3.85, 1.2, 30.94, 4.15, 1.26, 'oak'],
+    ['b', 30.59, 3.91, 1.26, 30.79, 4.09, 1.55, 'dust'],
+    ['b', 30.62, 3.93, 1.55, 30.76, 4.05, 1.68, 'linen'],
+    ['b', 30.44, 3.85, 0, 30.94, 4.35, 0.03, 'linen'],
+    ['b', 24.815, 3.85, 0.45, 25.365, 4.4, 0.48, 'oak'],
+    ['b', 25.015, 4.05, 0, 25.165, 4.2, 0.45, 'oak'],
+    ['b', 24.84, 3.91, 0.48, 25.34, 4.35, 0.5, 'iron'],
+    ['b', 24.89, 3.97, 0.5, 25.05, 4.13, 0.66, 'white'],
+    ['b', 24.945, 3.91, 0.56, 24.995, 3.97, 0.6, 'white'],
+    ['b', 25.18, 4.05, 0.5, 25.28, 4.15, 0.58, 'white'],
+    ['b', 25.223, 4.09, 0.56, 25.238, 4.11, 0.7, 'gilt'],
+    ['b', 31.165, 5.85, 0, 31.215, 6.35, 0.05, 'oak'],
+    ['b', 31.165, 6.05, 0, 31.215, 6.1, 1.3, 'oak'],
+    ['b', 32.165, 5.85, 0, 32.215, 6.35, 0.05, 'oak'],
+    ['b', 32.165, 6.05, 0, 32.215, 6.1, 1.3, 'oak'],
+    ['b', 31.165, 6.05, 0.5, 32.215, 6.1, 0.54, 'oak'],
+    ['b', 31.165, 6.05, 0.85, 32.215, 6.1, 0.89, 'oak'],
+    ['b', 31.165, 6.05, 1.25, 32.215, 6.1, 1.29, 'oak'],
+    ['b', 31.29, 5.99, 0.55, 31.69, 6.15, 1.25, 'linen'],
+    ['b', 31.765, 5.99, 0.9, 32.115, 6.15, 1.25, 'petals'],
+    ['b', 32.84, 8.65, 0, 33.14, 8.95, 0.04, 'iron'],
+    ['b', 32.96, 8.77, 0.04, 33.02, 8.83, 1.4, 'gilt'],
+    ['b', 32.88, 8.69, 1.4, 33.1, 8.91, 1.55, 'glass'],
+    ['b', 32.86, 8.67, 1.55, 33.12, 8.93, 1.72, 'green'],
+    ['b', 28.19, 16.0, 0.55, 28.99, 16.8, 0.6, 'oak'],
+    ['b', 28.22, 16.68, 0, 28.28, 16.76, 0.55, 'oak'],
+    ['b', 28.22, 16.04, 0, 28.28, 16.12, 0.55, 'oak'],
+    ['b', 28.9, 16.68, 0, 28.96, 16.76, 0.55, 'oak'],
+    ['b', 28.9, 16.04, 0, 28.96, 16.12, 0.55, 'oak'],
+    ['b', 28.29, 16.1, 0.6, 28.89, 16.7, 0.62, 'black'],
+    ['b', 28.355, 16.53, 0.62, 28.425, 16.6, 0.74, 'white'],
+    ['b', 28.555, 16.43, 0.62, 28.625, 16.5, 0.74, 'white'],
+    ['b', 28.705, 16.33, 0.62, 28.775, 16.4, 0.74, 'white'],
+    ['b', 28.455, 16.23, 0.62, 28.525, 16.3, 0.74, 'black'],
+    ['b', 28.755, 16.13, 0.62, 28.825, 16.2, 0.74, 'books3'],
+    ['b', 28.305, 16.08, 0.62, 28.375, 16.15, 0.74, 'books3'],
+    ['b', 35.14, 9.275, 0, 35.54, 9.725, 0.6, 'oak'],
+    ['b', 35.18, 9.295, 0.6, 35.5, 9.705, 0.62, 'oak'],
+    ['b', 35.32, 9.35, 0.62, 35.44, 9.45, 0.66, 'books3'],
+    ['b', 35.36, 9.56, 0.62, 35.44, 9.64, 0.72, 'gilt'],
+    ['b', 35.23, 9.475, 0.62, 35.28, 9.525, 0.68, 'gilt'],
+    ['b', 35.24, 9.488, 0.68, 35.27, 9.512, 0.82, 'white'],
+    ['b', 35.24, 9.488, 0.82, 35.27, 9.512, 0.86, 'flame'],
+    ['b', 35.04, 12.85, 0, 35.54, 13.35, 0.9, 'oak'],
+    ['b', 35.09, 12.875, 0.9, 35.49, 13.325, 1.35, 'amber'],
+    ['b', 21.64, 8.8, 0.7, 22.34, 10.2, 0.76, 'oak'],
+    ['b', 21.68, 8.84, 0, 21.76, 8.92, 0.7, 'oak'],
+    ['b', 22.22, 8.84, 0, 22.3, 8.92, 0.7, 'oak'],
+    ['b', 21.68, 10.08, 0, 21.76, 10.16, 0.7, 'oak'],
+    ['b', 22.22, 10.08, 0, 22.3, 10.16, 0.7, 'oak'],
+    ['b', 21.74, 8.85, 0.76, 22.04, 9.15, 0.84, 'books3'],
+    ['b', 21.76, 8.87, 0.84, 22.0, 9.13, 0.9, 'linen'],
+    ['b', 21.99, 9.575, 0.76, 22.04, 9.625, 0.84, 'black'],
+    ['b', 22.0, 9.59, 0.84, 22.02, 9.61, 1.0, 'white'],
+    ['b', 21.84, 9.92, 0.76, 21.9, 9.98, 0.9, 'gilt'],
+    ['b', 21.86, 9.94, 0.9, 21.88, 9.96, 0.96, 'flame'],
+    ['b', 22.49, 9.29, 0, 22.89, 9.71, 0.45, 'oak'],
+    ['b', 22.83, 9.29, 0.45, 22.89, 9.71, 0.95, 'oak'],
+    ['b', 22.44, 3.85, 0, 23.54, 4.17, 2.2, 'oak'],
+    ['b', 22.49, 3.95, 0.15, 23.49, 4.15, 0.45, 'ruby'],
+    ['b', 22.49, 3.95, 0.55, 23.49, 4.15, 0.85, 'books3'],
+    ['b', 22.49, 3.95, 0.95, 23.49, 4.15, 1.25, 'green'],
+    ['b', 22.49, 3.95, 1.35, 23.49, 4.15, 1.65, 'ruby'],
+    ['b', 22.49, 3.95, 1.75, 23.49, 4.15, 2.05, 'books3'],
+    ['b', 26.69, 7.25, 0, 30.49, 9.85, 0.02, 'rope'],
+    ['b', 26.81, 7.37, 0.02, 30.37, 9.73, 0.035, 'ruby'],
+    ['b', 27.59, 7.95, 0.035, 29.59, 9.15, 0.05, 'books3'],
+    ['b', 24.415, 17.45, 0.45, 24.965, 18.0, 0.48, 'oak'],
+    ['b', 24.615, 17.65, 0, 24.765, 17.8, 0.45, 'oak'],
+    ['b', 24.44, 17.5, 0.48, 24.94, 17.94, 0.5, 'iron'],
+    ['b', 24.49, 17.72, 0.5, 24.65, 17.88, 0.66, 'white'],
+    ['b', 24.545, 17.88, 0.56, 24.595, 17.94, 0.6, 'white'],
+    ['b', 24.78, 17.7, 0.5, 24.88, 17.8, 0.58, 'white'],
+    ['b', 24.823, 17.74, 0.56, 24.838, 17.76, 0.7, 'gilt'],
+    ['b', 27.74, 7.4, 0, 29.44, 8.3, 0.45, 'lavender'],
+    ['b', 27.74, 7.4, 0.45, 29.44, 7.65, 0.95, 'lavender'],
+    ['b', 27.73, 7.4, 0.45, 27.85, 8.3, 0.65, 'lavender'],
+    ['b', 29.33, 7.4, 0.45, 29.45, 8.3, 0.65, 'lavender'],
+    ['b', 27.94, 7.7, 0.45, 28.34, 8.0, 0.7, 'amber'],
+    ['b', 28.315, 8.7, 0.45, 28.865, 9.25, 0.48, 'oak'],
+    ['b', 28.515, 8.9, 0, 28.665, 9.05, 0.45, 'oak'],
+    ['b', 28.34, 8.76, 0.48, 28.84, 9.2, 0.5, 'iron'],
+    ['b', 28.39, 8.82, 0.5, 28.55, 8.98, 0.66, 'white'],
+    ['b', 28.445, 8.76, 0.56, 28.495, 8.82, 0.6, 'white'],
+    ['b', 28.68, 8.9, 0.5, 28.78, 9.0, 0.58, 'white'],
+    ['b', 28.723, 8.94, 0.56, 28.738, 8.96, 0.7, 'gilt'],
+    ['b', 26.99, 12.85, 0.74, 29.59, 13.75, 0.8, 'oak'],
+    ['b', 27.1, 13.57, 0, 27.18, 13.65, 0.74, 'oak'],
+    ['b', 29.4, 13.57, 0, 29.48, 13.65, 0.74, 'oak'],
+    ['b', 27.1, 12.92, 0, 27.18, 13.0, 0.74, 'oak'],
+    ['b', 29.4, 12.92, 0, 29.48, 13.0, 0.74, 'oak'],
+    ['b', 27.61, 13.25, 0.8, 27.77, 13.4, 0.84, 'iron'],
+    ['b', 27.63, 13.27, 0.84, 27.75, 13.38, 1.1, 'tallow'],
+    ['b', 27.54, 13.23, 1.1, 27.84, 13.42, 1.3, 'tartan'],
+    ['b', 28.54, 13.2, 0.8, 28.84, 13.55, 0.95, 'petals'],
+    ['b', 28.57, 13.25, 0.95, 28.81, 13.5, 1.0, 'mahog'],
+    ['b', 29.015, 13.05, 0.8, 29.365, 13.35, 0.82, 'ink'],
+    ['b', 27.48, 13.81, 0.44, 27.9, 14.23, 0.49, 'oak'],
+    ['b', 27.48, 14.19, 0.49, 27.9, 14.23, 0.95, 'oak'],
+    ['b', 27.485, 14.16, 0, 27.535, 14.21, 0.44, 'oak'],
+    ['b', 27.845, 14.16, 0, 27.895, 14.21, 0.44, 'oak'],
+    ['b', 27.485, 13.82, 0, 27.535, 13.87, 0.44, 'oak'],
+    ['b', 27.845, 13.82, 0, 27.895, 13.87, 0.44, 'oak'],
+    ['b', 27.48, 12.38, 0.44, 27.9, 12.8, 0.49, 'oak'],
+    ['b', 27.48, 12.38, 0.49, 27.9, 12.42, 0.95, 'oak'],
+    ['b', 27.485, 12.73, 0, 27.535, 12.78, 0.44, 'oak'],
+    ['b', 27.845, 12.73, 0, 27.895, 12.78, 0.44, 'oak'],
+    ['b', 27.485, 12.39, 0, 27.535, 12.44, 0.44, 'oak'],
+    ['b', 27.845, 12.39, 0, 27.895, 12.44, 0.44, 'oak'],
+    ['b', 28.68, 13.81, 0.44, 29.1, 14.23, 0.49, 'oak'],
+    ['b', 28.68, 14.19, 0.49, 29.1, 14.23, 0.95, 'oak'],
+    ['b', 28.685, 14.16, 0, 28.735, 14.21, 0.44, 'oak'],
+    ['b', 29.045, 14.16, 0, 29.095, 14.21, 0.44, 'oak'],
+    ['b', 28.685, 13.82, 0, 28.735, 13.87, 0.44, 'oak'],
+    ['b', 29.045, 13.82, 0, 29.095, 13.87, 0.44, 'oak'],
+    ['b', 28.68, 12.38, 0.44, 29.1, 12.8, 0.49, 'oak'],
+    ['b', 28.68, 12.38, 0.49, 29.1, 12.42, 0.95, 'oak'],
+    ['b', 28.685, 12.73, 0, 28.735, 12.78, 0.44, 'oak'],
+    ['b', 29.045, 12.73, 0, 29.095, 12.78, 0.44, 'oak'],
+    ['b', 28.685, 12.39, 0, 28.735, 12.44, 0.44, 'oak'],
+    ['b', 29.045, 12.39, 0, 29.095, 12.44, 0.44, 'oak'],
+    ['b', 21.64, 15.35, 0, 22.24, 16.65, 2.1, 'oak'],
+    ['b', 22.24, 15.98, 0.2, 22.26, 16.02, 2.0, 'black'],
+    ['b', 22.04, 17.7, 0, 22.34, 18.0, 0.08, 'oak'],
+    ['b', 22.165, 17.83, 0.08, 22.215, 17.88, 1.85, 'oak'],
+    ['b', 22.17, 17.78, 1.55, 22.21, 17.95, 1.59, 'amber'],
+    ['b', 22.17, 17.8, 1.65, 22.21, 17.95, 1.69, 'amber'],
+    ['b', 22.17, 17.76, 1.8, 22.21, 17.95, 1.84, 'amber'],
+    ['b', 22.26, 17.88, 0.08, 22.3, 17.94, 0.8, 'ink']]);
+  T['staff-bedrooms-7'].lights = (T['staff-bedrooms-7'].lights || []).concat([[26.69, 4.1, 0.5, 16757862, 1.1, 8], [23.69, 4.15, 2.33, 16757862, 1.1, 8], [28.59, 17.7, 2.33, 16757862, 1.1, 8], [35.31, 11.45, 1.01, 16757862, 1.1, 8], [21.93, 6.1, 0.91, 16757862, 1.1, 8], [35.26, 9.5, 0.91, 16757862, 1.1, 8], [21.87, 9.95, 1.01, 16757862, 1.1, 8]]);
+})(window.SHELL_W5A.things);
+/* HAND2 end staff-bedrooms-7 */
+/* HAND2 begin astronomy-warming-room */
+/* Interiors req 2423 sec 14: a stove with mittens drying, a bench of fur-lined coats on hooks, a kettle, a rack of star charts; req 2532 adds hangings, a dado and a thing to read or pull; req 2543 adds two brass telescopes on tripods at the south window wall, two observation tables with logs, cups and lamps, stools, a centre rug, an urn of hot cocoa with mugs and, for rule 7, a ceiling star map whose gilt stars are placed for the shell to move; sited by tools/architect-hand-rooms-1101.py, plain stand-ins (Objects draw the real ones) */
+(function (T) {
+  T['astronomy-warming-room'] = T['astronomy-warming-room'] || { items: [] };
+  T['astronomy-warming-room'].items = T['astronomy-warming-room'].items.concat([
+    ['b', 113.1, 62.6, 0, 113.8, 63.3, 1.2, 'iron'],
+    ['b', 112.9, 62.825, 0.2, 113.1, 63.075, 1.0, 'black'],
+    ['b', 102.79, 59.0, 1.9, 102.91, 59.04, 2.3, 'iron'],
+    ['b', 102.825, 59.04, 2.25, 102.875, 59.3, 2.3, 'iron'],
+    ['b', 102.79, 59.26, 2.0, 102.91, 59.34, 2.28, 'flame'],
+    ['b', 107.09, 71.96, 1.9, 107.21, 72.0, 2.3, 'iron'],
+    ['b', 107.125, 71.7, 2.25, 107.175, 71.96, 2.3, 'iron'],
+    ['b', 107.09, 71.66, 2.0, 107.21, 71.74, 2.28, 'flame'],
+    ['b', 100.9, 62.05, 1.6, 100.98, 64.45, 1.66, 'oak'],
+    ['b', 100.95, 62.175, 0.7, 101.1, 62.525, 1.6, 'dust'],
+    ['b', 100.95, 62.625, 0.7, 101.1, 62.975, 1.6, 'dust'],
+    ['b', 100.95, 63.075, 0.7, 101.1, 63.425, 1.6, 'dust'],
+    ['b', 100.95, 63.525, 0.7, 101.1, 63.875, 1.6, 'dust'],
+    ['b', 100.95, 63.975, 0.7, 101.1, 64.325, 1.6, 'dust'],
+    ['b', 102.62, 71.92, 1.57, 104.28, 72.0, 2.83, 'wood'],
+    ['b', 102.65, 71.9, 1.6, 104.25, 71.92, 2.8, 'petals'],
+    ['b', 103.03, 71.89, 1.72, 103.07, 71.9, 2.68, 'black'],
+    ['b', 103.43, 71.89, 1.72, 103.47, 71.9, 2.68, 'black'],
+    ['b', 103.83, 71.89, 1.72, 103.87, 71.9, 2.68, 'black'],
+    ['b', 110.62, 71.92, 1.57, 111.88, 72.0, 2.53, 'wood'],
+    ['b', 110.65, 71.9, 1.6, 111.85, 71.92, 2.5, 'linen'],
+    ['b', 110.93, 71.89, 1.72, 110.97, 71.9, 2.38, 'black'],
+    ['b', 111.23, 71.89, 1.72, 111.27, 71.9, 2.38, 'black'],
+    ['b', 111.53, 71.89, 1.72, 111.57, 71.9, 2.38, 'black'],
+    ['b', 113.72, 65.85, 1.5, 113.8, 67.45, 1.56, 'oak'],
+    ['b', 113.68, 65.93, 1.1, 113.76, 66.07, 1.5, 'iron'],
+    ['b', 113.68, 66.21, 1.1, 113.76, 66.31, 1.5, 'iron'],
+    ['b', 113.68, 66.45, 1.1, 113.76, 66.59, 1.5, 'iron'],
+    ['b', 113.68, 66.73, 1.1, 113.76, 66.83, 1.5, 'iron'],
+    ['b', 113.68, 66.97, 1.1, 113.76, 67.11, 1.5, 'iron'],
+    ['b', 113.68, 67.25, 1.1, 113.76, 67.35, 1.5, 'iron'],
+    ['b', 106.405, 71.6, 0, 106.455, 71.65, 1.25, 'oak'],
+    ['b', 106.625, 71.48, 0, 106.675, 71.53, 1.25, 'oak'],
+    ['b', 106.845, 71.6, 0, 106.895, 71.65, 1.25, 'oak'],
+    ['b', 106.5, 71.3, 1.25, 106.8, 71.75, 1.3, 'iron'],
+    ['b', 106.59, 71.25, 1.3, 106.71, 71.7, 1.42, 'brass'],
+    ['b', 106.59, 71.32, 1.4, 106.71, 71.77, 1.52, 'brass'],
+    ['b', 106.59, 71.39, 1.5, 106.71, 71.84, 1.62, 'brass'],
+    ['b', 106.59, 71.46, 1.6, 106.71, 71.91, 1.72, 'brass'],
+    ['b', 106.57, 71.8, 1.7, 106.73, 72.0, 1.85, 'brass'],
+    ['b', 106.625, 71.25, 1.28, 106.675, 71.38, 1.4, 'glass'],
+    ['b', 113.4, 70.505, 0, 113.45, 70.555, 1.25, 'oak'],
+    ['b', 113.28, 70.725, 0, 113.33, 70.775, 1.25, 'oak'],
+    ['b', 113.4, 70.945, 0, 113.45, 70.995, 1.25, 'oak'],
+    ['b', 113.1, 70.6, 1.25, 113.55, 70.9, 1.3, 'iron'],
+    ['b', 113.05, 70.69, 1.3, 113.5, 70.81, 1.42, 'brass'],
+    ['b', 113.12, 70.69, 1.4, 113.57, 70.81, 1.52, 'brass'],
+    ['b', 113.19, 70.69, 1.5, 113.64, 70.81, 1.62, 'brass'],
+    ['b', 113.26, 70.69, 1.6, 113.71, 70.81, 1.72, 'brass'],
+    ['b', 113.6, 70.67, 1.7, 113.8, 70.83, 1.85, 'brass'],
+    ['b', 113.05, 70.725, 1.28, 113.18, 70.775, 1.4, 'glass'],
+    ['b', 104.4, 61.65, 0.72, 105.3, 64.25, 0.78, 'oak'],
+    ['b', 104.45, 61.71, 0, 105.25, 61.79, 0.72, 'oak'],
+    ['b', 104.45, 64.11, 0, 105.25, 64.19, 0.72, 'oak'],
+    ['b', 104.6, 61.925, 0.78, 105.1, 62.375, 0.8, 'linen'],
+    ['b', 104.85, 62.14, 0.8, 104.87, 62.16, 0.82, 'black'],
+    ['b', 104.95, 62.81, 0.78, 105.05, 62.89, 0.86, 'white'],
+    ['b', 104.95, 63.01, 0.78, 105.05, 63.09, 0.86, 'white'],
+    ['b', 104.95, 63.21, 0.78, 105.05, 63.29, 0.86, 'white'],
+    ['b', 104.75, 63.8, 0.78, 104.95, 64.0, 0.84, 'iron'],
+    ['b', 104.8, 63.85, 0.84, 104.9, 63.95, 1.05, 'amber'],
+    ['b', 104.55, 63.59, 0.78, 104.7, 63.71, 0.9, 'linen'],
+    ['b', 104.4, 67.05, 0.72, 105.3, 69.65, 0.78, 'oak'],
+    ['b', 104.45, 67.11, 0, 105.25, 67.19, 0.72, 'oak'],
+    ['b', 104.45, 69.51, 0, 105.25, 69.59, 0.72, 'oak'],
+    ['b', 104.6, 67.325, 0.78, 105.1, 67.775, 0.8, 'linen'],
+    ['b', 104.85, 67.54, 0.8, 104.87, 67.56, 0.82, 'black'],
+    ['b', 104.95, 68.21, 0.78, 105.05, 68.29, 0.86, 'white'],
+    ['b', 104.95, 68.41, 0.78, 105.05, 68.49, 0.86, 'white'],
+    ['b', 104.95, 68.61, 0.78, 105.05, 68.69, 0.86, 'white'],
+    ['b', 104.75, 69.2, 0.78, 104.95, 69.4, 0.84, 'iron'],
+    ['b', 104.8, 69.25, 0.84, 104.9, 69.35, 1.05, 'amber'],
+    ['b', 104.55, 68.99, 0.78, 104.7, 69.11, 0.9, 'linen'],
+    ['b', 105.6, 62.07, 0, 105.96, 62.43, 0.5, 'oak'],
+    ['b', 105.6, 63.37, 0, 105.96, 63.73, 0.5, 'oak'],
+    ['b', 105.6, 67.57, 0, 105.96, 67.93, 0.5, 'oak'],
+    ['b', 105.6, 68.87, 0, 105.96, 69.23, 0.5, 'oak'],
+    ['b', 107.1, 62.75, 0, 110.3, 68.15, 0.02, 'gilt'],
+    ['b', 107.22, 62.87, 0.02, 110.18, 68.03, 0.035, 'ruby'],
+    ['b', 107.8, 63.85, 0.035, 109.6, 67.05, 0.05, 'blue'],
+    ['b', 108.3, 64.75, 0.05, 109.1, 66.15, 0.065, 'gilt'],
+    ['b', 113.1, 67.2, 0, 113.8, 68.1, 0.8, 'oak'],
+    ['b', 113.2, 67.425, 0.8, 113.7, 67.875, 1.45, 'copper'],
+    ['b', 113.3, 67.525, 1.45, 113.6, 67.775, 1.6, 'copper'],
+    ['b', 113.02, 67.615, 0.95, 113.2, 67.685, 1.05, 'brass'],
+    ['b', 113.57, 67.19, 0.8, 113.65, 67.27, 0.88, 'white'],
+    ['b', 113.57, 67.28, 0.8, 113.65, 67.36, 0.88, 'white'],
+    ['b', 113.57, 67.91, 0.8, 113.65, 67.99, 0.88, 'white'],
+    ['b', 113.57, 68.0, 0.8, 113.65, 68.08, 0.88, 'white'],
+    ['b', 113.35, 67.61, 1.6, 113.55, 67.69, 1.75, 'white'],
+    ['b', 103.8, 61.95, 4.28, 110.8, 68.95, 4.32, 'blue'],
+    ['b', 103.8, 65.41, 4.32, 110.8, 65.49, 4.4, 'brass'],
+    ['b', 110.72, 61.95, 4.32, 110.8, 68.95, 4.4, 'brass'],
+    ['b', 104.8, 62.97, 4.24, 104.96, 63.13, 4.29, 'gilt'],
+    ['b', 106.4, 63.89, 4.24, 106.52, 64.01, 4.29, 'gilt'],
+    ['b', 104.6, 64.95, 4.24, 104.8, 65.15, 4.29, 'gilt'],
+    ['b', 105.9, 65.99, 4.24, 106.02, 66.11, 4.29, 'gilt'],
+    ['b', 105.0, 67.07, 4.24, 105.16, 67.23, 4.29, 'gilt'],
+    ['b', 106.8, 67.89, 4.24, 106.92, 68.01, 4.29, 'gilt'],
+    ['b', 108.0, 63.39, 4.24, 108.12, 63.51, 4.29, 'gilt'],
+    ['b', 107.6, 64.57, 4.24, 107.76, 64.73, 4.29, 'gilt'],
+    ['b', 108.4, 65.65, 4.24, 108.6, 65.85, 4.29, 'gilt'],
+    ['b', 109.0, 66.79, 4.24, 109.12, 66.91, 4.29, 'gilt'],
+    ['b', 108.2, 67.97, 4.24, 108.36, 68.13, 4.29, 'gilt'],
+    ['b', 109.6, 64.19, 4.24, 109.72, 64.31, 4.29, 'gilt'],
+    ['b', 106.8, 65.33, 4.24, 107.04, 65.57, 4.29, 'gilt'],
+    ['b', 110.0, 66.39, 4.24, 110.12, 66.51, 4.29, 'gilt'],
+    ['b', 107.75, 71.6, 0, 108.35, 72.0, 0.7, 'oak'],
+    ['b', 107.825, 71.82, 0.7, 107.915, 71.9, 1.15, 'linen'],
+    ['b', 107.945, 71.82, 0.7, 108.035, 71.9, 1.2, 'linen'],
+    ['b', 108.065, 71.82, 0.7, 108.155, 71.9, 1.15, 'linen'],
+    ['b', 108.185, 71.82, 0.7, 108.275, 71.9, 1.2, 'linen']]);
+  T['astronomy-warming-room'].lights = (T['astronomy-warming-room'].lights || []).concat([[102.85, 59.3, 2.33, 16757862, 1.1, 8], [107.15, 71.7, 2.33, 16757862, 1.1, 8]]);
+})(window.SHELL_W5A.things);
+/* HAND2 end astronomy-warming-room */
+/* HAND2 begin headmaster-guest-sitting-room-7 */
+/* Interiors req 2423 sec 13: a sofa, a tea-table, a writing desk, a bookshelf of local histories, a stag-hunt tapestry, a hearth; req 2532 adds hangings, a dado and a thing to read or pull; sited by tools/architect-hand-rooms-1101.py, plain stand-ins (Objects draw the real ones) */
+(function (T) {
+  T['headmaster-guest-sitting-room-7'] = T['headmaster-guest-sitting-room-7'] || { items: [] };
+  T['headmaster-guest-sitting-room-7'].items = T['headmaster-guest-sitting-room-7'].items.concat([
+    ['b', 57.8, 7.6, 0, 59.6, 8.1, 1.3, 'stone'],
+    ['b', 58.2, 7.6, 0.1, 59.2, 8.12, 1.0, 'black'],
+    ['b', 58.45, 7.7, 0.12, 58.95, 8.0, 0.45, 'flame'],
+    ['b', 58.0, 8.1, 0, 59.4, 8.3, 0.18, 'iron'],
+    ['b', 57.65, 7.6, 1.3, 59.75, 8.25, 1.38, 'oak'],
+    ['b', 58.64, 17.96, 1.9, 58.76, 18.0, 2.3, 'iron'],
+    ['b', 58.675, 17.7, 2.25, 58.725, 17.96, 2.3, 'iron'],
+    ['b', 58.64, 17.66, 2.0, 58.76, 17.74, 2.28, 'flame'],
+    ['b', 55.85, 15.35, 0, 56.75, 17.35, 0.45, 'ruby'],
+    ['b', 55.85, 15.35, 0.45, 56.1, 17.35, 0.95, 'ruby'],
+    ['b', 60.95, 10.8, 0, 61.45, 11.5, 0.7, 'oak'],
+    ['b', 61.05, 10.9, 0.7, 61.35, 11.4, 0.72, 'tin'],
+    ['b', 61.2, 11.09, 0.72, 61.3, 11.21, 0.85, 'white'],
+    ['b', 60.65, 14.65, 0, 61.45, 16.25, 0.78, 'oak'],
+    ['b', 61.2, 15.8, 0.78, 61.3, 15.9, 1.0, 'flame'],
+    ['b', 57.9, 17.92, 2.9, 59.5, 18.0, 4.1, 'dust'],
+    ['b', 58.0, 17.91, 3.02, 59.4, 17.92, 3.98, 'stone'],
+    ['b', 57.85, 17.91, 4.1, 59.55, 18.0, 4.14, 'wood'],
+    ['b', 55.85, 14.85, 2.3, 55.93, 16.65, 4.0, 'dust'],
+    ['b', 55.93, 14.97, 2.42, 55.94, 16.53, 3.88, 'linen'],
+    ['b', 55.94, 14.97, 2.6, 55.95, 16.53, 2.72, 'petals'],
+    ['b', 55.94, 14.97, 3.58, 55.95, 16.53, 3.7, 'petals'],
+    ['b', 55.94, 15.5, 2.85, 55.96, 16.0, 3.45, 'petals'],
+    ['b', 55.96, 15.62, 3.0, 55.97, 15.88, 3.3, 'dust'],
+    ['b', 55.85, 14.8, 4.0, 55.94, 16.7, 4.04, 'wood'],
+    ['b', 55.94, 15.125, 2.18, 55.95, 15.175, 2.32, 'dust'],
+    ['b', 55.94, 15.425, 2.18, 55.95, 15.475, 2.32, 'dust'],
+    ['b', 55.94, 15.725, 2.18, 55.95, 15.775, 2.32, 'dust'],
+    ['b', 55.94, 16.025, 2.18, 55.95, 16.075, 2.32, 'dust'],
+    ['b', 55.94, 16.325, 2.18, 55.95, 16.375, 2.32, 'dust'],
+    ['b', 61.37, 13.85, 2.3, 61.45, 15.65, 4.0, 'dust'],
+    ['b', 61.36, 13.97, 2.42, 61.37, 15.53, 3.88, 'petals'],
+    ['b', 61.35, 13.97, 2.6, 61.36, 15.53, 2.72, 'linen'],
+    ['b', 61.35, 13.97, 3.58, 61.36, 15.53, 3.7, 'linen'],
+    ['b', 61.34, 14.5, 2.85, 61.36, 15.0, 3.45, 'linen'],
+    ['b', 61.33, 14.62, 3.0, 61.34, 14.88, 3.3, 'dust'],
+    ['b', 61.36, 13.8, 4.0, 61.45, 15.7, 4.04, 'wood'],
+    ['b', 61.35, 14.125, 2.18, 61.36, 14.175, 2.32, 'dust'],
+    ['b', 61.35, 14.425, 2.18, 61.36, 14.475, 2.32, 'dust'],
+    ['b', 61.35, 14.725, 2.18, 61.36, 14.775, 2.32, 'dust'],
+    ['b', 61.35, 15.025, 2.18, 61.36, 15.075, 2.32, 'dust'],
+    ['b', 61.35, 15.325, 2.18, 61.36, 15.375, 2.32, 'dust'],
+    ['b', 55.9, 17.95, 0.1, 58.9, 18.0, 1.05, 'oak'],
+    ['b', 55.9, 17.92, 1.05, 58.9, 18.0, 1.13, 'wood'],
+    ['b', 55.9, 17.92, 0, 58.9, 18.0, 0.1, 'wood'],
+    ['b', 59.7, 7.6, 0, 60.3, 8.1, 1.0, 'oak'],
+    ['b', 59.725, 7.65, 1.0, 60.275, 8.05, 1.1, 'linen'],
+    ['b', 59.99, 7.7, 1.1, 60.01, 7.72, 1.4, 'gilt'],
+    ['b', 55.85, 8.09, 0.9, 55.95, 8.21, 2.6, 'ruby'],
+    ['b', 55.95, 8.05, 2.4, 56.05, 8.25, 2.6, 'gilt'],
+    ['b', 55.95, 8.07, 0.7, 56.01, 8.23, 0.9, 'gilt']]);
+  T['headmaster-guest-sitting-room-7'].lights = (T['headmaster-guest-sitting-room-7'].lights || []).concat([[58.7, 7.85, 0.5, 16757862, 1.1, 8], [58.7, 17.7, 2.33, 16757862, 1.1, 8], [61.25, 15.85, 1.05, 16757862, 1.1, 8]]);
+})(window.SHELL_W5A.things);
+/* HAND2 end headmaster-guest-sitting-room-7 */
+/* HAND2 begin pomfrey-office */
+/* Interiors req 2423 sec 12 + Architect req 2532: medicine cupboard, chart of the bones, ledger, kettle by a small hearth; a row of ward keys and a bell-pull to the wards; req 2532 adds hangings, a dado and a thing to read or pull; req 2543 adds a roll-top desk, a washstand, a weighing scale, a tonic shelf, an apothecary chest of drawers and the matron's cape and cap; sited by tools/architect-hand-rooms-1101.py, plain stand-ins (Objects draw the real ones) */
+(function (T) {
+  T['pomfrey-office'] = T['pomfrey-office'] || { items: [] };
+  T['pomfrey-office'].items = T['pomfrey-office'].items.concat([
+    ['b', 155.4, 46.05, 0, 155.9, 47.85, 1.3, 'stone'],
+    ['b', 155.4, 46.45, 0.1, 155.92, 47.45, 1.0, 'black'],
+    ['b', 155.5, 46.7, 0.12, 155.8, 47.2, 0.45, 'flame'],
+    ['b', 155.9, 46.25, 0, 156.1, 47.65, 0.18, 'iron'],
+    ['b', 155.4, 45.9, 1.3, 156.05, 48.0, 1.38, 'oak'],
+    ['b', 157.29, 49.36, 1.9, 157.41, 49.4, 2.3, 'iron'],
+    ['b', 157.325, 49.1, 2.25, 157.375, 49.36, 2.3, 'iron'],
+    ['b', 157.29, 49.06, 2.0, 157.41, 49.14, 2.28, 'flame'],
+    ['b', 155.45, 45.4, 0, 157.05, 45.85, 2.1, 'oak'],
+    ['b', 155.55, 45.85, 0.7, 156.95, 45.87, 2.0, 'glass'],
+    ['b', 159.32, 46.57, 1.37, 159.4, 47.53, 2.53, 'wood'],
+    ['b', 159.3, 46.6, 1.4, 159.32, 47.5, 2.5, 'linen'],
+    ['b', 159.29, 46.805, 1.52, 159.3, 46.845, 2.38, 'black'],
+    ['b', 159.29, 47.03, 1.52, 159.3, 47.07, 2.38, 'black'],
+    ['b', 159.29, 47.255, 1.52, 159.3, 47.295, 2.38, 'black'],
+    ['b', 156.3, 49.05, 0, 156.8, 49.4, 1.0, 'oak'],
+    ['b', 156.25, 48.9, 1.0, 156.85, 49.4, 1.08, 'linen'],
+    ['b', 158.1, 49.34, 1.5, 159.0, 49.4, 1.6, 'oak'],
+    ['b', 158.145, 49.31, 1.2, 158.195, 49.34, 1.5, 'gilt'],
+    ['b', 158.295, 49.31, 1.2, 158.345, 49.34, 1.5, 'gilt'],
+    ['b', 158.445, 49.31, 1.2, 158.495, 49.34, 1.5, 'gilt'],
+    ['b', 158.595, 49.31, 1.2, 158.645, 49.34, 1.5, 'gilt'],
+    ['b', 158.745, 49.31, 1.2, 158.795, 49.34, 1.5, 'gilt'],
+    ['b', 158.895, 49.31, 1.2, 158.945, 49.34, 1.5, 'gilt'],
+    ['b', 159.09, 45.4, 0.9, 159.21, 45.5, 2.6, 'ruby'],
+    ['b', 159.05, 45.5, 2.4, 159.25, 45.6, 2.6, 'gilt'],
+    ['b', 159.07, 45.5, 0.7, 159.23, 45.56, 0.9, 'gilt'],
+    ['b', 159.32, 48.37, 1.57, 159.4, 48.93, 2.03, 'wood'],
+    ['b', 159.3, 48.4, 1.6, 159.32, 48.9, 2.0, 'linen'],
+    ['b', 159.29, 48.505, 1.72, 159.3, 48.545, 1.88, 'black'],
+    ['b', 159.29, 48.63, 1.72, 159.3, 48.67, 1.88, 'black'],
+    ['b', 159.29, 48.755, 1.72, 159.3, 48.795, 1.88, 'black'],
+    ['b', 156.9, 48.9, 0, 157.8, 49.38, 0.75, 'oak'],
+    ['b', 156.9, 49.15, 0.75, 157.8, 49.38, 1.3, 'oak'],
+    ['b', 156.95, 48.9, 0.78, 157.75, 49.15, 0.82, 'linen'],
+    ['b', 157.62, 49.0, 0.82, 157.68, 49.05, 0.9, 'black'],
+    ['b', 159.1, 47.05, 0, 159.4, 47.85, 1.3, 'oak'],
+    ['b', 159.07, 47.1, 0.1, 159.1, 47.3, 0.34, 'oak'],
+    ['b', 159.07, 47.35, 0.1, 159.1, 47.55, 0.34, 'linen'],
+    ['b', 159.07, 47.6, 0.1, 159.1, 47.8, 0.34, 'oak'],
+    ['b', 159.07, 47.1, 0.4, 159.1, 47.3, 0.64, 'linen'],
+    ['b', 159.07, 47.35, 0.4, 159.1, 47.55, 0.64, 'oak'],
+    ['b', 159.07, 47.6, 0.4, 159.1, 47.8, 0.64, 'linen'],
+    ['b', 159.07, 47.1, 0.7, 159.1, 47.3, 0.94, 'oak'],
+    ['b', 159.07, 47.35, 0.7, 159.1, 47.55, 0.94, 'linen'],
+    ['b', 159.07, 47.6, 0.7, 159.1, 47.8, 0.94, 'oak'],
+    ['b', 159.07, 47.1, 1.0, 159.1, 47.3, 1.24, 'linen'],
+    ['b', 159.07, 47.35, 1.0, 159.1, 47.55, 1.24, 'oak'],
+    ['b', 159.07, 47.6, 1.0, 159.1, 47.8, 1.24, 'linen'],
+    ['b', 158.8, 47.35, 0.7, 159.1, 47.55, 0.94, 'amber'],
+    ['b', 159.15, 47.68, 1.3, 159.3, 47.82, 1.62, 'green'],
+    ['b', 159.18, 47.72, 1.62, 159.26, 47.78, 1.95, 'white'],
+    ['b', 158.95, 48.55, 0, 159.35, 49.35, 0.85, 'oak'],
+    ['b', 159.0, 48.65, 0.85, 159.3, 49.05, 0.95, 'white'],
+    ['b', 159.1, 49.12, 0.85, 159.25, 49.28, 1.2, 'white'],
+    ['b', 159.32, 48.6, 0.85, 159.35, 49.3, 1.4, 'linen'],
+    ['b', 156.8, 49.22, 1.3, 158.1, 49.4, 1.34, 'oak'],
+    ['b', 156.85, 49.28, 1.34, 156.95, 49.36, 1.58, 'ruby'],
+    ['b', 156.86, 49.27, 1.4, 156.94, 49.28, 1.5, 'linen'],
+    ['b', 157.03, 49.28, 1.34, 157.13, 49.36, 1.58, 'amber'],
+    ['b', 157.04, 49.27, 1.4, 157.12, 49.28, 1.5, 'linen'],
+    ['b', 157.21, 49.28, 1.34, 157.31, 49.36, 1.58, 'blue'],
+    ['b', 157.22, 49.27, 1.4, 157.3, 49.28, 1.5, 'linen'],
+    ['b', 157.39, 49.28, 1.34, 157.49, 49.36, 1.58, 'green'],
+    ['b', 157.4, 49.27, 1.4, 157.48, 49.28, 1.5, 'linen'],
+    ['b', 157.57, 49.28, 1.34, 157.67, 49.36, 1.58, 'ruby'],
+    ['b', 157.58, 49.27, 1.4, 157.66, 49.28, 1.5, 'linen'],
+    ['b', 157.75, 49.28, 1.34, 157.85, 49.36, 1.58, 'amber'],
+    ['b', 157.76, 49.27, 1.4, 157.84, 49.28, 1.5, 'linen'],
+    ['b', 157.93, 49.28, 1.34, 158.03, 49.36, 1.58, 'blue'],
+    ['b', 157.94, 49.27, 1.4, 158.02, 49.28, 1.5, 'linen']]);
+  T['pomfrey-office'].lights = (T['pomfrey-office'].lights || []).concat([[155.65, 46.95, 0.5, 16757862, 1.1, 8], [157.35, 49.1, 2.33, 16757862, 1.1, 8]]);
+})(window.SHELL_W5A.things);
+/* HAND2 end pomfrey-office */
+/* HAND2 begin room-over-caretakers-office */
+/* Interiors req 2423 sec 12: a bed, a locker, a board of spare keys, a chest of confiscated sweets, a hooded lamp; req 2532 adds hangings, a dado and a thing to read or pull; req 2543 adds a rack of mops, a lamp-trimming bench, a ledger desk, a rack of tagged confiscated goods, a jar of sweets whose lid bounces, a washstand, a mop that scrubs by itself, a clock and a rug; req 2532 adds hangings, a dado and a thing to read or pull; the chest of sweets moved off the east door (Fawkes, 1 Nov 2.31 pm); sited by tools/architect-hand-rooms-1101.py, plain stand-ins (Objects draw the real ones) */
+(function (T) {
+  T['room-over-caretakers-office'] = T['room-over-caretakers-office'] || { items: [] };
+  T['room-over-caretakers-office'].items = T['room-over-caretakers-office'].items.concat([
+    ['b', 110.94, 62.25, 1.9, 111.06, 62.29, 2.3, 'iron'],
+    ['b', 110.975, 62.29, 2.25, 111.025, 62.55, 2.3, 'iron'],
+    ['b', 110.94, 62.51, 2.0, 111.06, 62.59, 2.28, 'flame'],
+    ['b', 104.25, 64.0, 0.25, 106.25, 65.0, 0.5, 'oak'],
+    ['b', 104.3, 64.02, 0.5, 106.2, 64.98, 0.68, 'linen'],
+    ['b', 104.3, 64.15, 0.68, 104.75, 64.85, 0.8, 'white'],
+    ['b', 104.25, 64.0, 0.25, 104.31, 65.0, 1.25, 'iron'],
+    ['b', 105.45, 64.02, 0.68, 106.2, 64.98, 0.72, 'ruby'],
+    ['b', 104.25, 67.25, 0, 104.85, 68.55, 2.1, 'oak'],
+    ['b', 104.85, 67.88, 0.2, 104.87, 67.92, 2.0, 'black'],
+    ['b', 108.87, 69.67, 1.47, 110.13, 69.75, 2.43, 'wood'],
+    ['b', 108.9, 69.65, 1.5, 110.1, 69.67, 2.4, 'linen'],
+    ['b', 109.18, 69.64, 1.62, 109.22, 69.65, 2.28, 'black'],
+    ['b', 109.48, 69.64, 1.62, 109.52, 69.65, 2.28, 'black'],
+    ['b', 109.78, 69.64, 1.62, 109.82, 69.65, 2.28, 'black'],
+    ['b', 106.1, 62.25, 1.5, 107.9, 62.31, 1.6, 'oak'],
+    ['b', 106.23, 62.31, 0.35, 106.27, 62.35, 1.5, 'oak'],
+    ['b', 106.15, 62.29, 0.15, 106.35, 62.41, 0.4, 'tan'],
+    ['b', 106.53, 62.31, 0.35, 106.57, 62.35, 1.5, 'oak'],
+    ['b', 106.45, 62.29, 0.15, 106.65, 62.41, 0.4, 'dust'],
+    ['b', 106.83, 62.31, 0.35, 106.87, 62.35, 1.5, 'oak'],
+    ['b', 106.75, 62.29, 0.15, 106.95, 62.41, 0.4, 'tan'],
+    ['b', 107.13, 62.31, 0.35, 107.17, 62.35, 1.5, 'oak'],
+    ['b', 107.05, 62.29, 0.15, 107.25, 62.41, 0.4, 'dust'],
+    ['b', 107.43, 62.31, 0.35, 107.47, 62.35, 1.5, 'oak'],
+    ['b', 107.35, 62.29, 0.15, 107.55, 62.41, 0.4, 'tan'],
+    ['b', 107.73, 62.31, 0.35, 107.77, 62.35, 1.5, 'oak'],
+    ['b', 107.65, 62.29, 0.15, 107.85, 62.41, 0.4, 'dust'],
+    ['b', 106.2, 62.35, 0, 106.6, 62.75, 0.34, 'iron'],
+    ['b', 107.3, 62.35, 0, 107.7, 62.75, 0.34, 'iron'],
+    ['b', 106.95, 62.35, 0, 107.15, 62.55, 0.15, 'tan'],
+    ['b', 114.2, 62.25, 0, 115.8, 62.95, 0.85, 'oak'],
+    ['b', 114.2, 62.25, 0.85, 115.8, 62.95, 0.88, 'oak'],
+    ['b', 114.44, 62.35, 0.88, 114.56, 62.47, 1.1, 'white'],
+    ['b', 114.69, 62.35, 0.88, 114.81, 62.47, 1.1, 'white'],
+    ['b', 114.94, 62.35, 0.88, 115.06, 62.47, 1.1, 'white'],
+    ['b', 115.08, 62.35, 0.88, 115.22, 62.53, 1.02, 'copper'],
+    ['b', 115.28, 62.35, 0.88, 115.42, 62.53, 1.02, 'copper'],
+    ['b', 115.48, 62.35, 0.88, 115.62, 62.53, 1.02, 'copper'],
+    ['b', 115.66, 62.5, 0.88, 115.78, 62.65, 0.93, 'tan'],
+    ['b', 114.85, 62.7, 0.88, 114.95, 62.85, 0.92, 'iron'],
+    ['b', 104.25, 62.6, 0, 104.9, 63.8, 0.78, 'oak'],
+    ['b', 104.3, 62.75, 0.78, 104.85, 63.65, 0.84, 'oak'],
+    ['b', 104.4, 62.825, 0.84, 104.75, 63.275, 0.87, 'white'],
+    ['b', 104.4, 63.03, 0.84, 104.75, 63.07, 0.88, 'ruby'],
+    ['b', 104.45, 63.46, 0.84, 104.53, 63.54, 0.92, 'blue'],
+    ['b', 104.55, 63.48, 0.84, 104.63, 63.52, 1.1, 'white'],
+    ['b', 104.25, 62.75, 1.1, 104.31, 63.65, 1.6, 'oak'],
+    ['b', 104.31, 62.855, 1.4, 104.35, 62.905, 1.52, 'iron'],
+    ['b', 104.31, 63.015, 1.4, 104.35, 63.065, 1.52, 'iron'],
+    ['b', 104.31, 63.175, 1.4, 104.35, 63.225, 1.52, 'iron'],
+    ['b', 104.31, 63.335, 1.4, 104.35, 63.385, 1.52, 'iron'],
+    ['b', 104.31, 63.495, 1.4, 104.35, 63.545, 1.52, 'iron'],
+    ['b', 105.0, 69.4, 0, 106.6, 69.75, 1.8, 'oak'],
+    ['b', 105.05, 69.4, 0.55, 106.55, 69.7, 0.6, 'oak'],
+    ['b', 105.18, 69.53, 0.6, 105.32, 69.65, 0.8, 'tan'],
+    ['b', 105.21, 69.53, 0.55, 105.29, 69.55, 0.62, 'white'],
+    ['b', 105.55, 69.53, 0.6, 105.69, 69.65, 0.8, 'green'],
+    ['b', 105.58, 69.53, 0.55, 105.66, 69.55, 0.62, 'white'],
+    ['b', 105.92, 69.53, 0.6, 106.06, 69.65, 0.8, 'dust'],
+    ['b', 105.95, 69.53, 0.55, 106.03, 69.55, 0.62, 'white'],
+    ['b', 106.29, 69.53, 0.6, 106.43, 69.65, 0.8, 'ruby'],
+    ['b', 106.32, 69.53, 0.55, 106.4, 69.55, 0.62, 'white'],
+    ['b', 105.05, 69.4, 1.05, 106.55, 69.7, 1.1, 'oak'],
+    ['b', 105.18, 69.53, 1.1, 105.32, 69.65, 1.3, 'green'],
+    ['b', 105.21, 69.53, 1.05, 105.29, 69.55, 1.12, 'white'],
+    ['b', 105.55, 69.53, 1.1, 105.69, 69.65, 1.3, 'dust'],
+    ['b', 105.58, 69.53, 1.05, 105.66, 69.55, 1.12, 'white'],
+    ['b', 105.92, 69.53, 1.1, 106.06, 69.65, 1.3, 'ruby'],
+    ['b', 105.95, 69.53, 1.05, 106.03, 69.55, 1.12, 'white'],
+    ['b', 106.29, 69.53, 1.1, 106.43, 69.65, 1.3, 'tan'],
+    ['b', 106.32, 69.53, 1.05, 106.4, 69.55, 1.12, 'white'],
+    ['b', 105.05, 69.4, 1.55, 106.55, 69.7, 1.6, 'oak'],
+    ['b', 105.18, 69.53, 1.6, 105.32, 69.65, 1.8, 'dust'],
+    ['b', 105.21, 69.53, 1.55, 105.29, 69.55, 1.62, 'white'],
+    ['b', 105.55, 69.53, 1.6, 105.69, 69.65, 1.8, 'ruby'],
+    ['b', 105.58, 69.53, 1.55, 105.66, 69.55, 1.62, 'white'],
+    ['b', 105.92, 69.53, 1.6, 106.06, 69.65, 1.8, 'tan'],
+    ['b', 105.95, 69.53, 1.55, 106.03, 69.55, 1.62, 'white'],
+    ['b', 106.29, 69.53, 1.6, 106.43, 69.65, 1.8, 'green'],
+    ['b', 106.32, 69.53, 1.55, 106.4, 69.55, 1.62, 'white'],
+    ['b', 114.8, 69.35, 0.5, 115.6, 69.75, 0.54, 'oak'],
+    ['b', 115.1, 69.45, 0.54, 115.3, 69.65, 0.84, 'white'],
+    ['b', 115.12, 69.47, 0.54, 115.28, 69.63, 0.7, 'ruby'],
+    ['b', 115.18, 69.53, 0.84, 115.22, 69.57, 0.9, 'iron'],
+    ['b', 115.09, 69.43, 0.9, 115.31, 69.67, 0.93, 'iron'],
+    ['b', 115.175, 69.52, 0.93, 115.225, 69.57, 0.98, 'green'],
+    ['b', 115.205, 69.52, 0.98, 115.255, 69.57, 1.03, 'blue'],
+    ['b', 115.155, 69.52, 1.03, 115.205, 69.57, 1.08, 'ruby'],
+    ['b', 104.25, 68.6, 0, 104.75, 69.4, 0.8, 'oak'],
+    ['b', 104.25, 68.6, 0.8, 104.75, 69.4, 0.84, 'white'],
+    ['b', 104.35, 68.72, 0.84, 104.65, 69.08, 0.92, 'white'],
+    ['b', 104.4, 69.18, 0.84, 104.55, 69.32, 1.08, 'white'],
+    ['b', 104.25, 68.6, 1.0, 104.29, 69.4, 1.04, 'iron'],
+    ['b', 104.29, 68.7, 0.62, 104.32, 69.3, 1.0, 'linen'],
+    ['b', 112.12, 67.2, 0, 112.48, 67.55, 0.32, 'iron'],
+    ['b', 112.68, 67.05, 0, 112.72, 67.5, 1.3, 'oak'],
+    ['b', 112.57, 67.0, 0, 112.83, 67.55, 0.18, 'tan'],
+    ['b', 112.3, 66.75, 0.0, 113.1, 67.8, 0.012, 'white'],
+    ['b', 112.96, 67.25, 0.012, 113.04, 67.4, 0.05, 'white'],
+    ['b', 117.67, 64.65, 2.5, 117.75, 65.15, 3.0, 'brass'],
+    ['b', 117.65, 64.69, 2.54, 117.67, 65.11, 2.96, 'white'],
+    ['b', 117.63, 64.89, 2.75, 117.65, 64.91, 2.92, 'black'],
+    ['b', 117.63, 64.9, 2.73, 117.65, 65.02, 2.76, 'black'],
+    ['b', 106.6, 65.75, 0, 112.0, 68.95, 0.02, 'gilt'],
+    ['b', 106.72, 65.87, 0.02, 111.88, 68.83, 0.035, 'ruby'],
+    ['b', 107.7, 66.45, 0.035, 110.9, 68.25, 0.05, 'blue'],
+    ['b', 108.6, 66.95, 0.05, 110.0, 67.75, 0.065, 'gilt'],
+    ['b', 116.6, 67.15, 0, 117.2, 68.25, 0.55, 'wood'],
+    ['b', 116.58, 67.66, 0, 117.2, 67.74, 0.55, 'iron']]);
+  T['room-over-caretakers-office'].lights = (T['room-over-caretakers-office'].lights || []).concat([[111.0, 62.55, 2.33, 16757862, 1.1, 8]]);
+})(window.SHELL_W5A.things);
+/* HAND2 end room-over-caretakers-office */
+/* HAND2 begin staff-library */
+/* Interiors req 2423 sec 12: tall bookcases, a map table, a globe, a reading desk, a card catalogue, a scribes tapestry, a librarian portrait, a fire; req 2532 adds hangings, a dado and a thing to read or pull; req 2543 adds a ladder, a returns trolley, a chained reference lectern, a desk where a quill copies a page by itself, a rebinding table, a slid-out book and a clock; sited by tools/architect-hand-rooms-1101.py, plain stand-ins (Objects draw the real ones) */
+(function (T) {
+  T['staff-library'] = T['staff-library'] || { items: [] };
+  T['staff-library'].items = T['staff-library'].items.concat([
+    ['b', 155.54, 17.71, 1.9, 155.66, 17.75, 2.3, 'iron'],
+    ['b', 155.575, 17.45, 2.25, 155.625, 17.71, 2.3, 'iron'],
+    ['b', 155.54, 17.41, 2.0, 155.66, 17.49, 2.28, 'flame'],
+    ['b', 157.94, 17.71, 1.9, 158.06, 17.75, 2.3, 'iron'],
+    ['b', 157.975, 17.45, 2.25, 158.025, 17.71, 2.3, 'iron'],
+    ['b', 157.94, 17.41, 2.0, 158.06, 17.49, 2.28, 'flame'],
+    ['b', 153.75, 8.7, 0, 154.15, 10.3, 0.8, 'oak'],
+    ['b', 153.75, 8.7, 0.8, 153.97, 10.3, 2.0, 'wood'],
+    ['b', 153.97, 8.874, 1.1, 154.05, 8.974, 1.4, 'amber'],
+    ['b', 153.97, 9.258, 1.5, 154.05, 9.358, 1.8, 'amber'],
+    ['b', 153.97, 9.642, 1.1, 154.05, 9.742, 1.4, 'amber'],
+    ['b', 153.97, 10.026, 1.5, 154.05, 10.126, 1.8, 'amber'],
+    ['b', 153.75, 13.1, 0, 154.15, 14.7, 0.8, 'oak'],
+    ['b', 153.75, 13.1, 0.8, 153.97, 14.7, 2.0, 'wood'],
+    ['b', 153.97, 13.274, 1.1, 154.05, 13.374, 1.4, 'amber'],
+    ['b', 153.97, 13.658, 1.5, 154.05, 13.758, 1.8, 'amber'],
+    ['b', 153.97, 14.042, 1.1, 154.05, 14.142, 1.4, 'amber'],
+    ['b', 153.97, 14.426, 1.5, 154.05, 14.526, 1.8, 'amber'],
+    ['b', 153.75, 15.8, 0, 154.15, 17.4, 0.8, 'oak'],
+    ['b', 153.75, 15.8, 0.8, 153.97, 17.4, 2.0, 'wood'],
+    ['b', 153.97, 15.974, 1.1, 154.05, 16.074, 1.4, 'amber'],
+    ['b', 153.97, 16.358, 1.5, 154.05, 16.458, 1.8, 'amber'],
+    ['b', 153.97, 16.742, 1.1, 154.05, 16.842, 1.4, 'amber'],
+    ['b', 153.97, 17.126, 1.5, 154.05, 17.226, 1.8, 'amber'],
+    ['b', 159.0, 13.65, 0, 159.5, 14.15, 0.9, 'oak'],
+    ['b', 159.05, 13.675, 0.9, 159.45, 14.125, 1.35, 'gilt'],
+    ['b', 154.2, 6.75, 2.9, 155.8, 6.83, 4.1, 'dust'],
+    ['b', 154.3, 6.83, 3.02, 155.7, 6.84, 3.98, 'stone'],
+    ['b', 154.15, 6.75, 4.1, 155.85, 6.84, 4.14, 'wood'],
+    ['b', 154.55, 6.75, 1.5, 155.25, 6.83, 2.4, 'gilt'],
+    ['b', 154.6, 6.83, 1.55, 155.2, 6.84, 2.35, 'black'],
+    ['b', 153.8, 15.255, 0, 153.85, 15.305, 2.6, 'oak'],
+    ['b', 153.8, 15.695, 0, 153.85, 15.745, 2.6, 'oak'],
+    ['b', 153.8, 15.3, 0.25, 153.85, 15.7, 0.29, 'oak'],
+    ['b', 153.8, 15.3, 0.52, 153.85, 15.7, 0.56, 'oak'],
+    ['b', 153.8, 15.3, 0.79, 153.85, 15.7, 0.83, 'oak'],
+    ['b', 153.8, 15.3, 1.06, 153.85, 15.7, 1.1, 'oak'],
+    ['b', 153.8, 15.3, 1.33, 153.85, 15.7, 1.37, 'oak'],
+    ['b', 153.8, 15.3, 1.6, 153.85, 15.7, 1.64, 'oak'],
+    ['b', 153.8, 15.3, 1.87, 153.85, 15.7, 1.91, 'oak'],
+    ['b', 153.8, 15.3, 2.14, 153.85, 15.7, 2.18, 'oak'],
+    ['b', 153.8, 15.3, 2.41, 153.85, 15.7, 2.45, 'oak'],
+    ['b', 153.78, 15.245, 2.5, 153.87, 15.315, 2.6, 'gilt'],
+    ['b', 153.78, 15.685, 2.5, 153.87, 15.755, 2.6, 'gilt'],
+    ['b', 153.75, 7.75, 0.2, 154.25, 8.65, 0.24, 'oak'],
+    ['b', 153.75, 7.75, 0.7, 154.25, 8.65, 0.74, 'oak'],
+    ['b', 153.77, 7.775, 0, 154.23, 7.825, 0.74, 'iron'],
+    ['b', 153.77, 8.575, 0, 154.23, 8.625, 0.74, 'iron'],
+    ['b', 153.85, 7.77, 0.24, 154.15, 7.87, 0.5, 'ruby'],
+    ['b', 153.85, 7.9, 0.24, 154.15, 8.0, 0.53, 'green'],
+    ['b', 153.85, 8.03, 0.24, 154.15, 8.13, 0.56, 'blue'],
+    ['b', 153.85, 8.16, 0.24, 154.15, 8.26, 0.5, 'tan'],
+    ['b', 153.85, 8.29, 0.24, 154.15, 8.39, 0.53, 'ruby'],
+    ['b', 153.85, 8.42, 0.24, 154.15, 8.52, 0.56, 'green'],
+    ['b', 153.85, 7.84, 0.74, 154.15, 7.96, 0.96, 'green'],
+    ['b', 153.85, 8.04, 0.74, 154.15, 8.16, 0.92, 'tan'],
+    ['b', 153.85, 8.24, 0.74, 154.15, 8.36, 0.96, 'ruby'],
+    ['b', 153.85, 8.44, 0.74, 154.15, 8.56, 0.92, 'blue'],
+    ['b', 155.5, 17.35, 0, 155.9, 17.65, 0.9, 'oak'],
+    ['b', 155.4, 17.25, 0.9, 156.0, 17.75, 1.0, 'oak'],
+    ['b', 155.47, 17.35, 1.0, 155.93, 17.65, 1.06, 'white'],
+    ['b', 155.96, 17.45, 0.4, 156.0, 17.55, 1.0, 'iron'],
+    ['b', 153.95, 6.75, 0, 155.25, 7.35, 0.78, 'oak'],
+    ['b', 154.05, 6.85, 0.78, 154.55, 7.25, 0.82, 'white'],
+    ['b', 154.28, 6.85, 0.78, 154.32, 7.25, 0.83, 'ruby'],
+    ['b', 154.7, 6.85, 0.78, 155.1, 7.25, 0.8, 'white'],
+    ['b', 154.75, 6.9, 0.8, 155.05, 6.95, 0.82, 'iron'],
+    ['b', 154.75, 7.0, 0.8, 155.05, 7.05, 0.82, 'iron'],
+    ['b', 154.75, 7.1, 0.8, 155.05, 7.15, 0.82, 'iron'],
+    ['b', 155.03, 7.05, 0.8, 155.07, 7.09, 1.2, 'white'],
+    ['b', 155.0, 7.05, 1.2, 155.1, 7.09, 1.28, 'ruby'],
+    ['b', 153.75, 7.4, 1.0, 154.05, 8.6, 1.04, 'oak'],
+    ['b', 153.79, 7.45, 1.04, 154.01, 7.55, 1.3, 'ruby'],
+    ['b', 153.79, 7.57, 1.04, 154.01, 7.67, 1.27, 'green'],
+    ['b', 153.79, 7.69, 1.04, 154.01, 7.79, 1.24, 'blue'],
+    ['b', 153.79, 7.81, 1.04, 154.01, 7.91, 1.3, 'tan'],
+    ['b', 153.79, 7.93, 1.04, 154.01, 8.03, 1.27, 'dust'],
+    ['b', 153.79, 8.05, 1.04, 154.01, 8.15, 1.24, 'ruby'],
+    ['b', 153.79, 8.17, 1.04, 154.01, 8.27, 1.3, 'green'],
+    ['b', 153.79, 8.29, 1.04, 154.01, 8.39, 1.27, 'blue'],
+    ['b', 153.79, 8.41, 1.04, 154.01, 8.51, 1.24, 'tan'],
+    ['b', 153.95, 8.55, 1.04, 154.21, 8.65, 1.28, 'gilt'],
+    ['b', 154.75, 17.67, 2.5, 155.25, 17.75, 3.0, 'brass'],
+    ['b', 154.79, 17.65, 2.54, 155.21, 17.67, 2.96, 'white'],
+    ['b', 154.99, 17.63, 2.75, 155.01, 17.65, 2.92, 'black'],
+    ['b', 155.0, 17.63, 2.73, 155.12, 17.65, 2.76, 'black']]);
+  T['staff-library'].lights = (T['staff-library'].lights || []).concat([[155.6, 17.45, 2.33, 16757862, 1.1, 8], [158.0, 17.45, 2.33, 16757862, 1.1, 8]]);
+})(window.SHELL_W5A.things);
+/* HAND2 end staff-library */
+/* HAND2 begin clock-room-6 */
+/* Interiors req 2423 sec 14: the castle's wound clocks in rows, a bench of clock parts, a winding key on a peg, a pendulum in a case; req 2532 adds hangings, a dado and a thing to read or pull; a clockmaker's shop and winding round added: six long-case regulators, weight shaft, ladder, lathe bench, movements trestle, round-book desk, oils, a self-turning bracket clock (card 51, 1 Nov, the 430th); req 2532 adds hangings, a dado and a thing to read or pull; the template pendulum frame dropped for a great regulator seated on the east wall (card 51, 1 Nov, the 431st); sited by tools/architect-hand-rooms-1101.py, plain stand-ins (Objects draw the real ones) */
+(function (T) {
+  T['clock-room-6'] = T['clock-room-6'] || { items: [] };
+  T['clock-room-6'].items = T['clock-room-6'].items.concat([
+    ['b', 54.44, 7.45, 1.9, 54.56, 7.49, 2.3, 'iron'],
+    ['b', 54.475, 7.49, 2.25, 54.525, 7.75, 2.3, 'iron'],
+    ['b', 54.44, 7.71, 2.0, 54.56, 7.79, 2.28, 'flame'],
+    ['b', 59.74, 18.01, 1.9, 59.86, 18.05, 2.3, 'iron'],
+    ['b', 59.775, 17.75, 2.25, 59.825, 18.01, 2.3, 'iron'],
+    ['b', 59.74, 17.71, 2.0, 59.86, 17.79, 2.28, 'flame'],
+    ['b', 58.6, 7.45, 1.0, 59.0, 7.59, 1.4, 'gilt'],
+    ['b', 59.25, 7.45, 1.0, 59.65, 7.59, 1.4, 'gilt'],
+    ['b', 59.9, 7.45, 1.0, 60.3, 7.59, 1.4, 'gilt'],
+    ['b', 60.55, 7.45, 1.0, 60.95, 7.59, 1.4, 'gilt'],
+    ['b', 58.6, 7.45, 1.55, 59.0, 7.59, 1.95, 'gilt'],
+    ['b', 59.25, 7.45, 1.55, 59.65, 7.59, 1.95, 'gilt'],
+    ['b', 59.9, 7.45, 1.55, 60.3, 7.59, 1.95, 'gilt'],
+    ['b', 60.55, 7.45, 1.55, 60.95, 7.59, 1.95, 'gilt'],
+    ['b', 58.6, 7.45, 2.1, 59.0, 7.59, 2.5, 'gilt'],
+    ['b', 59.25, 7.45, 2.1, 59.65, 7.59, 2.5, 'gilt'],
+    ['b', 59.9, 7.45, 2.1, 60.3, 7.59, 2.5, 'gilt'],
+    ['b', 60.55, 7.45, 2.1, 60.95, 7.59, 2.5, 'gilt'],
+    ['b', 52.15, 11.6, 0, 52.85, 13.8, 0.9, 'oak'],
+    ['b', 52.25, 11.9, 0.9, 52.5, 12.1, 1.1, 'iron'],
+    ['b', 52.35, 13.025, 0.9, 52.65, 13.175, 0.95, 'tin'],
+    ['b', 52.15, 8.85, 1.5, 52.23, 9.15, 1.9, 'gilt'],
+    ['b', 52.23, 8.9, 1.55, 52.24, 9.1, 1.85, 'black'],
+    ['b', 66.85, 14.3, 0, 67.55, 16.5, 0.9, 'oak'],
+    ['b', 67.2, 14.6, 0.9, 67.45, 14.8, 1.1, 'iron'],
+    ['b', 67.05, 15.725, 0.9, 67.35, 15.875, 0.95, 'tin'],
+    ['b', 58.6, 17.91, 1.0, 59.0, 18.05, 1.4, 'gilt'],
+    ['b', 59.25, 17.91, 1.0, 59.65, 18.05, 1.4, 'gilt'],
+    ['b', 59.9, 17.91, 1.0, 60.3, 18.05, 1.4, 'gilt'],
+    ['b', 60.55, 17.91, 1.0, 60.95, 18.05, 1.4, 'gilt'],
+    ['b', 58.6, 17.91, 1.55, 59.0, 18.05, 1.95, 'gilt'],
+    ['b', 59.25, 17.91, 1.55, 59.65, 18.05, 1.95, 'gilt'],
+    ['b', 59.9, 17.91, 1.55, 60.3, 18.05, 1.95, 'gilt'],
+    ['b', 60.55, 17.91, 1.55, 60.95, 18.05, 1.95, 'gilt'],
+    ['b', 58.6, 17.91, 2.1, 59.0, 18.05, 2.5, 'gilt'],
+    ['b', 59.25, 17.91, 2.1, 59.65, 18.05, 2.5, 'gilt'],
+    ['b', 59.9, 17.91, 2.1, 60.3, 18.05, 2.5, 'gilt'],
+    ['b', 60.55, 17.91, 2.1, 60.95, 18.05, 2.5, 'gilt'],
+    ['b', 61.09, 17.73, 0, 61.51, 18.05, 0.3, 'oak'],
+    ['b', 61.13, 17.77, 0.3, 61.47, 18.03, 1.65, 'oak'],
+    ['b', 61.22, 17.75, 0.7, 61.38, 17.85, 1.35, 'amber'],
+    ['b', 61.25, 17.81, 0.78, 61.35, 17.95, 0.9, 'copper'],
+    ['b', 61.07, 17.71, 1.65, 61.53, 18.05, 2.0, 'oak'],
+    ['b', 61.15, 17.7, 1.7, 61.45, 17.75, 1.95, 'white'],
+    ['b', 62.09, 17.73, 0, 62.51, 18.05, 0.3, 'oak'],
+    ['b', 62.13, 17.77, 0.3, 62.47, 18.03, 1.73, 'oak'],
+    ['b', 62.22, 17.75, 0.7, 62.38, 17.85, 1.35, 'amber'],
+    ['b', 62.25, 17.81, 0.78, 62.35, 17.95, 1.0, 'copper'],
+    ['b', 62.07, 17.71, 1.73, 62.53, 18.05, 2.08, 'oak'],
+    ['b', 62.15, 17.7, 1.78, 62.45, 17.75, 2.03, 'white'],
+    ['b', 63.09, 17.73, 0, 63.51, 18.05, 0.3, 'oak'],
+    ['b', 63.13, 17.77, 0.3, 63.47, 18.03, 1.81, 'oak'],
+    ['b', 63.22, 17.75, 0.7, 63.38, 17.85, 1.35, 'amber'],
+    ['b', 63.25, 17.81, 0.78, 63.35, 17.95, 0.9, 'copper'],
+    ['b', 63.07, 17.71, 1.81, 63.53, 18.05, 2.16, 'oak'],
+    ['b', 63.15, 17.7, 1.86, 63.45, 17.75, 2.11, 'white'],
+    ['b', 64.09, 17.73, 0, 64.51, 18.05, 0.3, 'oak'],
+    ['b', 64.13, 17.77, 0.3, 64.47, 18.03, 1.65, 'oak'],
+    ['b', 64.22, 17.75, 0.7, 64.38, 17.85, 1.35, 'amber'],
+    ['b', 64.25, 17.81, 0.78, 64.35, 17.95, 1.0, 'copper'],
+    ['b', 64.07, 17.71, 1.65, 64.53, 18.05, 2.0, 'oak'],
+    ['b', 64.15, 17.7, 1.7, 64.45, 17.75, 1.95, 'white'],
+    ['b', 65.09, 17.73, 0, 65.51, 18.05, 0.3, 'oak'],
+    ['b', 65.13, 17.77, 0.3, 65.47, 18.03, 1.73, 'oak'],
+    ['b', 65.22, 17.75, 0.7, 65.38, 17.85, 1.35, 'amber'],
+    ['b', 65.25, 17.81, 0.78, 65.35, 17.95, 0.9, 'copper'],
+    ['b', 65.07, 17.71, 1.73, 65.53, 18.05, 2.08, 'oak'],
+    ['b', 65.15, 17.7, 1.78, 65.45, 17.75, 2.03, 'white'],
+    ['b', 66.09, 17.73, 0, 66.51, 18.05, 0.3, 'oak'],
+    ['b', 66.13, 17.77, 0.3, 66.47, 18.03, 1.81, 'oak'],
+    ['b', 66.22, 17.75, 0.7, 66.38, 17.85, 1.35, 'amber'],
+    ['b', 66.25, 17.81, 0.78, 66.35, 17.95, 1.0, 'copper'],
+    ['b', 66.07, 17.71, 1.81, 66.53, 18.05, 2.16, 'oak'],
+    ['b', 66.15, 17.7, 1.86, 66.45, 17.75, 2.11, 'white'],
+    ['b', 67.42, 8.31, 0, 67.5, 8.39, 3.8, 'oak'],
+    ['b', 66.87, 8.31, 0, 66.95, 8.39, 3.8, 'oak'],
+    ['b', 67.42, 9.01, 0, 67.5, 9.09, 3.8, 'oak'],
+    ['b', 66.87, 9.01, 0, 66.95, 9.09, 3.8, 'oak'],
+    ['b', 67.1, 8.56, 0.3, 67.3, 8.84, 0.9, 'copper'],
+    ['b', 67.18, 8.69, 0.9, 67.22, 8.71, 3.7, 'iron'],
+    ['b', 67.1, 8.56, 1.5, 67.3, 8.84, 2.1, 'copper'],
+    ['b', 67.18, 8.69, 2.1, 67.22, 8.71, 3.7, 'iron'],
+    ['b', 67.1, 8.56, 2.4, 67.3, 8.84, 3.0, 'copper'],
+    ['b', 67.18, 8.69, 3.0, 67.22, 8.71, 3.7, 'iron'],
+    ['b', 66.9, 8.31, 3.8, 67.5, 9.09, 3.9, 'oak'],
+    ['b', 54.92, 7.5, 0, 54.98, 7.6, 2.6, 'oak'],
+    ['b', 55.42, 7.5, 0, 55.48, 7.6, 2.6, 'oak'],
+    ['b', 54.95, 7.5, 0.3, 55.45, 7.65, 0.35, 'oak'],
+    ['b', 54.95, 7.5, 0.65, 55.45, 7.65, 0.7, 'oak'],
+    ['b', 54.95, 7.5, 1.0, 55.45, 7.65, 1.05, 'oak'],
+    ['b', 54.95, 7.5, 1.35, 55.45, 7.65, 1.4, 'oak'],
+    ['b', 54.95, 7.5, 1.7, 55.45, 7.65, 1.75, 'oak'],
+    ['b', 54.95, 7.5, 2.05, 55.45, 7.65, 2.1, 'oak'],
+    ['b', 54.95, 7.5, 2.4, 55.45, 7.65, 2.45, 'oak'],
+    ['b', 56.2, 7.55, 0.85, 58.6, 8.25, 0.92, 'oak'],
+    ['b', 56.25, 7.6, 0, 56.35, 8.2, 0.85, 'oak'],
+    ['b', 58.45, 7.6, 0, 58.55, 8.2, 0.85, 'oak'],
+    ['b', 56.8, 7.75, 0.92, 58.0, 7.87, 0.98, 'iron'],
+    ['b', 56.775, 7.7, 0.98, 57.025, 7.95, 1.22, 'iron'],
+    ['b', 57.825, 7.75, 0.98, 57.975, 7.9, 1.18, 'iron'],
+    ['b', 56.25, 7.85, 0.2, 56.95, 7.95, 0.9, 'iron'],
+    ['b', 56.4, 7.75, 0, 56.8, 8.15, 0.08, 'oak'],
+    ['b', 56.27, 7.55, 0.92, 56.33, 7.61, 1.6, 'oak'],
+    ['b', 58.47, 7.55, 0.92, 58.53, 7.61, 1.6, 'oak'],
+    ['b', 56.27, 7.55, 1.5, 58.53, 7.61, 1.6, 'oak'],
+    ['b', 56.575, 7.55, 1.15, 56.625, 7.59, 1.5, 'iron'],
+    ['b', 56.975, 7.55, 1.15, 57.025, 7.59, 1.5, 'iron'],
+    ['b', 57.375, 7.55, 1.15, 57.425, 7.59, 1.5, 'iron'],
+    ['b', 57.775, 7.55, 1.15, 57.825, 7.59, 1.5, 'iron'],
+    ['b', 58.175, 7.55, 1.15, 58.225, 7.59, 1.5, 'iron'],
+    ['b', 52.25, 9.1, 0.78, 53.05, 11.1, 0.84, 'oak'],
+    ['b', 52.3, 9.15, 0, 53.0, 9.25, 0.78, 'oak'],
+    ['b', 52.3, 10.95, 0, 53.0, 11.05, 0.78, 'oak'],
+    ['b', 52.4, 9.3, 0.84, 52.9, 10.9, 0.86, 'linen'],
+    ['b', 52.45, 9.28, 0.86, 52.7, 9.52, 0.89, 'copper'],
+    ['b', 52.53, 9.63, 0.86, 52.78, 9.87, 0.89, 'copper'],
+    ['b', 52.45, 9.98, 0.86, 52.7, 10.22, 0.89, 'copper'],
+    ['b', 52.53, 10.33, 0.86, 52.78, 10.57, 0.89, 'copper'],
+    ['b', 52.45, 10.68, 0.86, 52.7, 10.92, 0.89, 'copper'],
+    ['b', 52.7, 10.27, 0.86, 52.9, 10.43, 1.0, 'copper'],
+    ['b', 52.75, 9.49, 0.86, 52.95, 9.61, 0.92, 'black'],
+    ['b', 64.65, 7.55, 0, 65.75, 8.15, 0.9, 'oak'],
+    ['b', 64.6, 7.5, 0.9, 65.8, 8.2, 1.0, 'oak'],
+    ['b', 64.8, 7.65, 1.0, 65.6, 8.05, 1.04, 'white'],
+    ['b', 65.37, 7.55, 1.04, 65.43, 7.65, 1.2, 'iron'],
+    ['b', 64.5, 7.45, 1.5, 65.9, 7.49, 2.3, 'oak'],
+    ['b', 64.55, 7.49, 1.6, 64.75, 7.51, 2.2, 'linen'],
+    ['b', 64.825, 7.49, 1.6, 65.025, 7.51, 2.2, 'linen'],
+    ['b', 65.1, 7.49, 1.6, 65.3, 7.51, 2.2, 'linen'],
+    ['b', 65.375, 7.49, 1.6, 65.575, 7.51, 2.2, 'linen'],
+    ['b', 65.65, 7.49, 1.6, 65.85, 7.51, 2.2, 'linen'],
+    ['b', 52.45, 7.5, 0, 53.35, 7.95, 1.1, 'oak'],
+    ['b', 52.555, 7.6, 1.1, 52.645, 7.7, 1.3, 'amber'],
+    ['b', 52.755, 7.6, 1.1, 52.845, 7.7, 1.33, 'amber'],
+    ['b', 52.955, 7.6, 1.1, 53.045, 7.7, 1.36, 'amber'],
+    ['b', 53.155, 7.6, 1.1, 53.245, 7.7, 1.39, 'amber'],
+    ['b', 52.15, 16.65, 1.3, 52.45, 17.35, 1.34, 'oak'],
+    ['b', 52.19, 16.85, 1.34, 52.41, 17.15, 1.74, 'black'],
+    ['b', 52.41, 16.89, 1.42, 52.43, 17.11, 1.68, 'white'],
+    ['b', 52.25, 16.98, 1.52, 52.31, 17.12, 1.56, 'copper'],
+    ['b', 52.15, 16.675, 1.0, 52.35, 16.725, 1.3, 'iron'],
+    ['b', 52.15, 17.275, 1.0, 52.35, 17.325, 1.3, 'iron'],
+    ['b', 60.01, 8.65, 0.62, 60.39, 9.03, 0.68, 'oak'],
+    ['b', 60.03, 8.67, 0, 60.09, 8.73, 0.62, 'oak'],
+    ['b', 60.31, 8.67, 0, 60.37, 8.73, 0.62, 'oak'],
+    ['b', 60.03, 8.95, 0, 60.09, 9.01, 0.62, 'oak'],
+    ['b', 60.31, 8.95, 0, 60.37, 9.01, 0.62, 'oak'],
+    ['b', 60.8, 12.05, 0, 64.6, 14.65, 0.02, 'rope'],
+    ['b', 60.92, 12.17, 0.02, 64.48, 14.53, 0.035, 'ruby'],
+    ['b', 61.7, 12.75, 0.035, 63.7, 13.95, 0.05, 'books3'],
+    ['b', 67.0, 10.05, 0, 67.55, 11.15, 0.35, 'oak'],
+    ['b', 67.05, 10.12, 0.35, 67.52, 11.08, 2.55, 'oak'],
+    ['b', 67.03, 10.2, 0.75, 67.05, 11.0, 2.2, 'amber'],
+    ['b', 67.35, 10.585, 0.9, 67.37, 10.615, 2.2, 'iron'],
+    ['b', 67.29, 10.4, 1.0, 67.41, 10.8, 1.4, 'copper'],
+    ['b', 66.95, 10.0, 2.55, 67.55, 11.2, 3.1, 'oak'],
+    ['b', 66.92, 10.3, 2.62, 66.95, 10.9, 3.02, 'white'],
+    ['b', 66.9, 10.58, 2.8, 66.92, 10.62, 3.0, 'iron'],
+    ['b', 66.65, 10.325, 0, 66.93, 10.875, 0.22, 'oak'],
+    ['b', 66.45, 10.325, 0, 66.65, 10.875, 0.12, 'oak']]);
+  T['clock-room-6'].lights = (T['clock-room-6'].lights || []).concat([[54.5, 7.75, 2.33, 16757862, 1.1, 8], [59.8, 17.75, 2.33, 16757862, 1.1, 8]]);
+})(window.SHELL_W5A.things);
+/* HAND2 end clock-room-6 */
+/* HAND2 begin examiners-room-7 */
+/* Interiors req 2423 sec 14: a long table, ribboned bundles of papers, inkwells, a wall rack of seals, wax, lamps, a hearth; sited by tools/architect-hand-rooms-1101.py, plain stand-ins (Objects draw the real ones) */
+(function (T) {
+  T['examiners-room-7'] = T['examiners-room-7'] || { items: [] };
+  T['examiners-room-7'].items = T['examiners-room-7'].items.concat([
+    ['b', 150.15, 8.5, 0, 151.95, 9.0, 1.3, 'stone'],
+    ['b', 150.55, 8.5, 0.1, 151.55, 9.02, 1.0, 'black'],
+    ['b', 150.8, 8.6, 0.12, 151.3, 8.9, 0.45, 'flame'],
+    ['b', 150.35, 9.0, 0, 151.75, 9.2, 0.18, 'iron'],
+    ['b', 150.0, 8.5, 1.3, 152.1, 9.15, 1.38, 'oak'],
+    ['b', 145.69, 8.5, 1.9, 145.81, 8.54, 2.3, 'iron'],
+    ['b', 145.725, 8.54, 2.25, 145.775, 8.8, 2.3, 'iron'],
+    ['b', 145.69, 8.76, 2.0, 145.81, 8.84, 2.28, 'flame'],
+    ['b', 156.29, 8.5, 1.9, 156.41, 8.54, 2.3, 'iron'],
+    ['b', 156.325, 8.54, 2.25, 156.375, 8.8, 2.3, 'iron'],
+    ['b', 156.29, 8.76, 2.0, 156.41, 8.84, 2.28, 'flame'],
+    ['b', 150.99, 17.86, 1.9, 151.11, 17.9, 2.3, 'iron'],
+    ['b', 151.025, 17.6, 2.25, 151.075, 17.86, 2.3, 'iron'],
+    ['b', 150.99, 17.56, 2.0, 151.11, 17.64, 2.28, 'flame'],
+    ['b', 143.5, 10.15, 0, 144.4, 12.75, 0.78, 'oak'],
+    ['b', 157.7, 10.45, 0, 158.6, 13.05, 0.78, 'oak'],
+    ['b', 146.15, 17.3, 0, 146.95, 17.9, 0.4, 'linen'],
+    ['b', 146.35, 17.4, 0.4, 146.95, 17.85, 0.75, 'dust'],
+    ['b', 146.75, 17.5, 0, 147.25, 17.85, 0.35, 'wood'],
+    ['b', 155.2, 17.4, 0, 155.9, 17.9, 0.7, 'oak'],
+    ['b', 155.3, 17.5, 0.7, 155.8, 17.8, 0.72, 'tin'],
+    ['b', 155.49, 17.65, 0.72, 155.61, 17.75, 0.85, 'white'],
+    ['b', 143.5, 15.65, 1.5, 143.58, 17.25, 1.56, 'oak'],
+    ['b', 143.54, 15.73, 1.1, 143.62, 15.87, 1.5, 'iron'],
+    ['b', 143.54, 16.01, 1.1, 143.62, 16.11, 1.5, 'iron'],
+    ['b', 143.54, 16.25, 1.1, 143.62, 16.39, 1.5, 'iron'],
+    ['b', 143.54, 16.53, 1.1, 143.62, 16.63, 1.5, 'iron'],
+    ['b', 143.54, 16.77, 1.1, 143.62, 16.91, 1.5, 'iron'],
+    ['b', 143.54, 17.05, 1.1, 143.62, 17.15, 1.5, 'iron'],
+    ['b', 158.1, 16.1, 0, 158.6, 16.8, 0.7, 'oak'],
+    ['b', 158.2, 16.2, 0.7, 158.5, 16.7, 0.72, 'tin'],
+    ['b', 158.35, 16.39, 0.72, 158.45, 16.51, 0.85, 'white']]);
+  T['examiners-room-7'].lights = (T['examiners-room-7'].lights || []).concat([[151.05, 8.75, 0.5, 16757862, 1.1, 8], [145.75, 8.8, 2.33, 16757862, 1.1, 8], [156.35, 8.8, 2.33, 16757862, 1.1, 8], [151.05, 17.6, 2.33, 16757862, 1.1, 8]]);
+})(window.SHELL_W5A.things);
+/* HAND2 end examiners-room-7 */
+/* HAND2 begin prefects-patrol-room */
+/* Interiors req 2423 sec 15: a lamp, a hearth, a long table with the rota, a rack of lanterns, a board of keys, a signing-out book, badges, boots by the fire; req 2532 adds hangings, a dado and a thing to read or pull; req 2532 adds hangings, a dado and a thing to read or pull; req 2543 adds cloak pegs with capes and lanterns, a hob table with kettle and mugs, a coal scuttle, a pigeonhole case of detention slips, a slate of the rounds and a board of corridor bells, one of which rings itself; sited by tools/architect-hand-rooms-1101.py, plain stand-ins (Objects draw the real ones) */
+(function (T) {
+  T['prefects-patrol-room'] = T['prefects-patrol-room'] || { items: [] };
+  T['prefects-patrol-room'].items = T['prefects-patrol-room'].items.concat([
+    ['b', 147.2, 60.75, 0, 149.0, 61.25, 1.3, 'stone'],
+    ['b', 147.6, 60.75, 0.1, 148.6, 61.27, 1.0, 'black'],
+    ['b', 147.85, 60.85, 0.12, 148.35, 61.15, 0.45, 'flame'],
+    ['b', 147.4, 61.25, 0, 148.8, 61.45, 0.18, 'iron'],
+    ['b', 147.05, 60.75, 1.3, 149.15, 61.4, 1.38, 'oak'],
+    ['b', 146.14, 71.96, 1.9, 146.26, 72.0, 2.3, 'iron'],
+    ['b', 146.175, 71.7, 2.25, 146.225, 71.96, 2.3, 'iron'],
+    ['b', 146.14, 71.66, 2.0, 146.26, 71.74, 2.28, 'flame'],
+    ['b', 139.85, 63.9, 0, 140.75, 66.5, 0.78, 'oak'],
+    ['b', 152.42, 63.67, 1.37, 152.5, 64.53, 2.03, 'wood'],
+    ['b', 152.4, 63.7, 1.4, 152.42, 64.5, 2.0, 'linen'],
+    ['b', 152.39, 63.88, 1.52, 152.4, 63.92, 1.88, 'black'],
+    ['b', 152.39, 64.08, 1.52, 152.4, 64.12, 1.88, 'black'],
+    ['b', 152.39, 64.28, 1.52, 152.4, 64.32, 1.88, 'black'],
+    ['b', 152.42, 66.7, 1.5, 152.5, 68.3, 1.56, 'oak'],
+    ['b', 152.38, 66.78, 1.1, 152.46, 66.92, 1.5, 'iron'],
+    ['b', 152.38, 67.06, 1.1, 152.46, 67.16, 1.5, 'iron'],
+    ['b', 152.38, 67.3, 1.1, 152.46, 67.44, 1.5, 'iron'],
+    ['b', 152.38, 67.58, 1.1, 152.46, 67.68, 1.5, 'iron'],
+    ['b', 152.38, 67.82, 1.1, 152.46, 67.96, 1.5, 'iron'],
+    ['b', 152.38, 68.1, 1.1, 152.46, 68.2, 1.5, 'iron'],
+    ['b', 142.07, 71.92, 1.47, 143.33, 72.0, 2.43, 'wood'],
+    ['b', 142.1, 71.9, 1.5, 143.3, 71.92, 2.4, 'linen'],
+    ['b', 142.38, 71.89, 1.62, 142.42, 71.9, 2.28, 'black'],
+    ['b', 142.68, 71.89, 1.62, 142.72, 71.9, 2.28, 'black'],
+    ['b', 142.98, 71.89, 1.62, 143.02, 71.9, 2.28, 'black'],
+    ['b', 139.85, 69.45, 0, 140.2, 69.95, 1.0, 'oak'],
+    ['b', 139.85, 69.4, 1.0, 140.35, 70.0, 1.08, 'linen'],
+    ['b', 149.65, 71.5, 0, 150.35, 72.0, 0.75, 'oak'],
+    ['b', 149.8, 71.6, 0.75, 150.2, 71.9, 0.8, 'ruby'],
+    ['b', 149.88, 71.72, 0.8, 149.96, 71.8, 0.84, 'gilt'],
+    ['b', 150.06, 71.72, 0.8, 150.14, 71.8, 0.84, 'gilt'],
+    ['b', 149.6, 60.75, 0, 150.4, 61.35, 0.4, 'linen'],
+    ['b', 149.8, 60.8, 0.4, 150.4, 61.25, 0.75, 'dust'],
+    ['b', 150.2, 60.8, 0, 150.7, 61.15, 0.35, 'wood'],
+    ['b', 139.85, 61.5, 2.3, 139.93, 63.3, 4.0, 'dust'],
+    ['b', 139.93, 61.62, 2.42, 139.94, 63.18, 3.88, 'linen'],
+    ['b', 139.94, 61.62, 2.6, 139.95, 63.18, 2.72, 'petals'],
+    ['b', 139.94, 61.62, 3.58, 139.95, 63.18, 3.7, 'petals'],
+    ['b', 139.94, 62.15, 2.85, 139.96, 62.65, 3.45, 'petals'],
+    ['b', 139.96, 62.27, 3.0, 139.97, 62.53, 3.3, 'dust'],
+    ['b', 139.85, 61.45, 4.0, 139.94, 63.35, 4.04, 'wood'],
+    ['b', 139.94, 61.775, 2.18, 139.95, 61.825, 2.32, 'dust'],
+    ['b', 139.94, 62.075, 2.18, 139.95, 62.125, 2.32, 'dust'],
+    ['b', 139.94, 62.375, 2.18, 139.95, 62.425, 2.32, 'dust'],
+    ['b', 139.94, 62.675, 2.18, 139.95, 62.725, 2.32, 'dust'],
+    ['b', 139.94, 62.975, 2.18, 139.95, 63.025, 2.32, 'dust'],
+    ['b', 152.42, 69.4, 2.3, 152.5, 71.2, 4.0, 'dust'],
+    ['b', 152.41, 69.52, 2.42, 152.42, 71.08, 3.88, 'petals'],
+    ['b', 152.4, 69.52, 2.6, 152.41, 71.08, 2.72, 'linen'],
+    ['b', 152.4, 69.52, 3.58, 152.41, 71.08, 3.7, 'linen'],
+    ['b', 152.39, 70.05, 2.85, 152.41, 70.55, 3.45, 'linen'],
+    ['b', 152.38, 70.17, 3.0, 152.39, 70.43, 3.3, 'dust'],
+    ['b', 152.41, 69.35, 4.0, 152.5, 71.25, 4.04, 'wood'],
+    ['b', 152.4, 69.675, 2.18, 152.41, 69.725, 2.32, 'dust'],
+    ['b', 152.4, 69.975, 2.18, 152.41, 70.025, 2.32, 'dust'],
+    ['b', 152.4, 70.275, 2.18, 152.41, 70.325, 2.32, 'dust'],
+    ['b', 152.4, 70.575, 2.18, 152.41, 70.625, 2.32, 'dust'],
+    ['b', 152.4, 70.875, 2.18, 152.41, 70.925, 2.32, 'dust'],
+    ['b', 140.2, 60.75, 0.1, 143.2, 60.8, 1.05, 'oak'],
+    ['b', 140.2, 60.75, 1.05, 143.2, 60.83, 1.13, 'wood'],
+    ['b', 140.2, 60.75, 0, 143.2, 60.83, 0.1, 'wood'],
+    ['b', 144.7, 71.95, 0.1, 147.7, 72.0, 1.05, 'oak'],
+    ['b', 144.7, 71.92, 1.05, 147.7, 72.0, 1.13, 'wood'],
+    ['b', 144.7, 71.92, 0, 147.7, 72.0, 0.1, 'wood'],
+    ['b', 142.67, 60.75, 1.47, 144.53, 60.83, 2.83, 'wood'],
+    ['b', 142.7, 60.83, 1.5, 144.5, 60.85, 2.8, 'linen'],
+    ['b', 143.13, 60.85, 1.62, 143.17, 60.86, 2.68, 'black'],
+    ['b', 143.58, 60.85, 1.62, 143.62, 60.86, 2.68, 'black'],
+    ['b', 144.03, 60.85, 1.62, 144.07, 60.86, 2.68, 'black'],
+    ['b', 149.24, 60.75, 0.9, 149.36, 60.85, 2.6, 'ruby'],
+    ['b', 149.2, 60.85, 2.4, 149.4, 60.95, 2.6, 'gilt'],
+    ['b', 149.22, 60.85, 0.7, 149.38, 60.91, 0.9, 'gilt'],
+    ['b', 141.1, 63.2, 0.1, 144.3, 69.8, 0.14, 'petals'],
+    ['b', 141.3, 63.4, 0.14, 144.1, 69.6, 0.16, 'dust'],
+    ['b', 152.42, 60.9, 1.7, 152.5, 63.3, 1.85, 'oak'],
+    ['b', 152.3, 61.075, 1.72, 152.42, 61.125, 1.78, 'iron'],
+    ['b', 152.3, 61.575, 1.72, 152.42, 61.625, 1.78, 'iron'],
+    ['b', 152.3, 62.075, 1.72, 152.42, 62.125, 1.78, 'iron'],
+    ['b', 152.3, 62.575, 1.72, 152.42, 62.625, 1.78, 'iron'],
+    ['b', 152.3, 63.075, 1.72, 152.42, 63.125, 1.78, 'iron'],
+    ['b', 152.3, 60.9, 0.55, 152.42, 61.3, 1.72, 'dark'],
+    ['b', 152.3, 61.4, 0.55, 152.42, 61.8, 1.72, 'dark'],
+    ['b', 152.3, 62.4, 0.55, 152.42, 62.8, 1.72, 'dark'],
+    ['b', 152.22, 62.01, 1.25, 152.4, 62.19, 1.72, 'brass'],
+    ['b', 152.26, 62.05, 1.3, 152.36, 62.15, 1.5, 'flame'],
+    ['b', 152.22, 63.01, 1.25, 152.4, 63.19, 1.72, 'brass'],
+    ['b', 152.26, 63.05, 1.3, 152.36, 63.15, 1.5, 'flame'],
+    ['b', 143.25, 60.8, 0, 144.35, 61.4, 0.8, 'oak'],
+    ['b', 143.35, 60.95, 0.8, 143.65, 61.25, 1.05, 'iron'],
+    ['b', 143.45, 61.05, 1.05, 143.55, 61.15, 1.15, 'iron'],
+    ['b', 143.75, 60.95, 0.8, 144.15, 61.25, 0.83, 'tin'],
+    ['b', 143.78, 61.03, 0.83, 143.86, 61.11, 0.92, 'tin'],
+    ['b', 143.91, 61.03, 0.83, 143.99, 61.11, 0.92, 'tin'],
+    ['b', 144.04, 61.03, 0.83, 144.12, 61.11, 0.92, 'tin'],
+    ['b', 144.15, 61.0, 0.8, 144.29, 61.14, 0.96, 'ruby'],
+    ['b', 144.475, 60.85, 0, 144.925, 61.4, 0.45, 'iron'],
+    ['b', 144.525, 60.9, 0.45, 144.875, 61.3, 0.5, 'black'],
+    ['b', 144.98, 60.85, 0, 145.02, 60.89, 0.75, 'iron'],
+    ['b', 145.06, 60.85, 0, 145.1, 60.89, 0.7, 'iron'],
+    ['b', 143.4, 71.7, 0.9, 144.6, 72.0, 1.9, 'oak'],
+    ['b', 143.45, 71.68, 1.0, 143.65, 71.8, 1.12, 'ruby'],
+    ['b', 143.75, 71.68, 1.0, 143.95, 71.8, 1.12, 'amber'],
+    ['b', 144.05, 71.68, 1.0, 144.25, 71.8, 1.12, 'blue'],
+    ['b', 144.35, 71.68, 1.0, 144.55, 71.8, 1.12, 'green'],
+    ['b', 143.45, 71.68, 1.22, 143.65, 71.8, 1.34, 'amber'],
+    ['b', 143.75, 71.68, 1.22, 143.95, 71.8, 1.34, 'blue'],
+    ['b', 144.05, 71.68, 1.22, 144.25, 71.8, 1.34, 'green'],
+    ['b', 144.35, 71.68, 1.22, 144.55, 71.8, 1.34, 'ruby'],
+    ['b', 143.45, 71.68, 1.44, 143.65, 71.8, 1.56, 'blue'],
+    ['b', 143.75, 71.68, 1.44, 143.95, 71.8, 1.56, 'green'],
+    ['b', 144.05, 71.68, 1.44, 144.25, 71.8, 1.56, 'ruby'],
+    ['b', 144.35, 71.68, 1.44, 144.55, 71.8, 1.56, 'amber'],
+    ['b', 143.45, 71.68, 1.66, 143.65, 71.8, 1.78, 'green'],
+    ['b', 143.75, 71.68, 1.66, 143.95, 71.8, 1.78, 'ruby'],
+    ['b', 144.05, 71.68, 1.66, 144.25, 71.8, 1.78, 'amber'],
+    ['b', 144.35, 71.68, 1.66, 144.55, 71.8, 1.78, 'blue'],
+    ['b', 139.85, 63.6, 1.2, 139.9, 64.6, 1.9, 'oak'],
+    ['b', 139.9, 63.65, 1.28, 139.93, 64.55, 1.82, 'black'],
+    ['b', 139.93, 63.65, 1.35, 139.94, 64.05, 1.38, 'white'],
+    ['b', 139.93, 63.6, 1.47, 139.94, 64.1, 1.5, 'white'],
+    ['b', 139.93, 63.65, 1.59, 139.94, 64.05, 1.62, 'white'],
+    ['b', 139.93, 63.6, 1.71, 139.94, 64.1, 1.74, 'white'],
+    ['b', 148.3, 71.92, 1.5, 150.3, 72.0, 2.1, 'oak'],
+    ['b', 148.38, 71.78, 1.65, 148.52, 71.92, 1.85, 'brass'],
+    ['b', 148.435, 71.8, 1.55, 148.465, 71.92, 1.65, 'linen'],
+    ['b', 148.62, 71.78, 1.65, 148.76, 71.92, 1.85, 'brass'],
+    ['b', 148.675, 71.8, 1.55, 148.705, 71.92, 1.65, 'linen'],
+    ['b', 148.86, 71.78, 1.65, 149.0, 71.92, 1.85, 'brass'],
+    ['b', 148.915, 71.8, 1.55, 148.945, 71.92, 1.65, 'linen'],
+    ['b', 149.1, 71.78, 1.65, 149.24, 71.92, 1.85, 'gilt'],
+    ['b', 149.155, 71.8, 1.55, 149.185, 71.92, 1.65, 'linen'],
+    ['b', 149.34, 71.78, 1.65, 149.48, 71.92, 1.85, 'brass'],
+    ['b', 149.395, 71.8, 1.55, 149.425, 71.92, 1.65, 'linen'],
+    ['b', 149.58, 71.78, 1.65, 149.72, 71.92, 1.85, 'brass'],
+    ['b', 149.635, 71.8, 1.55, 149.665, 71.92, 1.65, 'linen'],
+    ['b', 149.82, 71.78, 1.65, 149.96, 71.92, 1.85, 'brass'],
+    ['b', 149.875, 71.8, 1.55, 149.905, 71.92, 1.65, 'linen'],
+    ['b', 150.06, 71.78, 1.65, 150.2, 71.92, 1.85, 'brass'],
+    ['b', 150.115, 71.8, 1.55, 150.145, 71.92, 1.65, 'linen']]);
+  T['prefects-patrol-room'].lights = (T['prefects-patrol-room'].lights || []).concat([[148.1, 61.0, 0.5, 16757862, 1.1, 8], [146.2, 71.7, 2.33, 16757862, 1.1, 8], [152.31, 62.1, 1.55, 16757862, 1.1, 8], [152.31, 63.1, 1.55, 16757862, 1.1, 8]]);
+})(window.SHELL_W5A.things);
+/* HAND2 end prefects-patrol-room */
+/* HAND2 begin trophy-polishing-room-3 */
+/* Interiors req 2423 sec 14: shelves of trophies waiting, tins of polish, cloths on lines, a rack of silver cups, a bench with the cup being polished; req 2532 adds hangings, a dado and a thing to read or pull; req 2543 adds a polishing bench of cups half bright, a locked cupboard whose cloth rubs a cup by itself, a coat-peg rail, an ink cupboard, a clock and a rolled rug; sited by tools/architect-hand-rooms-1101.py, plain stand-ins (Objects draw the real ones) */
+(function (T) {
+  T['trophy-polishing-room-3'] = T['trophy-polishing-room-3'] || { items: [] };
+  T['trophy-polishing-room-3'].items = T['trophy-polishing-room-3'].items.concat([
+    ['b', 9.24, 3.85, 1.9, 9.36, 3.89, 2.3, 'iron'],
+    ['b', 9.275, 3.89, 2.25, 9.325, 4.15, 2.3, 'iron'],
+    ['b', 9.24, 4.11, 2.0, 9.36, 4.19, 2.28, 'flame'],
+    ['b', 19.04, 3.85, 1.9, 19.16, 3.89, 2.3, 'iron'],
+    ['b', 19.075, 3.89, 2.25, 19.125, 4.15, 2.3, 'iron'],
+    ['b', 19.04, 4.11, 2.0, 19.16, 4.19, 2.28, 'flame'],
+    ['b', 7.25, 7.2, 0, 7.65, 8.8, 0.8, 'oak'],
+    ['b', 7.25, 7.2, 0.8, 7.47, 8.8, 2.0, 'wood'],
+    ['b', 7.47, 7.374, 1.1, 7.55, 7.474, 1.4, 'amber'],
+    ['b', 7.47, 7.758, 1.5, 7.55, 7.858, 1.8, 'amber'],
+    ['b', 7.47, 8.142, 1.1, 7.55, 8.242, 1.4, 'amber'],
+    ['b', 7.47, 8.526, 1.5, 7.55, 8.626, 1.8, 'amber'],
+    ['b', 7.25, 13.5, 0, 7.65, 15.1, 0.8, 'oak'],
+    ['b', 7.25, 13.5, 0.8, 7.47, 15.1, 2.0, 'wood'],
+    ['b', 7.47, 13.674, 1.1, 7.55, 13.774, 1.4, 'amber'],
+    ['b', 7.47, 14.058, 1.5, 7.55, 14.158, 1.8, 'amber'],
+    ['b', 7.47, 14.442, 1.1, 7.55, 14.542, 1.4, 'amber'],
+    ['b', 7.47, 14.826, 1.5, 7.55, 14.926, 1.8, 'amber'],
+    ['b', 21.06, 7.2, 1.5, 21.14, 8.8, 1.56, 'oak'],
+    ['b', 21.02, 7.28, 1.1, 21.1, 7.42, 1.5, 'iron'],
+    ['b', 21.02, 7.56, 1.1, 21.1, 7.66, 1.5, 'iron'],
+    ['b', 21.02, 7.8, 1.1, 21.1, 7.94, 1.5, 'iron'],
+    ['b', 21.02, 8.08, 1.1, 21.1, 8.18, 1.5, 'iron'],
+    ['b', 21.02, 8.32, 1.1, 21.1, 8.46, 1.5, 'iron'],
+    ['b', 21.02, 8.6, 1.1, 21.1, 8.7, 1.5, 'iron'],
+    ['b', 13.1, 17.05, 0, 15.3, 17.75, 0.9, 'oak'],
+    ['b', 13.4, 17.4, 0.9, 13.6, 17.65, 1.1, 'iron'],
+    ['b', 14.525, 17.25, 0.9, 14.675, 17.55, 0.95, 'tin'],
+    ['b', 21.06, 13.1, 1.6, 21.14, 15.5, 1.66, 'oak'],
+    ['b', 20.94, 13.225, 0.7, 21.09, 13.575, 1.6, 'dust'],
+    ['b', 20.94, 13.675, 0.7, 21.09, 14.025, 1.6, 'dust'],
+    ['b', 20.94, 14.125, 0.7, 21.09, 14.475, 1.6, 'dust'],
+    ['b', 20.94, 14.575, 0.7, 21.09, 14.925, 1.6, 'dust'],
+    ['b', 20.94, 15.025, 0.7, 21.09, 15.375, 1.6, 'dust'],
+    ['b', 9.05, 17.4, 0, 9.55, 17.75, 1.0, 'oak'],
+    ['b', 9.0, 17.25, 1.0, 9.6, 17.75, 1.08, 'linen'],
+    ['b', 11.3, 3.85, 0, 13.3, 4.65, 0.85, 'oak'],
+    ['b', 11.4, 4.05, 0.85, 11.6, 4.35, 1.05, 'brass'],
+    ['b', 11.8, 4.05, 0.85, 12.0, 4.35, 1.05, 'brass'],
+    ['b', 12.2, 4.05, 0.85, 12.4, 4.35, 1.05, 'brass'],
+    ['b', 12.6, 4.05, 0.85, 12.8, 4.35, 1.05, 'dust'],
+    ['b', 13.0, 4.05, 0.85, 13.2, 4.35, 1.05, 'dust'],
+    ['b', 13.03, 4.35, 0.85, 13.17, 4.55, 0.95, 'iron'],
+    ['b', 12.75, 4.4, 0.85, 12.95, 4.6, 0.9, 'linen'],
+    ['b', 20.69, 6.1, 0, 21.14, 7.1, 1.9, 'oak'],
+    ['b', 20.64, 6.15, 0.9, 20.69, 7.05, 1.8, 'glass'],
+    ['b', 20.74, 6.45, 1.0, 20.94, 6.75, 1.25, 'brass'],
+    ['b', 20.74, 6.55, 1.05, 20.89, 6.89, 1.2, 'linen'],
+    ['b', 20.62, 6.94, 1.3, 20.66, 7.06, 1.5, 'white'],
+    ['b', 9.7, 16.95, 0, 11.7, 17.75, 0.85, 'oak'],
+    ['b', 9.8, 17.25, 0.85, 10.0, 17.55, 1.05, 'brass'],
+    ['b', 10.2, 17.25, 0.85, 10.4, 17.55, 1.05, 'brass'],
+    ['b', 10.6, 17.25, 0.85, 10.8, 17.55, 1.05, 'brass'],
+    ['b', 11.0, 17.25, 0.85, 11.2, 17.55, 1.05, 'dust'],
+    ['b', 11.4, 17.25, 0.85, 11.6, 17.55, 1.05, 'dust'],
+    ['b', 11.43, 17.05, 0.85, 11.57, 17.25, 0.95, 'iron'],
+    ['b', 11.15, 17.0, 0.85, 11.35, 17.2, 0.9, 'linen'],
+    ['b', 20.34, 4.0, 0, 21.14, 6.0, 0.85, 'oak'],
+    ['b', 20.64, 4.1, 0.85, 20.94, 4.3, 1.05, 'brass'],
+    ['b', 20.64, 4.5, 0.85, 20.94, 4.7, 1.05, 'brass'],
+    ['b', 20.64, 4.9, 0.85, 20.94, 5.1, 1.05, 'brass'],
+    ['b', 20.64, 5.3, 0.85, 20.94, 5.5, 1.05, 'dust'],
+    ['b', 20.64, 5.7, 0.85, 20.94, 5.9, 1.05, 'dust'],
+    ['b', 20.44, 5.73, 0.85, 20.64, 5.87, 0.95, 'iron'],
+    ['b', 20.39, 5.45, 0.85, 20.59, 5.65, 0.9, 'linen'],
+    ['b', 13.2, 7.85, 0, 15.2, 8.65, 0.85, 'oak'],
+    ['b', 13.3, 8.05, 0.85, 13.5, 8.35, 1.05, 'brass'],
+    ['b', 13.7, 8.05, 0.85, 13.9, 8.35, 1.05, 'brass'],
+    ['b', 14.1, 8.05, 0.85, 14.3, 8.35, 1.05, 'brass'],
+    ['b', 14.5, 8.05, 0.85, 14.7, 8.35, 1.05, 'dust'],
+    ['b', 14.9, 8.05, 0.85, 15.1, 8.35, 1.05, 'dust'],
+    ['b', 14.93, 8.35, 0.85, 15.07, 8.55, 0.95, 'iron'],
+    ['b', 14.65, 8.4, 0.85, 14.85, 8.6, 0.9, 'linen'],
+    ['b', 17.25, 17.25, 0.1, 18.15, 17.75, 0.14, 'oak'],
+    ['b', 17.25, 17.25, 0.7, 18.15, 17.75, 0.74, 'oak'],
+    ['b', 17.28, 17.27, 0, 17.32, 17.73, 0.9, 'oak'],
+    ['b', 18.08, 17.27, 0, 18.12, 17.73, 0.9, 'oak'],
+    ['b', 17.295, 17.35, 0.14, 17.405, 17.65, 0.4, 'ruby'],
+    ['b', 17.445, 17.35, 0.14, 17.555, 17.65, 0.44, 'blue'],
+    ['b', 17.595, 17.35, 0.14, 17.705, 17.65, 0.4, 'green'],
+    ['b', 17.745, 17.35, 0.14, 17.855, 17.65, 0.44, 'amber'],
+    ['b', 17.895, 17.35, 0.14, 18.005, 17.65, 0.4, 'dust'],
+    ['b', 17.34, 17.35, 0.74, 17.46, 17.65, 1.0, 'green'],
+    ['b', 17.51, 17.35, 0.74, 17.63, 17.65, 1.0, 'ruby'],
+    ['b', 17.68, 17.35, 0.74, 17.8, 17.65, 1.0, 'dust'],
+    ['b', 17.85, 17.35, 0.74, 17.97, 17.65, 1.0, 'blue'],
+    ['b', 7.25, 10.05, 1.55, 7.31, 11.35, 1.62, 'oak'],
+    ['b', 7.31, 10.2, 1.5, 7.35, 10.24, 1.6, 'iron'],
+    ['b', 7.31, 10.09, 0.7, 7.45, 10.35, 1.5, 'dark'],
+    ['b', 7.31, 10.52, 1.5, 7.35, 10.56, 1.6, 'iron'],
+    ['b', 7.31, 10.41, 0.7, 7.45, 10.67, 1.5, 'dark'],
+    ['b', 7.31, 10.84, 1.5, 7.35, 10.88, 1.6, 'iron'],
+    ['b', 7.31, 11.16, 1.5, 7.35, 11.2, 1.6, 'iron'],
+    ['b', 7.31, 11.05, 0.7, 7.45, 11.31, 1.5, 'dark'],
+    ['b', 7.31, 11.11, 0.9, 7.41, 11.25, 1.5, 'ruby'],
+    ['b', 7.25, 6.1, 0, 7.7, 7.1, 0.9, 'oak'],
+    ['b', 7.3, 6.15, 0.9, 7.65, 7.05, 0.93, 'black'],
+    ['b', 7.35, 6.19, 0.93, 7.45, 6.29, 1.03, 'black'],
+    ['b', 7.35, 6.37, 0.93, 7.45, 6.47, 1.03, 'black'],
+    ['b', 7.35, 6.55, 0.93, 7.45, 6.65, 1.03, 'black'],
+    ['b', 7.35, 6.73, 0.93, 7.45, 6.83, 1.03, 'black'],
+    ['b', 7.35, 6.91, 0.93, 7.45, 7.01, 1.03, 'black'],
+    ['b', 7.5, 6.75, 0.93, 7.55, 7.05, 0.96, 'white'],
+    ['b', 13.95, 17.67, 2.5, 14.45, 17.75, 3.0, 'brass'],
+    ['b', 13.99, 17.65, 2.54, 14.41, 17.67, 2.96, 'white'],
+    ['b', 14.19, 17.63, 2.75, 14.21, 17.65, 2.92, 'black'],
+    ['b', 14.2, 17.63, 2.73, 14.32, 17.65, 2.76, 'black'],
+    ['b', 20.79, 14.9, 0, 21.14, 16.5, 0.35, 'ruby'],
+    ['b', 20.77, 15.17, 0, 21.14, 15.23, 0.36, 'tan'],
+    ['b', 20.77, 16.17, 0, 21.14, 16.23, 0.36, 'tan']]);
+  T['trophy-polishing-room-3'].lights = (T['trophy-polishing-room-3'].lights || []).concat([[9.3, 4.15, 2.33, 16757862, 1.1, 8], [19.1, 4.15, 2.33, 16757862, 1.1, 8]]);
+})(window.SHELL_W5A.things);
+/* HAND2 end trophy-polishing-room-3 */
+/* HAND2 begin tudor-bay-5 */
+/* Interiors req 2423 sec 14: a window seat with cushions, a small table with a chess set, a telescope on the sill, lamps; sited by tools/architect-hand-rooms-1101.py, plain stand-ins (Objects draw the real ones) */
+(function (T) {
+  T['tudor-bay-5'] = T['tudor-bay-5'] || { items: [] };
+  T['tudor-bay-5'].items = T['tudor-bay-5'].items.concat([
+    ['b', 105.6, -3.5, 0, 106.3, -3.0, 0.7, 'oak'],
+    ['b', 105.7, -3.4, 0.7, 106.2, -3.1, 0.72, 'tin'],
+    ['b', 105.89, -3.25, 0.72, 106.01, -3.15, 0.85, 'white'],
+    ['b', 101.4, -6.5, 0, 101.9, -6.0, 0.05, 'oak'],
+    ['b', 101.6, -6.3, 0.05, 101.7, -6.2, 1.4, 'gilt'],
+    ['b', 101.59, -6.4, 1.3, 101.71, -5.6, 1.45, 'gilt'],
+    ['b', 101.69, -3.04, 1.9, 101.81, -3.0, 2.3, 'iron'],
+    ['b', 101.725, -3.3, 2.25, 101.775, -3.04, 2.3, 'iron'],
+    ['b', 101.69, -3.34, 2.0, 101.81, -3.26, 2.28, 'flame'],
+    ['b', 109.39, -3.04, 1.9, 109.51, -3.0, 2.3, 'iron'],
+    ['b', 109.425, -3.3, 2.25, 109.475, -3.04, 2.3, 'iron'],
+    ['b', 109.39, -3.34, 2.0, 109.51, -3.26, 2.28, 'flame']]);
+  T['tudor-bay-5'].lights = (T['tudor-bay-5'].lights || []).concat([[101.75, -3.3, 2.33, 16757862, 1.1, 8], [109.45, -3.3, 2.33, 16757862, 1.1, 8]]);
+})(window.SHELL_W5A.things);
+/* HAND2 end tudor-bay-5 */
+/* HAND2 begin kitchen-stores */
+/* Interiors req 2423 sec 15: barrels, sacks of flour, hams on hooks, crates of apples, a cheese shelf, a salted-fish barrel, jars of oil, one lamp; sited by tools/architect-hand-rooms-1101.py, plain stand-ins (Objects draw the real ones) */
+(function (T) {
+  T['kitchen-stores'] = T['kitchen-stores'] || { items: [] };
+  T['kitchen-stores'].items = T['kitchen-stores'].items.concat([
+    ['b', 92.69, 50.6, 1.9, 92.81, 50.64, 2.3, 'iron'],
+    ['b', 92.725, 50.64, 2.25, 92.775, 50.9, 2.3, 'iron'],
+    ['b', 92.69, 50.86, 2.0, 92.81, 50.94, 2.28, 'flame'],
+    ['b', 89.0, 54.9, 0, 89.7, 55.6, 0.9, 'wood'],
+    ['b', 89.05, 54.925, 0.9, 89.65, 55.575, 0.95, 'linen'],
+    ['b', 89.0, 55.7, 0, 89.7, 56.4, 0.9, 'wood'],
+    ['b', 89.05, 55.725, 0.9, 89.65, 56.375, 0.95, 'linen'],
+    ['b', 89.0, 56.5, 0, 89.7, 57.2, 0.9, 'wood'],
+    ['b', 89.05, 56.525, 0.9, 89.65, 57.175, 0.95, 'linen'],
+    ['b', 95.82, 54.85, 0, 96.42, 55.65, 0.4, 'linen'],
+    ['b', 95.92, 55.05, 0.4, 96.37, 55.65, 0.75, 'dust'],
+    ['b', 96.02, 55.45, 0, 96.37, 55.95, 0.35, 'wood'],
+    ['b', 89.25, 50.6, 1.6, 91.65, 50.68, 1.66, 'oak'],
+    ['b', 89.375, 50.65, 0.7, 89.725, 50.8, 1.6, 'dust'],
+    ['b', 89.825, 50.65, 0.7, 90.175, 50.8, 1.6, 'dust'],
+    ['b', 90.275, 50.65, 0.7, 90.625, 50.8, 1.6, 'dust'],
+    ['b', 90.725, 50.65, 0.7, 91.075, 50.8, 1.6, 'dust'],
+    ['b', 91.175, 50.65, 0.7, 91.525, 50.8, 1.6, 'dust'],
+    ['b', 95.82, 56.0, 0, 96.42, 57.1, 0.55, 'wood'],
+    ['b', 95.8, 56.51, 0, 96.42, 56.59, 0.55, 'iron'],
+    ['b', 90.25, 56.85, 0, 91.85, 57.25, 0.8, 'oak'],
+    ['b', 90.25, 57.03, 0.8, 91.85, 57.25, 2.0, 'wood'],
+    ['b', 90.424, 56.95, 1.1, 90.524, 57.03, 1.4, 'amber'],
+    ['b', 90.808, 56.95, 1.5, 90.908, 57.03, 1.8, 'amber'],
+    ['b', 91.192, 56.95, 1.1, 91.292, 57.03, 1.4, 'amber'],
+    ['b', 91.576, 56.95, 1.5, 91.676, 57.03, 1.8, 'amber']]);
+  T['kitchen-stores'].lights = (T['kitchen-stores'].lights || []).concat([[92.75, 50.9, 2.33, 16757862, 1.1, 8]]);
+})(window.SHELL_W5A.things);
+/* HAND2 end kitchen-stores */
+/* HAND2 begin kitchens-corridor */
+/* Interiors req 2423 sec 15 (GoF 21): torches, still-life paintings of food, the fruit bowl the largest, a trolley with a covered dish, hooks, copper pans; sited by tools/architect-hand-rooms-1101.py, plain stand-ins (Objects draw the real ones) */
+(function (T) {
+  T['kitchens-corridor'] = T['kitchens-corridor'] || { items: [] };
+  T['kitchens-corridor'].items = T['kitchens-corridor'].items.concat([
+    ['b', 46.2, 48.5, 1.95, 46.3, 48.54, 2.15, 'iron'],
+    ['b', 46.23, 48.54, 2.0, 46.27, 48.68, 2.03, 'iron'],
+    ['b', 46.22, 48.64, 2.03, 46.28, 48.7, 2.3, 'flame'],
+    ['b', 53.0, 48.5, 1.95, 53.1, 48.54, 2.15, 'iron'],
+    ['b', 53.03, 48.54, 2.0, 53.07, 48.68, 2.03, 'iron'],
+    ['b', 53.02, 48.64, 2.03, 53.08, 48.7, 2.3, 'flame'],
+    ['b', 59.8, 48.5, 1.95, 59.9, 48.54, 2.15, 'iron'],
+    ['b', 59.83, 48.54, 2.0, 59.87, 48.68, 2.03, 'iron'],
+    ['b', 59.82, 48.64, 2.03, 59.88, 48.7, 2.3, 'flame'],
+    ['b', 49.6, 51.46, 1.95, 49.7, 51.5, 2.15, 'iron'],
+    ['b', 49.63, 51.32, 2.0, 49.67, 51.46, 2.03, 'iron'],
+    ['b', 49.62, 51.3, 2.03, 49.68, 51.36, 2.3, 'flame'],
+    ['b', 64.3, 51.46, 1.95, 64.4, 51.5, 2.15, 'iron'],
+    ['b', 64.33, 51.32, 2.0, 64.37, 51.46, 2.03, 'iron'],
+    ['b', 64.32, 51.3, 2.03, 64.38, 51.36, 2.3, 'flame'],
+    ['b', 54.32, 51.42, 1.27, 56.18, 51.5, 2.63, 'wood'],
+    ['b', 54.35, 51.4, 1.3, 56.15, 51.42, 2.6, 'petals'],
+    ['b', 54.78, 51.39, 1.42, 54.82, 51.4, 2.48, 'black'],
+    ['b', 55.23, 51.39, 1.42, 55.27, 51.4, 2.48, 'black'],
+    ['b', 55.68, 51.39, 1.42, 55.72, 51.4, 2.48, 'black'],
+    ['b', 58.22, 51.42, 1.47, 59.08, 51.5, 2.13, 'wood'],
+    ['b', 58.25, 51.4, 1.5, 59.05, 51.42, 2.1, 'petals'],
+    ['b', 58.43, 51.39, 1.62, 58.47, 51.4, 1.98, 'black'],
+    ['b', 58.63, 51.39, 1.62, 58.67, 51.4, 1.98, 'black'],
+    ['b', 58.83, 51.39, 1.62, 58.87, 51.4, 1.98, 'black'],
+    ['b', 55.92, 48.5, 1.37, 56.98, 48.58, 2.23, 'wood'],
+    ['b', 55.95, 48.58, 1.4, 56.95, 48.6, 2.2, 'petals'],
+    ['b', 56.18, 48.6, 1.52, 56.22, 48.61, 2.08, 'black'],
+    ['b', 56.43, 48.6, 1.52, 56.47, 48.61, 2.08, 'black'],
+    ['b', 56.68, 48.6, 1.52, 56.72, 48.61, 2.08, 'black'],
+    ['b', 45.85, 50.9, 0, 46.65, 51.5, 0.4, 'linen'],
+    ['b', 46.05, 51.0, 0.4, 46.65, 51.45, 0.75, 'dust'],
+    ['b', 46.45, 51.1, 0, 46.95, 51.45, 0.35, 'wood'],
+    ['b', 62.35, 48.5, 1.9, 64.15, 48.6, 1.93, 'iron'],
+    ['b', 62.38, 48.54, 1.6, 62.72, 48.88, 1.9, 'copper'],
+    ['b', 62.75, 48.54, 1.64, 63.05, 48.84, 1.9, 'copper'],
+    ['b', 63.12, 48.54, 1.68, 63.38, 48.8, 1.9, 'copper'],
+    ['b', 63.49, 48.54, 1.7, 63.71, 48.76, 1.9, 'copper'],
+    ['b', 63.86, 48.54, 1.74, 64.04, 48.72, 1.9, 'copper'],
+    ['b', 48.45, 48.5, 1.6, 50.85, 48.58, 1.66, 'oak'],
+    ['b', 48.575, 48.55, 0.7, 48.925, 48.7, 1.6, 'dust'],
+    ['b', 49.025, 48.55, 0.7, 49.375, 48.7, 1.6, 'dust'],
+    ['b', 49.475, 48.55, 0.7, 49.825, 48.7, 1.6, 'dust'],
+    ['b', 49.925, 48.55, 0.7, 50.275, 48.7, 1.6, 'dust'],
+    ['b', 50.375, 48.55, 0.7, 50.725, 48.7, 1.6, 'dust']]);
+  T['kitchens-corridor'].lights = (T['kitchens-corridor'].lights || []).concat([[46.25, 48.67, 2.35, 16757862, 1.1, 8], [53.05, 48.67, 2.35, 16757862, 1.1, 8], [59.85, 48.67, 2.35, 16757862, 1.1, 8], [49.65, 51.33, 2.35, 16757862, 1.1, 8], [64.35, 51.33, 2.35, 16757862, 1.1, 8]]);
+})(window.SHELL_W5A.things);
+/* HAND2 end kitchens-corridor */
+/* HAND2 begin potions-dungeon-newt */
+/* Interiors req 2423 sec 15: torch brackets, a hearth, grim tapestries, a slate of brewing steps, cauldrons, a shelf of jars, a ladle rack; sited by tools/architect-hand-rooms-1101.py, plain stand-ins (Objects draw the real ones) */
+(function (T) {
+  T['potions-dungeon-newt'] = T['potions-dungeon-newt'] || { items: [] };
+  T['potions-dungeon-newt'].items = T['potions-dungeon-newt'].items.concat([
+    ['b', 7.05, 45.78, 0, 8.85, 46.28, 1.3, 'stone'],
+    ['b', 7.45, 45.78, 0.1, 8.45, 46.3, 1.0, 'black'],
+    ['b', 7.7, 45.88, 0.12, 8.2, 46.18, 0.45, 'flame'],
+    ['b', 7.25, 46.28, 0, 8.65, 46.48, 0.18, 'iron'],
+    ['b', 6.9, 45.78, 1.3, 9.0, 46.43, 1.38, 'oak'],
+    ['b', 1.8, 45.78, 1.95, 1.9, 45.82, 2.15, 'iron'],
+    ['b', 1.83, 45.82, 2.0, 1.87, 45.96, 2.03, 'iron'],
+    ['b', 1.82, 45.92, 2.03, 1.88, 45.98, 2.3, 'flame'],
+    ['b', 10.2, 45.78, 1.95, 10.3, 45.82, 2.15, 'iron'],
+    ['b', 10.23, 45.82, 2.0, 10.27, 45.96, 2.03, 'iron'],
+    ['b', 10.22, 45.92, 2.03, 10.28, 45.98, 2.3, 'flame'],
+    ['b', 3.7, 49.74, 1.95, 3.8, 49.78, 2.15, 'iron'],
+    ['b', 3.73, 49.6, 2.0, 3.77, 49.74, 2.03, 'iron'],
+    ['b', 3.72, 49.58, 2.03, 3.78, 49.64, 2.3, 'flame'],
+    ['b', 8.4, 49.74, 1.95, 8.5, 49.78, 2.15, 'iron'],
+    ['b', 8.43, 49.6, 2.0, 8.47, 49.74, 2.03, 'iron'],
+    ['b', 8.42, 49.58, 2.03, 8.48, 49.64, 2.3, 'flame'],
+    ['b', 3.05, 45.78, 3.1, 4.25, 45.86, 4.1, 'dust'],
+    ['b', 3.15, 45.86, 3.22, 4.15, 45.87, 3.98, 'stone'],
+    ['b', 3.0, 45.78, 4.1, 4.3, 45.87, 4.14, 'wood'],
+    ['b', 7.85, 45.78, 3.1, 9.05, 45.86, 4.1, 'dust'],
+    ['b', 7.95, 45.86, 3.22, 8.95, 45.87, 3.98, 'stone'],
+    ['b', 7.8, 45.78, 4.1, 9.1, 45.87, 4.14, 'wood'],
+    ['b', 11.05, 48.98, 0, 11.85, 49.78, 0.7, 'iron'],
+    ['b', 11.1, 49.08, 0.7, 11.8, 49.68, 0.75, 'black'],
+    ['b', 0.0, 46.33, 0, 0.4, 47.93, 0.8, 'oak'],
+    ['b', 0.0, 46.33, 0.8, 0.22, 47.93, 2.0, 'wood'],
+    ['b', 0.22, 46.504, 1.1, 0.3, 46.604, 1.4, 'amber'],
+    ['b', 0.22, 46.888, 1.5, 0.3, 46.988, 1.8, 'amber'],
+    ['b', 0.22, 47.272, 1.1, 0.3, 47.372, 1.4, 'amber'],
+    ['b', 0.22, 47.656, 1.5, 0.3, 47.756, 1.8, 'amber']]);
+  T['potions-dungeon-newt'].lights = (T['potions-dungeon-newt'].lights || []).concat([[7.95, 46.03, 0.5, 16757862, 1.1, 8], [1.85, 45.95, 2.35, 16757862, 1.1, 8], [10.25, 45.95, 2.35, 16757862, 1.1, 8], [3.75, 49.61, 2.35, 16757862, 1.1, 8], [8.45, 49.61, 2.35, 16757862, 1.1, 8]]);
+})(window.SHELL_W5A.things);
+/* HAND2 end potions-dungeon-newt */
+/* HAND2 begin service-corridor-b */
+/* Interiors req 2423 sec 15: sparse brackets, a hand-cart, a rack of coats, an elves notice board; sited by tools/architect-hand-rooms-1101.py, plain stand-ins (Objects draw the real ones) */
+(function (T) {
+  T['service-corridor-b'] = T['service-corridor-b'] || { items: [] };
+  T['service-corridor-b'].items = T['service-corridor-b'].items.concat([
+    ['b', 74.65, 57.75, 1.95, 74.75, 57.79, 2.15, 'iron'],
+    ['b', 74.68, 57.79, 2.0, 74.72, 57.93, 2.03, 'iron'],
+    ['b', 74.67, 57.89, 2.03, 74.73, 57.95, 2.3, 'flame'],
+    ['b', 98.35, 57.75, 1.95, 98.45, 57.79, 2.15, 'iron'],
+    ['b', 98.38, 57.79, 2.0, 98.42, 57.93, 2.03, 'iron'],
+    ['b', 98.37, 57.89, 2.03, 98.43, 57.95, 2.3, 'flame'],
+    ['b', 122.05, 57.75, 1.95, 122.15, 57.79, 2.15, 'iron'],
+    ['b', 122.08, 57.79, 2.0, 122.12, 57.93, 2.03, 'iron'],
+    ['b', 122.07, 57.89, 2.03, 122.13, 57.95, 2.3, 'flame'],
+    ['b', 145.75, 57.75, 1.95, 145.85, 57.79, 2.15, 'iron'],
+    ['b', 145.78, 57.79, 2.0, 145.82, 57.93, 2.03, 'iron'],
+    ['b', 145.77, 57.89, 2.03, 145.83, 57.95, 2.3, 'flame'],
+    ['b', 83.8, 59.65, 0, 84.6, 60.25, 0.4, 'linen'],
+    ['b', 84.0, 59.75, 0.4, 84.6, 60.2, 0.75, 'dust'],
+    ['b', 84.4, 59.85, 0, 84.9, 60.2, 0.35, 'wood'],
+    ['b', 111.4, 60.17, 1.6, 113.8, 60.25, 1.66, 'oak'],
+    ['b', 111.525, 60.05, 0.7, 111.875, 60.2, 1.6, 'dust'],
+    ['b', 111.975, 60.05, 0.7, 112.325, 60.2, 1.6, 'dust'],
+    ['b', 112.425, 60.05, 0.7, 112.775, 60.2, 1.6, 'dust'],
+    ['b', 112.875, 60.05, 0.7, 113.225, 60.2, 1.6, 'dust'],
+    ['b', 113.325, 60.05, 0.7, 113.675, 60.2, 1.6, 'dust'],
+    ['b', 135.57, 60.17, 1.27, 137.03, 60.25, 2.33, 'wood'],
+    ['b', 135.6, 60.15, 1.3, 137.0, 60.17, 2.3, 'linen'],
+    ['b', 135.93, 60.14, 1.42, 135.97, 60.15, 2.18, 'black'],
+    ['b', 136.28, 60.14, 1.42, 136.32, 60.15, 2.18, 'black'],
+    ['b', 136.63, 60.14, 1.42, 136.67, 60.15, 2.18, 'black']]);
+  T['service-corridor-b'].lights = (T['service-corridor-b'].lights || []).concat([[74.7, 57.92, 2.35, 16757862, 1.1, 8], [98.4, 57.92, 2.35, 16757862, 1.1, 8], [122.1, 57.92, 2.35, 16757862, 1.1, 8], [145.8, 57.92, 2.35, 16757862, 1.1, 8]]);
+})(window.SHELL_W5A.things);
+/* HAND2 end service-corridor-b */
+/* HAND2 begin north-range-corridor-4 */
+/* Interiors req 2423 sec 15: wall brackets, portraits in pairs, a tapestry mid-way, armour at each bay, a bench, a grandfather clock; sited by tools/architect-hand-rooms-1101.py, plain stand-ins (Objects draw the real ones) */
+(function (T) {
+  T['north-range-corridor-4'] = T['north-range-corridor-4'] || { items: [] };
+  T['north-range-corridor-4'].items = T['north-range-corridor-4'].items.concat([
+    ['b', 80.05, 50.85, 1.95, 80.15, 50.89, 2.15, 'iron'],
+    ['b', 80.08, 50.89, 2.0, 80.12, 51.03, 2.03, 'iron'],
+    ['b', 80.07, 50.99, 2.03, 80.13, 51.05, 2.3, 'flame'],
+    ['b', 97.85, 50.85, 1.95, 97.95, 50.89, 2.15, 'iron'],
+    ['b', 97.88, 50.89, 2.0, 97.92, 51.03, 2.03, 'iron'],
+    ['b', 97.87, 50.99, 2.03, 97.93, 51.05, 2.3, 'flame'],
+    ['b', 115.55, 50.85, 1.95, 115.65, 50.89, 2.15, 'iron'],
+    ['b', 115.58, 50.89, 2.0, 115.62, 51.03, 2.03, 'iron'],
+    ['b', 115.57, 50.99, 2.03, 115.63, 51.05, 2.3, 'flame'],
+    ['b', 133.35, 50.85, 1.95, 133.45, 50.89, 2.15, 'iron'],
+    ['b', 133.38, 50.89, 2.0, 133.42, 51.03, 2.03, 'iron'],
+    ['b', 133.37, 50.99, 2.03, 133.43, 51.05, 2.3, 'flame'],
+    ['b', 151.25, 50.85, 1.95, 151.35, 50.89, 2.15, 'iron'],
+    ['b', 151.28, 50.89, 2.0, 151.32, 51.03, 2.03, 'iron'],
+    ['b', 151.27, 50.99, 2.03, 151.33, 51.05, 2.3, 'flame'],
+    ['b', 82.35, 53.27, 1.5, 83.05, 53.35, 2.4, 'gilt'],
+    ['b', 82.4, 53.26, 1.55, 83.0, 53.27, 2.35, 'black'],
+    ['b', 86.45, 53.27, 1.5, 87.15, 53.35, 2.4, 'gilt'],
+    ['b', 86.5, 53.26, 1.55, 87.1, 53.27, 2.35, 'black'],
+    ['b', 128.55, 53.27, 1.5, 129.25, 53.35, 2.4, 'gilt'],
+    ['b', 128.6, 53.26, 1.55, 129.2, 53.27, 2.35, 'black'],
+    ['b', 132.15, 53.27, 1.5, 132.85, 53.35, 2.4, 'gilt'],
+    ['b', 132.2, 53.26, 1.55, 132.8, 53.27, 2.35, 'black'],
+    ['b', 110.3, 53.27, 2.7, 112.1, 53.35, 4.1, 'dust'],
+    ['b', 110.4, 53.26, 2.82, 112.0, 53.27, 3.98, 'stone'],
+    ['b', 110.25, 53.26, 4.1, 112.15, 53.35, 4.14, 'wood'],
+    ['b', 88.97, 50.85, 0, 89.03, 51.45, 1.7, 'iron'],
+    ['b', 88.75, 50.95, 1.05, 89.25, 51.35, 1.55, 'tin'],
+    ['b', 88.85, 51.0, 1.55, 89.15, 51.25, 1.8, 'tin'],
+    ['b', 124.47, 50.85, 0, 124.53, 51.45, 1.7, 'iron'],
+    ['b', 124.25, 50.95, 1.05, 124.75, 51.35, 1.55, 'tin'],
+    ['b', 124.35, 51.0, 1.55, 124.65, 51.25, 1.8, 'tin'],
+    ['b', 105.9, 50.85, 0, 107.7, 51.45, 0.9, 'oak'],
+    ['b', 142.3, 50.85, 0, 142.7, 51.15, 2.2, 'glass'],
+    ['b', 142.46, 50.9, 0.3, 142.54, 51.1, 1.8, 'gilt']]);
+  T['north-range-corridor-4'].lights = (T['north-range-corridor-4'].lights || []).concat([[80.1, 51.02, 2.35, 16757862, 1.1, 8], [97.9, 51.02, 2.35, 16757862, 1.1, 8], [115.6, 51.02, 2.35, 16757862, 1.1, 8], [133.4, 51.02, 2.35, 16757862, 1.1, 8], [151.3, 51.02, 2.35, 16757862, 1.1, 8]]);
+})(window.SHELL_W5A.things);
+/* HAND2 end north-range-corridor-4 */
+/* HAND2 begin slytherin-common-room */
+/* Interiors req 2423 sec 15 and CoS 12: a carved mantelpiece and fire, round lamps on chains, serpent tapestries, high-backed chairs, a long bench, cabinets of house cups; sited by tools/architect-hand-rooms-1101.py, plain stand-ins (Objects draw the real ones) */
+(function (T) {
+  T['slytherin-common-room'] = T['slytherin-common-room'] || { items: [] };
+  T['slytherin-common-room'].items = T['slytherin-common-room'].items.concat([
+    ['b', 55.15, -11.5, 0, 56.95, -11, 1.3, 'stone'],
+    ['b', 55.55, -11.52, 0.1, 56.55, -11.0, 1.0, 'black'],
+    ['b', 55.8, -11.4, 0.12, 56.3, -11.1, 0.45, 'flame'],
+    ['b', 55.35, -11.7, 0, 56.75, -11.5, 0.18, 'iron'],
+    ['b', 55.0, -11.65, 1.3, 57.1, -11, 1.38, 'oak'],
+    ['b', 46.39, -11.04, 1.9, 46.51, -11, 2.3, 'iron'],
+    ['b', 46.425, -11.3, 2.25, 46.475, -11.04, 2.3, 'iron'],
+    ['b', 46.39, -11.34, 2.0, 46.51, -11.26, 2.28, 'flame'],
+    ['b', 65.49, -11.04, 1.9, 65.61, -11, 2.3, 'iron'],
+    ['b', 65.525, -11.3, 2.25, 65.575, -11.04, 2.3, 'iron'],
+    ['b', 65.49, -11.34, 2.0, 65.61, -11.26, 2.28, 'flame'],
+    ['b', 47.99, -23, 1.9, 48.11, -22.96, 2.3, 'iron'],
+    ['b', 48.025, -22.96, 2.25, 48.075, -22.7, 2.3, 'iron'],
+    ['b', 47.99, -22.74, 2.0, 48.11, -22.66, 2.28, 'flame'],
+    ['b', 63.89, -23, 1.9, 64.01, -22.96, 2.3, 'iron'],
+    ['b', 63.925, -22.96, 2.25, 63.975, -22.7, 2.3, 'iron'],
+    ['b', 63.89, -22.74, 2.0, 64.01, -22.66, 2.28, 'flame'],
+    ['b', 55.25, -23, 2.8, 56.85, -22.92, 4.1, 'dust'],
+    ['b', 55.35, -22.92, 2.92, 56.75, -22.91, 3.98, 'stone'],
+    ['b', 55.2, -23, 4.1, 56.9, -22.91, 4.14, 'wood'],
+    ['b', 40, -17.75, 2.9, 40.08, -16.35, 4.1, 'dust'],
+    ['b', 40.08, -17.65, 3.02, 40.09, -16.45, 3.98, 'stone'],
+    ['b', 40, -17.8, 4.1, 40.09, -16.3, 4.14, 'wood'],
+    ['b', 71.92, -17.75, 2.9, 72, -16.35, 4.1, 'dust'],
+    ['b', 71.91, -17.65, 3.02, 71.92, -16.45, 3.98, 'stone'],
+    ['b', 71.91, -17.8, 4.1, 72, -16.3, 4.14, 'wood'],
+    ['b', 51.8, -11.7, 0, 52.5, -11, 0.5, 'oak'],
+    ['b', 51.8, -11.12, 0.5, 52.5, -11, 1.7, 'oak'],
+    ['b', 59.5, -11.7, 0, 60.2, -11, 0.5, 'oak'],
+    ['b', 59.5, -11.12, 0.5, 60.2, -11, 1.7, 'oak'],
+    ['b', 52.35, -23, 0, 54.15, -22.4, 0.9, 'oak'],
+    ['b', 71.55, -20.85, 0, 72, -19.25, 2.1, 'oak'],
+    ['b', 71.53, -20.75, 0.7, 71.55, -19.35, 2.0, 'glass']]);
+  T['slytherin-common-room'].lights = (T['slytherin-common-room'].lights || []).concat([[56.05, -11.25, 0.5, 16757862, 1.1, 8], [46.45, -11.3, 2.33, 16757862, 1.1, 8], [65.55, -11.3, 2.33, 16757862, 1.1, 8], [48.05, -22.7, 2.33, 16757862, 1.1, 8], [63.95, -22.7, 2.33, 16757862, 1.1, 8]]);
+})(window.SHELL_W5A.things);
+/* HAND2 end slytherin-common-room */
+/* HAND2 begin owlery */
+/* Curator c, owlery (floors-3-to-7-by-purpose-1031.md): a feed bin and grain tins on a low shelf, a water bucket, a broom and pan, the parcel shelf with string and wax, parcels waiting with their tags; placed on the south and west walls, the arch (5.05, 72) and the loops (r 8) kept clear; sited by tools/architect-hand-rooms-1101.py, plain stand-ins; sited by tools/architect-hand-rooms-1101.py, plain stand-ins (Objects draw the real ones) */
+(function (T) {
+  T['owlery'] = T['owlery'] || { items: [] };
+  T['owlery'].items = T['owlery'].items.concat([
+    ['b', 1.05, 75.861, 0, 1.75, 76.561, 0.9, 'wood'],
+    ['b', 1.075, 75.911, 0.9, 1.725, 76.511, 0.95, 'linen'],
+    ['b', -1.9, 76.168, 0, -0.5, 76.618, 0.85, 'pine'],
+    ['b', -1.2, 76.418, 0.85, -1.0, 76.418, 1.0, 'tin'],
+    ['b', -1.2, 76.018, 0.85, -1.0, 76.418, 1.0, 'tin'],
+    ['b', -1.25, 75.618, 0.85, -0.95, 76.418, 0.93, 'wood'],
+    ['b', -3.15, 75.417, 0, -2.85, 75.717, 0.32, 'tin'],
+    ['b', -4.495, 72.85, 1.0, -4.145, 74.35, 1.06, 'oak'],
+    ['b', -4.295, 73.55, 1.06, -4.295, 73.75, 1.2, 'dust'],
+    ['b', -4.345, 73.575, 1.06, -3.795, 73.725, 1.14, 'ruby'],
+    ['b', -4.245, 73.475, 1.06, -3.495, 73.825, 1.12, 'linen'],
+    ['b', -4.665, 70.6, 0, -4.065, 71.4, 0.4, 'linen'],
+    ['b', -4.615, 70.8, 0.4, -4.165, 71.4, 0.75, 'dust'],
+    ['b', -4.615, 71.2, 0, -4.265, 71.7, 0.35, 'wood'],
+    ['b', -2.6, 67.764, 0, -1.8, 68.364, 0.4, 'linen'],
+    ['b', -2.4, 67.814, 0.4, -1.8, 68.264, 0.75, 'dust'],
+    ['b', -2.0, 67.814, 0, -1.5, 68.164, 0.35, 'wood'],
+    ['b', 2.54, 67.995, 0, 2.66, 68.115, 1.3, 'wood']]);
+})(window.SHELL_W5A.things);
+/* HAND2 end owlery */
+/* HAND2 begin passage-3-study */
+/* Interiors floors-3-to-7 line 37: a runner, framed portraits that move and speak, lamp brackets; Architect: a brass speaking-horn on the wall (board rule 7); the horn rebuilt thin with a stepped flare, the runner made the passage length and 1.0 wide (card 45, 1 Nov, the 429th); sited by tools/architect-hand-rooms-1101.py, plain stand-ins (Objects draw the real ones) */
+(function (T) {
+  T['passage-3-study'] = T['passage-3-study'] || { items: [] };
+  T['passage-3-study'].items = T['passage-3-study'].items.concat([
+    ['b', 87.75, 54.7, 0, 88.55, 56.7, 0.035, 'ruby'],
+    ['b', 88.47, 54.7, 0.035, 88.55, 56.7, 0.045, 'gilt'],
+    ['b', 87.75, 54.7, 0.035, 87.83, 56.7, 0.045, 'gilt'],
+    ['b', 88.81, 54.64, 1.9, 88.85, 54.76, 2.3, 'iron'],
+    ['b', 88.55, 54.675, 2.25, 88.81, 54.725, 2.3, 'iron'],
+    ['b', 88.51, 54.64, 2.0, 88.59, 54.76, 2.28, 'flame'],
+    ['b', 88.81, 56.64, 1.9, 88.85, 56.76, 2.3, 'iron'],
+    ['b', 88.55, 56.675, 2.25, 88.81, 56.725, 2.3, 'iron'],
+    ['b', 88.51, 56.64, 2.0, 88.59, 56.76, 2.28, 'flame'],
+    ['b', 88.77, 54.85, 1.5, 88.85, 55.55, 2.4, 'gilt'],
+    ['b', 88.76, 54.9, 1.55, 88.77, 55.5, 2.35, 'black'],
+    ['b', 88.77, 55.65, 1.5, 88.85, 56.35, 2.4, 'gilt'],
+    ['b', 88.76, 55.7, 1.55, 88.77, 56.3, 2.35, 'black'],
+    ['b', 87.25, 55.72, 1.02, 87.33, 56.08, 1.48, 'gilt'],
+    ['b', 87.33, 55.83, 1.2, 87.37, 55.97, 1.3, 'gilt'],
+    ['b', 87.37, 55.79, 1.17, 87.42, 56.01, 1.33, 'gilt'],
+    ['b', 87.42, 55.75, 1.13, 87.47, 56.05, 1.37, 'gilt'],
+    ['b', 87.47, 55.8, 1.18, 87.475, 56.0, 1.32, 'black'],
+    ['b', 87.25, 55.86, 0.12, 87.33, 55.94, 1.02, 'gilt'],
+    ['b', 87.25, 55.15, 1.5, 87.33, 55.85, 2.4, 'gilt'],
+    ['b', 87.33, 55.2, 1.55, 87.34, 55.8, 2.35, 'black']]);
+  T['passage-3-study'].lights = (T['passage-3-study'].lights || []).concat([[88.55, 54.7, 2.33, 16757862, 1.1, 8], [88.55, 56.7, 2.33, 16757862, 1.1, 8]]);
+})(window.SHELL_W5A.things);
+/* HAND2 end passage-3-study */
+/* HAND2 begin disused-classroom-4-lake-east */
+/* Interiors req 2423 sec 11 + Architect req 2532: disused classroom, dust-sheeted, faded hangings, a roller map half down; sited by tools/architect-hand-rooms-1101.py, plain stand-ins (Objects draw the real ones) */
+(function (T) {
+  T['disused-classroom-4-lake-east'] = T['disused-classroom-4-lake-east'] || { items: [] };
+  T['disused-classroom-4-lake-east'].items = T['disused-classroom-4-lake-east'].items.concat([
+    ['b', 136.36, 3.85, 0, 138.16, 4.35, 1.3, 'stone'],
+    ['b', 136.76, 3.85, 0.1, 137.76, 4.37, 1.0, 'black'],
+    ['b', 137.01, 3.95, 0.12, 137.51, 4.25, 0.45, 'flame'],
+    ['b', 136.56, 4.35, 0, 137.96, 4.55, 0.18, 'iron'],
+    ['b', 136.21, 3.85, 1.3, 138.31, 4.5, 1.38, 'oak'],
+    ['b', 131.2, 3.85, 1.9, 131.32, 3.89, 2.3, 'iron'],
+    ['b', 131.235, 3.89, 2.25, 131.285, 4.15, 2.3, 'iron'],
+    ['b', 131.2, 4.11, 2.0, 131.32, 4.19, 2.28, 'flame'],
+    ['b', 136.86, 17.95, 0.95, 139.46, 18.0, 2.1, 'wood'],
+    ['b', 136.91, 17.92, 1.0, 139.41, 17.95, 2.05, 'black'],
+    ['b', 136.86, 17.8, 0.9, 139.46, 17.95, 0.95, 'wood'],
+    ['b', 137.3, 17.86, 0.95, 137.42, 17.92, 0.97, 'white'],
+    ['b', 137.46, 17.86, 0.95, 137.66, 17.92, 0.96, 'dust'],
+    ['b', 129.51, 7.35, 0, 130.21, 7.85, 0.75, 'oak'],
+    ['b', 129.51, 7.85, 0, 130.21, 8.35, 0.75, 'oak'],
+    ['b', 129.51, 8.35, 0, 130.21, 8.85, 0.75, 'oak'],
+    ['b', 129.56, 7.45, 0.75, 130.11, 8.75, 1.2, 'oak'],
+    ['b', 140.23, 7.5, 0, 141.13, 8.7, 0.9, 'linen'],
+    ['b', 140.43, 7.65, 0.9, 141.03, 8.55, 1.1, 'white'],
+    ['b', 138.43, 3.85, 1.57, 139.69, 3.93, 2.53, 'wood'],
+    ['b', 138.46, 3.93, 1.6, 139.66, 3.95, 2.5, 'linen'],
+    ['b', 138.74, 3.95, 1.72, 138.78, 3.96, 2.38, 'black'],
+    ['b', 139.04, 3.95, 1.72, 139.08, 3.96, 2.38, 'black'],
+    ['b', 139.34, 3.95, 1.72, 139.38, 3.96, 2.38, 'black'],
+    ['b', 141.05, 14.85, 1.5, 141.13, 15.55, 2.4, 'gilt'],
+    ['b', 141.04, 14.9, 1.55, 141.05, 15.5, 2.35, 'black'],
+    ['b', 129.51, 14.65, 0, 130.11, 15.75, 0.55, 'wood'],
+    ['b', 129.51, 15.16, 0, 130.13, 15.24, 0.55, 'iron'],
+    ['b', 131.86, 3.85, 2.3, 133.66, 3.93, 4.0, 'dust'],
+    ['b', 131.98, 3.93, 2.42, 133.54, 3.94, 3.88, 'linen'],
+    ['b', 131.98, 3.94, 2.6, 133.54, 3.95, 2.72, 'petals'],
+    ['b', 131.98, 3.94, 3.58, 133.54, 3.95, 3.7, 'petals'],
+    ['b', 132.51, 3.94, 2.85, 133.01, 3.96, 3.45, 'petals'],
+    ['b', 132.63, 3.96, 3.0, 132.89, 3.97, 3.3, 'dust'],
+    ['b', 131.81, 3.85, 4.0, 133.71, 3.94, 4.04, 'wood'],
+    ['b', 132.135, 3.94, 2.18, 132.185, 3.95, 2.32, 'dust'],
+    ['b', 132.435, 3.94, 2.18, 132.485, 3.95, 2.32, 'dust'],
+    ['b', 132.735, 3.94, 2.18, 132.785, 3.95, 2.32, 'dust'],
+    ['b', 133.035, 3.94, 2.18, 133.085, 3.95, 2.32, 'dust'],
+    ['b', 133.335, 3.94, 2.18, 133.385, 3.95, 2.32, 'dust'],
+    ['b', 136.56, 3.85, 2.3, 138.36, 3.93, 4.0, 'dust'],
+    ['b', 136.68, 3.93, 2.42, 138.24, 3.94, 3.88, 'petals'],
+    ['b', 136.68, 3.94, 2.6, 138.24, 3.95, 2.72, 'linen'],
+    ['b', 136.68, 3.94, 3.58, 138.24, 3.95, 3.7, 'linen'],
+    ['b', 137.21, 3.94, 2.85, 137.71, 3.96, 3.45, 'linen'],
+    ['b', 137.33, 3.96, 3.0, 137.59, 3.97, 3.3, 'dust'],
+    ['b', 136.51, 3.85, 4.0, 138.41, 3.94, 4.04, 'wood'],
+    ['b', 136.835, 3.94, 2.18, 136.885, 3.95, 2.32, 'dust'],
+    ['b', 137.135, 3.94, 2.18, 137.185, 3.95, 2.32, 'dust'],
+    ['b', 137.435, 3.94, 2.18, 137.485, 3.95, 2.32, 'dust'],
+    ['b', 137.735, 3.94, 2.18, 137.785, 3.95, 2.32, 'dust'],
+    ['b', 138.035, 3.94, 2.18, 138.085, 3.95, 2.32, 'dust'],
+    ['b', 141.05, 9.3, 2.3, 141.13, 11.1, 4.0, 'dust'],
+    ['b', 141.04, 9.42, 2.42, 141.05, 10.98, 3.88, 'linen'],
+    ['b', 141.03, 9.42, 2.6, 141.04, 10.98, 2.72, 'petals'],
+    ['b', 141.03, 9.42, 3.58, 141.04, 10.98, 3.7, 'petals'],
+    ['b', 141.02, 9.95, 2.85, 141.04, 10.45, 3.45, 'petals'],
+    ['b', 141.01, 10.07, 3.0, 141.02, 10.33, 3.3, 'dust'],
+    ['b', 141.04, 9.25, 4.0, 141.13, 11.15, 4.04, 'wood'],
+    ['b', 141.03, 9.575, 2.18, 141.04, 9.625, 2.32, 'dust'],
+    ['b', 141.03, 9.875, 2.18, 141.04, 9.925, 2.32, 'dust'],
+    ['b', 141.03, 10.175, 2.18, 141.04, 10.225, 2.32, 'dust'],
+    ['b', 141.03, 10.475, 2.18, 141.04, 10.525, 2.32, 'dust'],
+    ['b', 141.03, 10.775, 2.18, 141.04, 10.825, 2.32, 'dust'],
+    ['b', 130.36, 3.85, 0.1, 133.36, 3.9, 1.05, 'oak'],
+    ['b', 130.36, 3.85, 1.05, 133.36, 3.93, 1.13, 'wood'],
+    ['b', 130.36, 3.85, 0, 133.36, 3.93, 0.1, 'wood'],
+    ['b', 129.76, 17.95, 0.1, 132.76, 18.0, 1.05, 'oak'],
+    ['b', 129.76, 17.92, 1.05, 132.76, 18.0, 1.13, 'wood'],
+    ['b', 129.76, 17.92, 0, 132.76, 18.0, 0.1, 'wood'],
+    ['b', 141.08, 4.4, 0.1, 141.13, 7.4, 1.05, 'oak'],
+    ['b', 141.05, 4.4, 1.05, 141.13, 7.4, 1.13, 'wood'],
+    ['b', 141.05, 4.4, 0, 141.13, 7.4, 0.1, 'wood'],
+    ['b', 141.08, 14.4, 0.1, 141.13, 17.4, 1.05, 'oak'],
+    ['b', 141.05, 14.4, 1.05, 141.13, 17.4, 1.13, 'wood'],
+    ['b', 141.05, 14.4, 0, 141.13, 17.4, 0.1, 'wood'],
+    ['b', 132.26, 17.92, 3.0, 134.26, 18.0, 3.1, 'wood'],
+    ['b', 132.31, 17.9, 1.4, 134.21, 17.92, 3.0, 'linen'],
+    ['b', 132.51, 17.89, 1.9, 132.81, 17.9, 2.0, 'black'],
+    ['b', 132.91, 17.89, 1.8, 133.21, 17.9, 1.9, 'black'],
+    ['b', 133.31, 17.89, 1.7, 133.61, 17.9, 1.8, 'black'],
+    ['b', 133.71, 17.89, 1.6, 134.01, 17.9, 1.7, 'black'],
+    ['b', 132.31, 17.86, 1.32, 134.21, 17.92, 1.4, 'wood']]);
+  T['disused-classroom-4-lake-east'].lights = (T['disused-classroom-4-lake-east'].lights || []).concat([[137.26, 4.1, 0.5, 16757862, 1.1, 8], [131.26, 4.15, 2.33, 16757862, 1.1, 8]]);
+})(window.SHELL_W5A.things);
+/* HAND2 end disused-classroom-4-lake-east */
+/* HAND2 begin mcgonagalls-office */
+/* req 2543 (Architect): a tartan dressing gown on a peg, a pigeonhole cupboard of detention slips, a notice board, a tea table, a desk where a quill marks essays by itself, a pincushion with a snout and a cat cushion by the hearth; Interiors fire, chairs, desk and windows stay; sited by tools/architect-hand-rooms-1101.py, plain stand-ins (Objects draw the real ones) */
+(function (T) {
+  T['mcgonagalls-office'] = T['mcgonagalls-office'] || { items: [] };
+  T['mcgonagalls-office'].items = T['mcgonagalls-office'].items.concat([
+    ['b', 152.0, 67.29, 1.5, 152.05, 68.19, 1.6, 'oak'],
+    ['b', 152.05, 67.47, 1.52, 152.1, 67.51, 1.58, 'iron'],
+    ['b', 152.05, 67.97, 1.52, 152.1, 68.01, 1.58, 'iron'],
+    ['b', 152.05, 67.3, 0.6, 152.16, 67.42, 1.5, 'green'],
+    ['b', 152.05, 67.43, 0.6, 152.16, 67.55, 1.5, 'blue'],
+    ['b', 152.05, 67.56, 0.6, 152.16, 67.68, 1.5, 'green'],
+    ['b', 152.05, 67.69, 0.6, 152.16, 67.81, 1.5, 'ruby'],
+    ['b', 152.05, 67.82, 0.6, 152.16, 67.94, 1.5, 'green'],
+    ['b', 152.05, 67.91, 1.38, 152.12, 68.07, 1.52, 'dust'],
+    ['b', 151.98, 71.05, 0, 153.08, 71.4, 1.7, 'oak'],
+    ['b', 152.025, 71.04, 0.2, 152.195, 71.1, 0.5, 'dust'],
+    ['b', 152.235, 71.04, 0.2, 152.405, 71.1, 0.5, 'white'],
+    ['b', 152.445, 71.04, 0.2, 152.615, 71.1, 0.5, 'white'],
+    ['b', 152.655, 71.04, 0.2, 152.825, 71.1, 0.5, 'dust'],
+    ['b', 152.865, 71.04, 0.2, 153.035, 71.1, 0.5, 'white'],
+    ['b', 152.025, 71.04, 0.56, 152.195, 71.1, 0.86, 'white'],
+    ['b', 152.235, 71.04, 0.56, 152.405, 71.1, 0.86, 'white'],
+    ['b', 152.445, 71.04, 0.56, 152.615, 71.1, 0.86, 'dust'],
+    ['b', 152.655, 71.04, 0.56, 152.825, 71.1, 0.86, 'white'],
+    ['b', 152.865, 71.04, 0.56, 153.035, 71.1, 0.86, 'white'],
+    ['b', 152.025, 71.04, 0.92, 152.195, 71.1, 1.22, 'white'],
+    ['b', 152.235, 71.04, 0.92, 152.405, 71.1, 1.22, 'dust'],
+    ['b', 152.445, 71.04, 0.92, 152.615, 71.1, 1.22, 'white'],
+    ['b', 152.655, 71.04, 0.92, 152.825, 71.1, 1.22, 'white'],
+    ['b', 152.865, 71.04, 0.92, 153.035, 71.1, 1.22, 'dust'],
+    ['b', 152.025, 71.04, 1.28, 152.195, 71.1, 1.58, 'dust'],
+    ['b', 152.235, 71.04, 1.28, 152.405, 71.1, 1.58, 'white'],
+    ['b', 152.445, 71.04, 1.28, 152.615, 71.1, 1.58, 'white'],
+    ['b', 152.655, 71.04, 1.28, 152.825, 71.1, 1.58, 'dust'],
+    ['b', 152.865, 71.04, 1.28, 153.035, 71.1, 1.58, 'white'],
+    ['b', 152.08, 71.03, 1.68, 152.98, 71.1, 1.72, 'gilt'],
+    ['b', 156.95, 74.43, 1.1, 157.0, 75.73, 1.9, 'oak'],
+    ['b', 156.93, 74.48, 1.15, 156.95, 75.68, 1.85, 'dust'],
+    ['b', 156.925, 74.54, 1.22, 156.93, 74.82, 1.58, 'white'],
+    ['b', 156.925, 74.93, 1.35, 156.93, 75.23, 1.65, 'white'],
+    ['b', 156.925, 75.35, 1.15, 156.93, 75.61, 1.55, 'white'],
+    ['b', 156.925, 74.83, 1.125, 156.93, 75.03, 1.275, 'white'],
+    ['b', 152.0, 68.52, 0, 152.5, 69.12, 0.72, 'oak'],
+    ['b', 152.05, 68.545, 0.72, 152.45, 69.095, 0.75, 'copper'],
+    ['b', 152.2, 68.62, 0.75, 152.34, 68.78, 0.9, 'white'],
+    ['b', 152.28, 68.675, 0.84, 152.42, 68.725, 0.88, 'white'],
+    ['b', 152.1, 68.885, 0.75, 152.2, 68.955, 0.8, 'white'],
+    ['b', 152.1, 68.985, 0.75, 152.2, 69.055, 0.8, 'white'],
+    ['b', 152.25, 68.77, 0.75, 152.45, 68.91, 0.77, 'tan'],
+    ['b', 156.45, 71.94, 0, 157.0, 72.94, 0.76, 'oak'],
+    ['b', 156.55, 72.09, 0.76, 156.85, 72.39, 0.98, 'white'],
+    ['b', 156.55, 72.09, 0.98, 156.85, 72.39, 1.0, 'dust'],
+    ['b', 156.55, 72.49, 0.76, 156.9, 72.79, 0.78, 'white'],
+    ['b', 156.83, 72.55, 0.78, 156.85, 72.57, 0.79, 'ruby'],
+    ['b', 156.73, 72.62, 0.78, 156.75, 72.64, 0.79, 'ruby'],
+    ['b', 156.63, 72.69, 0.78, 156.65, 72.71, 0.79, 'ruby'],
+    ['b', 156.72, 72.68, 0.78, 156.75, 72.7, 1.12, 'white'],
+    ['b', 156.72, 72.64, 1.12, 156.75, 72.74, 1.2, 'ruby'],
+    ['b', 152.0, 68.47, 0.95, 152.25, 69.17, 0.98, 'oak'],
+    ['b', 152.1, 68.71, 0.98, 152.2, 68.93, 1.08, 'green'],
+    ['b', 152.18, 68.79, 1.0, 152.28, 68.85, 1.04, 'dust'],
+    ['b', 152.2, 68.763, 1.03, 152.22, 68.778, 1.05, 'black'],
+    ['b', 152.2, 68.863, 1.03, 152.22, 68.877, 1.05, 'black'],
+    ['b', 152.09, 68.735, 1.08, 152.1, 68.745, 1.16, 'iron'],
+    ['b', 152.09, 68.775, 1.08, 152.1, 68.785, 1.16, 'iron'],
+    ['b', 152.09, 68.815, 1.08, 152.1, 68.825, 1.16, 'iron'],
+    ['b', 152.09, 68.855, 1.08, 152.1, 68.865, 1.16, 'iron'],
+    ['b', 152.09, 68.895, 1.08, 152.1, 68.905, 1.16, 'iron'],
+    ['b', 152.08, 69.0, 0.98, 152.14, 69.14, 1.02, 'white'],
+    ['b', 152.08, 68.48, 0.98, 152.2, 68.66, 1.1, 'blue'],
+    ['b', 154.11, 66.5, 0, 154.81, 67.2, 0.14, 'ruby'],
+    ['b', 154.16, 66.55, 0.14, 154.76, 67.15, 0.2, 'ruby'],
+    ['b', 154.25, 66.7, 0.2, 154.37, 66.8, 0.205, 'iron'],
+    ['b', 154.4, 66.8, 0.2, 154.52, 66.9, 0.205, 'iron'],
+    ['b', 154.52, 66.9, 0.2, 154.64, 67.0, 0.205, 'iron'],
+    ['b', 154.885, 66.65, 0, 155.135, 66.9, 0.04, 'white'],
+    ['b', 154.925, 66.69, 0.04, 155.095, 66.86, 0.045, 'white']]);
+})(window.SHELL_W5A.things);
+/* HAND2 end mcgonagalls-office */
+/* HAND2 begin long-gallery-2 */
+/* Interiors req 2618 and Architect req 2621: the long gallery (H92), a covered walk of 1897: a shovelboard with two stools and a slate, eight window benches and a box settle, twenty-four portraits of nobody by date, three woven hangings (T5, T10 living; T4 still), eight hanging lanterns, two rush mats and the elves' step-stool; the lane y 71.0 to 72.4 and both ends' clear ground are bare; sited by tools/architect-hand-rooms-1101.py, plain stand-ins (Objects draw the real ones) */
+(function (T) {
+  T['long-gallery-2'] = T['long-gallery-2'] || { items: [] };
+  T['long-gallery-2'].items = T['long-gallery-2'].items.concat([
+    ['b', 37.45, 69.58, 0, 37.55, 69.66, 0.8, 'oak'],
+    ['b', 37.45, 69.97, 0, 37.55, 70.05, 0.8, 'oak'],
+    ['b', 42.55, 69.58, 0, 42.65, 69.66, 0.8, 'oak'],
+    ['b', 42.55, 69.97, 0, 42.65, 70.05, 0.8, 'oak'],
+    ['b', 37.3, 69.5, 0.8, 42.8, 70.05, 0.85, 'oak'],
+    ['b', 39.135, 69.52, 0.85, 39.165, 70.03, 0.86, 'white'],
+    ['b', 40.935, 69.52, 0.85, 40.965, 70.03, 0.86, 'white'],
+    ['b', 37.35, 69.6, 0.85, 37.65, 69.95, 0.87, 'black'],
+    ['b', 37.44, 69.7, 0.87, 37.56, 69.85, 0.89, 'brass'],
+    ['b', 42.45, 69.6, 0.85, 42.75, 69.95, 0.87, 'black'],
+    ['b', 42.54, 69.7, 0.87, 42.66, 69.85, 0.89, 'brass'],
+    ['b', 37.45, 70.04, 0.65, 37.95, 70.08, 0.78, 'oak'],
+    ['b', 37.65, 70.08, 0.7, 37.75, 70.12, 0.73, 'brass'],
+    ['b', 38.518, 69.65, 0.85, 38.583, 69.715, 0.88, 'brass'],
+    ['b', 38.798, 69.85, 0.85, 38.863, 69.915, 0.88, 'brass'],
+    ['b', 39.078, 69.65, 0.85, 39.143, 69.715, 0.88, 'brass'],
+    ['b', 39.358, 69.85, 0.85, 39.423, 69.915, 0.88, 'brass'],
+    ['b', 39.638, 69.65, 0.85, 39.703, 69.715, 0.88, 'iron'],
+    ['b', 39.918, 69.85, 0.85, 39.983, 69.915, 0.88, 'iron'],
+    ['b', 40.198, 69.65, 0.85, 40.263, 69.715, 0.88, 'iron'],
+    ['b', 40.478, 69.85, 0.85, 40.543, 69.915, 0.88, 'iron'],
+    ['b', 42.325, 69.9, 0.85, 42.375, 69.95, 1.0, 'brass'],
+    ['b', 42.3, 69.87, 1.0, 42.4, 69.98, 1.05, 'amber'],
+    ['b', 38.405, 70.3, 0, 38.455, 70.35, 0.46, 'oak'],
+    ['b', 38.405, 70.54, 0, 38.455, 70.59, 0.46, 'oak'],
+    ['b', 38.645, 70.3, 0, 38.695, 70.35, 0.46, 'oak'],
+    ['b', 38.645, 70.54, 0, 38.695, 70.59, 0.46, 'oak'],
+    ['b', 38.375, 70.25, 0.46, 38.725, 70.6, 0.5, 'oak'],
+    ['b', 41.405, 70.3, 0, 41.455, 70.35, 0.46, 'oak'],
+    ['b', 41.405, 70.54, 0, 41.455, 70.59, 0.46, 'oak'],
+    ['b', 41.645, 70.3, 0, 41.695, 70.35, 0.46, 'oak'],
+    ['b', 41.645, 70.54, 0, 41.695, 70.59, 0.46, 'oak'],
+    ['b', 41.375, 70.25, 0.46, 41.725, 70.6, 0.5, 'oak'],
+    ['b', 43.08, 69.5, 1.3, 43.42, 69.58, 1.62, 'wood'],
+    ['b', 43.11, 69.58, 1.34, 43.39, 69.59, 1.58, 'black'],
+    ['b', 43.155, 69.59, 1.4, 43.185, 69.6, 1.5, 'white'],
+    ['b', 43.205, 69.59, 1.42, 43.235, 69.6, 1.5, 'white'],
+    ['b', 43.255, 69.59, 1.44, 43.285, 69.6, 1.5, 'white'],
+    ['b', 43.305, 69.59, 1.46, 43.335, 69.6, 1.5, 'white'],
+    ['b', 39.85, 72.75, 0, 41.05, 73.3, 0.45, 'oak'],
+    ['b', 39.9, 72.77, 0.45, 41.0, 73.28, 0.5, 'cloth'],
+    ['b', 39.85, 73.24, 0.5, 41.05, 73.3, 1.05, 'oak'],
+    ['b', 40.94, 73.02, 0.5, 41.0, 73.1, 0.7, 'brass'],
+    ['b', 40.92, 73.01, 0.7, 41.02, 73.11, 0.75, 'amber'],
+    ['b', 37.55, 69.5, 1.6, 42.55, 69.58, 2.7, 'ruby'],
+    ['b', 37.67, 69.58, 1.72, 42.43, 69.59, 2.58, 'linen'],
+    ['b', 37.67, 69.59, 1.9, 42.43, 69.6, 2.02, 'amber'],
+    ['b', 37.67, 69.59, 2.28, 42.43, 69.6, 2.4, 'amber'],
+    ['b', 37.5, 69.5, 2.7, 42.6, 69.59, 2.74, 'wood'],
+    ['b', 50.85, 69.5, 1.5, 53.25, 69.58, 3.4, 'blue'],
+    ['b', 50.97, 69.58, 1.62, 53.13, 69.59, 3.28, 'green'],
+    ['b', 50.97, 69.59, 1.8, 53.13, 69.6, 1.92, 'ruby'],
+    ['b', 50.97, 69.59, 2.98, 53.13, 69.6, 3.1, 'ruby'],
+    ['b', 50.8, 69.5, 3.4, 53.3, 69.59, 3.44, 'wood'],
+    ['b', 28.95, 73.22, 0.4, 30.15, 73.3, 4.0, 'green'],
+    ['b', 29.07, 73.21, 0.52, 30.03, 73.22, 3.88, 'dust'],
+    ['b', 29.07, 73.2, 0.7, 30.03, 73.21, 0.82, 'petals'],
+    ['b', 29.07, 73.2, 3.58, 30.03, 73.21, 3.7, 'petals'],
+    ['b', 28.9, 73.21, 4.0, 30.2, 73.3, 4.04, 'wood'],
+    ['b', 36.05, 70.7, 0, 38.45, 71.7, 0.02, 'rope'],
+    ['b', 36.13, 70.78, 0.02, 38.37, 71.62, 0.03, 'dust'],
+    ['b', 42.05, 70.7, 0, 44.45, 71.7, 0.02, 'rope'],
+    ['b', 42.13, 70.78, 0.02, 44.37, 71.62, 0.03, 'dust'],
+    ['b', 34.3, 72.9, 0.0, 34.8, 73.3, 0.15, 'oak'],
+    ['b', 34.3, 73.0, 0.15, 34.8, 73.3, 0.3, 'oak'],
+    ['b', 34.3, 73.1, 0.3, 34.8, 73.3, 0.45, 'oak'],
+    ['b', 35.025, 72.95, 0, 35.375, 73.3, 0.4, 'rope'],
+    ['b', 35.175, 73.13, 0.4, 35.225, 73.18, 0.75, 'wood'],
+    ['b', 35.13, 73.08, 0.75, 35.27, 73.22, 0.95, 'dust'],
+    ['b', 21.95, 72.9, 0.4, 23.75, 73.3, 0.45, 'oak'],
+    ['b', 22.02, 72.94, 0, 22.08, 73.26, 0.4, 'oak'],
+    ['b', 23.62, 72.94, 0, 23.68, 73.26, 0.4, 'oak'],
+    ['b', 22.0, 72.92, 0.45, 23.7, 73.28, 0.5, 'cloth'],
+    ['b', 26.95, 72.9, 0.4, 28.75, 73.3, 0.45, 'oak'],
+    ['b', 27.02, 72.94, 0, 27.08, 73.26, 0.4, 'oak'],
+    ['b', 28.62, 72.94, 0, 28.68, 73.26, 0.4, 'oak'],
+    ['b', 27.0, 72.92, 0.45, 28.7, 73.28, 0.5, 'cloth'],
+    ['b', 32.05, 72.9, 0.4, 33.85, 73.3, 0.45, 'oak'],
+    ['b', 32.12, 72.94, 0, 32.18, 73.26, 0.4, 'oak'],
+    ['b', 33.72, 72.94, 0, 33.78, 73.26, 0.4, 'oak'],
+    ['b', 32.1, 72.92, 0.45, 33.8, 73.28, 0.5, 'cloth'],
+    ['b', 36.95, 72.9, 0.4, 38.75, 73.3, 0.45, 'oak'],
+    ['b', 37.02, 72.94, 0, 37.08, 73.26, 0.4, 'oak'],
+    ['b', 38.62, 72.94, 0, 38.68, 73.26, 0.4, 'oak'],
+    ['b', 37.0, 72.92, 0.45, 38.7, 73.28, 0.5, 'cloth'],
+    ['b', 43.95, 72.9, 0.4, 45.75, 73.3, 0.45, 'oak'],
+    ['b', 44.02, 72.94, 0, 44.08, 73.26, 0.4, 'oak'],
+    ['b', 45.62, 72.94, 0, 45.68, 73.26, 0.4, 'oak'],
+    ['b', 44.0, 72.92, 0.45, 45.7, 73.28, 0.5, 'cloth'],
+    ['b', 48.95, 72.9, 0.4, 50.75, 73.3, 0.45, 'oak'],
+    ['b', 49.02, 72.94, 0, 49.08, 73.26, 0.4, 'oak'],
+    ['b', 50.62, 72.94, 0, 50.68, 73.26, 0.4, 'oak'],
+    ['b', 49.0, 72.92, 0.45, 50.7, 73.28, 0.5, 'cloth'],
+    ['b', 54.05, 72.9, 0.4, 55.85, 73.3, 0.45, 'oak'],
+    ['b', 54.12, 72.94, 0, 54.18, 73.26, 0.4, 'oak'],
+    ['b', 55.72, 72.94, 0, 55.78, 73.26, 0.4, 'oak'],
+    ['b', 54.1, 72.92, 0.45, 55.8, 73.28, 0.5, 'cloth'],
+    ['b', 58.95, 72.9, 0.4, 60.75, 73.3, 0.45, 'oak'],
+    ['b', 59.02, 72.94, 0, 59.08, 73.26, 0.4, 'oak'],
+    ['b', 60.62, 72.94, 0, 60.68, 73.26, 0.4, 'oak'],
+    ['b', 59.0, 72.92, 0.45, 60.7, 73.28, 0.5, 'cloth'],
+    ['b', 19.93, 71.7, 3.55, 19.97, 71.74, 4.5, 'iron'],
+    ['b', 19.81, 71.62, 2.9, 20.09, 71.9, 3.0, 'brass'],
+    ['b', 19.83, 71.64, 3.0, 20.07, 71.88, 3.45, 'glass'],
+    ['b', 19.89, 71.7, 3.05, 20.01, 71.8, 3.3, 'flame'],
+    ['b', 19.81, 71.62, 3.45, 20.09, 71.9, 3.55, 'brass'],
+    ['b', 26.43, 71.7, 3.55, 26.47, 71.74, 4.5, 'iron'],
+    ['b', 26.31, 71.62, 2.9, 26.59, 71.9, 3.0, 'brass'],
+    ['b', 26.33, 71.64, 3.0, 26.57, 71.88, 3.45, 'glass'],
+    ['b', 26.39, 71.7, 3.05, 26.51, 71.8, 3.3, 'flame'],
+    ['b', 26.31, 71.62, 3.45, 26.59, 71.9, 3.55, 'brass'],
+    ['b', 33.03, 71.7, 3.55, 33.07, 71.74, 4.5, 'iron'],
+    ['b', 32.91, 71.62, 2.9, 33.19, 71.9, 3.0, 'brass'],
+    ['b', 32.93, 71.64, 3.0, 33.17, 71.88, 3.45, 'glass'],
+    ['b', 32.99, 71.7, 3.05, 33.11, 71.8, 3.3, 'flame'],
+    ['b', 32.91, 71.62, 3.45, 33.19, 71.9, 3.55, 'brass'],
+    ['b', 39.43, 71.7, 3.55, 39.47, 71.74, 4.5, 'iron'],
+    ['b', 39.31, 71.62, 2.9, 39.59, 71.9, 3.0, 'brass'],
+    ['b', 39.33, 71.64, 3.0, 39.57, 71.88, 3.45, 'glass'],
+    ['b', 39.39, 71.7, 3.05, 39.51, 71.8, 3.3, 'flame'],
+    ['b', 39.31, 71.62, 3.45, 39.59, 71.9, 3.55, 'brass'],
+    ['b', 46.03, 71.7, 3.55, 46.07, 71.74, 4.5, 'iron'],
+    ['b', 45.91, 71.62, 2.9, 46.19, 71.9, 3.0, 'brass'],
+    ['b', 45.93, 71.64, 3.0, 46.17, 71.88, 3.45, 'glass'],
+    ['b', 45.99, 71.7, 3.05, 46.11, 71.8, 3.3, 'flame'],
+    ['b', 45.91, 71.62, 3.45, 46.19, 71.9, 3.55, 'brass'],
+    ['b', 52.43, 71.7, 3.55, 52.47, 71.74, 4.5, 'iron'],
+    ['b', 52.31, 71.62, 2.9, 52.59, 71.9, 3.0, 'brass'],
+    ['b', 52.33, 71.64, 3.0, 52.57, 71.88, 3.45, 'glass'],
+    ['b', 52.39, 71.7, 3.05, 52.51, 71.8, 3.3, 'flame'],
+    ['b', 52.31, 71.62, 3.45, 52.59, 71.9, 3.55, 'brass'],
+    ['b', 59.03, 71.7, 3.55, 59.07, 71.74, 4.5, 'iron'],
+    ['b', 58.91, 71.62, 2.9, 59.19, 71.9, 3.0, 'brass'],
+    ['b', 58.93, 71.64, 3.0, 59.17, 71.88, 3.45, 'glass'],
+    ['b', 58.99, 71.7, 3.05, 59.11, 71.8, 3.3, 'flame'],
+    ['b', 58.91, 71.62, 3.45, 59.19, 71.9, 3.55, 'brass'],
+    ['b', 63.53, 71.7, 3.55, 63.57, 71.74, 4.5, 'iron'],
+    ['b', 63.41, 71.62, 2.9, 63.69, 71.9, 3.0, 'brass'],
+    ['b', 63.43, 71.64, 3.0, 63.67, 71.88, 3.45, 'glass'],
+    ['b', 63.49, 71.7, 3.05, 63.61, 71.8, 3.3, 'flame'],
+    ['b', 63.41, 71.62, 3.45, 63.69, 71.9, 3.55, 'brass'],
+    ['b', 17.6, 69.5, 1.0, 18.5, 69.58, 2.2, 'oak'],
+    ['b', 17.67, 69.58, 1.07, 18.43, 69.59, 2.13, 'black'],
+    ['b', 17.99, 69.59, 1.66, 18.19, 69.6, 1.96, 'dust'],
+    ['b', 17.85, 69.59, 1.24, 18.25, 69.6, 1.6, 'linen'],
+    ['b', 17.99, 69.5, 0.93, 18.11, 69.59, 0.97, 'brass'],
+    ['b', 19.5, 73.22, 1.0, 20.4, 73.3, 2.2, 'oak'],
+    ['b', 19.57, 73.21, 1.07, 20.33, 73.22, 2.13, 'black'],
+    ['b', 19.89, 73.2, 1.66, 20.09, 73.21, 1.96, 'dust'],
+    ['b', 19.75, 73.2, 1.24, 20.15, 73.21, 1.6, 'linen'],
+    ['b', 19.89, 73.21, 0.93, 20.01, 73.3, 0.97, 'brass'],
+    ['b', 19.8, 69.5, 1.0, 20.7, 69.58, 2.2, 'oak'],
+    ['b', 19.87, 69.58, 1.07, 20.63, 69.59, 2.13, 'black'],
+    ['b', 20.19, 69.59, 1.66, 20.39, 69.6, 1.96, 'dust'],
+    ['b', 20.05, 69.59, 1.24, 20.45, 69.6, 1.6, 'linen'],
+    ['b', 20.19, 69.5, 0.93, 20.31, 69.59, 0.97, 'brass'],
+    ['b', 22.2, 69.5, 1.0, 23.1, 69.58, 2.2, 'oak'],
+    ['b', 22.27, 69.58, 1.07, 23.03, 69.59, 2.13, 'black'],
+    ['b', 22.59, 69.59, 1.66, 22.79, 69.6, 1.96, 'dust'],
+    ['b', 22.45, 69.59, 1.24, 22.85, 69.6, 1.6, 'linen'],
+    ['b', 22.59, 69.5, 0.93, 22.71, 69.59, 0.97, 'brass'],
+    ['b', 24.4, 69.5, 1.0, 25.3, 69.58, 2.2, 'black'],
+    ['b', 24.47, 69.58, 1.07, 25.23, 69.59, 2.13, 'black'],
+    ['b', 24.79, 69.59, 1.66, 24.99, 69.6, 1.96, 'dust'],
+    ['b', 24.65, 69.59, 1.24, 25.05, 69.6, 1.6, 'linen'],
+    ['b', 24.79, 69.5, 0.93, 24.91, 69.59, 0.97, 'brass'],
+    ['b', 25.15, 73.22, 1.2, 25.75, 73.3, 2.0, 'black'],
+    ['b', 25.22, 73.21, 1.27, 25.68, 73.22, 1.93, 'black'],
+    ['b', 25.39, 73.2, 1.64, 25.59, 73.21, 1.84, 'dust'],
+    ['b', 25.25, 73.2, 1.36, 25.65, 73.21, 1.6, 'linen'],
+    ['b', 25.39, 73.21, 1.13, 25.51, 73.3, 1.17, 'brass'],
+    ['b', 26.8, 69.5, 1.0, 27.7, 69.58, 2.2, 'black'],
+    ['b', 26.87, 69.58, 1.07, 27.63, 69.59, 2.13, 'black'],
+    ['b', 27.19, 69.59, 1.66, 27.39, 69.6, 1.96, 'dust'],
+    ['b', 27.05, 69.59, 1.24, 27.45, 69.6, 1.6, 'linen'],
+    ['b', 27.19, 69.5, 0.93, 27.31, 69.59, 0.97, 'brass'],
+    ['b', 29.1, 69.5, 1.0, 30.0, 69.58, 2.2, 'gilt'],
+    ['b', 29.17, 69.58, 1.07, 29.93, 69.59, 2.13, 'black'],
+    ['b', 29.49, 69.59, 1.66, 29.69, 69.6, 1.96, 'dust'],
+    ['b', 29.35, 69.59, 1.24, 29.75, 69.6, 1.6, 'linen'],
+    ['b', 29.49, 69.5, 0.93, 29.61, 69.59, 0.97, 'brass'],
+    ['b', 31.3, 69.5, 1.0, 32.2, 69.58, 2.2, 'gilt'],
+    ['b', 31.37, 69.58, 1.07, 32.13, 69.59, 2.13, 'black'],
+    ['b', 31.69, 69.59, 1.66, 31.89, 69.6, 1.96, 'dust'],
+    ['b', 31.55, 69.59, 1.24, 31.95, 69.6, 1.6, 'linen'],
+    ['b', 31.69, 69.5, 0.93, 31.81, 69.59, 0.97, 'brass'],
+    ['b', 33.7, 69.5, 1.0, 34.6, 69.58, 2.2, 'gilt'],
+    ['b', 33.77, 69.58, 1.07, 34.53, 69.59, 2.13, 'black'],
+    ['b', 34.09, 69.59, 1.66, 34.29, 69.6, 1.96, 'dust'],
+    ['b', 33.95, 69.59, 1.24, 34.35, 69.6, 1.6, 'linen'],
+    ['b', 34.09, 69.5, 0.93, 34.21, 69.59, 0.97, 'brass'],
+    ['b', 35.0, 73.22, 1.0, 35.9, 73.3, 2.2, 'gilt'],
+    ['b', 35.07, 73.21, 1.07, 35.83, 73.22, 2.13, 'black'],
+    ['b', 35.39, 73.2, 1.66, 35.59, 73.21, 1.96, 'dust'],
+    ['b', 35.25, 73.2, 1.24, 35.65, 73.21, 1.6, 'linen'],
+    ['b', 35.39, 73.21, 0.93, 35.51, 73.3, 0.97, 'brass'],
+    ['b', 38.65, 73.22, 1.2, 39.25, 73.3, 2.0, 'gilt'],
+    ['b', 38.72, 73.21, 1.27, 39.18, 73.22, 1.93, 'black'],
+    ['b', 38.89, 73.2, 1.64, 39.09, 73.21, 1.84, 'dust'],
+    ['b', 38.75, 73.2, 1.36, 39.15, 73.21, 1.6, 'linen'],
+    ['b', 38.89, 73.21, 1.13, 39.01, 73.3, 1.17, 'brass'],
+    ['b', 42.6, 73.22, 1.0, 43.5, 73.3, 2.2, 'gilt'],
+    ['b', 42.67, 73.21, 1.07, 43.43, 73.22, 2.13, 'black'],
+    ['b', 42.99, 73.2, 1.66, 43.19, 73.21, 1.96, 'dust'],
+    ['b', 42.85, 73.2, 1.24, 43.25, 73.21, 1.6, 'linen'],
+    ['b', 42.99, 73.21, 0.93, 43.11, 73.3, 0.97, 'brass'],
+    ['b', 43.5, 69.5, 1.0, 44.4, 69.58, 2.2, 'gilt'],
+    ['b', 43.57, 69.58, 1.07, 44.33, 69.59, 2.13, 'black'],
+    ['b', 43.89, 69.59, 1.66, 44.09, 69.6, 1.96, 'dust'],
+    ['b', 43.75, 69.59, 1.24, 44.15, 69.6, 1.6, 'linen'],
+    ['b', 43.89, 69.5, 0.93, 44.01, 69.59, 0.97, 'brass'],
+    ['b', 45.9, 69.5, 1.0, 46.8, 69.58, 2.2, 'rope'],
+    ['b', 45.97, 69.58, 1.07, 46.73, 69.59, 2.13, 'black'],
+    ['b', 46.29, 69.59, 1.66, 46.49, 69.6, 1.96, 'dust'],
+    ['b', 46.15, 69.59, 1.24, 46.55, 69.6, 1.6, 'linen'],
+    ['b', 46.29, 69.5, 0.93, 46.41, 69.59, 0.97, 'brass'],
+    ['b', 47.0, 73.22, 1.0, 47.9, 73.3, 2.2, 'rope'],
+    ['b', 47.07, 73.21, 1.07, 47.83, 73.22, 2.13, 'black'],
+    ['b', 47.39, 73.2, 1.66, 47.59, 73.21, 1.96, 'dust'],
+    ['b', 47.25, 73.2, 1.24, 47.65, 73.21, 1.6, 'linen'],
+    ['b', 47.39, 73.21, 0.93, 47.51, 73.3, 0.97, 'brass'],
+    ['b', 48.2, 69.5, 1.0, 49.1, 69.58, 2.2, 'rope'],
+    ['b', 48.27, 69.58, 1.07, 49.03, 69.59, 2.13, 'black'],
+    ['b', 48.59, 69.59, 1.66, 48.79, 69.6, 1.96, 'dust'],
+    ['b', 48.45, 69.59, 1.24, 48.85, 69.6, 1.6, 'linen'],
+    ['b', 48.59, 69.5, 0.93, 48.71, 69.59, 0.97, 'brass'],
+    ['b', 52.05, 73.22, 1.2, 52.65, 73.3, 2.0, 'rope'],
+    ['b', 52.12, 73.21, 1.27, 52.58, 73.22, 1.93, 'black'],
+    ['b', 52.29, 73.2, 1.64, 52.49, 73.21, 1.84, 'dust'],
+    ['b', 52.15, 73.2, 1.36, 52.55, 73.21, 1.6, 'linen'],
+    ['b', 52.29, 73.21, 1.13, 52.41, 73.3, 1.17, 'brass'],
+    ['b', 54.6, 69.5, 1.0, 55.5, 69.58, 2.2, 'black'],
+    ['b', 54.67, 69.58, 1.07, 55.43, 69.59, 2.13, 'black'],
+    ['b', 54.99, 69.59, 1.66, 55.19, 69.6, 1.96, 'dust'],
+    ['b', 54.85, 69.59, 1.24, 55.25, 69.6, 1.6, 'linen'],
+    ['b', 54.99, 69.5, 0.93, 55.11, 69.59, 0.97, 'brass'],
+    ['b', 57.0, 69.5, 1.0, 57.9, 69.58, 2.2, 'black'],
+    ['b', 57.07, 69.58, 1.07, 57.83, 69.59, 2.13, 'black'],
+    ['b', 57.39, 69.59, 1.66, 57.59, 69.6, 1.96, 'dust'],
+    ['b', 57.25, 69.59, 1.24, 57.65, 69.6, 1.6, 'linen'],
+    ['b', 57.39, 69.5, 0.93, 57.51, 69.59, 0.97, 'brass'],
+    ['b', 57.0, 73.22, 1.0, 57.9, 73.3, 2.2, 'black'],
+    ['b', 57.07, 73.21, 1.07, 57.83, 73.22, 2.13, 'black'],
+    ['b', 57.39, 73.2, 1.66, 57.59, 73.21, 1.96, 'dust'],
+    ['b', 57.25, 73.2, 1.24, 57.65, 73.21, 1.6, 'linen'],
+    ['b', 57.39, 73.21, 0.93, 57.51, 73.3, 0.97, 'brass'],
+    ['b', 59.3, 69.5, 1.0, 60.2, 69.58, 2.2, 'dust'],
+    ['b', 59.37, 69.58, 1.07, 60.13, 69.59, 2.13, 'black'],
+    ['b', 59.69, 69.59, 1.66, 59.89, 69.6, 1.96, 'dust'],
+    ['b', 59.55, 69.59, 1.24, 59.95, 69.6, 1.6, 'linen'],
+    ['b', 59.69, 69.5, 0.93, 59.81, 69.59, 0.97, 'brass'],
+    ['b', 61.6, 73.22, 1.0, 62.5, 73.3, 2.2, 'dust'],
+    ['b', 61.67, 73.21, 1.07, 62.43, 73.22, 2.13, 'black'],
+    ['b', 61.99, 73.2, 1.66, 62.19, 73.21, 1.96, 'dust'],
+    ['b', 61.85, 73.2, 1.24, 62.25, 73.21, 1.6, 'linen'],
+    ['b', 61.99, 73.21, 0.93, 62.11, 73.3, 0.97, 'brass'],
+    ['b', 61.8, 69.5, 1.0, 62.7, 69.58, 2.2, 'dust'],
+    ['b', 61.87, 69.58, 1.07, 62.63, 69.59, 2.13, 'black'],
+    ['b', 62.19, 69.59, 1.66, 62.39, 69.6, 1.96, 'dust'],
+    ['b', 62.05, 69.59, 1.24, 62.45, 69.6, 1.6, 'linen'],
+    ['b', 62.19, 69.5, 0.93, 62.31, 69.59, 0.97, 'brass']]);
+  T['long-gallery-2'].lights = (T['long-gallery-2'].lights || []).concat([[19.95, 71.75, 3.35, 16757862, 1.1, 8], [26.45, 71.75, 3.35, 16757862, 1.1, 8], [33.05, 71.75, 3.35, 16757862, 1.1, 8], [39.45, 71.75, 3.35, 16757862, 1.1, 8], [46.05, 71.75, 3.35, 16757862, 1.1, 8], [52.45, 71.75, 3.35, 16757862, 1.1, 8], [59.05, 71.75, 3.35, 16757862, 1.1, 8], [63.55, 71.75, 3.35, 16757862, 1.1, 8]]);
+})(window.SHELL_W5A.things);
+/* HAND2 end long-gallery-2 */
