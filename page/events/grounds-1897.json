@@ -1,6 +1,6 @@
 {
   "chain": "grounds-1897",
-  "about": "The 1897 grounds' hooks from Magic's docs/magic/pass2-hooks-grounds.md (req 2567): lake, east landing, harbour, forest edge, cabin site by Story's eight steps, kitchen garden, glass range, paddock, pitch, owlery approach, gates. Held: the squid, the creatures, pumpkins, Dementors, the crossing. Place ids are provisional until Grounds' pages name them.",
+  "about": "The 1897 grounds' hooks from Magic's docs/magic/pass2-hooks-grounds.md (req 2567): lake, east landing, harbour, forest edge, cabin site by Story's eight steps, kitchen garden, glass range, paddock, pitch, owlery approach, gates. Provisional (req 2645): the lake boat from year three autumn, gated on Godric confirming Story's catch. Held: the squid, the creatures, pumpkins, Dementors, the crossing. Place ids are provisional until Grounds' pages name them.",
   "first_visit": [],
   "room": [
     {
@@ -465,6 +465,73 @@
       ],
       "starts": [],
       "canon": "Magic's req 2567 (docs/magic/pass2-hooks-grounds.md, Gates: settled 203; the lodge keeper's title is not written)"
+    },
+    {
+      "id": "grounds-1897.boat-set-out",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "weight": 1,
+      "moment": "tap boat",
+      "when": [
+        "era = 1890s",
+        "place = east landing",
+        "year >= 3",
+        "season = autumn",
+        "boat = none"
+      ],
+      "show": [
+        "he folds a plain paper boat, writes his few words on its sail and sets it on the water at the quay; it floats a little way, a pale shape moves under it, and the boat is turned toward the far shore and goes; nothing glows, nothing is scored, nothing is harmed"
+      ],
+      "starts": [
+        "set boat = out",
+        "stamp boat_out"
+      ],
+      "canon": "Magic's req 2645 (docs/magic/rooms.md, The lake boat, 1897; settled 225 and 229, PROVISIONAL: year three's autumn is Story's reading, Godric to confirm; B1 ch16 L5470, B3 ch16 L19616; the boat and its post are ours)"
+    },
+    {
+      "id": "grounds-1897.boat-at-the-far-stair",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "weight": 1,
+      "moment": "tap far stair",
+      "when": [
+        "era = 1890s",
+        "place = lake tower g",
+        "year >= 3",
+        "season = autumn",
+        "boat = out",
+        "days since boat_out >= 3"
+      ],
+      "show": [
+        "the boat has fetched up on the wet bottom step, quite readable; the other brother finds it, and the words on its sail are his alone"
+      ],
+      "starts": [
+        "set boat = none"
+      ],
+      "canon": "Magic's req 2645 (docs/magic/rooms.md, The lake boat, 1897; settled 225 and 229, PROVISIONAL: year three's autumn is Story's reading, Godric to confirm; B1 ch16 L5470, B3 ch16 L19616; the boat and its post are ours); the far landing is Grounds' and the Architect's to name, 'far stair' is the lake tower g stand-in until the shell names a water stair"
+    },
+    {
+      "id": "grounds-1897.boat-comes-back-with-a-thing",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "weight": 1,
+      "moment": "tap boat",
+      "when": [
+        "era = 1890s",
+        "place = east landing",
+        "year >= 3",
+        "season != autumn",
+        "season != summer",
+        "boat = none"
+      ],
+      "show": [
+        "a boat set out in the cold drifts round and comes back to the quay it left, with a small thing tucked in its fold: a smooth pebble, a feather or a little shell, his to keep; the words are not shown"
+      ],
+      "starts": [],
+      "canon": "Magic's req 2645 (docs/magic/rooms.md, The lake boat, 1897; settled 225 and 229, PROVISIONAL: year three's autumn is Story's reading, Godric to confirm; B1 ch16 L5470, B3 ch16 L19616; the boat and its post are ours)"
     }
   ]
 }

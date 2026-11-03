@@ -356,9 +356,9 @@ window.CastleShell = { build: function (F, M, placeId, o) {
   var vaultFaces = {}, faceMats = {};
   function vaultFaceMat(state) {
     if (!faceMats[state]) {
-      var FC = window.CastleCeilings.faces, t = new THREE.TextureLoader().load(FC.base() + FC.files[state]);
+      var FC = window.CastleCeilings.faces, t = new THREE.TextureLoader().load(FC.base() + FC.files[state], FC.stone);
       if (THREE.SRGBColorSpace) t.colorSpace = THREE.SRGBColorSpace; else if (THREE.sRGBEncoding) t.encoding = THREE.sRGBEncoding;
-      faceMats[state] = new THREE.MeshLambertMaterial({ map: t, alphaTest: 0.5 });
+      faceMats[state] = new THREE.MeshLambertMaterial({ map: t, color: FC.color, alphaTest: 0.5 });
     }
     return faceMats[state];
   }
@@ -891,8 +891,119 @@ window.CastleShell = { build: function (F, M, placeId, o) {
     for (var kn = n0; kn < group.children.length; kn++) group.children[kn].userData.owner = Q.id;
   }
 
+  /* v164 (model v280, ledger 354, req 690): the plain ridged glasshouse, houses two to four of the grounds record, built
+     where a house has no nave: a brick dwarf wall to the glass (0.8), iron standards in the long walls each pane, the
+     glass to the eaves (3.0), two glazed pitches to an iron ridge beam (4.6) over the path's middle, the gables glazed
+     to the ridge, the west door's gap in its gable. The 6 m span needs no column inside. The brick path, the staging
+     along both long walls, the iron grilles in the path (the boiler's warm air comes up through them) and the grate
+     over the stokehole's half under the east gable, a dark pit below it (the fire's light is a later piece) */
+  function buildPlainGlasshouse(Q) {
+    var h = Q.glasshouse.house, B = Q.glasshouse.building, FT = h.fittings || {}, n0 = group.children.length;
+    var R = h.rect, f = Q.floor, X0 = R[0], Y0 = R[1], X1 = R[2], Y1 = R[3], YC = (Y0 + Y1) / 2;
+    var E = B.eaves || 3.0, RG = B.ridge || 4.6, GF = B.glass_from || 0.8, PW = 2.44, D = B.door || { w: 1.2, h: 2.2 }, DY = h.door ? h.door[1] : YC;
+    var iron = F.solid(0x2a2d2c), brick = F.solid(0x8a4b38), earth = F.solid(0x5a4a3a), slat = F.solid(0x8b6d4c), pit = F.solid(0x15110e), pitwall = F.solid(0x3b2a22);
+    if (!mats.pane) mats.pane = new THREE.MeshBasicMaterial({ color: new THREE.Color(tone('sky-day')).convertSRGBToLinear(), side: THREE.DoubleSide });
+    function L(x, y, z) { return toLocal(x, y, f + z); }
+    function own(m, name, hit) { m.name = Q.id + '-' + name; if (!hit) m.raycast = function () {}; group.add(m); return m; }
+    var boxes = {};
+    function box(k, x0, y0, z0, x1, y1, z1) { (boxes[k] = boxes[k] || []).push([Math.min(x0, x1), Math.min(y0, y1), Math.min(z0, z1), Math.max(x0, x1), Math.max(y0, y1), Math.max(z0, z1)]); }
+    function flush(k, m) {
+      var l = boxes[k] || []; if (!l.length) return;
+      var im = new THREE.InstancedMesh(new THREE.BoxGeometry(1, 1, 1), m, l.length), MX = new THREE.Matrix4(), QI = new THREE.Quaternion(), SC = new THREE.Vector3();
+      l.forEach(function (b, i) { var a = L(b[0], b[1], b[2]), c = L(b[3], b[4], b[5]); SC.set(Math.abs(c.x - a.x), Math.abs(c.y - a.y), Math.abs(c.z - a.z)); MX.compose(a.clone().add(c).multiplyScalar(0.5), QI, SC); im.setMatrixAt(i, MX); });
+      return own(im, k);
+    }
+    var glass = {};
+    function tri(k, a, b, c) { (glass[k] = glass[k] || []).push(a.x, a.y, a.z, b.x, b.y, b.z, c.x, c.y, c.z); }
+    function quadG(k, p) { var v = p.map(function (q) { return L(q[0], q[1], q[2]); }); tri(k, v[0], v[1], v[2]); tri(k, v[0], v[2], v[3]); }
+    function triG(k, p) { var v = p.map(function (q) { return L(q[0], q[1], q[2]); }); tri(k, v[0], v[1], v[2]); }
+    function wallG(xa, ya, xb, yb, z0, z1) {
+      quadG('glass-walls', [[xa, ya, z0], [xb, yb, z0], [xb, yb, z1], [xa, ya, z1]]);
+      var len = Math.hypot(xb - xa, yb - ya), n = Math.max(1, Math.round(len / PW));
+      for (var i = 1; i < n; i++) { var t = i / n, x = xa + (xb - xa) * t, y = ya + (yb - ya) * t; box('bars', x - 0.025, y - 0.025, z0, x + 0.025, y + 0.025, z1); }
+    }
+    function tube(a, b, r, name) {
+      var va = L(a[0], a[1], a[2]), vb = L(b[0], b[1], b[2]), dl = vb.clone().sub(va), m = new THREE.Mesh(new THREE.CylinderGeometry(r, r, dl.length(), 5), iron);
+      m.position.copy(va.clone().add(vb).multiplyScalar(0.5)); m.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), dl.normalize()); return own(m, name);
+    }
+    var T = 0.3, dy0 = DY - D.w / 2, dy1 = DY + D.w / 2;
+    box('dwarf', X0 - T, Y0 - T, 0, X1 + T, Y0, GF); box('dwarf', X0 - T, Y1, 0, X1 + T, Y1 + T, GF);
+    box('dwarf', X1, Y0, 0, X1 + T, Y1, GF); box('dwarf', X0 - T, Y0, 0, X0, dy0, GF); box('dwarf', X0 - T, dy1, 0, X0, Y1, GF);
+    /* the long walls' glass and standards, the eaves' gutter beam */
+    var nP = Math.round((X1 - X0) / PW);
+    [Y0, Y1].forEach(function (y) {
+      wallG(X0, y, X1, y, GF, E);
+      for (var i = 0; i <= nP; i++) { var sx = X0 + i * (X1 - X0) / nP; box('girders', sx - 0.06, y - 0.06, GF, sx + 0.06, y + 0.06, E); }
+      box('girders', X0, y - 0.09, E - 0.12, X1, y + 0.09, E);
+    });
+    /* the gables: glazed to the eaves, a triangle to the ridge above; the west's door gap below its head */
+    wallG(X0, Y0, X0, dy0, GF, E); wallG(X0, dy1, X0, Y1, GF, E); wallG(X0, dy0, X0, dy1, D.h, E);
+    wallG(X1, Y0, X1, Y1, GF, E);
+    [X0, X1].forEach(function (x) { triG('glass-walls', [[x, Y0, E], [x, Y1, E], [x, YC, RG]]); box('bars', x - 0.025, YC - 0.025, E, x + 0.025, YC + 0.025, RG - 0.02); });
+    /* the door: an iron-framed glazed leaf, shut, in the gable's line */
+    quadG('glass-walls', [[X0, dy0, 0.15], [X0, dy1, 0.15], [X0, dy1, D.h - 0.08], [X0, dy0, D.h - 0.08]]);
+    box('frame', X0 - 0.04, dy0, 0, X0 + 0.04, dy0 + 0.08, D.h); box('frame', X0 - 0.04, dy1 - 0.08, 0, X0 + 0.04, dy1, D.h);
+    box('frame', X0 - 0.04, dy0, D.h - 0.08, X0 + 0.04, dy1, D.h); box('frame', X0 - 0.04, dy0, 0, X0 + 0.04, dy1, 0.15);
+    box('frame', X0 - 0.04, DY - 0.02, 0.15, X0 + 0.04, DY + 0.02, D.h - 0.08);
+    /* the roof: a glazed pitch each side to the ridge beam, a rafter each pane */
+    for (var k = 0; k < nP; k++) {
+      var xa = X0 + k * (X1 - X0) / nP, xb = X0 + (k + 1) * (X1 - X0) / nP;
+      quadG('glass-roofs', [[xa, Y0, E], [xb, Y0, E], [xb, YC, RG], [xa, YC, RG]]);
+      quadG('glass-roofs', [[xa, Y1, E], [xb, Y1, E], [xb, YC, RG], [xa, YC, RG]]);
+    }
+    for (var q = 0; q <= nP; q++) {
+      var xr = X0 + q * (X1 - X0) / nP;
+      tube([xr, Y0, E], [xr, YC, RG], 0.03, 'rafter-s' + q); tube([xr, Y1, E], [xr, YC, RG], 0.03, 'rafter-n' + q);
+    }
+    box('girders', X0, YC - 0.1, RG - 0.22, X1, YC + 0.1, RG + 0.03);
+    /* the floor: earth, the brick path over it (herringbone is a texture to come), the grate's opening left in it */
+    var SH = B.stokehole, GR = SH ? [SH.rect[0] + 0.3, SH.rect[1] + 0.25, Math.min(SH.rect[2], X1) - 0.1, SH.rect[3] - 0.25] : null;
+    /* v165 (the Architect, 3 November 2026): the earth floor is cut away over the stokehole's pit (it had covered it whole, so
+       the pit and its fire could not be seen through the grate): four pieces round the grate's rectangle */
+    (GR ? [[X0, Y0, X1, GR[1]], [X0, GR[3], X1, Y1], [X0, GR[1], GR[0], GR[3]], [GR[2], GR[1], X1, GR[3]]] : [[X0, Y0, X1, Y1]]).forEach(function (r, i) {
+      if (r[2] - r[0] < 0.001 || r[3] - r[1] < 0.001) return;
+      var fl = quad(r[2] - r[0], r[3] - r[1], earth, 'floor'); fl.rotation.x = -Math.PI / 2; fl.position.copy(L((r[0] + r[2]) / 2, (r[1] + r[3]) / 2, 0)); fl.name = Q.id + '-floor' + (GR ? '-' + i : ''); group.add(fl);
+    });
+    function walk(r, nm) { var wk = quad(r[2] - r[0], r[3] - r[1], brick, 'floor'); wk.rotation.x = -Math.PI / 2; wk.position.copy(L((r[0] + r[2]) / 2, (r[1] + r[3]) / 2, 0.008)); wk.name = Q.id + '-' + nm; group.add(wk); }
+    if (FT.walk) {
+      var wr = FT.walk.rect;
+      if (GR) { walk([wr[0], wr[1], GR[0], wr[3]], 'walk-w'); walk([GR[0], wr[1], GR[2], GR[1]], 'walk-s'); walk([GR[0], GR[3], GR[2], wr[3]], 'walk-n'); walk([GR[2], wr[1], wr[2], wr[3]], 'walk-e'); }
+      else walk(wr, 'walk');
+    }
+    /* the staging, as house one's: slats along its length on legs each pane */
+    if (FT.staging) {
+      var sg = FT.staging;
+      [sg.south, sg.north].forEach(function (r) {
+        for (var y = r[1] + 0.02; y + 0.1 <= r[3] + 0.001; y += 0.15) box('slats', r[0], y, sg.top - 0.03, r[2], y + 0.1, sg.top);
+        box('slats', r[0], r[1], sg.top - 0.12, r[2], r[1] + 0.05, sg.top - 0.03); box('slats', r[0], r[3] - 0.05, sg.top - 0.12, r[2], r[3], sg.top - 0.03);
+        for (var x = r[0] + 0.05; x <= r[2] - 0.05 + 0.001; x += PW) { box('slats', x - 0.03, r[1], 0, x + 0.03, r[1] + 0.06, sg.top - 0.03); box('slats', x - 0.03, r[3] - 0.06, 0, x + 0.03, r[3], sg.top - 0.03); }
+      });
+    }
+    /* the warm-air grilles in the path (the stokehole's duct runs under its middle): a dark well, cast-iron bars over it */
+    if (SH && SH.grilles) SH.grilles.forEach(function (g) {
+      box('pitbox', g[0] - 0.4, g[1] - 0.3, 0.004, g[0] + 0.4, g[1] + 0.3, 0.012);
+      for (var b = -3; b <= 3; b++) box('girders', g[0] - 0.4, g[1] + b * 0.085 - 0.02, 0.012, g[0] + 0.4, g[1] + b * 0.085 + 0.02, 0.05);
+      box('girders', g[0] - 0.42, g[1] - 0.34, 0.004, g[0] + 0.42, g[1] - 0.3, 0.05); box('girders', g[0] - 0.42, g[1] + 0.3, 0.004, g[0] + 0.42, g[1] + 0.34, 0.05);
+    });
+    /* the stokehole's grate in the path's east end: iron bars across a pit 2.4 deep, its walls brick, the pit dark */
+    if (GR && SH) {
+      var PZ = SH.floor || -2.4, pw = GR[2] - GR[0], pd = GR[3] - GR[1];
+      var pf = quad(pw, pd, pit, 'floor'); pf.rotation.x = -Math.PI / 2; pf.position.copy(L((GR[0] + GR[2]) / 2, (GR[1] + GR[3]) / 2, PZ)); pf.name = Q.id + '-pit-floor'; group.add(pf);
+      box('pitwall', GR[0] - 0.12, GR[1] - 0.12, PZ, GR[2] + 0.12, GR[1], 0.0); box('pitwall', GR[0] - 0.12, GR[3], PZ, GR[2] + 0.12, GR[3] + 0.12, 0.0);
+      box('pitwall', GR[0] - 0.12, GR[1], PZ, GR[0], GR[3], 0.0); box('pitwall', GR[2], GR[1], PZ, GR[2] + 0.12, GR[3], 0.0);
+      for (var gy = GR[1] + 0.05; gy < GR[3]; gy += 0.14) box('girders', GR[0], gy - 0.02, 0.0, GR[2], gy + 0.02, 0.06);
+      box('girders', GR[0] - 0.05, GR[1] - 0.05, 0.0, GR[0] + 0.05, GR[3] + 0.05, 0.06); box('girders', GR[2] - 0.05, GR[1] - 0.05, 0.0, GR[2] + 0.05, GR[3] + 0.05, 0.06);
+    }
+    flush('dwarf', brick); flush('bars', iron); flush('frame', iron); flush('girders', iron); flush('slats', slat); flush('pitbox', pit); flush('pitwall', pitwall);
+    for (var gk in glass) {
+      var gg = new THREE.BufferGeometry(); gg.setAttribute('position', new THREE.Float32BufferAttribute(glass[gk], 3)); gg.computeVertexNormals();
+      var gm = F.register(new THREE.Mesh(gg, mats.pane), LAYER.wall); gm.name = Q.id + '-' + gk; group.add(gm); out.panes.push(gm);
+    }
+    for (var kn = n0; kn < group.children.length; kn++) group.children[kn].userData.owner = Q.id;
+  }
+
   function buildPlace(Q) {
-    if (Q.glasshouse) return buildGlasshouse(Q);
+    if (Q.glasshouse) return Q.glasshouse.house.nave ? buildGlasshouse(Q) : buildPlainGlasshouse(Q);
     var n0 = group.children.length;                                     /* v30: what this place builds is its own */
     var xs = Q.poly.map(function (p) { return p[0]; }), ys = Q.poly.map(function (p) { return p[1]; });
     var x0 = Math.min.apply(null, xs), x1 = Math.max.apply(null, xs), y0 = Math.min.apply(null, ys), y1 = Math.max.apply(null, ys);
@@ -963,7 +1074,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
     var CV = null;
     /* v33 (req 714, Design's 2c3ebaab): the star drawn too, its crossings each one owner (a springer at each springing) */
     if (row && !Q.roof && !GBL && !Q.area && !HD.length && Q.ceiling != null && window.CastleCeilings && (Q.poly.length === 4 || (Q.rec && Q.rec.vault))) {
-      var vst = stoneAt(row, mx, my), VB = Q.rec && Q.rec.vault, QC = Q, stoneM = paintMat(tone(vst + '/ashlar', vst), true);
+      var vst = stoneAt(row, mx, my), VB = Q.rec && Q.rec.vault, QC = Q, stoneM = wallMat(row, mx, my, 0);
       /* v32 (model v71, ledger line 116): a groin with no free pier springs from corbels on its walls; the bays are laid
          out as if the corbels were piers, then each pier gives way to a corbel bearing 2 cm into its wall */
       if (VB && VB.corbels && !(VB.piers || []).length)
@@ -2887,7 +2998,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
     var n = 0;
     bins.forEach(function (list) {
       if (list.length < 2) return;
-      var names = ['position', 'normal', 'uv'].filter(function (a) { return list.every(function (m) { return m.geometry.attributes[a]; }); });
+      var names = ['position', 'normal', 'uv', 'aFade'].filter(function (a) { return list.every(function (m) { return m.geometry.attributes[a]; }); });
       if (names[0] !== 'position') return;
       var arrs = {}, mx = new THREE.Matrix4();
       names.forEach(function (a) { arrs[a] = []; });
@@ -2898,7 +3009,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
         geo.dispose();
       });
       var bg = new THREE.BufferGeometry(), f = list[0];
-      names.forEach(function (a) { bg.setAttribute(a, new THREE.Float32BufferAttribute(arrs[a], a === 'uv' ? 2 : 3)); });
+      names.forEach(function (a) { bg.setAttribute(a, new THREE.Float32BufferAttribute(arrs[a], a === 'uv' ? 2 : a === 'aFade' ? 1 : 3)); });
       if (names.indexOf('normal') < 0) bg.computeVertexNormals();
       var one = new THREE.Mesh(bg, f.material);
       one.name = f.name; one.castShadow = f.castShadow; one.receiveShadow = f.receiveShadow; one.renderOrder = f.renderOrder;
@@ -2968,7 +3079,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
 function farView(F, M, toLocal, panes, paneMat, shaft) {
   var LAWN = -1.2, LAKE = -46.0, BASE = -20.0;      /* tools/architect-sections-pdf.py's lawn and lake; the castle's foot */
   var FALL = { 'far-lawn': 0x7d8a5c, 'far-pitch': 0x8d9a64, 'far-water-day': 0x6f8797, 'far-water-night': 0x141b24,
-    'far-forest': 0x3a4630, 'far-hills': 0x7c8794, 'far-stone': 0xa9a194, 'far-rock': 0x8b8478, 'far-roof': 0x5f6670,
+    'far-forest': 0x3a4630, 'far-braes': 0x5e664c, 'far-hills': 0x7c8794, 'far-stone': 0xa9a194, 'far-rock': 0x8b8478, 'far-roof': 0x5f6670,
     'far-glass': 0xc9d2d8, 'far-timber': 0x6e4c30, 'far-window': 0x2b2f36, 'far-window-night': 0xd9a65a, 'sky-day': 0xb8cde6, 'sky-night': 0x10141f };
   var S = window.CASTLE_TONES && CASTLE_TONES.surfaces;
   function hex(k) { return S && S[k] && S[k].hex ? new THREE.Color(S[k].hex) : new THREE.Color(FALL[k]); }
@@ -3102,6 +3213,26 @@ function farView(F, M, toLocal, panes, paneMat, shaft) {
       prism(circ(s.point, 3.5, 12), LAWN, LAWN + 3.5, 'far-timber'); cone(s.point, 3.6, LAWN + 3.5, LAWN + 7);
     }
     else if (g.id === 'vegetable-patch' && s.rect) flat(shape(rect(s.rect)), LAWN + 0.04, 'far-forest');
+    else if (g.id === 'hogsmeade-mountain' && s.point && s.height_m && s.profile) {
+      /* v163 (req 2714, Grounds' mountain, GoF 27): the massif over the village, a polar grid round its summit; its
+         height at a point is the row's profile (z_frac at u, the distance from the summit over the foot radius on that
+         bearing), which carries both caves on the ground; a little fixed unevenness, no random */
+      var pf = s.profile, fr = pf.foot_r_m || {}, rS = fr.toward_160_deg || 1890, rN = fr.toward_340_deg || 1510;
+      var NB = 72, NR = 24, mp = [], top = s.height_m;
+      function zf(u) { var U = pf.u, Z = pf.z_frac; for (var j = 1; j < U.length; j++) if (u <= U[j]) return Z[j - 1] + (Z[j] - Z[j - 1]) * (u - U[j - 1]) / (U[j] - U[j - 1]); return 0; }
+      function mpt(ib, ir) {
+        var b = ib / NB * Math.PI * 2, u = ir / NR, d = b - 160 * Math.PI / 180;
+        var R = (rS + rN) / 2 + (rS - rN) / 2 * Math.cos(d) + 60 * Math.sin(5 * b + 1) + 35 * Math.sin(11 * b + 2);
+        var rough = ir > 0 && ir < NR ? 1 + 0.04 * Math.sin(7 * b + 3 * u) * Math.sin(Math.PI * u) : 1;
+        return V(s.point[0] + u * R * Math.sin(b), s.point[1] + u * R * Math.cos(b), ir === NR ? LAWN - 2 : LAWN + top * zf(u) * rough);
+      }
+      for (var ib = 0; ib < NB; ib++) for (var ir = 0; ir < NR; ir++) {
+        var a0 = mpt(ib, ir), a1 = mpt(ib + 1, ir), b0 = mpt(ib, ir + 1), b1 = mpt(ib + 1, ir + 1);
+        if (ir > 0) mp.push(a0, b0, a1); mp.push(a1, b0, b1);
+      }
+      var mg = new THREE.BufferGeometry().setFromPoints(mp); mg.computeVertexNormals();
+      var mm = add(mg, 'far-braes'); mm.material.side = THREE.DoubleSide; mm.name = 'far-hogsmeade-mountain';
+    }
   });
 
   /* the castle: each mass by its roof's parts (a box to the eaves, the roof over it), the towers as drums and cones */
