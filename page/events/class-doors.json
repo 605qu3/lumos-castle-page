@@ -1,0 +1,796 @@
+{
+  "chain": "class-doors",
+  "about": "The class doors' manners and the first visits, 1897 (Magic's req 2825, Story's settled 233): a class door is a polite door until Clementine has taken the boy there once, per boy, in his own year, then it is his for good. Variable cd_<class> = met, kept per boy in his own castle year; the books' castles' prefect words are Nineties', so every record reads era = 1890s. Provisional: the doors' places and tap ids until the Architect names each class's door; the offer sets clem_walk = <class> (Magic's gate, row 2822) when Clementine's walk is on its way to that door, and the tap on it is the first visit and `tried <door>` when his Alohomora answers nothing. Wednesday afternoon's History of Magic slot is not here (Events, open).",
+  "first_visit": [],
+  "records": [
+    {
+      "id": "class-doors.charms-shut",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "weight": 1,
+      "moment": "tap charms door",
+      "when": [
+        "era = 1890s",
+        "place = classroom corridor",
+        "cd_charms != met",
+        "clem_walk != charms"
+      ],
+      "show": [
+        "the Charms classroom's door: a polite door's own 'Ahem.', then, a breath later, 'We haven't been introduced.'; the latch gives a small shrug and the door stays shut; no count kept, nothing marked, no lock word"
+      ],
+      "canon": "Magic's req 2825 (docs/magic/rooms.md, The class doors and the first visits, 1897; Story's settled 233, row 2822; docs/handoff/magic.md 1.2, PS 8 L2722, read in the canon tool: doors that would not open unless asked politely; the words 'We haven't been introduced' are ours); PROVISIONAL: the door's place and tap id until the Architect names each class's door"
+    },
+    {
+      "id": "class-doors.charms-alohomora",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "weight": 1,
+      "moment": "tried charms door",
+      "when": [
+        "era = 1890s",
+        "place = classroom corridor",
+        "cd_charms != met"
+      ],
+      "show": [
+        "the door huffs, 'Well! Not so much as a please.'; the charm is not the way in, and the door stays a door with manners, not a lock"
+      ],
+      "canon": "Magic's req 2825 (docs/magic/rooms.md, The class doors and the first visits, 1897; Story's settled 233, row 2822; docs/handoff/magic.md 1.2, PS 8 L2722, read in the canon tool: doors that would not open unless asked politely; the words 'We haven't been introduced' are ours); PROVISIONAL: the door's place and tap id until the Architect names each class's door"
+    },
+    {
+      "id": "class-doors.charms-first-visit",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "weight": 1,
+      "moment": "tap charms door",
+      "when": [
+        "era = 1890s",
+        "place = classroom corridor",
+        "cd_charms != met",
+        "clem_walk = charms"
+      ],
+      "show": [
+        "Clementine knocks once and says, 'Good morning. These two, if you please.' The door says 'Ahem.', then the hinges give wide and the room's own teacher greets them in character"
+      ],
+      "starts": [
+        "set cd_charms = met",
+        "set clem_walk = none"
+      ],
+      "canon": "Magic's req 2825 (docs/magic/rooms.md, The class doors and the first visits, 1897; Story's settled 233, row 2822; docs/handoff/magic.md 1.2, PS 8 L2722, read in the canon tool: doors that would not open unless asked politely; the words 'We haven't been introduced' are ours); PROVISIONAL: the door's place and tap id until the Architect names each class's door"
+    },
+    {
+      "id": "class-doors.charms-met",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "weight": 1,
+      "moment": "tap charms door",
+      "when": [
+        "era = 1890s",
+        "place = classroom corridor",
+        "cd_charms = met"
+      ],
+      "show": [
+        "the latch lifts a beat before his hand arrives, as a door does for one it knows, and the door opens at the first tap; no 'Ahem.'"
+      ],
+      "canon": "Magic's req 2825 (docs/magic/rooms.md, The class doors and the first visits, 1897; Story's settled 233, row 2822; docs/handoff/magic.md 1.2, PS 8 L2722, read in the canon tool: doors that would not open unless asked politely; the words 'We haven't been introduced' are ours); PROVISIONAL: the door's place and tap id until the Architect names each class's door"
+    },
+    {
+      "id": "class-doors.transfiguration-shut",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "weight": 1,
+      "moment": "tap transfiguration door",
+      "when": [
+        "era = 1890s",
+        "place = classroom corridor",
+        "cd_transfiguration != met",
+        "clem_walk != transfiguration"
+      ],
+      "show": [
+        "the Transfiguration classroom's door: a polite door's own 'Ahem.', then, a breath later, 'We haven't been introduced.'; the latch gives a small shrug and the door stays shut; no count kept, nothing marked, no lock word"
+      ],
+      "canon": "Magic's req 2825 (docs/magic/rooms.md, The class doors and the first visits, 1897; Story's settled 233, row 2822; docs/handoff/magic.md 1.2, PS 8 L2722, read in the canon tool: doors that would not open unless asked politely; the words 'We haven't been introduced' are ours); PROVISIONAL: the door's place and tap id until the Architect names each class's door"
+    },
+    {
+      "id": "class-doors.transfiguration-alohomora",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "weight": 1,
+      "moment": "tried transfiguration door",
+      "when": [
+        "era = 1890s",
+        "place = classroom corridor",
+        "cd_transfiguration != met"
+      ],
+      "show": [
+        "the door huffs, 'Well! Not so much as a please.'; the charm is not the way in, and the door stays a door with manners, not a lock"
+      ],
+      "canon": "Magic's req 2825 (docs/magic/rooms.md, The class doors and the first visits, 1897; Story's settled 233, row 2822; docs/handoff/magic.md 1.2, PS 8 L2722, read in the canon tool: doors that would not open unless asked politely; the words 'We haven't been introduced' are ours); PROVISIONAL: the door's place and tap id until the Architect names each class's door"
+    },
+    {
+      "id": "class-doors.transfiguration-first-visit",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "weight": 1,
+      "moment": "tap transfiguration door",
+      "when": [
+        "era = 1890s",
+        "place = classroom corridor",
+        "cd_transfiguration != met",
+        "clem_walk = transfiguration"
+      ],
+      "show": [
+        "Clementine knocks once and says, 'Good morning. These two, if you please.' The door says 'Ahem.', then the hinges give wide and the room's own teacher greets them in character"
+      ],
+      "starts": [
+        "set cd_transfiguration = met",
+        "set clem_walk = none"
+      ],
+      "canon": "Magic's req 2825 (docs/magic/rooms.md, The class doors and the first visits, 1897; Story's settled 233, row 2822; docs/handoff/magic.md 1.2, PS 8 L2722, read in the canon tool: doors that would not open unless asked politely; the words 'We haven't been introduced' are ours); PROVISIONAL: the door's place and tap id until the Architect names each class's door"
+    },
+    {
+      "id": "class-doors.transfiguration-met",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "weight": 1,
+      "moment": "tap transfiguration door",
+      "when": [
+        "era = 1890s",
+        "place = classroom corridor",
+        "cd_transfiguration = met"
+      ],
+      "show": [
+        "the latch lifts a beat before his hand arrives, as a door does for one it knows, and the door opens at the first tap; no 'Ahem.'"
+      ],
+      "canon": "Magic's req 2825 (docs/magic/rooms.md, The class doors and the first visits, 1897; Story's settled 233, row 2822; docs/handoff/magic.md 1.2, PS 8 L2722, read in the canon tool: doors that would not open unless asked politely; the words 'We haven't been introduced' are ours); PROVISIONAL: the door's place and tap id until the Architect names each class's door"
+    },
+    {
+      "id": "class-doors.defence-shut",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "weight": 1,
+      "moment": "tap defence door",
+      "when": [
+        "era = 1890s",
+        "place = classroom corridor",
+        "cd_defence != met",
+        "clem_walk != defence"
+      ],
+      "show": [
+        "the Defence classroom's door: a polite door's own 'Ahem.', then, a breath later, 'We haven't been introduced.'; the latch gives a small shrug and the door stays shut; no count kept, nothing marked, no lock word"
+      ],
+      "canon": "Magic's req 2825 (docs/magic/rooms.md, The class doors and the first visits, 1897; Story's settled 233, row 2822; docs/handoff/magic.md 1.2, PS 8 L2722, read in the canon tool: doors that would not open unless asked politely; the words 'We haven't been introduced' are ours); PROVISIONAL: the door's place and tap id until the Architect names each class's door"
+    },
+    {
+      "id": "class-doors.defence-alohomora",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "weight": 1,
+      "moment": "tried defence door",
+      "when": [
+        "era = 1890s",
+        "place = classroom corridor",
+        "cd_defence != met"
+      ],
+      "show": [
+        "the door huffs, 'Well! Not so much as a please.'; the charm is not the way in, and the door stays a door with manners, not a lock"
+      ],
+      "canon": "Magic's req 2825 (docs/magic/rooms.md, The class doors and the first visits, 1897; Story's settled 233, row 2822; docs/handoff/magic.md 1.2, PS 8 L2722, read in the canon tool: doors that would not open unless asked politely; the words 'We haven't been introduced' are ours); PROVISIONAL: the door's place and tap id until the Architect names each class's door"
+    },
+    {
+      "id": "class-doors.defence-first-visit",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "weight": 1,
+      "moment": "tap defence door",
+      "when": [
+        "era = 1890s",
+        "place = classroom corridor",
+        "cd_defence != met",
+        "clem_walk = defence",
+        "weekday != friday"
+      ],
+      "show": [
+        "Clementine knocks once and says, 'Good morning. These two, if you please.' The door says 'Ahem.', then the hinges give wide and the room's own teacher greets them in character"
+      ],
+      "starts": [
+        "set cd_defence = met",
+        "set clem_walk = none"
+      ],
+      "canon": "Magic's req 2825 (docs/magic/rooms.md, The class doors and the first visits, 1897; Story's settled 233, row 2822; docs/handoff/magic.md 1.2, PS 8 L2722, read in the canon tool: doors that would not open unless asked politely; the words 'We haven't been introduced' are ours); PROVISIONAL: the door's place and tap id until the Architect names each class's door"
+    },
+    {
+      "id": "class-doors.defence-friday-round",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "weight": 1,
+      "moment": "tap defence door",
+      "when": [
+        "era = 1890s",
+        "place = classroom corridor",
+        "cd_defence != met",
+        "clem_walk = defence",
+        "weekday = friday"
+      ],
+      "show": [
+        "on the walk Clementine says, 'It's Friday. That one goes somewhere else, so we go round.' A longer way, never a stuck one, and a way back always near; at the door the same knock, the same 'Ahem.', the same open"
+      ],
+      "starts": [
+        "set cd_defence = met",
+        "set clem_walk = none"
+      ],
+      "canon": "Magic's req 2825 (docs/magic/rooms.md, The class doors and the first visits, 1897; Story's settled 233, row 2822; docs/handoff/magic.md 1.2, PS 8 L2722, read in the canon tool: doors that would not open unless asked politely; the words 'We haven't been introduced' are ours); PROVISIONAL: the door's place and tap id until the Architect names each class's door; the Friday flight's round is Magic's 1.1, built"
+    },
+    {
+      "id": "class-doors.defence-met",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "weight": 1,
+      "moment": "tap defence door",
+      "when": [
+        "era = 1890s",
+        "place = classroom corridor",
+        "cd_defence = met"
+      ],
+      "show": [
+        "the latch lifts a beat before his hand arrives, as a door does for one it knows, and the door opens at the first tap; no 'Ahem.'"
+      ],
+      "canon": "Magic's req 2825 (docs/magic/rooms.md, The class doors and the first visits, 1897; Story's settled 233, row 2822; docs/handoff/magic.md 1.2, PS 8 L2722, read in the canon tool: doors that would not open unless asked politely; the words 'We haven't been introduced' are ours); PROVISIONAL: the door's place and tap id until the Architect names each class's door"
+    },
+    {
+      "id": "class-doors.history-shut",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "weight": 1,
+      "moment": "tap history door",
+      "when": [
+        "era = 1890s",
+        "place = classroom corridor",
+        "cd_history != met",
+        "clem_walk != history"
+      ],
+      "show": [
+        "the History of Magic classroom's door: a polite door's own 'Ahem.', then, a breath later, 'We haven't been introduced.'; the latch gives a small shrug and the door stays shut; no count kept, nothing marked, no lock word"
+      ],
+      "canon": "Magic's req 2825 (docs/magic/rooms.md, The class doors and the first visits, 1897; Story's settled 233, row 2822; docs/handoff/magic.md 1.2, PS 8 L2722, read in the canon tool: doors that would not open unless asked politely; the words 'We haven't been introduced' are ours); PROVISIONAL: the door's place and tap id until the Architect names each class's door"
+    },
+    {
+      "id": "class-doors.history-alohomora",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "weight": 1,
+      "moment": "tried history door",
+      "when": [
+        "era = 1890s",
+        "place = classroom corridor",
+        "cd_history != met"
+      ],
+      "show": [
+        "the door huffs, 'Well! Not so much as a please.'; the charm is not the way in, and the door stays a door with manners, not a lock"
+      ],
+      "canon": "Magic's req 2825 (docs/magic/rooms.md, The class doors and the first visits, 1897; Story's settled 233, row 2822; docs/handoff/magic.md 1.2, PS 8 L2722, read in the canon tool: doors that would not open unless asked politely; the words 'We haven't been introduced' are ours); PROVISIONAL: the door's place and tap id until the Architect names each class's door"
+    },
+    {
+      "id": "class-doors.history-first-visit",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "weight": 1,
+      "moment": "tap history door",
+      "when": [
+        "era = 1890s",
+        "place = classroom corridor",
+        "cd_history != met",
+        "clem_walk = history"
+      ],
+      "show": [
+        "Clementine knocks once and says, 'Good morning. These two, if you please.' The door says 'Ahem.', then the hinges give wide and the room's own teacher greets them in character"
+      ],
+      "starts": [
+        "set cd_history = met",
+        "set clem_walk = none"
+      ],
+      "canon": "Magic's req 2825 (docs/magic/rooms.md, The class doors and the first visits, 1897; Story's settled 233, row 2822; docs/handoff/magic.md 1.2, PS 8 L2722, read in the canon tool: doors that would not open unless asked politely; the words 'We haven't been introduced' are ours); PROVISIONAL: the door's place and tap id until the Architect names each class's door"
+    },
+    {
+      "id": "class-doors.history-met",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "weight": 1,
+      "moment": "tap history door",
+      "when": [
+        "era = 1890s",
+        "place = classroom corridor",
+        "cd_history = met"
+      ],
+      "show": [
+        "the latch lifts a beat before his hand arrives, as a door does for one it knows, and the door opens at the first tap; no 'Ahem.'"
+      ],
+      "canon": "Magic's req 2825 (docs/magic/rooms.md, The class doors and the first visits, 1897; Story's settled 233, row 2822; docs/handoff/magic.md 1.2, PS 8 L2722, read in the canon tool: doors that would not open unless asked politely; the words 'We haven't been introduced' are ours); PROVISIONAL: the door's place and tap id until the Architect names each class's door"
+    },
+    {
+      "id": "class-doors.potions-shut",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "weight": 1,
+      "moment": "tap potions door",
+      "when": [
+        "era = 1890s",
+        "place = potions dungeon",
+        "cd_potions != met",
+        "clem_walk != potions"
+      ],
+      "show": [
+        "the Potions dungeon's door: a polite door's own 'Ahem.', then, a breath later, 'We haven't been introduced.'; the latch gives a small shrug and the door stays shut; no count kept, nothing marked, no lock word"
+      ],
+      "canon": "Magic's req 2825 (docs/magic/rooms.md, The class doors and the first visits, 1897; Story's settled 233, row 2822; docs/handoff/magic.md 1.2, PS 8 L2722, read in the canon tool: doors that would not open unless asked politely; the words 'We haven't been introduced' are ours); PROVISIONAL: the door's place and tap id until the Architect names each class's door"
+    },
+    {
+      "id": "class-doors.potions-alohomora",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "weight": 1,
+      "moment": "tried potions door",
+      "when": [
+        "era = 1890s",
+        "place = potions dungeon",
+        "cd_potions != met"
+      ],
+      "show": [
+        "the door huffs, 'Well! Not so much as a please.'; the charm is not the way in, and the door stays a door with manners, not a lock"
+      ],
+      "canon": "Magic's req 2825 (docs/magic/rooms.md, The class doors and the first visits, 1897; Story's settled 233, row 2822; docs/handoff/magic.md 1.2, PS 8 L2722, read in the canon tool: doors that would not open unless asked politely; the words 'We haven't been introduced' are ours); PROVISIONAL: the door's place and tap id until the Architect names each class's door"
+    },
+    {
+      "id": "class-doors.potions-first-visit",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "weight": 1,
+      "moment": "tap potions door",
+      "when": [
+        "era = 1890s",
+        "place = potions dungeon",
+        "cd_potions != met",
+        "clem_walk = potions"
+      ],
+      "show": [
+        "Clementine knocks once and says, 'Good morning. These two, if you please.' The door says 'Ahem.', then the hinges give wide and the room's own teacher greets them in character"
+      ],
+      "starts": [
+        "set cd_potions = met",
+        "set clem_walk = none"
+      ],
+      "canon": "Magic's req 2825 (docs/magic/rooms.md, The class doors and the first visits, 1897; Story's settled 233, row 2822; docs/handoff/magic.md 1.2, PS 8 L2722, read in the canon tool: doors that would not open unless asked politely; the words 'We haven't been introduced' are ours); PROVISIONAL: the door's place and tap id until the Architect names each class's door"
+    },
+    {
+      "id": "class-doors.potions-met",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "weight": 1,
+      "moment": "tap potions door",
+      "when": [
+        "era = 1890s",
+        "place = potions dungeon",
+        "cd_potions = met"
+      ],
+      "show": [
+        "the latch lifts a beat before his hand arrives, as a door does for one it knows, and the door opens at the first tap; no 'Ahem.'"
+      ],
+      "canon": "Magic's req 2825 (docs/magic/rooms.md, The class doors and the first visits, 1897; Story's settled 233, row 2822; docs/handoff/magic.md 1.2, PS 8 L2722, read in the canon tool: doors that would not open unless asked politely; the words 'We haven't been introduced' are ours); PROVISIONAL: the door's place and tap id until the Architect names each class's door"
+    },
+    {
+      "id": "class-doors.herbology-shut",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "weight": 1,
+      "moment": "tap herbology door",
+      "when": [
+        "era = 1890s",
+        "place = greenhouses",
+        "cd_herbology != met",
+        "clem_walk != herbology"
+      ],
+      "show": [
+        "the first greenhouse's door: a polite door's own 'Ahem.', then, a breath later, 'We haven't been introduced.'; the latch gives a small shrug and the door stays shut; no count kept, nothing marked, no lock word"
+      ],
+      "canon": "Magic's req 2825 (docs/magic/rooms.md, The class doors and the first visits, 1897; Story's settled 233, row 2822; docs/handoff/magic.md 1.2, PS 8 L2722, read in the canon tool: doors that would not open unless asked politely; the words 'We haven't been introduced' are ours); PROVISIONAL: the door's place and tap id until the Architect names each class's door"
+    },
+    {
+      "id": "class-doors.herbology-alohomora",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "weight": 1,
+      "moment": "tried herbology door",
+      "when": [
+        "era = 1890s",
+        "place = greenhouses",
+        "cd_herbology != met"
+      ],
+      "show": [
+        "the door huffs, 'Well! Not so much as a please.'; the charm is not the way in, and the door stays a door with manners, not a lock"
+      ],
+      "canon": "Magic's req 2825 (docs/magic/rooms.md, The class doors and the first visits, 1897; Story's settled 233, row 2822; docs/handoff/magic.md 1.2, PS 8 L2722, read in the canon tool: doors that would not open unless asked politely; the words 'We haven't been introduced' are ours); PROVISIONAL: the door's place and tap id until the Architect names each class's door"
+    },
+    {
+      "id": "class-doors.herbology-first-visit",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "weight": 1,
+      "moment": "tap herbology door",
+      "when": [
+        "era = 1890s",
+        "place = greenhouses",
+        "cd_herbology != met",
+        "clem_walk = herbology"
+      ],
+      "show": [
+        "Clementine knocks once and says, 'Good morning. These two, if you please.' The door says 'Ahem.', then the hinges give wide and the room's own teacher greets them in character"
+      ],
+      "starts": [
+        "set cd_herbology = met",
+        "set clem_walk = none"
+      ],
+      "canon": "Magic's req 2825 (docs/magic/rooms.md, The class doors and the first visits, 1897; Story's settled 233, row 2822; docs/handoff/magic.md 1.2, PS 8 L2722, read in the canon tool: doors that would not open unless asked politely; the words 'We haven't been introduced' are ours); PROVISIONAL: the door's place and tap id until the Architect names each class's door"
+    },
+    {
+      "id": "class-doors.herbology-met",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "weight": 1,
+      "moment": "tap herbology door",
+      "when": [
+        "era = 1890s",
+        "place = greenhouses",
+        "cd_herbology = met"
+      ],
+      "show": [
+        "the latch lifts a beat before his hand arrives, as a door does for one it knows, and the door opens at the first tap; no 'Ahem.'"
+      ],
+      "canon": "Magic's req 2825 (docs/magic/rooms.md, The class doors and the first visits, 1897; Story's settled 233, row 2822; docs/handoff/magic.md 1.2, PS 8 L2722, read in the canon tool: doors that would not open unless asked politely; the words 'We haven't been introduced' are ours); PROVISIONAL: the door's place and tap id until the Architect names each class's door"
+    },
+    {
+      "id": "class-doors.astronomy-shut",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "weight": 1,
+      "moment": "tap astronomy door",
+      "when": [
+        "era = 1890s",
+        "place = astronomy spiral",
+        "cd_astronomy != met",
+        "clem_walk != astronomy"
+      ],
+      "show": [
+        "the Tower's foot door, at its midnight hour: a polite door's own 'Ahem.', then, a breath later, 'We haven't been introduced.'; the latch gives a small shrug and the door stays shut; no count kept, nothing marked, no lock word"
+      ],
+      "canon": "Magic's req 2825 (docs/magic/rooms.md, The class doors and the first visits, 1897; Story's settled 233, row 2822; docs/handoff/magic.md 1.2, PS 8 L2722, read in the canon tool: doors that would not open unless asked politely; the words 'We haven't been introduced' are ours); PROVISIONAL: the door's place and tap id until the Architect names each class's door"
+    },
+    {
+      "id": "class-doors.astronomy-alohomora",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "weight": 1,
+      "moment": "tried astronomy door",
+      "when": [
+        "era = 1890s",
+        "place = astronomy spiral",
+        "cd_astronomy != met"
+      ],
+      "show": [
+        "the door huffs, 'Well! Not so much as a please.'; the charm is not the way in, and the door stays a door with manners, not a lock"
+      ],
+      "canon": "Magic's req 2825 (docs/magic/rooms.md, The class doors and the first visits, 1897; Story's settled 233, row 2822; docs/handoff/magic.md 1.2, PS 8 L2722, read in the canon tool: doors that would not open unless asked politely; the words 'We haven't been introduced' are ours); PROVISIONAL: the door's place and tap id until the Architect names each class's door"
+    },
+    {
+      "id": "class-doors.astronomy-first-visit",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "weight": 1,
+      "moment": "tap astronomy door",
+      "when": [
+        "era = 1890s",
+        "place = astronomy spiral",
+        "cd_astronomy != met",
+        "clem_walk = astronomy"
+      ],
+      "show": [
+        "Clementine knocks once and says, 'Good morning. These two, if you please.' The door says 'Ahem.', then the hinges give wide and the room's own teacher greets them in character"
+      ],
+      "starts": [
+        "set cd_astronomy = met",
+        "set clem_walk = none"
+      ],
+      "canon": "Magic's req 2825 (docs/magic/rooms.md, The class doors and the first visits, 1897; Story's settled 233, row 2822; docs/handoff/magic.md 1.2, PS 8 L2722, read in the canon tool: doors that would not open unless asked politely; the words 'We haven't been introduced' are ours); PROVISIONAL: the door's place and tap id until the Architect names each class's door"
+    },
+    {
+      "id": "class-doors.astronomy-met",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "weight": 1,
+      "moment": "tap astronomy door",
+      "when": [
+        "era = 1890s",
+        "place = astronomy spiral",
+        "cd_astronomy = met"
+      ],
+      "show": [
+        "the latch lifts a beat before his hand arrives, as a door does for one it knows, and the door opens at the first tap; no 'Ahem.'"
+      ],
+      "canon": "Magic's req 2825 (docs/magic/rooms.md, The class doors and the first visits, 1897; Story's settled 233, row 2822; docs/handoff/magic.md 1.2, PS 8 L2722, read in the canon tool: doors that would not open unless asked politely; the words 'We haven't been introduced' are ours); PROVISIONAL: the door's place and tap id until the Architect names each class's door"
+    },
+    {
+      "id": "class-doors.flying-shut",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "weight": 1,
+      "moment": "tap kit room door",
+      "when": [
+        "era = 1890s",
+        "place = quidditch kit room",
+        "cd_flying != met",
+        "clem_walk != flying"
+      ],
+      "show": [
+        "the Quidditch kit room's door: a polite door's own 'Ahem.', then, a breath later, 'We haven't been introduced.'; the latch gives a small shrug and the door stays shut; no count kept, nothing marked, no lock word"
+      ],
+      "canon": "Magic's req 2825 (docs/magic/rooms.md, The class doors and the first visits, 1897; Story's settled 233, row 2822; docs/handoff/magic.md 1.2, PS 8 L2722, read in the canon tool: doors that would not open unless asked politely; the words 'We haven't been introduced' are ours); PROVISIONAL: the door's place and tap id until the Architect names each class's door"
+    },
+    {
+      "id": "class-doors.flying-alohomora",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "weight": 1,
+      "moment": "tried kit room door",
+      "when": [
+        "era = 1890s",
+        "place = quidditch kit room",
+        "cd_flying != met"
+      ],
+      "show": [
+        "the door huffs, 'Well! Not so much as a please.'; the charm is not the way in, and the door stays a door with manners, not a lock"
+      ],
+      "canon": "Magic's req 2825 (docs/magic/rooms.md, The class doors and the first visits, 1897; Story's settled 233, row 2822; docs/handoff/magic.md 1.2, PS 8 L2722, read in the canon tool: doors that would not open unless asked politely; the words 'We haven't been introduced' are ours); PROVISIONAL: the door's place and tap id until the Architect names each class's door"
+    },
+    {
+      "id": "class-doors.flying-first-visit",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "weight": 1,
+      "moment": "tap kit room door",
+      "when": [
+        "era = 1890s",
+        "place = quidditch kit room",
+        "cd_flying != met",
+        "clem_walk = flying"
+      ],
+      "show": [
+        "Clementine knocks once and says, 'Good morning. These two, if you please.' The door says 'Ahem.', then the hinges give wide and the room's own teacher greets them in character"
+      ],
+      "starts": [
+        "set cd_flying = met",
+        "set clem_walk = none"
+      ],
+      "canon": "Magic's req 2825 (docs/magic/rooms.md, The class doors and the first visits, 1897; Story's settled 233, row 2822; docs/handoff/magic.md 1.2, PS 8 L2722, read in the canon tool: doors that would not open unless asked politely; the words 'We haven't been introduced' are ours); PROVISIONAL: the door's place and tap id until the Architect names each class's door"
+    },
+    {
+      "id": "class-doors.flying-met",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "weight": 1,
+      "moment": "tap kit room door",
+      "when": [
+        "era = 1890s",
+        "place = quidditch kit room",
+        "cd_flying = met"
+      ],
+      "show": [
+        "the latch lifts a beat before his hand arrives, as a door does for one it knows, and the door opens at the first tap; no 'Ahem.'"
+      ],
+      "canon": "Magic's req 2825 (docs/magic/rooms.md, The class doors and the first visits, 1897; Story's settled 233, row 2822; docs/handoff/magic.md 1.2, PS 8 L2722, read in the canon tool: doors that would not open unless asked politely; the words 'We haven't been introduced' are ours); PROVISIONAL: the door's place and tap id until the Architect names each class's door"
+    },
+    {
+      "id": "class-doors.charms-offer",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "weight": 1,
+      "moment": "arrive",
+      "when": [
+        "era = 1890s",
+        "weekday = monday",
+        "cd_charms != met",
+        "clem_walk != charms"
+      ],
+      "show": [
+        "Clementine asks whether she may take them to Charms today; a yes brings her gift and her walk to the door, a no costs nothing, is never marked, and the offer comes round again on its weekday"
+      ],
+      "starts": [
+        "set clem_walk = charms"
+      ],
+      "canon": "Magic's req 2825 (docs/magic/rooms.md, The class doors and the first visits, 1897; Story's settled 233, row 2822; docs/handoff/magic.md 1.2, PS 8 L2722, read in the canon tool: doors that would not open unless asked politely; the words 'We haven't been introduced' are ours); PROVISIONAL: the door's place and tap id until the Architect names each class's door; settled 170's week one (docs/story/settled.md, the weekday table) and 233; the yes or no is Magic's gate (row 2822): here a yes is taken as read, PROVISIONAL"
+    },
+    {
+      "id": "class-doors.herbology-offer",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "weight": 1,
+      "moment": "arrive",
+      "when": [
+        "era = 1890s",
+        "weekday = monday",
+        "cd_herbology != met",
+        "clem_walk != herbology",
+        "cd_charms = met"
+      ],
+      "show": [
+        "Clementine asks whether she may take them to Herbology today; a yes brings her gift and her walk to the door, a no costs nothing, is never marked, and the offer comes round again on its weekday"
+      ],
+      "starts": [
+        "set clem_walk = herbology"
+      ],
+      "canon": "Magic's req 2825 (docs/magic/rooms.md, The class doors and the first visits, 1897; Story's settled 233, row 2822; docs/handoff/magic.md 1.2, PS 8 L2722, read in the canon tool: doors that would not open unless asked politely; the words 'We haven't been introduced' are ours); PROVISIONAL: the door's place and tap id until the Architect names each class's door; settled 170's week one (docs/story/settled.md, the weekday table) and 233; the yes or no is Magic's gate (row 2822): here a yes is taken as read, PROVISIONAL"
+    },
+    {
+      "id": "class-doors.potions-offer",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "weight": 1,
+      "moment": "arrive",
+      "when": [
+        "era = 1890s",
+        "weekday = tuesday",
+        "cd_potions != met",
+        "clem_walk != potions"
+      ],
+      "show": [
+        "Clementine asks whether she may take them to Potions today; a yes brings her gift and her walk to the door, a no costs nothing, is never marked, and the offer comes round again on its weekday"
+      ],
+      "starts": [
+        "set clem_walk = potions"
+      ],
+      "canon": "Magic's req 2825 (docs/magic/rooms.md, The class doors and the first visits, 1897; Story's settled 233, row 2822; docs/handoff/magic.md 1.2, PS 8 L2722, read in the canon tool: doors that would not open unless asked politely; the words 'We haven't been introduced' are ours); PROVISIONAL: the door's place and tap id until the Architect names each class's door; settled 170's week one (docs/story/settled.md, the weekday table) and 233; the yes or no is Magic's gate (row 2822): here a yes is taken as read, PROVISIONAL"
+    },
+    {
+      "id": "class-doors.transfiguration-offer",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "weight": 1,
+      "moment": "arrive",
+      "when": [
+        "era = 1890s",
+        "weekday = wednesday",
+        "cd_transfiguration != met",
+        "clem_walk != transfiguration"
+      ],
+      "show": [
+        "Clementine asks whether she may take them to Transfiguration today; a yes brings her gift and her walk to the door, a no costs nothing, is never marked, and the offer comes round again on its weekday"
+      ],
+      "starts": [
+        "set clem_walk = transfiguration"
+      ],
+      "canon": "Magic's req 2825 (docs/magic/rooms.md, The class doors and the first visits, 1897; Story's settled 233, row 2822; docs/handoff/magic.md 1.2, PS 8 L2722, read in the canon tool: doors that would not open unless asked politely; the words 'We haven't been introduced' are ours); PROVISIONAL: the door's place and tap id until the Architect names each class's door; settled 170's week one (docs/story/settled.md, the weekday table) and 233; the yes or no is Magic's gate (row 2822): here a yes is taken as read, PROVISIONAL"
+    },
+    {
+      "id": "class-doors.history-offer",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "weight": 1,
+      "moment": "arrive",
+      "when": [
+        "era = 1890s",
+        "weekday = wednesday",
+        "cd_history != met",
+        "clem_walk != history",
+        "cd_transfiguration = met",
+        "time = day"
+      ],
+      "show": [
+        "Clementine asks whether she may take them to History of Magic today; a yes brings her gift and her walk to the door, a no costs nothing, is never marked, and the offer comes round again on its weekday"
+      ],
+      "starts": [
+        "set clem_walk = history"
+      ],
+      "canon": "Magic's req 2825 (docs/magic/rooms.md, The class doors and the first visits, 1897; Story's settled 233, row 2822; docs/handoff/magic.md 1.2, PS 8 L2722, read in the canon tool: doors that would not open unless asked politely; the words 'We haven't been introduced' are ours); PROVISIONAL: the door's place and tap id until the Architect names each class's door; settled 170's week one (docs/story/settled.md, the weekday table) and 233; the yes or no is Magic's gate (row 2822): here a yes is taken as read, PROVISIONAL"
+    },
+    {
+      "id": "class-doors.astronomy-offer",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "weight": 1,
+      "moment": "arrive",
+      "when": [
+        "era = 1890s",
+        "weekday = wednesday",
+        "cd_astronomy != met",
+        "clem_walk != astronomy",
+        "cd_transfiguration = met",
+        "time = night"
+      ],
+      "show": [
+        "Clementine asks whether she may take them to Astronomy at the Tower's foot today; a yes brings her gift and her walk to the door, a no costs nothing, is never marked, and the offer comes round again on its weekday"
+      ],
+      "starts": [
+        "set clem_walk = astronomy"
+      ],
+      "canon": "Magic's req 2825 (docs/magic/rooms.md, The class doors and the first visits, 1897; Story's settled 233, row 2822; docs/handoff/magic.md 1.2, PS 8 L2722, read in the canon tool: doors that would not open unless asked politely; the words 'We haven't been introduced' are ours); PROVISIONAL: the door's place and tap id until the Architect names each class's door; settled 170's week one (docs/story/settled.md, the weekday table) and 233; the yes or no is Magic's gate (row 2822): here a yes is taken as read, PROVISIONAL"
+    },
+    {
+      "id": "class-doors.flying-offer",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "weight": 1,
+      "moment": "arrive",
+      "when": [
+        "era = 1890s",
+        "weekday = thursday",
+        "cd_flying != met",
+        "clem_walk != flying"
+      ],
+      "show": [
+        "Clementine asks whether she may take them to Flying today; a yes brings her gift and her walk to the door, a no costs nothing, is never marked, and the offer comes round again on its weekday"
+      ],
+      "starts": [
+        "set clem_walk = flying"
+      ],
+      "canon": "Magic's req 2825 (docs/magic/rooms.md, The class doors and the first visits, 1897; Story's settled 233, row 2822; docs/handoff/magic.md 1.2, PS 8 L2722, read in the canon tool: doors that would not open unless asked politely; the words 'We haven't been introduced' are ours); PROVISIONAL: the door's place and tap id until the Architect names each class's door; settled 170's week one (docs/story/settled.md, the weekday table) and 233; the yes or no is Magic's gate (row 2822): here a yes is taken as read, PROVISIONAL"
+    },
+    {
+      "id": "class-doors.defence-offer",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "weight": 1,
+      "moment": "arrive",
+      "when": [
+        "era = 1890s",
+        "weekday = friday",
+        "cd_defence != met",
+        "clem_walk != defence"
+      ],
+      "show": [
+        "Clementine asks whether she may take them to Defence today; a yes brings her gift and her walk to the door, a no costs nothing, is never marked, and the offer comes round again on its weekday"
+      ],
+      "starts": [
+        "set clem_walk = defence"
+      ],
+      "canon": "Magic's req 2825 (docs/magic/rooms.md, The class doors and the first visits, 1897; Story's settled 233, row 2822; docs/handoff/magic.md 1.2, PS 8 L2722, read in the canon tool: doors that would not open unless asked politely; the words 'We haven't been introduced' are ours); PROVISIONAL: the door's place and tap id until the Architect names each class's door; settled 170's week one (docs/story/settled.md, the weekday table) and 233; the yes or no is Magic's gate (row 2822): here a yes is taken as read, PROVISIONAL"
+    }
+  ]
+}
