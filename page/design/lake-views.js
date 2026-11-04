@@ -9,7 +9,7 @@
    tone key with its fallback here, provisional (req 906's far tones: these keys are new and wait on Godric's look).
 
    CastleLakeViews.ranges(THREE, V, o)  the Highland ranges as a group, three bands round the castle past the lake's far
-       shore (about 680 m south): the braes rising off the far shore (crest about 1.25 km out, 100 to 280 m high), a
+       shore (about 680 m south): the near range, the kept range's own skyline (req 2817: crest 0.5 to 3 km out, 50 to 560 m, wild west and north-west, low east), a
        middle range (3.4 km, 300 to 700 m) and the far summits (9 km, 600 to 1150 m, Munro height), each paler than the
        one before (the air between), a glen to the south-west where the near two fall away and the far ones show
        through. o: { lawn (default -1.2), centre [x, y] (default the castle's, [60, 36]), tone(key) a THREE.Color or
@@ -61,8 +61,19 @@
     o = o || {};
     var G = new THREE.Group(), lawn = o.lawn != null ? o.lawn : -1.2, c = o.centre || [60, 36], N = 180;
     var GLEN = 215 * Math.PI / 180;                     /* the compass bearing of the glen the loch runs out by */
+    /* the near range: the kept range's own skyline (req 2817; Grounds' tools/grounds-range-2807.py, Godric's 1 on req 2814, the
+       Architect's tools/architect-range-skyline-2816.py): for every 15 degrees of compass bearing from the lawn, the range and
+       height above it of the ground's greatest elevation angle, metres. Wild massif west and north-west, low east with
+       its plains (105 to 120 degrees), the glen's gap at 225. Between samples the crest eases (cosine). */
+    var SKY = [[480, 220], [460, 220], [840, 340], [940, 320], [1060, 280], [1200, 350], [1180, 220], [1540, 180], [1600, 210],
+      [1780, 280], [1900, 440], [2160, 530], [1940, 490], [2120, 420], [1920, 220], [1720, 50], [2940, 380], [1360, 310],
+      [1600, 440], [2000, 560], [1540, 480], [720, 290], [740, 340], [460, 210]];
+    function sky(t, w) {
+      var u = ((t * 180 / Math.PI) % 360 + 360) % 360 / 15, i = Math.floor(u), f = (1 - Math.cos((u - i) * Math.PI)) / 2;
+      var a = SKY[i % 24][w], b = SKY[(i + 1) % 24][w]; return a + (b - a) * f;
+    }
     var bands = [
-      { k: 'far-braes', foot: 950, crest: 1250, back: 1550, h: function (t) { return 170 + 70 * Math.sin(3 * t + 0.4) + 40 * Math.sin(8 * t + 1.3) + 20 * Math.sin(17 * t); }, glen: 0.8 },
+      { k: 'far-braes', rad: function (t) { return sky(t, 0); }, h: function (t) { return sky(t, 1); }, glen: 0 },
       { k: 'far-hills', foot: 2600, crest: 3400, back: 4100, h: function (t) { return 480 + 160 * Math.sin(2 * t + 2) + 90 * Math.sin(5 * t + 0.7) + 40 * Math.sin(11 * t + 1); }, glen: 0.6 },
       { k: 'far-summits', foot: 7000, crest: 9000, back: 10200, h: function (t) { return 850 + 220 * Math.sin(2 * t + 4.1) + 120 * Math.sin(6 * t + 2.2) + 60 * Math.sin(13 * t + 0.5); }, glen: 0 }
     ];
@@ -73,8 +84,10 @@
         var t0 = i / N * Math.PI * 2, t1 = (i + 1) / N * Math.PI * 2;
         var dip = function (t) { var d = Math.atan2(Math.sin(t - GLEN), Math.cos(t - GLEN)); return 1 - b.glen * Math.exp(-Math.pow(d / 0.16, 2)); };
         var h0 = lawn + b.h(t0) * dip(t0), h1 = lawn + b.h(t1) * dip(t1);
-        var f0 = at(t0, b.foot, lawn - 2), f1 = at(t1, b.foot, lawn - 2), c0 = at(t0, b.crest, h0), c1 = at(t1, b.crest, h1);
-        var k0 = at(t0, b.back, lawn + 0.3 * (h0 - lawn)), k1 = at(t1, b.back, lawn + 0.3 * (h1 - lawn));
+        var r0 = b.rad ? b.rad(t0) : 0, r1 = b.rad ? b.rad(t1) : 0;
+        var F0 = b.rad ? 0.6 * r0 : b.foot, F1 = b.rad ? 0.6 * r1 : b.foot, C0 = b.rad ? r0 : b.crest, C1 = b.rad ? r1 : b.crest, K0 = b.rad ? 1.4 * r0 : b.back, K1 = b.rad ? 1.4 * r1 : b.back;
+        var f0 = at(t0, F0, lawn - 2), f1 = at(t1, F1, lawn - 2), c0 = at(t0, C0, h0), c1 = at(t1, C1, h1);
+        var k0 = at(t0, K0, lawn + 0.3 * (h0 - lawn)), k1 = at(t1, K1, lawn + 0.3 * (h1 - lawn));
         pts.push(f0, f1, c1, f0, c1, c0, c0, c1, k1, c0, k1, k0);
       }
       var m = new THREE.Mesh(tri(THREE, pts), lam(THREE, col(THREE, o, b.k)));
