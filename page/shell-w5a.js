@@ -5471,7 +5471,7 @@ window.SHELL_W5A = {
   /* G-ADDS washrooms-5-west */
   /* NOW (floors-3-to-7-by-purpose-1031.md): washbasin-1, plank-bench-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-5.js for collision only */
   add('washrooms-5-west', [
-    ['b', 0.02, 15.85, 0, 0.42, 16.35, 0.85, 'white'], ['b', 0.0, 12.27, 0.42, 1.3, 12.65, 0.47, 'pine'], ['b', 0.07, 12.3, 0, 0.13, 12.6, 0.42, 'pine'], ['b', 1.17, 12.3, 0, 1.23, 12.6, 0.42, 'pine']]);
+    ['b', 0.02, 15.85, 0, 0.42, 16.35, 0.85, 'white'], ['b', 0.0, 17.35, 0.42, 1.3, 17.73, 0.47, 'pine'], ['b', 0.07, 17.4, 0, 0.13, 17.7, 0.42, 'pine'], ['b', 1.17, 17.4, 0, 1.23, 17.7, 0.42, 'pine']]);
   /* G-ADDS end washrooms-5-west */
   /* G-ADDS spare-desks-store-5-middle */
   /* NOW (floors-3-to-7-by-purpose-1031.md): school-trunk-1, folded-linen-1, short-ladder-1; NOT PLACED for want of a clear spot: luggage-tag-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-5.js for collision only */

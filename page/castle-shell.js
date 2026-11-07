@@ -3180,7 +3180,11 @@ window.CastleShell = { build: function (F, M, placeId, o) {
            of the band across it */
         var sc = (h.s0 + h.s1) / 2, oc = (sg.off[0] + sg.off[1]) / 2, C = toLocal(sg.a[0] + ux * sc + sg.n[0] * oc, sg.a[1] + uy * sc + sg.n[1] * oc, lo);
         var along = new THREE.Vector3(ux, 0, -uy);
-        var near = function (c) { var r = c.position.clone().sub(C); return Math.abs(r.dot(along)) <= (h.s1 - h.s0) / 2 + 0.1 && Math.abs(r.dot(nL)) <= bh + 1.0; };
+        /* and only a piece that runs with this strip: a door's sweep cuts every strip it crosses at its height, a third room's
+           0.8 default band included (first-floor-corridor's past pomfrey-bedroom-door, the drum's slanted strips past the
+           bindery door), and that strip's hole once took the leaf across its own normal, 4 to 19 cm into the third room */
+        var sa = Math.atan2(uy, ux);
+        var near = function (c) { var r = c.position.clone().sub(C); return Math.abs(Math.sin(c.rotation.y - sa)) < 0.05 && Math.abs(r.dot(along)) <= (h.s1 - h.s0) / 2 + 0.1 && Math.abs(r.dot(nL)) <= bh + 1.0; };
         var ends = function (c, tag) { var nm = c.name || ''; return nm.slice(-(tag + h.op).length) === tag + h.op && near(c); };
         var lf = null, stops = [], ths = [];
         group.children.forEach(function (c) {
