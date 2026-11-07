@@ -379,6 +379,9 @@ window.CastleShell = { build: function (F, M, placeId, o) {
      along it and a hall's older band below; page/design/tones.js (Design's, req 643) the colours, the model's
      materials.stones the fallback. Provisional until Design's tones are settled; nothing drawn, nothing generated. */
   var PAINT = window.CASTLE_PAINT || null, TONES = window.CASTLE_TONES || null, painted = o.paint || [], TRIM = !!o.trim && !!window.CastleTrim;
+  /* req 3166 slice 1 (the wall rebuild, docs/architect/wall-rebuild-1107.md section 8): ?walls=v2 builds each shared
+     wall once from the wall graph (castle-walls-v2.js) with true holes; v1 stays the default until the pass marks hold */
+  var WALLS2 = o.walls === 'v2' && !!window.CastleWalls && !!window.CastleStrip;
   var DPRE = (function () {   /* req 1996: door-surround options for Godric's eye, the page's ?dpre=A|B|C|D; the plain build has none */
     var m = /[?&]dpre=([A-D])/.exec(window.location.search || ''); if (!m) return null;
     var rev = { n: 3, bw: 0.12, proj: 0.025, chamfer: true, stop: false, bead: false, hood: 0 };
@@ -546,7 +549,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
   var floorQs = [];
   /* v103 (the sweep, Godric's 7.32 am): halfGap reads every place the model stands on this floor, built or not (gapQs):
      the east courtyard is built later, through a way, and the staff rooms' south walls stood their whole 0.8 m in it */
-  var gapQs = [], wallRuns = [];   /* v104: every wall run built, for the shared lines */
+  var gapQs = [], wallRuns = [], W2 = {};   /* v104: every wall run built, for the shared lines */
   /* v113: the places beside Q, for a corner's run on: the floor's when it is built whole, else those its openings join */
   var besideMemo = {};
   function besideQs(Q) {
@@ -1454,6 +1457,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
       return Q !== P && Math.hypot(ed.b[0] - ed.a[0], ed.b[1] - ed.a[1]) >= 1e-6 && out.places.some(function (R) { var e = R !== Q && onEdge(R.poly, midE);
         return e && e.d < 0.05 && R.floor < (Q.ceiling == null ? Infinity : Q.ceiling) - 0.05 && (R.ceiling == null ? Infinity : R.ceiling) > Q.floor + 0.05; });
     }
+    if (WALLS2) W2[Q.id] = { Q: Q, E: E, gaps: gaps, row: row, H: H };   /* req 3166: the strips read these once every place is built */
     E.forEach(function (ed, i) {
       var a = ed.a, b = ed.b, dx = b[0] - a[0], dy = b[1] - a[1], L = Math.hypot(dx, dy), HE = ed.H != null ? ed.H : H;
       /* v11 (model v37, ledger 82 f): a side of the leads with its own parapet (the old keep's line on the north, plain) */
@@ -1582,6 +1586,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
       if (YL.length) (out.sharedLines = out.sharedLines || []).push(Q.id + ' wall ' + i + ' leaves ' + YL.length + ' stretch(es)');
       wallRuns.push(run);
       function piece(s0, s1, ya, yb, name) {
+        if (WALLS2 && /-(wall|head|sill)-/.test(name)) return;   /* req 3166: the strip pass draws the wall body */
         if (s1 - s0 < 0.02 || yb - ya < 0.02) return;
         for (var yk = 0; yk < YL.length; yk++) {
           var Y = YL[yk];
@@ -1867,7 +1872,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
             var spd = F.register(new THREE.Mesh(new THREE.ExtrudeGeometry(sp, { depth: dd, bevelEnabled: false, curveSegments: 16 }), spm), LAYER.wall);
             if (spSide) spd.material = [spm, spSide];
             spd.position.set(mid.x + Math.sin(ang) * fin, mid.y + g.h - up, mid.z + Math.cos(ang) * fin);   /* v154 (req 2011): under TRIM the fill stands 0.8 mm inside each face, not 5, so the cut's reveal at the springing is no hairline */ spd.rotation.y = ang;
-            spd.name = Q.id + '-round-head-' + g.op.id; spd.userData.owner = Q.id; group.add(spd);
+            spd.name = Q.id + '-round-head-' + g.op.id; spd.userData.owner = Q.id; if (!WALLS2) group.add(spd);
           }
         }
         var to = other(g.op, Q.id), via = isWay(g.op.kind) ? viaStair(M, to, Q.id) : null;
@@ -2984,6 +2989,133 @@ window.CastleShell = { build: function (F, M, placeId, o) {
      Each flight's treads become one mesh carrying userData.stair, so flightOf() in shell.html finds it as it found a
      tread; Design's ceilings and panelling (each place's -ceilings and -panelling groups) one mesh a material, their
      corbels and every carved face kept whole (the faces' atlas is swapped by state, the corbels are taps) */
+  if (WALLS2) wallsV2();
+  /* req 3166 slice 1 (docs/architect/wall-rebuild-1107.md sections 3 to 5): under ?walls=v2 every wall line of the
+     built places is drawn once, from the wall graph, as one strip with its holes cut true (castle-strip.js). The
+     places: the floor's (gapQs) or, for one room, the same filter over the model, so both modes see one graph. A
+     segment is drawn where a built place stands on either side; its height the taller room's; its holes every
+     opening either room records on that line (hidden doors, niches and recesses stay solid: their v1 skins and
+     linings are slice 2). Out: out.walls2 { segments, drawn, merged, plan } for the checker. */
+  function wallsV2() {
+    var ids = Object.keys(W2); if (!ids.length) return;
+    var pool = gapQs.length > 1 ? gapQs.slice() : (function () {
+      var seen = {}, L = [];
+      (M.rooms || []).map(function (r) { return r.id; }).concat((M.stairs || []).map(function (x) { return slug(x.id); })).forEach(function (id) {
+        if (!id || seen[id]) return; seen[id] = 1;
+        var Q = findPlace(M, id);
+        if (Q && !Q.glasshouse && (Q.poly || Q.area) && Q.floor < P.floor + 2.5 && (Q.ceiling != null ? Q.ceiling : Q.floor + 3) > P.floor + 0.5) L.push(Q);
+      });
+      return L;
+    })();
+    ids.forEach(function (id) { if (!pool.some(function (q) { return q.id === id; })) pool.push(W2[id].Q); });
+    var places = pool.map(function (Q) {
+      var loops = Q.loops || (Q.poly ? [Q.poly] : null);
+      return loops && { id: Q.id, loops: loops, T: Q.wall || 0.8, z0: Q.floor, z1: Q.ceiling != null ? Q.ceiling : Q.floor + 3 };
+    }).filter(Boolean);
+    /* a flush line stays open where a way between the two spans it (a corridor cut into named stretches) */
+    var openWhole = function (ra, rb, s0, s1) {
+      return (M.openings || []).some(function (op) { return matches(M, op, ra) && matches(M, op, rb) && isWay(op.kind || '') && (op.w || 0) >= s1 - s0 - 0.15; });
+    };
+    var G = CastleWalls.graph(places, { stand: P.id, openWhole: openWhole }), byId = {};
+    places.forEach(function (q) { byId[q.id] = q; });
+    var eIdx = function (id, e) { var q = byId[id], k = 0; for (var j = 0; j < e[0]; j++) k += q.loops[j].length; return k + e[1]; };
+    var faceOf = function (id, e) { var pts = byId[id].loops[e[0]], a = pts[e[1]], b = pts[(e[1] + 1) % pts.length]; return { a: a, b: b, L: Math.hypot(b[0] - a[0], b[1] - a[1]), n: pts.length }; };
+    var extAt = {};   /* an exterior segment starting a face, by room and face, for the corner blocks */
+    var extEnd = {};
+    G.segments.forEach(function (sg) { if (sg.kind === 'exterior' && sg.edge[sg.owner][2] < 0.01) extAt[sg.owner + ':' + sg.edge[sg.owner][0] + ':' + sg.edge[sg.owner][1]] = sg; });
+    G.segments.forEach(function (sg) { var e = sg.edge[sg.owner]; if (sg.kind === 'exterior' && e[3] >= faceOf(sg.owner, e).L - 0.01) extEnd[sg.owner + ':' + e[0] + ':' + e[1]] = sg; });
+    /* every opening as a sweep: its span on its room's face, carried outward across the gap until it enters the far
+       room, so the hole comes out on the far side whatever the far wall's angle (a round room's 24 sides beside a
+       straight corridor are two exterior strips, neither parallel; plan section 5) */
+    var inPoly = function (pts, x, y) { var c = false; for (var k = 0, j = pts.length - 1; k < pts.length; j = k++) { var A = pts[k], B = pts[j]; if ((A[1] > y) !== (B[1] > y) && x < (B[0] - A[0]) * (y - A[1]) / (B[1] - A[1]) + A[0]) c = !c; } return c; };
+    var OPS = [];
+    ids.forEach(function (r) {
+      var w = W2[r];
+      w.E.forEach(function (ed, i) {
+        var L = Math.hypot(ed.b[0] - ed.a[0], ed.b[1] - ed.a[1]); if (L < 1e-6) return;
+        var fu = [(ed.b[0] - ed.a[0]) / L, (ed.b[1] - ed.a[1]) / L], fn = [fu[1], -fu[0]];
+        (w.gaps[i] || []).forEach(function (g) {
+          if (g.hidden || g.niche || g.recess) return;
+          var far = g.op.between ? other(g.op, r) : null, fq = far && byId[far], pa = [ed.a[0] + fu[0] * g.s0, ed.a[1] + fu[1] * g.s0], pb = [ed.a[0] + fu[0] * g.s1, ed.a[1] + fu[1] * g.s1];
+          var mx = (pa[0] + pb[0]) / 2, my = (pa[1] + pb[1]) / 2, D = Math.max(1.25, (g.op.depth || 0) + 0.05);
+          if (fq) for (var d = 0.05; d <= 4; d += 0.05) if (inPoly(fq.loops[0], mx + fn[0] * d, my + fn[1] * d)) { D = d + 0.02; break; }
+          var hk = String(g.op.head || '').split(',')[0].trim(), win_ = /window|lancet/.test(g.op.kind || '') && !/loop|slit|round window|window, round/.test(g.op.kind || '');
+          var headed = (hk === 'round' && g.op.head === 'round' || hk === 'pointed' || hk === 'tudor') && !g.back && !g.soffit && (isDoor(g.op.kind) || isWay(g.op.kind) || win_);
+          var rr = (g.s1 - g.s0) / 2, up = !headed ? 0 : hk === 'pointed' ? Math.sqrt(3) * rr : hk === 'tudor' ? (window.CastleTrim && CastleTrim.rise ? CastleTrim.rise('tudor', rr, 0) : rr * 0.6) : rr;
+          OPS.push({ rooms: far ? [r, far] : [r], q: [[pa[0] - fn[0] * 0.02, pa[1] - fn[1] * 0.02], [pb[0] - fn[0] * 0.02, pb[1] - fn[1] * 0.02], [pb[0] + fn[0] * D, pb[1] + fn[1] * D], [pa[0] + fn[0] * D, pa[1] + fn[1] * D]],
+            z0: w.Q.floor + g.sill, z1: w.Q.floor + g.h, head: headed ? hk : null, up: up, id: g.op.id });
+        });
+      });
+    });
+    /* the sweep's footprint in a segment's (s, o) frame, clipped to the solid's band; null where it misses */
+    var cross = function (O, sg, ux, uy, len) {
+      var P2 = O.q.map(function (p) { var dx = p[0] - sg.a[0], dy = p[1] - sg.a[1]; return [dx * ux + dy * uy, dx * sg.n[0] + dy * sg.n[1]]; });
+      [[sg.off[0] - 0.001, 1], [sg.off[1] + 0.001, -1]].forEach(function (cl) {
+        var o = [], k = cl[0], sgn = cl[1], ins = function (p) { return sgn * (p[1] - k) >= 0; };
+        P2.forEach(function (c, j) {
+          var d = P2[(j + 1) % P2.length];
+          if (ins(c)) o.push(c);
+          if (ins(c) !== ins(d)) { var tt = (k - c[1]) / (d[1] - c[1]); o.push([c[0] + (d[0] - c[0]) * tt, k]); }
+        });
+        P2 = o;
+      });
+      if (P2.length < 3) return null;
+      var s0 = Math.min.apply(null, P2.map(function (p) { return p[0]; })), s1 = Math.max.apply(null, P2.map(function (p) { return p[0]; }));
+      return s1 > 0.01 && s0 < len - 0.01 && s1 - s0 > 0.02 ? [s0, s1] : null;
+    };
+    var res = out.walls2 = { segments: G.segments.length, drawn: 0, merged: 0, plan: G.plan, rows: [] }, nk = {};
+    res.ops = OPS.map(function (O) { return O.id + '@' + O.rooms.join('/'); });
+    G.segments.forEach(function (sg) {
+      if (sg.kind === 'open') return;
+      var built = sg.rooms.filter(function (r) { return W2[r]; });
+      if (!built.length) return;
+      var ux = sg.b[0] - sg.a[0], uy = sg.b[1] - sg.a[1], len = Math.hypot(ux, uy); if (len < 0.02) return;
+      ux /= len; uy /= len;
+      var lo = Infinity, top = -Infinity, holes = [];
+      built.forEach(function (r) {
+        var w = W2[r], e = sg.edge[r], i = eIdx(r, e), ed = w.E[i], HE = ed && ed.H != null ? ed.H : w.H;
+        lo = Math.min(lo, w.Q.floor); top = Math.max(top, w.Q.floor + HE);
+      });
+      OPS.forEach(function (O) {
+        if (!O.rooms.some(function (r) { return sg.rooms.indexOf(r) >= 0; })) return;
+        var c = cross(O, sg, ux, uy, len); if (!c) return;
+        holes.push({ s0: c[0], s1: c[1], z0: O.z0, z1: O.z1, head: O.head, up: O.up, op: O.id });
+      });
+      /* the corner block: an exterior face ending at a convex corner whose next face starts exterior too runs on by
+         the next one's thickness (drawn once, by the face before it, as v1's v42) */
+      /* the corner: at a square-ish convex corner (turn over 45 degrees) the face before draws the block, running on by
+         the next face's thickness, as v1's v42; at a shallow one (a round room's 24 sides, 15 degrees) both run on by
+         t tan(turn / 2), a mitre, since a full block would reach across the next side's door */
+      var e0 = 0, e1 = 0, oe = sg.edge[sg.owner], of = faceOf(sg.owner, oe);
+      var turn = function (f, g) { var c = (f.b[0] - f.a[0]) * (g.b[1] - g.a[1]) - (f.b[1] - f.a[1]) * (g.b[0] - g.a[0]), d = (f.b[0] - f.a[0]) * (g.b[0] - g.a[0]) + (f.b[1] - f.a[1]) * (g.b[1] - g.a[1]); return Math.atan2(c, d); };
+      if (sg.kind === 'exterior' && oe[3] >= of.L - 0.01) {
+        var nj = (oe[1] + 1) % of.n, nx_ = extAt[sg.owner + ':' + oe[0] + ':' + nj];
+        if (nx_) { var th = turn(of, faceOf(sg.owner, [oe[0], nj])); if (th > 1e-4) e1 = th > Math.PI / 4 + 1e-3 ? nx_.t : sg.t * Math.tan(th / 2); }
+      }
+      if (sg.kind === 'exterior' && oe[2] <= 0.01) {
+        var pj = (oe[1] + of.n - 1) % of.n, pv = extEnd[sg.owner + ':' + oe[0] + ':' + pj];
+        if (pv) { var th0 = turn(faceOf(sg.owner, [oe[0], pj]), of); if (th0 > 1e-4 && th0 <= Math.PI / 4 + 1e-3) e0 = sg.t * Math.tan(th0 / 2); }
+      }
+      var spec = { len: len, hi: top - lo, depth: sg.off[1] - sg.off[0], e0: e0, e1: e1,
+        holes: holes.map(function (h) { return { s0: h.s0, s1: h.s1, z0: h.z0 - lo, z1: h.z1 - lo, head: h.head, up: h.up }; }) };
+      var S = CastleStrip.build(THREE, spec);
+      res.merged += S.merged;
+      if (S.merged) res.rows.push({ owner: sg.owner, rooms: sg.rooms, merged: S.merged, ops: holes.map(function (h) { return h.op; }) });
+      var oQ = W2[sg.owner] || W2[built[0]], sm = len / 2;
+      var mat = oQ.row ? wallMat(oQ.row, sg.a[0] + ux * sm, sg.a[1] + uy * sm, (top - lo) / 2) : mats.wall;
+      var o0 = toLocal(sg.a[0] + sg.n[0] * sg.off[0], sg.a[1] + sg.n[1] * sg.off[0], lo);
+      var MX = new THREE.Matrix4().makeBasis(new THREE.Vector3(ux, 0, -uy), new THREE.Vector3(0, 1, 0), new THREE.Vector3(sg.n[0], 0, -sg.n[1])).setPosition(o0);
+      var i0 = eIdx(sg.owner, oe);
+      S.geos.forEach(function (geo) {
+        geo.applyMatrix4(MX);
+        var key = sg.owner + ':' + i0, k = nk[key] = (nk[key] || 0) + 1;
+        var m = F.register(new THREE.Mesh(geo, mat), LAYER.wall);
+        m.name = sg.owner + '-wall-' + i0 + '-' + (k - 1);
+        m.userData.owner = sg.owner; m.userData.rooms = sg.rooms.slice(); m.userData.wall2 = sg.kind; m.userData.holes = spec.holes.map(function (h, k) { return [holes[k].op, +h.s0.toFixed(2), +h.s1.toFixed(2), +h.z0.toFixed(2), +h.z1.toFixed(2)]; }); m.userData.len = +len.toFixed(2);
+        group.add(m); res.drawn++;
+      });
+    });
+  }
   var NOHOOK = THREE.Object3D.prototype.onBeforeRender;
   function mergeDrawn(root, take, key) {
     var bins = new Map();
