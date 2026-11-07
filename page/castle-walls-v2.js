@@ -140,6 +140,30 @@
         } else segs.push(exterior(f, r.s0, r.s1, null));
       });
     });
+    /* an exterior band stops short of any other room it would run into at its height: rooms cut into a thick wall
+       (the West Tower's newel stair and its passage inside the falconers' room's 3.2 m drum) are voids in it, and
+       their own faces build their own walls there (req 3166, west-tower-arch-5) */
+    segs.forEach(function (sg) {
+      if (sg.kind !== 'exterior') return;
+      var dx = sg.b[0] - sg.a[0], dy = sg.b[1] - sg.a[1], L = Math.hypot(dx, dy); if (L < 1e-6) return;
+      var ux = dx / L, uy = dy / L, best = sg.t, nS = Math.max(2, Math.ceil(L / 0.25) + 1);
+      for (var k = 0; k < nS; k++) {
+        var s = Math.min(L - 0.02, Math.max(0.02, L * k / (nS - 1))), px = sg.a[0] + ux * s, py = sg.a[1] + uy * s;
+        F.forEach(function (g) {
+          if (g.room === sg.owner || g.z1 <= sg.z[0] + 0.05 || g.z0 >= sg.z[1] - 0.05) return;
+          var ex = g.b[0] - g.a[0], ey = g.b[1] - g.a[1], den = sg.n[0] * ey - sg.n[1] * ex; if (Math.abs(den) < 1e-9) return;
+          var t = ((g.a[0] - px) * ey - (g.a[1] - py) * ex) / den, v = ((g.a[0] - px) * sg.n[1] - (g.a[1] - py) * sg.n[0]) / den;
+          if (t > 1e-4 && v >= -1e-6 && v <= 1 + 1e-6 && t - 0.02 < best) best = Math.max(0.05, t - 0.02);
+        });
+      }
+      /* and a corner of another room standing inside the band between two samples */
+      F.forEach(function (g) {
+        if (g.room === sg.owner || g.z1 <= sg.z[0] + 0.05 || g.z0 >= sg.z[1] - 0.05) return;
+        var qx = g.a[0] - sg.a[0], qy = g.a[1] - sg.a[1], s = qx * ux + qy * uy, d = qx * sg.n[0] + qy * sg.n[1];
+        if (s > 0 && s < L && d > 1e-4 && d - 0.02 < best) best = Math.max(0.05, d - 0.02);
+      });
+      if (best < sg.t - 1e-3) { sg.t = best; sg.off = [0, best]; sg.clipped = true; }
+    });
     return { segments: segs, plan: plan, pairs: P.map(function (p) { return { rooms: [F[p.A].room, F[p.B].room], gap: p.gap, over: p.s[1] - p.s[0], kind: kindOf(p.gap) }; }) };
   }
 

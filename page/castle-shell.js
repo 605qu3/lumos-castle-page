@@ -3077,7 +3077,10 @@ window.CastleShell = { build: function (F, M, placeId, o) {
         lo = Math.min(lo, w.Q.floor); top = Math.max(top, w.Q.floor + HE);
       });
       OPS.forEach(function (O) {
-        if (!O.rooms.some(function (r) { return sg.rooms.indexOf(r) >= 0; })) return;
+        /* a way between two rooms cuts any strip its sweep crosses at its height, a third room's too: the West
+           Tower's newel stair stands inside the drum's 3.2 m wall, so the falconers' room's band covers the arch
+           from its passage (west-tower-arch-5); a window, with no far room, cuts only its own room's strips */
+        if (!O.rooms.some(function (r) { return sg.rooms.indexOf(r) >= 0; }) && !(O.rooms.length > 1 && O.z1 > lo + 0.05 && O.z0 < top - 0.05)) return;
         var c = cross(O, sg, ux, uy, len); if (!c) return;
         holes.push({ s0: c[0], s1: c[1], z0: O.z0, z1: O.z1, head: O.head, up: O.up, op: O.id });
       });
@@ -3096,6 +3099,26 @@ window.CastleShell = { build: function (F, M, placeId, o) {
         var pj = (oe[1] + of.n - 1) % of.n, pv = extEnd[sg.owner + ':' + oe[0] + ':' + pj];
         if (pv) { var th0 = turn(faceOf(sg.owner, [oe[0], pj]), of); if (th0 > 1e-4 && th0 <= Math.PI / 4 + 1e-3) e0 = sg.t * Math.tan(th0 / 2); }
       }
+      /* a corner's run-on stops short of another room it would enter (library-gallery's south-west block stood
+         0.55 m inside passage-5-southwest): rays along the face from its end, across the band's depth */
+      var runOn = function (e, s, dir) {
+        if (e <= 0) return e;
+        for (var o = sg.off[0] + 0.02; o <= sg.off[1] - 0.02 + 1e-6; o += Math.max(0.05, (sg.off[1] - sg.off[0] - 0.04) / 6)) {
+          var px = sg.a[0] + ux * s + sg.n[0] * o, py = sg.a[1] + uy * s + sg.n[1] * o, dx = ux * dir, dy = uy * dir;
+          places.forEach(function (q) {
+            if (q.id === sg.owner || q.z1 <= lo + 0.05 || q.z0 >= top - 0.05) return;
+            q.loops.forEach(function (pts) {
+              for (var k = 0, j = pts.length - 1; k < pts.length; j = k++) {
+                var A = pts[j], B = pts[k], ex = B[0] - A[0], ey = B[1] - A[1], den = dx * ey - dy * ex; if (Math.abs(den) < 1e-9) continue;
+                var t = ((A[0] - px) * ey - (A[1] - py) * ex) / den, v = ((A[0] - px) * dy - (A[1] - py) * dx) / den;
+                if (t > -1e-4 && v >= 0 && v <= 1 && t - 0.02 < e) e = Math.max(0, t - 0.02);
+              }
+            });
+          });
+        }
+        return e;
+      };
+      e1 = runOn(e1, len, 1); e0 = runOn(e0, 0, -1);
       var spec = { len: len, hi: top - lo, depth: sg.off[1] - sg.off[0], e0: e0, e1: e1,
         holes: holes.map(function (h) { return { s0: h.s0, s1: h.s1, z0: h.z0 - lo, z1: h.z1 - lo, head: h.head, up: h.up }; }) };
       var S = CastleStrip.build(THREE, spec);
