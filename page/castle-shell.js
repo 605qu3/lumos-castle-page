@@ -549,7 +549,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
   var floorQs = [];
   /* v103 (the sweep, Godric's 7.32 am): halfGap reads every place the model stands on this floor, built or not (gapQs):
      the east courtyard is built later, through a way, and the staff rooms' south walls stood their whole 0.8 m in it */
-  var gapQs = [], wallRuns = [], W2 = {};   /* v104: every wall run built, for the shared lines */
+  var gapQs = [], wallRuns = [], W2 = {}, W2T = [];   /* v104: every wall run built, for the shared lines */
   /* v113: the places beside Q, for a corner's run on: the floor's when it is built whole, else those its openings join */
   var besideMemo = {};
   function besideQs(Q) {
@@ -1643,6 +1643,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
         var pp = toLocal(a[0] + ux * sm + nx * pd, a[1] + uy * sm + ny * pd, Q.floor);
         pn_.position.set(pp.x, pp.y + g.sill + hh / 2, pp.z); pn_.rotation.y = ang; pn_.raycast = function () {};
         pn_.name = Q.id + '-pane-' + g.op.id + suf; pn_.userData.owner = Q.id; group.add(pn_);
+        if (WALLS2) pn_.userData.seat = { id: Q.id, op: g.op.id, c: [a[0] + ux * sm, a[1] + uy * sm], u: [ux, uy], n: [nx, ny], d: pd, in: 0.03 };   /* req 3166 dot 8: wallsV2 seats it */
         out.panes.push(pn_);
       }
       /* v142 (req 1807): a window's `lights` in a screen of stone at its reveal's depth: each light's sill, its jambs to
@@ -1709,6 +1710,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
               lim: { x0: -sE, x1: L - sE, ymax: HE - 0.008 } });
             var off = face === 'out' ? t : 0, p = toLocal(a[0] + ux * sE + nx * off, a[1] + uy * sE + ny * off, Q.floor);
             geo.applyMatrix4(new THREE.Matrix4().makeRotationY(ang).setPosition(p.x, p.y, p.z));
+            if (WALLS2 && face === 'out') geo.userData.seat = { id: Q.id, op: g.op.id, c: [a[0] + ux * sE, a[1] + uy * sE], u: [ux, uy], n: [nx, ny], d: t, in: 0 };
             var mt = trimMat(row, a[0] + ux * sE, a[1] + uy * sE, E1[3]);
             (trimB[mt.uuid] = trimB[mt.uuid] || { mat: mt, geos: [] }).geos.push(geo);
           });
@@ -2053,8 +2055,9 @@ window.CastleShell = { build: function (F, M, placeId, o) {
         }
       }
     });
-    /* v91: the trim, one mesh a stone, untappable */
-    Object.keys(trimB).forEach(function (key) {
+    /* v91: the trim, one mesh a stone, untappable; req 3166 (dot 8): under v2 merged after wallsV2 has seated its outer face */
+    if (WALLS2) W2T.push({ group: group, id: Q.id, trimB: trimB });
+    else Object.keys(trimB).forEach(function (key) {
       var b = trimB[key], tm = F.register(new THREE.Mesh(CastleTrim.merge(THREE, b.geos), b.mat), LAYER.wall);
       tm.name = Q.id + '-trim'; tm.userData.owner = Q.id; tm.raycast = function () {}; group.add(tm);
     });
@@ -3021,7 +3024,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
      Each flight's treads become one mesh carrying userData.stair, so flightOf() in shell.html finds it as it found a
      tread; Design's ceilings and panelling (each place's -ceilings and -panelling groups) one mesh a material, their
      corbels and every carved face kept whole (the faces' atlas is swapped by state, the corbels are taps) */
-  if (WALLS2) wallsV2();
+  if (WALLS2) { wallsV2(); trimV2(); }
   /* req 3166 slice 1 (docs/architect/wall-rebuild-1107.md sections 3 to 5): under ?walls=v2 every wall line of the
      built places is drawn once, from the wall graph, as one strip with its holes cut true (castle-strip.js). The
      places: the floor's (gapQs) or, for one room, the same filter over the model, so both modes see one graph. A
@@ -3099,7 +3102,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
       var s0 = Math.min.apply(null, P2.map(function (p) { return p[0]; })), s1 = Math.max.apply(null, P2.map(function (p) { return p[0]; }));
       return s1 > 0.01 && s0 < len - 0.01 && s1 - s0 > 0.02 ? [s0, s1] : null;
     };
-    var res = out.walls2 = { segments: G.segments.length, drawn: 0, merged: 0, plan: G.plan, rows: [] }, nk = {};
+    var res = out.walls2 = { segments: G.segments.length, drawn: 0, merged: 0, plan: G.plan, rows: [] }, nk = {}, segHoles = [];
     res.ops = OPS.map(function (O) { return O.id + '@' + O.rooms.join('/'); });
     G.segments.forEach(function (sg) {
       if (sg.kind === 'open') return;
@@ -3214,6 +3217,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
           var cr = c.position.clone().sub(C); c.position.addScaledVector(nL, -cr.dot(nL));
         });
       });
+      segHoles.push({ sg: sg, ux: ux, uy: uy, len: len, ops: holes.map(function (h) { return h.op; }) });
       res.merged += S.merged;
       if (S.merged) res.rows.push({ owner: sg.owner, rooms: sg.rooms, merged: S.merged, ops: holes.map(function (h) { return h.op; }) });
       var oQ = W2[sg.owner] || W2[built[0]], sm = len / 2;
@@ -3230,6 +3234,39 @@ window.CastleShell = { build: function (F, M, placeId, o) {
         group.add(m); res.drawn++;
       });
     });
+    /* req 3166 (dot 8, the oriel reshoot): a window's outer trim and its pane were set in the per-place pass at the plan's
+       wall depth (0.8 at lake-corridor-5-west), but its strip stands at its band's (0.21 there), so both floated 0.4 m
+       out and the frame showed inside the reveal. Each is moved along its face's normal to the outer face of the band
+       that holds its hole (the pane 3 cm inside it); a piece whose band is not found stays where v1 puts it */
+    var seatOf = function (S) {
+      var best = null;
+      segHoles.forEach(function (h) {
+        if (h.ops.indexOf(S.op) < 0 || h.sg.rooms.indexOf(S.id) < 0) return;
+        if (Math.abs(h.ux * S.u[1] - h.uy * S.u[0]) > 0.02) return;
+        var sg = h.sg, s = (S.c[0] - sg.a[0]) * h.ux + (S.c[1] - sg.a[1]) * h.uy; if (s < -0.05 || s > h.len + 0.05) return;
+        var f = sg.off.map(function (o) { return (sg.a[0] + sg.n[0] * o - S.c[0]) * S.n[0] + (sg.a[1] + sg.n[1] * o - S.c[1]) * S.n[1]; });
+        if (Math.abs(Math.min(f[0], f[1])) > 0.05) return;   /* the band starts at this room's face */
+        var outer = Math.max(f[0], f[1]); if (best == null || outer > best) best = outer;
+      });
+      return best;
+    };
+    res.seats = [];
+    var seatMove = function (S) { var o = seatOf(S); if (o == null) { res.seats.push([S.id, S.op, null]); return null; } var dd = o - S.in - S.d; res.seats.push([S.id, S.op, +o.toFixed(3), +dd.toFixed(3)]); return Math.abs(dd) > 0.001 ? dd : null; };
+    out.panes.forEach(function (pn) {
+      var S = pn.userData.seat; if (!S) return;
+      var dd = seatMove(S); if (dd != null) { pn.position.x += S.n[0] * dd; pn.position.z -= S.n[1] * dd; }
+    });
+    W2T.forEach(function (T) { Object.keys(T.trimB).forEach(function (key) { T.trimB[key].geos.forEach(function (geo) {
+      var S = geo.userData.seat; if (!S) return;
+      var dd = seatMove(S); if (dd != null) geo.translate(S.n[0] * dd, 0, -S.n[1] * dd);
+    }); }); });
+  }
+  /* req 3166 (dot 8): the v2 trim, merged as v1's once wallsV2 has seated it */
+  function trimV2() {
+    W2T.forEach(function (T) { Object.keys(T.trimB).forEach(function (key) {
+      var b = T.trimB[key], tm = F.register(new THREE.Mesh(CastleTrim.merge(THREE, b.geos), b.mat), LAYER.wall);
+      tm.name = T.id + '-trim'; tm.userData.owner = T.id; tm.raycast = function () {}; T.group.add(tm);
+    }); });
   }
   var NOHOOK = THREE.Object3D.prototype.onBeforeRender;
   function mergeDrawn(root, take, key) {
