@@ -162,6 +162,30 @@
         var qx = g.a[0] - sg.a[0], qy = g.a[1] - sg.a[1], s = qx * ux + qy * uy, d = qx * sg.n[0] + qy * sg.n[1];
         if (s > 0 && s < L && d > 1e-4 && d - 0.02 < best) best = Math.max(Math.min(0.05, d / 2), d - 0.02);
       });
+      /* req 3166 (the stray holes): a band across the mouth of the gap between two other rooms ran on into the wall those
+         two share (first-floor-corridor's south band 0.2 m past the end of pomfrey-bedroom and -office's wall, four more
+         like it), and the sweep of a door in that wall cut a door-shaped hole through it from the third room. Where that
+         wall's solid stands across the band's whole length (every sample's ray meets it) the band stops at it, and the
+         wall's end closes the face; a band it only partly crosses keeps its depth (a long outer face is not thinned), and
+         a way between the two still cuts a band that really stands in its passage (the drum's, west-tower-arch-5) */
+      segs.forEach(function (o) {
+        if (o.kind === 'exterior' || o.kind === 'open' || !o.off || o.off[1] - o.off[0] < 1e-3 || o.rooms.indexOf(sg.owner) >= 0) return;
+        if (o.z[1] <= sg.z[0] + 0.05 || o.z[0] >= sg.z[1] - 0.05) return;
+        var R = [[o.a[0] + o.n[0] * o.off[0], o.a[1] + o.n[1] * o.off[0]], [o.b[0] + o.n[0] * o.off[0], o.b[1] + o.n[1] * o.off[0]],
+          [o.b[0] + o.n[0] * o.off[1], o.b[1] + o.n[1] * o.off[1]], [o.a[0] + o.n[0] * o.off[1], o.a[1] + o.n[1] * o.off[1]]];
+        var near = Infinity;
+        for (var k = 0; k < nS; k++) {
+          var s = Math.min(L - 0.02, Math.max(0.02, L * k / (nS - 1))), px = sg.a[0] + ux * s, py = sg.a[1] + uy * s, hit = Infinity;
+          for (var j = 0; j < 4; j++) {
+            var A = R[j], B = R[(j + 1) % 4], ex = B[0] - A[0], ey = B[1] - A[1], den = sg.n[0] * ey - sg.n[1] * ex; if (Math.abs(den) < 1e-9) continue;
+            var t = ((A[0] - px) * ey - (A[1] - py) * ex) / den, v = ((A[0] - px) * sg.n[1] - (A[1] - py) * sg.n[0]) / den;
+            if (t > 1e-3 && v >= -1e-6 && v <= 1 + 1e-6 && t < hit) hit = t;
+          }
+          if (!(hit < sg.t)) return;                                       /* a sample that misses it: not across the band */
+          near = Math.min(near, hit);
+        }
+        if (near < best) best = near;
+      });
       /* a band never thinner than 5 cm ran 2.5 cm into a room that near (shell-hoist-shaft-b into the powder room's circle):
          under 7 cm it stops at half the gap (req 3166, (c) row) */
       if (best < sg.t - 1e-3) { sg.t = best; sg.off = [0, best]; sg.clipped = true; }
