@@ -858,7 +858,9 @@ shell.doors.forEach(function (d) {
   var sill = shell.group.getObjectByName(d.place + '-threshold-' + d.id);
   if (sill) {
     var dish = wearPatch(d.w * WEAR.sill.frac, 0.6, 0x8a837b, 0.45);
-    dish.rotation.x = -Math.PI / 2; dish.position.y = 0.018; dish.scale.y = 0.75;
+    /* req 3166 (7 November 2026): no deeper than the threshold it lies on (v2 cuts a threshold to its wall, 0.25 where the plan had 0.8) */
+    var sdp = sill.geometry && sill.geometry.parameters && sill.geometry.parameters.depth;
+    dish.rotation.x = -Math.PI / 2; dish.position.y = 0.018; dish.scale.y = sdp ? Math.min(0.75, (sdp - 0.02) / 0.6) : 0.75;
     dish.name = 'wear-sill-' + d.id; sill.add(dish);
   }
 });

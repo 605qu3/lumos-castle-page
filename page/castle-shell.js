@@ -1945,7 +1945,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
           var lo = g.far ? g.far - 0.1 : td * 0.5;                       /* a passage's leaves hang at its far face */
           if (faceGap && !g.far && faceGap < td) lo = faceGap / 2;       /* v153: in a thin wall, in the middle of the wall that is there, behind both casings */
           leaf.position.set(mid.x + nx * lo, mid.y + g.sill + 0.02 + (hh - 0.04) / 2, mid.z - ny * lo);
-          leaf.rotation.y = ang; leaf.name = 'door-' + g.op.id; leaf.userData.door = g.op.id; group.add(leaf);
+          leaf.rotation.y = ang; leaf.name = 'door-' + g.op.id; leaf.userData.door = g.op.id; if (g.far) leaf.userData.far = 1; group.add(leaf);
           /* req 3166 (oriel dot 3): under v2 a leaf shuts against a stop, as a real one does, so its 1 cm gap shows stone,
              never the void of a place this scene does not build (gry-turret-door's leaf stands 0.4 into a 0.3 strip, the
              shaft beyond unbuilt): a stone ring 4 cm thick just behind the leaf, from 10 cm outside the hole to 3 cm inside the leaf */
@@ -3167,6 +3167,48 @@ window.CastleShell = { build: function (F, M, placeId, o) {
         fl.position.copy(toLocal(sg.a[0] + ux * sc + sg.n[0] * oc, sg.a[1] + uy * sc + sg.n[1] * oc, h.z0 - 0.052));
         fl.rotation.y = Math.atan2(uy, ux); fl.name = sg.owner + '-holefloor-' + h.op; fl.userData.owner = sg.owner; fl.userData.holeFloor = h.op;
         group.add(fl);
+      });
+      /* req 3166 (the inspector over the doorstops, 7 November 2026, 1.20 pm): the leaf, its stop and its threshold were set
+         in the per-place pass by the plan's wall depth (0.8 at the staff bedroom off lake-corridor-5-west), but v2 builds
+         this strip at its band's depth (0.25 there), so the leaf hung 8 to 22 cm inside the far room, its stop 25 cm in and
+         the threshold 55 cm across its floor. A leaf that stands outside its band is moved, with its stop, to the band's
+         middle, and its threshold is cut to the band; a leaf already inside it (a passage's at its far face) is left */
+      var nL = new THREE.Vector3(sg.n[0], 0, -sg.n[1]), bd = sg.off[1] - sg.off[0], bh = bd / 2;
+      holes.forEach(function (h) {
+        /* one door id can stand at several places on a floor (passage-7-back-stair-room-corridor-door at four), so a piece is
+           this hole's only by its name and by standing at this hole: within its width along the strip, and within a metre
+           of the band across it */
+        var sc = (h.s0 + h.s1) / 2, oc = (sg.off[0] + sg.off[1]) / 2, C = toLocal(sg.a[0] + ux * sc + sg.n[0] * oc, sg.a[1] + uy * sc + sg.n[1] * oc, lo);
+        var along = new THREE.Vector3(ux, 0, -uy);
+        var near = function (c) { var r = c.position.clone().sub(C); return Math.abs(r.dot(along)) <= (h.s1 - h.s0) / 2 + 0.1 && Math.abs(r.dot(nL)) <= bh + 1.0; };
+        var ends = function (c, tag) { var nm = c.name || ''; return nm.slice(-(tag + h.op).length) === tag + h.op && near(c); };
+        var lf = null, stops = [], ths = [];
+        group.children.forEach(function (c) {
+          if (c.name === 'door-' + h.op && near(c)) lf = c;
+          else if (ends(c, '-doorstop-')) stops.push(c);
+          else if (ends(c, '-threshold-')) ths.push(c);
+        });
+        /* the stop is this strip's stone: it carries the strip's kind and rooms, so a flush partition's stop, 0.105 past the
+           line both plans share and inside the 0.3 wall, is read as that wall is (the inspector's fp, not an intrusion) */
+        stops.forEach(function (c) { c.userData.wall2 = sg.kind; c.userData.rooms = sg.rooms.slice(); });
+        if (!lf || lf.userData.far) return;                              /* a passage's leaf hangs at its far face by design */
+        /* and along the strip: where this hole is the leaf's own, its full width (a leaf is 2 cm narrower), the leaf stands
+           on it; at a junction (passage-7-cleaning's door, where north-landing-run-7's walls meet) it hung 0.4 m off
+           its hole, half before solid stone */
+        if (!lf.geometry.boundingBox) lf.geometry.computeBoundingBox();
+        var lb = lf.geometry.boundingBox, lwid = lb.max.x - lb.min.x, rel = lf.position.clone().sub(C);
+        var d = rel.dot(nL), da = Math.abs(h.s1 - h.s0 - lwid - 0.02) < 0.05 ? rel.dot(along) : 0;
+        if (Math.abs(da) < 0.02) da = 0;
+        if (Math.abs(d) + 0.06 <= bh + 0.005 && !da) return;
+        var mv = nL.clone().multiplyScalar(-d).addScaledVector(along, -da);
+        lf.position.add(mv);
+        stops.forEach(function (c) { c.position.add(mv); });
+        ths.forEach(function (c) {
+          c.position.addScaledVector(along, -da);
+          var p = c.geometry && c.geometry.parameters; if (!p || !(p.depth > bd + 0.02)) return;
+          c.geometry.dispose(); c.geometry = new THREE.BoxGeometry(p.width, p.height, bd);
+          var cr = c.position.clone().sub(C); c.position.addScaledVector(nL, -cr.dot(nL));
+        });
       });
       res.merged += S.merged;
       if (S.merged) res.rows.push({ owner: sg.owner, rooms: sg.rooms, merged: S.merged, ops: holes.map(function (h) { return h.op; }) });
