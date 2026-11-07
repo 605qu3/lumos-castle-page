@@ -414,6 +414,9 @@ if (NIGHT_HALL) {   /* the night sky's hue at full strength, so the fill is a fi
   var top = Math.max(fillCol.r, fillCol.g, fillCol.b); fillCol.multiplyScalar(1 / top);
 }
 scene.add(new THREE.HemisphereLight(fillCol, 0x3a332c, FILL));
+/* the shade card (req 3175 fault 1, oriel dots 4, 8, 9; a look for Godric, not yet chosen): ?bounce=1 adds the floor's
+   warm bounce from below, so a corbel's or a window head's underside is not black; the default is unchanged */
+if (Q.get('bounce') === '1') scene.add(new THREE.HemisphereLight(0x000000, 0x9a8466, 0.55));
 var sun = new THREE.DirectionalLight(0xfff1dc, !PAINT_ON ? 0.45 : DAY && !WINDOWLESS && !W5B_LIT ? 0.15 : 0); sun.position.set(-6, 14, 9); scene.add(sun);
 scene.add(new THREE.AmbientLight(0xffffff, PAINT_ON ? 0.02 : 0.12));
 /* the torches' light without the torches (PS 7: "stone walls lit with flaming torches"): four warm lights a place at
@@ -600,6 +603,7 @@ shell.places.forEach(function (p, pi) {
   lamps.forEach(function (q) {
     var l = new THREE.PointLight(painted ? TORCH.hex : 0xffc98a, (pi ? 0.7 : 1.0) * k * NIGHT_FOUR, 26, 1.6);
     var lz = PAINTED.indexOf(p.id) >= 0 && p.ceiling != null ? Math.min(p.floor + 3.2, p.ceiling - 0.4) : p.floor + 3.2;   /* under a low ceiling */
+    if (Q.get('lamps') === 'low') lz = Math.min(lz, p.floor + 2.2);   /* the shade card's other look: the room's lights at a bracket's height, as the torches in their brackets (PS 7), under every corbel */
     l.position.copy(shell.toLocal(q[0], q[1], lz));
     scene.add(l);
   });
