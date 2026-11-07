@@ -2637,7 +2637,7 @@ var H71 = (function () {
     if (d[1] > 0 && (YN - E[1]) / d[1] < best[1]) best = ['north', (YN - E[1]) / d[1]];
     if ((XE - E[0]) / d[0] < best[1]) best = ['end', (XE - E[0]) / d[0]];
     var t = best[1], p = [E[0] + t * d[0], E[1] + t * d[1], E[2] + t * d[2]];
-    var real = solidAt(p);
+    var real = solidAt(p, best[0]);
     if (best[0] === 'floor') p[2] = OFF; else if (best[0] === 'south') p[1] = YS + OFF; else if (best[0] === 'north') p[1] = YN - OFF; else p[0] = XE - OFF;
     return [real ? best[0] : 'open', p];
   }
@@ -2653,11 +2653,19 @@ var H71 = (function () {
     if (!m.isMesh || !m.visible || m.userData.way || m.userData.decal || m.raycast !== THREE.Mesh.prototype.raycast) return;
     if (new THREE.Box3().setFromObject(m).intersectsBox(CBOX)) NEAR.push(m);
   });
-  function solidAt(p) {
+  /* req 3166 (oriel dots 1 and 2, second pass): a sightline into a hole's edge met the hole's own reveal within 6 cm of
+     the plane, so the gold ran down the linen-store doorway's and window 27.2's east reveals. The face it meets must now
+     also lie as the painted face lies: its normal within about 25 degrees of the plane's (either side, for two-sided
+     faces); a reveal, square to the wall, is no ground for paint */
+  var NRM = { floor: [0, 0, 1], south: [0, 1, 0], north: [0, -1, 0], end: [-1, 0, 0] };
+  function solidAt(p, face) {
     var T = shell.toLocal(p[0], p[1], z0 + p[2]), dv = T.clone().sub(EL), da = dv.length();
     RC.set(EL, dv.normalize()); RC.near = 0; RC.far = da + 1;
     var h = RC.intersectObjects(NEAR, false)[0];
-    return !!h && PANES.indexOf(h.object) < 0 && h.point.distanceTo(T) < 0.06;
+    if (!h || PANES.indexOf(h.object) >= 0 || h.point.distanceTo(T) >= 0.06 || !h.face) return false;
+    var nv = NRM[face], want = shell.toLocal(p[0] + nv[0], p[1] + nv[1], z0 + p[2] + nv[2]).sub(T).normalize();
+    var got = h.face.normal.clone().transformDirection(h.object.matrixWorld);
+    return Math.abs(got.dot(want)) > 0.9;
   }
   var paint = [], joint = [];
   function quad(list, a, b, c, d) { [a, b, c, a, c, d].forEach(function (p) { var l = shell.toLocal(p[0], p[1], z0 + p[2]); list.push(l.x, l.y, l.z); }); }
