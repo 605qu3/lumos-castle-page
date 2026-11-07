@@ -3261,9 +3261,16 @@ window.CastleShell = { build: function (F, M, placeId, o) {
          cut, along its curve from springing to springing, through the band's depth, in the casing's stone */
       if (TRIM && oQ.row) {
         var x0L = -e0, x1L = len + e1;
-        CastleStrip.unite(spec.holes.map(function (h) { return { s0: Math.max(x0L, h.s0), s1: Math.min(x1L, h.s1), z0: Math.max(0, h.z0), z1: Math.min(top - lo, h.z1), head: h.head || null, up: h.up || 0 }; })
-          .filter(function (h) { return h.s1 - h.s0 > 0.02 && h.z1 - h.z0 > 0.02; })).holes.forEach(function (h) {
+        /* v174 (7 November 2026): a head with no stone above it in this strip is not lined. Clipped at the strip's top,
+           its head would be redrawn at the clip line; swallowed by a wider, taller hole (library-corridor-mouth, 3 m
+           by 3.6 m round a 2.6 m door by kitchens-steps), entrance-hall's strip drew no stone there and its lining stood
+           0.15 m into stair-hall, as charms-passage's did into charms-landing-passage-3 */
+        var uH = CastleStrip.unite(spec.holes.map(function (h) { var cut = h.z1 > top - lo + 0.005; return { s0: Math.max(x0L, h.s0), s1: Math.min(x1L, h.s1), z0: Math.max(0, h.z0), z1: Math.min(top - lo, h.z1), head: cut ? null : (h.head || null), up: cut ? 0 : (h.up || 0) }; })
+          .filter(function (h) { return h.s1 - h.s0 > 0.02 && h.z1 - h.z0 > 0.02; })).holes;
+        uH.forEach(function (h) {
           if (!h.head || !(h.up > 0.01)) return;
+          if (uH.some(function (o) { return o !== h && o.s0 <= h.s0 + 0.01 && o.s1 >= h.s1 - 0.01 && o.z0 <= h.z1 - h.up + 0.01 &&
+            Math.min(CastleStrip.topAt(o, h.s0), CastleStrip.topAt(o, (h.s0 + h.s1) / 2), CastleStrip.topAt(o, h.s1)) >= h.z1 - 0.01; })) return;
           var up = Math.min(h.up, h.z1 - h.z0 - 0.01), sp = h.z1 - up;
           var C = CastleStrip.outline(h, sp).filter(function (q) { return q[1] >= sp - 1e-6; });
           C = C.slice(1, C.length - 1);   /* the springing to the springing, without the jambs' feet */
