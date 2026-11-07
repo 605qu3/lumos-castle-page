@@ -153,15 +153,17 @@
           if (g.room === sg.owner || g.z1 <= sg.z[0] + 0.05 || g.z0 >= sg.z[1] - 0.05) return;
           var ex = g.b[0] - g.a[0], ey = g.b[1] - g.a[1], den = sg.n[0] * ey - sg.n[1] * ex; if (Math.abs(den) < 1e-9) return;
           var t = ((g.a[0] - px) * ey - (g.a[1] - py) * ex) / den, v = ((g.a[0] - px) * sg.n[1] - (g.a[1] - py) * sg.n[0]) / den;
-          if (t > 1e-4 && v >= -1e-6 && v <= 1 + 1e-6 && t - 0.02 < best) best = Math.max(0.05, t - 0.02);
+          if (t > 1e-4 && v >= -1e-6 && v <= 1 + 1e-6 && t - 0.02 < best) best = Math.max(Math.min(0.05, t / 2), t - 0.02);
         });
       }
       /* and a corner of another room standing inside the band between two samples */
       F.forEach(function (g) {
         if (g.room === sg.owner || g.z1 <= sg.z[0] + 0.05 || g.z0 >= sg.z[1] - 0.05) return;
         var qx = g.a[0] - sg.a[0], qy = g.a[1] - sg.a[1], s = qx * ux + qy * uy, d = qx * sg.n[0] + qy * sg.n[1];
-        if (s > 0 && s < L && d > 1e-4 && d - 0.02 < best) best = Math.max(0.05, d - 0.02);
+        if (s > 0 && s < L && d > 1e-4 && d - 0.02 < best) best = Math.max(Math.min(0.05, d / 2), d - 0.02);
       });
+      /* a band never thinner than 5 cm ran 2.5 cm into a room that near (shell-hoist-shaft-b into the powder room's circle):
+         under 7 cm it stops at half the gap (req 3166, (c) row) */
       if (best < sg.t - 1e-3) { sg.t = best; sg.off = [0, best]; sg.clipped = true; }
     });
     return { segments: segs, plan: plan, pairs: P.map(function (p) { return { rooms: [F[p.A].room, F[p.B].room], gap: p.gap, over: p.s[1] - p.s[0], kind: kindOf(p.gap) }; }) };
