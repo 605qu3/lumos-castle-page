@@ -1396,10 +1396,18 @@ window.CastleShell = { build: function (F, M, placeId, o) {
           [k * 0.05, -k * 0.05].forEach(function (d) { if (best == null && cs.every(function (c) { return !hits(c, ax, d).length; })) best = d; });
         }
         if (best != null) { parts.forEach(function (o) { o.position[ax] += best; }); cleared.moved++; cleared.ids.push(Q.id + ' beam ' + i + ' ' + (best > 0 ? '+' : '') + best.toFixed(2) + ' (' + ids + ')'); }
-        else bad.forEach(function (c) {
-          parts.filter(function (o) { return o.userData.end === c.userData.end; }).forEach(function (o) { CV.group.remove(o); });
-          cleared.dropped++; cleared.ids.push(Q.id + ' corbel ' + c.name + ' dropped (' + ids + ')');
-        });
+        else {
+          /* seams 1107 (fault 2): an opening whose head reaches the beam's soffit (an open mouth to the ceiling) leaves no
+             wall over it for the beam to bear in, so the whole beam goes, its corbels, faces and wedges with it */
+          var soff = new THREE.Box3().setFromObject(bm).min.y - base;
+          if (bad.some(function (c) { return hits(c, ax, 0).some(function (o) { return o.head >= soff; }); })) {
+            parts.forEach(function (o) { CV.group.remove(o); });
+            cleared.dropped++; cleared.ids.push(Q.id + ' beam ' + bm.name + ' dropped, open to its soffit (' + ids + ')');
+          } else bad.forEach(function (c) {
+            parts.filter(function (o) { return o.userData.end === c.userData.end; }).forEach(function (o) { CV.group.remove(o); });
+            cleared.dropped++; cleared.ids.push(Q.id + ' corbel ' + c.name + ' dropped (' + ids + ')');
+          });
+        }
       });
       group.userData.corbelOps = OPS.map(function (o) { return [o.id, o.p0.x.toFixed(2), o.p0.z.toFixed(2), o.p1.x.toFixed(2), o.p1.z.toFixed(2), o.sill, o.head.toFixed(2)].join(" "); });
       out.corbelsCleared = group.userData.corbelsCleared = (out.corbelsCleared || []).concat(cleared.ids);
