@@ -3113,13 +3113,21 @@ window.CastleShell = { build: function (F, M, placeId, o) {
       var lo = Infinity, top = -Infinity, holes = [];
       built.forEach(function (r) {
         var w = W2[r], e = sg.edge[r], i = eIdx(r, e), ed = w.E[i], HE = ed && ed.H != null ? ed.H : w.H;
-        lo = Math.min(lo, w.Q.floor); top = Math.max(top, w.Q.floor + HE);
+        /* req 3166 (the cross-floor rows): only the height the graph gave this strip (seg.z, per height since
+           castle-walls-v2.js v5), a room's own wall top where the strip reaches its ceiling; the union of both rooms'
+           heights took a G room's wall beside stair-hall up to 46 m, into the fifth and sixth floors' rooms */
+        var rz = sg.zr[r] || [], z = sg.z || [], z0 = w.Q.floor, z1 = w.Q.floor + HE;
+        if (z[0] != null && rz[0] != null && z[0] > rz[0] + 1e-3) z0 = z[0];
+        if (z[1] != null && rz[1] != null && z[1] < rz[1] - 1e-3) z1 = Math.min(z[1], z1);
+        if (z1 - z0 > 1e-3) { lo = Math.min(lo, z0); top = Math.max(top, z1); }
       });
+      if (!(top - lo > 1e-3)) return;
       OPS.forEach(function (O) {
         /* a way between two rooms cuts any strip its sweep crosses at its height, a third room's too: the West
            Tower's newel stair stands inside the drum's 3.2 m wall, so the falconers' room's band covers the arch
            from its passage (west-tower-arch-5); a window, with no far room, cuts only its own room's strips */
         if (!O.rooms.some(function (r) { return sg.rooms.indexOf(r) >= 0; }) && !(O.rooms.length > 1 && O.z1 > lo + 0.05 && O.z0 < top - 0.05)) return;
+        if (O.z1 <= lo + 0.05 || O.z0 >= top - 0.05) return;   /* an opening above or below this strip's height (req 3166) */
         var c = cross(O, sg, ux, uy, len); if (!c) return;
         holes.push({ s0: c[0], s1: c[1], z0: O.z0, z1: O.z1, head: O.head, up: O.up, op: O.id });
       });
@@ -3166,6 +3174,11 @@ window.CastleShell = { build: function (F, M, placeId, o) {
          footprint in the band gets its own floor, 2 mm under the rooms' so the two never fight, 0.1 thick */
       holes.forEach(function (h) {
         if (h.z0 > lo + 0.05 || h.s1 - h.s0 < 0.05) return;
+        /* req 3166 (the cross-floor rows): only the strip a hole stands on, not one above it that its head reaches into;
+           and a flush partition's halves lie in its two rooms' plans, so where one of them has no floor at the hole's
+           (a mouth into stair-hall, whose floor is the ground floor's) its half is that room's open air, no floor */
+        if (h.z0 < lo - 0.05) return;
+        if (sg.kind === 'flush' && sg.rooms.some(function (r) { return !sg.zr[r] || Math.abs(sg.zr[r][0] - h.z0) > 0.05; })) return;
         var fl = slab(h.s1 - h.s0, 0.1, sg.off[1] - sg.off[0], mats.floor, 'floor'), sc = (h.s0 + h.s1) / 2, oc = (sg.off[0] + sg.off[1]) / 2;
         fl.position.copy(toLocal(sg.a[0] + ux * sc + sg.n[0] * oc, sg.a[1] + uy * sc + sg.n[1] * oc, h.z0 - 0.052));
         fl.rotation.y = Math.atan2(uy, ux); fl.name = sg.owner + '-holefloor-' + h.op; fl.userData.owner = sg.owner; fl.userData.holeFloor = h.op;
@@ -3181,6 +3194,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
         /* one door id can stand at several places on a floor (passage-7-back-stair-room-corridor-door at four), so a piece is
            this hole's only by its name and by standing at this hole: within its width along the strip, and within a metre
            of the band across it */
+        if (h.z0 < lo - 0.05) return;   /* req 3166: the leaf belongs to the strip its hole stands on, not one its head reaches */
         var sc = (h.s0 + h.s1) / 2, oc = (sg.off[0] + sg.off[1]) / 2, C = toLocal(sg.a[0] + ux * sc + sg.n[0] * oc, sg.a[1] + uy * sc + sg.n[1] * oc, lo);
         var along = new THREE.Vector3(ux, 0, -uy);
         /* and only a piece that runs with this strip: a door's sweep cuts every strip it crosses at its height, a third room's
@@ -3217,7 +3231,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
           var cr = c.position.clone().sub(C); c.position.addScaledVector(nL, -cr.dot(nL));
         });
       });
-      segHoles.push({ sg: sg, ux: ux, uy: uy, len: len, ops: holes.map(function (h) { return h.op; }) });
+      segHoles.push({ sg: sg, ux: ux, uy: uy, len: len, lo: lo, ops: holes.map(function (h) { return h.op; }), z0s: holes.map(function (h) { return h.z0; }) });
       res.merged += S.merged;
       if (S.merged) res.rows.push({ owner: sg.owner, rooms: sg.rooms, merged: S.merged, ops: holes.map(function (h) { return h.op; }) });
       var oQ = W2[sg.owner] || W2[built[0]], sm = len / 2;
@@ -3241,7 +3255,12 @@ window.CastleShell = { build: function (F, M, placeId, o) {
     var seatOf = function (S) {
       var best = null;
       segHoles.forEach(function (h) {
-        if (h.ops.indexOf(S.op) < 0 || h.sg.rooms.indexOf(S.id) < 0) return;
+        var hk = h.ops.indexOf(S.op);
+        if (hk < 0 || h.sg.rooms.indexOf(S.id) < 0) return;
+        /* req 3166 (the cross-floor rows): only the strip the window stands on, not one above it that its head reaches
+           into; lake-trace-1-106.8's head rises past loop-gallery-1's ceiling into the 0.8 band over it, and its trim was
+           seated on that band's face, 0.4 m inside the gallery (and on 2 and 5) */
+        if (h.z0s[hk] < h.lo - 0.05) return;
         if (Math.abs(h.ux * S.u[1] - h.uy * S.u[0]) > 0.02) return;
         var sg = h.sg, s = (S.c[0] - sg.a[0]) * h.ux + (S.c[1] - sg.a[1]) * h.uy; if (s < -0.05 || s > h.len + 0.05) return;
         var f = sg.off.map(function (o) { return (sg.a[0] + sg.n[0] * o - S.c[0]) * S.n[0] + (sg.a[1] + sg.n[1] * o - S.c[1]) * S.n[1]; });

@@ -67,29 +67,70 @@
       var z = zov(A, B);
       if (z[0] != null && z[1] - z[0] <= MINOV) continue;
       var s0 = along(A, B.a), s1 = along(A, B.b), lo = Math.max(0, Math.min(s0, s1)), hi = Math.min(A.L, Math.max(s0, s1));
-      if (hi - lo > MINOV) out.push({ A: i, B: j, gap: Math.max(0, d), s: [lo, hi], z: z });
+      /* the gap is the nearer of the two faces' distances at the ends of their overlap, not at B's first corner: the faces
+         may lean up to 5.7 degrees (PAR), and postern-lobby-g's long slanted face, measured from winter-store's 24-gon side
+         at its own far corner (155.3, 67) outside the 1.58 m they share, gave a 0.68 m solid where the gap is 0.50 to 0.62,
+         and its corner stood 0.18 m inside the store (req 3166). A leaning pair's solid now falls short of the far face by
+         up to its lean (a few cm of recess in that room's wall, solid behind), never into it */
+      var gl = across(B, at(A, lo)), gh = across(B, at(A, hi));
+      if (hi - lo > MINOV) out.push({ A: i, B: j, gap: Math.max(0, Math.min(gl, gh)), s: [lo, hi], z: z });
     }
     return out;
   }
 
-  /* along one face, its pairs' stretches, each split where a nearer pair takes over: [{ s0, s1, pair }] */
+  /* along one face, its pairs' stretches, each split where a nearer pair takes over: [{ s0, s1, z0, z1, pair }]. Req 3166
+     (the cross-floor rows): the nearest is found per height, not once a stretch. A tall room's face (stair-hall, G to 7)
+     sees a G room's face and a fifth-floor room's on one plan line; the G pair took the whole stretch and was built from
+     the G floor to the hall's top, 29 to 32 m into the rooms above, while theirs fell to an exterior of no depth. Each
+     pair now claims only its own height, nearest first, and what no pair claims (the slab between two floors, the hall
+     above the last) is the face's own exterior band at that height */
+  var INF = 1e9;
+  function zn(z) { return [z[0] == null ? -INF : z[0], z[1] == null ? INF : z[1]]; }
   function nearest(fi, F, P) {
-    var mine = P.filter(function (p) { return p.A === fi || p.B === fi; }).map(function (p) {
+    var f = F[fi], mine = P.filter(function (p) { return p.A === fi || p.B === fi; }).map(function (p) {
       if (p.A === fi) return { s0: p.s[0], s1: p.s[1], p: p };
-      var f = F[fi], a = along(f, at(F[p.A], p.s[0])), b = along(f, at(F[p.A], p.s[1]));
+      var a = along(f, at(F[p.A], p.s[0])), b = along(f, at(F[p.A], p.s[1]));
       return { s0: Math.max(0, Math.min(a, b)), s1: Math.min(f.L, Math.max(a, b)), p: p };
     });
-    var cuts = [0, F[fi].L];
+    var cuts = [0, f.L];
     mine.forEach(function (m) { cuts.push(m.s0, m.s1); });
     cuts = cuts.sort(function (x, y) { return x - y; }).filter(function (c, k, a) { return k === 0 || c - a[k - 1] > 1e-4; });
-    var run = [];
+    var run = [], open = [], fz = zn([f.z0, f.z1]);
     for (var k = 0; k + 1 < cuts.length; k++) {
-      var c0 = cuts[k], c1 = cuts[k + 1], mid = (c0 + c1) / 2, best = null;
-      mine.forEach(function (m) { if (m.s0 <= mid && mid <= m.s1 && (!best || m.p.gap < best.gap)) best = m.p; });
-      var last = run[run.length - 1];
-      if (last && last.pair === best) last.s1 = c1; else run.push({ s0: c0, s1: c1, pair: best });
+      var c0 = cuts[k], c1 = cuts[k + 1], mid = (c0 + c1) / 2, free = [fz.slice()], here = [];
+      mine.filter(function (m) { return m.s0 <= mid && mid <= m.s1; }).sort(function (x, y) { return x.p.gap - y.p.gap; }).forEach(function (m) {
+        var pz = zn(m.p.z), next = [];
+        free.forEach(function (q) {
+          var lo = Math.max(q[0], pz[0]), hi = Math.min(q[1], pz[1]);
+          if (hi - lo <= 1e-3) { next.push(q); return; }
+          here.push({ z0: lo, z1: hi, pair: m.p });
+          if (lo - q[0] > 1e-3) next.push([q[0], lo]);
+          if (q[1] - hi > 1e-3) next.push([hi, q[1]]);
+        });
+        free = next;
+      });
+      free.forEach(function (q) { here.push({ z0: q[0], z1: q[1], pair: null }); });
+      var still = [];
+      here.forEach(function (h) {
+        var o = open.filter(function (r) { return r.pair === h.pair && Math.abs(r.z0 - h.z0) < 1e-4 && Math.abs(r.z1 - h.z1) < 1e-4; })[0];
+        if (o) o.s1 = c1; else { o = { s0: c0, s1: c1, z0: h.z0, z1: h.z1, pair: h.pair }; run.push(o); }
+        still.push(o);
+      });
+      open = still;
     }
     return run;
+  }
+  /* what is left of a rectangle in (s, z) once others are taken out */
+  function minus(rs, m) {
+    return rs.reduce(function (acc, q) {
+      if (m[1] <= q[0] + 1e-3 || m[0] >= q[1] - 1e-3 || m[3] <= q[2] + 1e-3 || m[2] >= q[3] - 1e-3) { acc.push(q); return acc; }
+      if (m[0] - q[0] > 1e-3) acc.push([q[0], m[0], q[2], q[3]]);
+      if (q[1] - m[1] > 1e-3) acc.push([m[1], q[1], q[2], q[3]]);
+      var a = Math.max(q[0], m[0]), b = Math.min(q[1], m[1]);
+      if (m[2] - q[2] > 1e-3) acc.push([a, b, q[2], m[2]]);
+      if (q[3] - m[3] > 1e-3) acc.push([a, b, m[3], q[3]]);
+      return acc;
+    }, []);
   }
 
   function kindOf(g) { g = Math.round(g * 1000) / 1000; return g <= FLUSH ? 'flush' : g <= THIN ? 'thin' : 'wall'; }
@@ -99,34 +140,31 @@
     var F = faces(places), P = pairsOf(F, opts.maxGap || 1.2), runs = F.map(function (f, i) { return nearest(i, F, P); });
     var segs = [], plan = [], done = {};
     F.forEach(function (f, fi) {
+      var zb = function (z0, z1) { return [z0 <= -INF / 2 ? f.z0 : z0, z1 >= INF / 2 ? f.z1 : z1]; };
       runs[fi].forEach(function (r) {
         if (r.s1 - r.s0 <= 1e-3) return;
-        var p = r.pair, z = p ? p.z : [f.z0, f.z1];
+        var p = r.pair;
         if (p) {
-          /* mutual only: the stretch of the other face that is nearest to this one too */
+          /* mutual only: the stretch of the other face that is nearest to this one too, at the same height */
           var oi = p.A === fi ? p.B : p.A, o = F[oi], s0 = r.s0, s1 = r.s1;
-          var mutual = runs[oi].filter(function (q) { return q.pair === p; }).map(function (q) {
-            var a = along(f, at(o, q.s0)), b = along(f, at(o, q.s1)); return [Math.min(a, b), Math.max(a, b)];
-          });
           var parts = [];
-          mutual.forEach(function (m) { var lo = Math.max(s0, m[0]), hi = Math.min(s1, m[1]); if (hi - lo > 1e-3) parts.push([lo, hi]); });
-          /* what is not mutual stays this face's own, an exterior capped at half the gap */
-          var rest = [[s0, s1]];
-          parts.forEach(function (m) {
-            rest = rest.reduce(function (acc, q) {
-              if (m[1] <= q[0] || m[0] >= q[1]) acc.push(q);
-              else { if (m[0] - q[0] > 1e-3) acc.push([q[0], m[0]]); if (q[1] - m[1] > 1e-3) acc.push([m[1], q[1]]); }
-              return acc;
-            }, []);
+          runs[oi].forEach(function (q) {
+            if (q.pair !== p) return;
+            var a = along(f, at(o, q.s0)), b = along(f, at(o, q.s1));
+            var lo = Math.max(s0, Math.min(a, b)), hi = Math.min(s1, Math.max(a, b)), z0 = Math.max(r.z0, q.z0), z1 = Math.min(r.z1, q.z1);
+            if (hi - lo > 1e-3 && z1 - z0 > 1e-3) parts.push([lo, hi, z0, z1]);
           });
-          rest.forEach(function (q) { segs.push(exterior(f, q[0], q[1], p.gap / 2)); });
+          /* what is not mutual stays this face's own, an exterior capped at half the gap */
+          var rest = [[s0, s1, r.z0, r.z1]];
+          parts.forEach(function (m) { rest = minus(rest, m); });
+          rest.forEach(function (q) { segs.push(exterior(f, q[0], q[1], p.gap / 2, zb(q[2], q[3]))); });
           parts.forEach(function (m) {
-            var key = Math.min(fi, oi) + ':' + Math.max(fi, oi) + ':' + m[0].toFixed(3);
+            var key = Math.min(fi, oi) + ':' + Math.max(fi, oi) + ':' + m[0].toFixed(3) + ':' + m[2].toFixed(3);
             var ra = f.room, rb = o.room, owner = opts.stand === ra || opts.stand === rb ? opts.stand : (ra < rb ? ra : rb);
             if (owner !== f.room) return;   /* drawn once, from the owner's face */
             if (done[key]) return; done[key] = 1;
             var g = p.gap, k = kindOf(g), oa = along(o, at(f, m[0])), ob = along(o, at(f, m[1]));
-            var seg = { kind: k, owner: owner, rooms: [ra, rb], a: at(f, m[0]), b: at(f, m[1]), n: f.n, gap: g, z: z,
+            var seg = { kind: k, owner: owner, rooms: [ra, rb], a: at(f, m[0]), b: at(f, m[1]), n: f.n, gap: g, z: zb(m[2], m[3]),
               zr: {}, edge: {} };
             seg.zr[ra] = [f.z0, f.z1]; seg.zr[rb] = [o.z0, o.z1];
             seg.edge[ra] = [f.loop, f.i, m[0], m[1]]; seg.edge[rb] = [o.loop, o.i, Math.min(oa, ob), Math.max(oa, ob)];
@@ -137,7 +175,7 @@
             } else { seg.t = g; seg.off = [0, g]; }
             segs.push(seg);
           });
-        } else segs.push(exterior(f, r.s0, r.s1, null));
+        } else segs.push(exterior(f, r.s0, r.s1, null, zb(r.z0, r.z1)));
       });
     });
     /* an exterior band stops short of any other room it would run into at its height: rooms cut into a thick wall
@@ -193,9 +231,9 @@
     return { segments: segs, plan: plan, pairs: P.map(function (p) { return { rooms: [F[p.A].room, F[p.B].room], gap: p.gap, over: p.s[1] - p.s[0], kind: kindOf(p.gap) }; }) };
   }
 
-  function exterior(f, s0, s1, cap) {
+  function exterior(f, s0, s1, cap, z) {
     var t = cap != null ? Math.min(f.T, cap) : f.T, seg = { kind: 'exterior', owner: f.room, rooms: [f.room], a: at(f, s0), b: at(f, s1), n: f.n,
-      t: t, off: [0, t], gap: null, z: [f.z0, f.z1], zr: {}, edge: {} };
+      t: t, off: [0, t], gap: null, z: z || [f.z0, f.z1], zr: {}, edge: {} };
     seg.zr[f.room] = [f.z0, f.z1]; seg.edge[f.room] = [f.loop, f.i, s0, s1];
     return seg;
   }
