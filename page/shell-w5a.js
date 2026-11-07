@@ -7653,12 +7653,12 @@ window.SHELL_W5A = {
   /* G-HANG drum-bend-5-east */
   /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 0 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
   add('drum-bend-5-east', [
-    ['b', 48.59, 8.6, 1.15, 48.65, 9.2, 1.95, 'gilt']]);
+    ['b', 51.55, 8.6, 1.15, 51.61, 9.2, 1.95, 'gilt']]);
   /* G-HANG end drum-bend-5-east */
   /* G-HANG drum-bend-5-west */
   /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 0 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
   add('drum-bend-5-west', [
-    ['b', 33.35, 3.59, 1.15, 33.95, 3.65, 1.95, 'gilt']]);
+    ['b', 32.79, 5.55, 1.15, 32.85, 6.15, 1.95, 'gilt']]);
   /* G-HANG end drum-bend-5-west */
   /* G-HANG east-wing-5 */
   /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */

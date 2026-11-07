@@ -3060,6 +3060,10 @@ window.CastleShell = { build: function (F, M, placeId, o) {
         P2 = o;
       });
       if (P2.length < 3) return null;
+      /* a sweep that only grazes the band (running along the next strip's corner line) leaves a footprint about
+         0.001 m deep: that is no hole, and cut full height it made the black slits (oriel dots 4, 6, 14) */
+      var o0 = Math.min.apply(null, P2.map(function (p) { return p[1]; })), o1 = Math.max.apply(null, P2.map(function (p) { return p[1]; }));
+      if (o1 - o0 < Math.min(0.02, (sg.off[1] - sg.off[0]) / 2)) return null;
       var s0 = Math.min.apply(null, P2.map(function (p) { return p[0]; })), s1 = Math.max.apply(null, P2.map(function (p) { return p[0]; }));
       return s1 > 0.01 && s0 < len - 0.01 && s1 - s0 > 0.02 ? [s0, s1] : null;
     };

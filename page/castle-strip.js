@@ -38,7 +38,9 @@
       var o = out.filter(function (q) { return q.s0 < h.s1 - 1e-3 && h.s0 < q.s1 - 1e-3 && q.z0 < h.z1 - 1e-3 && h.z0 < q.z1 - 1e-3; })[0];
       if (!o) { out.push(h); return; }
       var same = Math.abs(o.s0 - h.s0) < 0.05 && Math.abs(o.s1 - h.s1) < 0.05;   /* one opening seen from its two rooms */
-      if (!same) merged++;
+      /* different openings that overlap stay apart: the columns below already take each one's own top, so a door's
+         pointed head is not lost to a window's flat one (oriel dot 3); merged counts such overlaps */
+      if (!same) { merged++; out.push(h); return; }
       if (h.z1 > o.z1) { o.head = h.head; o.up = h.up; } else if (!o.head && h.head && Math.abs(h.z1 - o.z1) < 0.05) { o.head = h.head; o.up = h.up; }
       o.s0 = Math.min(o.s0, h.s0); o.s1 = Math.max(o.s1, h.s1); o.z0 = Math.min(o.z0, h.z0); o.z1 = Math.max(o.z1, h.z1);
     });

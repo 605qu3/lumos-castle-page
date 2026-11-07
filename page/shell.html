@@ -189,13 +189,13 @@ if (!/[?&]faceall=0/.test(location.search) && window.CastleStoneFace) ['founders
 <script src="castle-trim.js?v=10"></script>
 <script src="design/lake-views.js?v=1"></script>
 <script src="castle-walls-v2.js?v=2"></script>
-<script src="castle-strip.js?v=1"></script>
-<script src="castle-shell.js?v=166"></script>
+<script src="castle-strip.js?v=2"></script>
+<script src="castle-shell.js?v=167"></script>
 <script src="shell-w5b.js?v=23"></script>
 <script src="depth-ties.js?v=1"></script>
 <script src="corridor/suit.js?v=6"></script>
 <script src="corridor/knight.js?v=2"></script>
-<script src="shell-w5a.js?v=171"></script>
+<script src="shell-w5a.js?v=172"></script>
 <script src="shell-things-2.js?v=26"></script>
 <script src="shell-things-7.js?v=5"></script>
 <script src="shell-things-3.js?v=5"></script>
@@ -2634,13 +2634,33 @@ var H71 = (function () {
     if (d[1] > 0 && (YN - E[1]) / d[1] < best[1]) best = ['north', (YN - E[1]) / d[1]];
     if ((XE - E[0]) / d[0] < best[1]) best = ['end', (XE - E[0]) / d[0]];
     var t = best[1], p = [E[0] + t * d[0], E[1] + t * d[1], E[2] + t * d[2]];
+    var real = solidAt(p);
     if (best[0] === 'floor') p[2] = OFF; else if (best[0] === 'south') p[1] = YS + OFF; else if (best[0] === 'north') p[1] = YN - OFF; else p[0] = XE - OFF;
-    return [best[0], p];
+    return [real ? best[0] : 'open', p];
+  }
+  /* req 3166 (oriel dots 1 and 2): the plane alone laid gold over the linen-store door and window lake-mull1-5-27.2.
+     Each corner's sightline is now cast into the built scene too: it lands only where the first thing it meets is
+     stone within 6 cm of that plane point (a hole lets it through, a frame or fitting stops it short); a glass pane,
+     a way or a decal is no ground for paint. A cell whose corner lands nowhere is no cell, as one split across faces */
+  shell.group.updateMatrixWorld(true);
+  var EL = shell.toLocal(E[0], E[1], z0 + E[2]), RC = new THREE.Raycaster(), lo_ = shell.toLocal(9, 0, z0 - 0.1), hi_ = shell.toLocal(36.6, 4.4, z0 + 4.6);
+  var CBOX = new THREE.Box3(new THREE.Vector3(Math.min(lo_.x, hi_.x), lo_.y, Math.min(lo_.z, hi_.z)), new THREE.Vector3(Math.max(lo_.x, hi_.x), hi_.y, Math.max(lo_.z, hi_.z)));
+  var PANES = shell.panes || [], NEAR = [];
+  shell.group.traverse(function (m) {
+    if (!m.isMesh || !m.visible || m.userData.way || m.userData.decal || m.raycast !== THREE.Mesh.prototype.raycast) return;
+    if (new THREE.Box3().setFromObject(m).intersectsBox(CBOX)) NEAR.push(m);
+  });
+  function solidAt(p) {
+    var T = shell.toLocal(p[0], p[1], z0 + p[2]), dv = T.clone().sub(EL), da = dv.length();
+    RC.set(EL, dv.normalize()); RC.near = 0; RC.far = da + 1;
+    var h = RC.intersectObjects(NEAR, false)[0];
+    return !!h && PANES.indexOf(h.object) < 0 && h.point.distanceTo(T) < 0.06;
   }
   var paint = [], joint = [];
   function quad(list, a, b, c, d) { [a, b, c, a, c, d].forEach(function (p) { var l = shell.toLocal(p[0], p[1], z0 + p[2]); list.push(l.x, l.y, l.z); }); }
   function cell(y0, z0c, y1, z1, depth) {
     var cs = [hit(y0, z0c), hit(y1, z0c), hit(y1, z1), hit(y0, z1)];
+    if (cs.every(function (c) { return c[0] === 'open'; })) return;
     if (cs.every(function (c) { return c[0] === cs[0][0]; })) { quad(paint, cs[0][1], cs[1][1], cs[2][1], cs[3][1]); return; }
     if (depth >= 4) return;
     var ym = (y0 + y1) / 2, zm = (z0c + z1) / 2;
