@@ -3255,6 +3255,38 @@ window.CastleShell = { build: function (F, M, placeId, o) {
         m.userData.owner = sg.owner; m.userData.rooms = sg.rooms.slice(); m.userData.wall2 = sg.kind; m.userData.holes = spec.holes.map(function (h, k) { return [holes[k].op, +h.s0.toFixed(2), +h.s1.toFixed(2), +h.z0.toFixed(2), +h.z1.toFixed(2)]; }); m.userData.len = +len.toFixed(2);
         group.add(m); res.drawn++;
       });
+      /* req 3166 (oriel dot 12, 7 November 2026, 5.13 pm): v1 dressed a headed opening's intrados with the casing stone
+         (the -round-head- fill's sides, trimMat), but v2's strip is one extrusion in the wall's stone, so mouth 5-ne's
+         pointed head showed plain rubble round its curve. Each head of the united holes gets a lining 3 mm inside the
+         cut, along its curve from springing to springing, through the band's depth, in the casing's stone */
+      if (TRIM && oQ.row) {
+        var x0L = -e0, x1L = len + e1;
+        CastleStrip.unite(spec.holes.map(function (h) { return { s0: Math.max(x0L, h.s0), s1: Math.min(x1L, h.s1), z0: Math.max(0, h.z0), z1: Math.min(top - lo, h.z1), head: h.head || null, up: h.up || 0 }; })
+          .filter(function (h) { return h.s1 - h.s0 > 0.02 && h.z1 - h.z0 > 0.02; })).holes.forEach(function (h) {
+          if (!h.head || !(h.up > 0.01)) return;
+          var up = Math.min(h.up, h.z1 - h.z0 - 0.01), sp = h.z1 - up;
+          var C = CastleStrip.outline(h, sp).filter(function (q) { return q[1] >= sp - 1e-6; });
+          C = C.slice(1, C.length - 1);   /* the springing to the springing, without the jambs' feet */
+          if (C.length < 3) return;
+          var dpt = sg.off[1] - sg.off[0], pos = [], uv = [], acc = 0, I = 0.003;
+          var off = C.map(function (q, k) {
+            var a = C[Math.max(0, k - 1)], b = C[Math.min(C.length - 1, k + 1)], dx = b[0] - a[0], dy = b[1] - a[1], L = Math.hypot(dx, dy) || 1;
+            return [q[0] + dy / L * I, q[1] - dx / L * I];   /* into the hole: below the curve run left to right */
+          });
+          for (var k = 0; k + 1 < off.length; k++) {
+            var A = off[k], B = off[k + 1], sl = Math.hypot(B[0] - A[0], B[1] - A[1]);
+            pos.push(A[0], A[1], 0.001, B[0], B[1], 0.001, B[0], B[1], dpt - 0.001, A[0], A[1], 0.001, B[0], B[1], dpt - 0.001, A[0], A[1], dpt - 0.001);
+            uv.push(acc, 0, acc + sl, 0, acc + sl, dpt, acc, 0, acc + sl, dpt, acc, dpt);
+            acc += sl;
+          }
+          var lg = new THREE.BufferGeometry();
+          lg.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); lg.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
+          lg.computeVertexNormals(); lg.applyMatrix4(MX);
+          var lm = F.register(new THREE.Mesh(lg, trimMat(oQ.row, sg.a[0] + ux * (h.s0 + h.s1) / 2, sg.a[1] + uy * (h.s0 + h.s1) / 2, lo + sp)), LAYER.wall);
+          lm.name = sg.owner + '-head-lining-' + i0 + '-' + (+h.s0.toFixed(2)); lm.userData.owner = sg.owner; lm.userData.lining = 1; lm.userData.rooms = sg.rooms.slice(); lm.userData.wall2 = sg.kind;
+          group.add(lm);
+        });
+      }
     });
     /* req 3166 (dot 8, the oriel reshoot): a window's outer trim and its pane were set in the per-place pass at the plan's
        wall depth (0.8 at lake-corridor-5-west), but its strip stands at its band's (0.21 there), so both floated 0.4 m
