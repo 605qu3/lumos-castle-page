@@ -1922,6 +1922,22 @@ window.CastleShell = { build: function (F, M, placeId, o) {
         }
         if (isDoor(g.op.kind) && !g.back && !out.doors.some(function (d) { return d.id === g.op.id; })) {
           var leaf = slab(w - 0.08, hh - 0.04, 0.12, mats.door, 'door');   /* v44: on its threshold (0.02), its foot not the threshold's */
+          /* req 3166 (oriel dots 1 and 3): under walls=v2 the hole is cut true, its head pointed or round to the crown, and
+             v1's spandrel fill is gone, so a square leaf 4 cm off each jamb left slits of void beside it and a wedge over
+             it. Under v2 a leaf stands 1 cm off each jamb, and a single leaf under a shaped head takes that head's shape
+             (CastleStrip.outline, 1 cm in), its crown 2 cm under the hole's; a pair keeps its square leaf (shell.html halves it) */
+          if (WALLS2) {
+            var lk = String(g.op.head || '').split(',')[0].trim(), lw = w - 0.02, lh = hh - 0.04;
+            var lHead = (lk === 'round' && g.op.head === 'round' || lk === 'pointed' || lk === 'tudor') && !g.back && !g.soffit && g.op.leaves !== 2 ? lk : null;
+            var lrr = lw / 2, lup = !lHead ? 0 : lHead === 'pointed' ? Math.sqrt(3) * lrr : lHead === 'tudor' ? (window.CastleTrim && CastleTrim.rise ? CastleTrim.rise('tudor', lrr, 0) : lrr * 0.6) : lrr;
+            var lgeo;
+            if (lHead && lup < lh - 0.05) {
+              var lpts = CastleStrip.outline({ s0: -lrr, s1: lrr, z0: 0, z1: lh, head: lHead, up: lup }, 0), lsh = new THREE.Shape();
+              lpts.forEach(function (pt, k) { if (k) lsh.lineTo(pt[0], pt[1] - lh / 2); else lsh.moveTo(pt[0], pt[1] - lh / 2); });
+              lgeo = new THREE.ExtrudeGeometry(lsh, { depth: 0.12, bevelEnabled: false, curveSegments: 12 }); lgeo.translate(0, 0, -0.06);
+            } else lgeo = new THREE.BoxGeometry(lw, lh, 0.12);
+            leaf.geometry.dispose(); leaf.geometry = lgeo;
+          }
           /* v124 (req 1622, Gate 0 on the first floor, the Architect's 264th): a door onto a stair in this wall's thickness
              (the still room's onto the West Tower's spiral, 0.5 through the drum's 3.2) is that door's depth deep, not the
              wall's: hung at half the wall it stood 1.6 in, against the newel, and no stand saw its leaf */
@@ -1930,6 +1946,22 @@ window.CastleShell = { build: function (F, M, placeId, o) {
           if (faceGap && !g.far && faceGap < td) lo = faceGap / 2;       /* v153: in a thin wall, in the middle of the wall that is there, behind both casings */
           leaf.position.set(mid.x + nx * lo, mid.y + g.sill + 0.02 + (hh - 0.04) / 2, mid.z - ny * lo);
           leaf.rotation.y = ang; leaf.name = 'door-' + g.op.id; leaf.userData.door = g.op.id; group.add(leaf);
+          /* req 3166 (oriel dot 3): under v2 a leaf shuts against a stop, as a real one does, so its 1 cm gap shows stone,
+             never the void of a place this scene does not build (gry-turret-door's leaf stands 0.4 into a 0.3 strip, the
+             shaft beyond unbuilt): a stone ring 4 cm thick just behind the leaf, from 10 cm outside the hole to 3 cm inside the leaf */
+          if (WALLS2) {
+            var so = new THREE.Shape(), sx = w / 2 + 0.1, sy0 = -lh / 2 - 0.02, sy1 = lh / 2 + 0.12;
+            so.moveTo(-sx, sy0); so.lineTo(sx, sy0); so.lineTo(sx, sy1); so.lineTo(-sx, sy1); so.lineTo(-sx, sy0);
+            var irr = lrr - 0.03, ih = lh - 0.03, iup = !lHead || !(lup < lh - 0.05) ? 0 : lHead === 'pointed' ? Math.sqrt(3) * irr : lHead === 'tudor' ? Math.min(lup, ih - 0.06) : irr;
+            var ipts = CastleStrip.outline({ s0: -irr, s1: irr, z0: 0, z1: ih, head: iup ? lHead : null, up: iup }, 0), ihole = new THREE.Path();
+            ipts.slice().reverse().forEach(function (pt, k) { var y = pt[1] - lh / 2 + 0.0; if (k) ihole.lineTo(pt[0], y); else ihole.moveTo(pt[0], y); });
+            so.holes.push(ihole);
+            var sgeo = new THREE.ExtrudeGeometry(so, { depth: 0.04, bevelEnabled: false, curveSegments: 12 });
+            var smat = typeof row !== 'undefined' && row ? wallMat(row, a[0] + ux * sm, a[1] + uy * sm, g.h + 0.6) : mats.wall;
+            var stop = F.register(new THREE.Mesh(sgeo, smat), LAYER.wall), sb = lo + 0.06 + 0.005;
+            stop.position.set(mid.x + nx * sb, leaf.position.y, mid.z - ny * sb); stop.rotation.y = ang;
+            stop.name = Q.id + '-doorstop-' + g.op.id; stop.userData.owner = Q.id; group.add(stop);
+          }
           /* its threshold through the wall (v4, req 284): the floor under a leaf that swings, else the void shows */
           var sl = slab(w, 0.02, td, mats.floor, 'floor'), sp = toLocal(a[0] + ux * sm + nx * td / 2, a[1] + uy * sm + ny * td / 2, Q.floor);
           sl.position.set(sp.x, sp.y + g.sill + 0.01, sp.z); sl.rotation.y = ang; sl.name = Q.id + '-threshold-' + g.op.id; group.add(sl);
@@ -3126,6 +3158,16 @@ window.CastleShell = { build: function (F, M, placeId, o) {
       var spec = { len: len, hi: top - lo, depth: sg.off[1] - sg.off[0], e0: e0, e1: e1,
         holes: holes.map(function (h) { return { s0: h.s0, s1: h.s1, z0: h.z0 - lo, z1: h.z1 - lo, head: h.head, up: h.up }; }) };
       var S = CastleStrip.build(THREE, spec);
+      /* req 3166 (oriel dots 4 and 9): a hole cut down to a floor goes through the strip's whole depth, where no room's
+         floor runs (each floor stops at its room's line), so a black line showed under the doorway. The hole's
+         footprint in the band gets its own floor, 2 mm under the rooms' so the two never fight, 0.1 thick */
+      holes.forEach(function (h) {
+        if (h.z0 > lo + 0.05 || h.s1 - h.s0 < 0.05) return;
+        var fl = slab(h.s1 - h.s0, 0.1, sg.off[1] - sg.off[0], mats.floor, 'floor'), sc = (h.s0 + h.s1) / 2, oc = (sg.off[0] + sg.off[1]) / 2;
+        fl.position.copy(toLocal(sg.a[0] + ux * sc + sg.n[0] * oc, sg.a[1] + uy * sc + sg.n[1] * oc, h.z0 - 0.052));
+        fl.rotation.y = Math.atan2(uy, ux); fl.name = sg.owner + '-holefloor-' + h.op; fl.userData.owner = sg.owner; fl.userData.holeFloor = h.op;
+        group.add(fl);
+      });
       res.merged += S.merged;
       if (S.merged) res.rows.push({ owner: sg.owner, rooms: sg.rooms, merged: S.merged, ops: holes.map(function (h) { return h.op; }) });
       var oQ = W2[sg.owner] || W2[built[0]], sm = len / 2;

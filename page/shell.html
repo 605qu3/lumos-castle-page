@@ -2658,12 +2658,24 @@ var H71 = (function () {
   }
   var paint = [], joint = [];
   function quad(list, a, b, c, d) { [a, b, c, a, c, d].forEach(function (p) { var l = shell.toLocal(p[0], p[1], z0 + p[2]); list.push(l.x, l.y, l.z); }); }
+  function dist(a, b) { return Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2]); }
   function cell(y0, z0c, y1, z1, depth) {
     var cs = [hit(y0, z0c), hit(y1, z0c), hit(y1, z1), hit(y0, z1)];
-    if (cs.every(function (c) { return c[0] === 'open'; })) return;
-    if (cs.every(function (c) { return c[0] === cs[0][0]; })) { quad(paint, cs[0][1], cs[1][1], cs[2][1], cs[3][1]); return; }
-    if (depth >= 4) return;
+    /* req 3166 (oriel dot 1): a cell is judged at its corners only, and a jamb cell 0.1 wide at x 24 lands 1.46 m wide
+       on the north wall (x 26.8 to 28.26), both corners on stone either side of the linen-store door, so one quad
+       bridged the doorway. A cell that lands over 8 cm across, or up, is split along that side first */
+    var dy = Math.max(dist(cs[0][1], cs[1][1]), dist(cs[3][1], cs[2][1])), dz = Math.max(dist(cs[0][1], cs[3][1]), dist(cs[1][1], cs[2][1]));
+    var same = cs.every(function (c) { return c[0] === cs[0][0]; });
+    if (same && cs[0][0] === 'open' && dy <= 0.08 && dz <= 0.08) return;
+    if (same && cs[0][0] !== 'open' && dy <= 0.08 && dz <= 0.08) { quad(paint, cs[0][1], cs[1][1], cs[2][1], cs[3][1]); return; }
+    if (depth >= 12) { if (same && cs[0][0] !== 'open') quad(paint, cs[0][1], cs[1][1], cs[2][1], cs[3][1]); return; }
     var ym = (y0 + y1) / 2, zm = (z0c + z1) / 2;
+    if (same || dy > 0.08 || dz > 0.08) {
+      if (dy >= dz) { cell(y0, z0c, ym, z1, depth + 1); cell(ym, z0c, y1, z1, depth + 1); }
+      else { cell(y0, z0c, y1, zm, depth + 1); cell(y0, zm, y1, z1, depth + 1); }
+      return;
+    }
+    if (depth >= 8) return;
     cell(y0, z0c, ym, zm, depth + 1); cell(ym, z0c, y1, zm, depth + 1); cell(ym, zm, y1, z1, depth + 1); cell(y0, zm, ym, z1, depth + 1);
   }
   function strip(y0, z0s, y1, z1, n, m) {   /* a frame strip in the plane x = XD, cut n across and m up */
