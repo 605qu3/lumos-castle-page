@@ -108,7 +108,7 @@
   /* the massing: triangles per material, every vertex through the main toLocal */
   var builtPlaces = [];
   function keepPlaces(out) { (out.places || []).forEach(function (q) { builtPlaces.push(q); }); }
-  var GREYS = { raiseFoot: 0xb8b2a8, filler: 0xb9b2a6, roof: 0x5f6670, parapet: 0x8a857e, ground: 0x7d8a5c, rock: 0x8b8478, water: 0x6f8797, raise: 0xa39d92, soffit: 0xd0c9bb, raiseCourse: 0x868077, slit: 0x18181a };   /* raise and raiseCourse are set from the probed wall tone (req 3222) */
+  var GREYS = { raiseFoot: 0xb8b2a8, filler: 0xb9b2a6, roof: 0x5f6670, parapet: 0x8a857e, ground: 0x7d8a5c, rock: 0x8b8478, water: 0x6f8797, raise: 0xa39d92, stripBand: 0xa39d92, stripTop: 0xa39d92, soffit: 0xd0c9bb, raiseCourse: 0x868077, slit: 0x18181a };   /* raise and raiseCourse are set from the probed wall tone (req 3222) */
   function massing(TL, scene) {
     var T = {}; Object.keys(GREYS).forEach(function (k) { T[k] = []; });
     function tri(k, a, b, c) { [a, b, c].forEach(function (p) { var v = TL(p[0], p[1], p[2]); T[k].push(v.x, v.y, v.z); }); }
@@ -280,6 +280,15 @@
       parts.forEach(function (p) { roofPart(p, R.parapet); });
       if (R.flat) flat(R.flat.rect, R.flat.z, R.flat.lead);
     });
+    /* req 3239 (the Architect, 8 Nov 2026; docs/architect/r3197/plan.md): the P5 spur and any other work in the model's works list, a ring of filler from its base to its top,
+       its cap in the wall's tone, and its parapet if it has one. ?works=0 leaves it out. */
+    if (!/[?&]works=0/.test(location.search)) (M.works || []).forEach(function (w) { if (!w.poly || w.poly.length < 3) return;
+      wallRing('filler', w.poly, w.base, w.top); cap('raise', w.poly, null, w.top);
+      if (w.parapet > w.top) wallRing('parapet', w.poly, w.top, w.parapet); });
+    /* req 3240 (the Architect, Fawkes's 5.58 am ruling, Godric's 1 on req 1480): the east wing's fifth storey (east-wing-5, first OotP, castle-model-5.js:15, rect [144,18.25,160,49.75],
+       floor 26 to 31.2) is absent in the PS stack; the eye saw through it into the sixth floor's inner west wall at x 147.85. A closed wall body in the outer wall's place, outer face
+       x 160.8, drawn only when the room is not in the page's (book-filtered) model, so the OotP stack keeps the room's own walls. 0.01 m inside the slabs above and below. ?ewing5=0 leaves it out. */
+    if (!/[?&]ewing5=0/.test(location.search) && !(M.rooms || []).some(function (r) { return r.id === 'east-wing-5'; })) box('raise', [160.0, 18.25, 160.79, 49.75], 25.95, 31.25);   /* v27: the box overlaps the slabs above and below by 0.05 m (it stood 0.01 m inside the storey: a 0.02 m gap, which read as faint dotted seams at r120-h and r120-e; 0.03 inside read as a thin dark line), its outer face 0.01 m behind the neighbours' at x 160.8 */
     function centre(q) {
       if (q.poly && q.poly.length) { var x = 0, y = 0; q.poly.forEach(function (p) { x += p[0]; y += p[1]; }); return [x / q.poly.length, y / q.poly.length]; }
       if (q.round && q.round.c) return q.round.c;
@@ -433,6 +442,34 @@
           quad('slit', [lx - 0.05, R0[1] - 0.12, Rz.z0 + 0.9], [lx + 0.05, R0[1] - 0.12, Rz.z0 + 0.9], [lx + 0.05, R0[1] - 0.12, Rz.z0 + 1.8], [lx - 0.05, R0[1] - 0.12, Rz.z0 + 1.8]);   /* v16: on the walk's own wall face (y -2.1), not behind it */ }); box('parapet', [m[0], R0[1] - 0.35, m[1], R0[1] + P], mz, Rz.z1 - 0.3); });
       box('roof', R0, Rz.z1 - 0.3, Rz.z1); parapetRect(R0, Rz.z1, Rz.z1 + 0.6);
     });
+    /* v23 (req 3221 item 7; Fawkes 1.30 am: solid masonry, the Exterior's wall body): the Entrance Hall's north strip, model y 69 to 70,
+       x 72 to 88, +10.4 to under the gate raise's flat (46.3), holds no floor of any room above the hall. Rays from outside reach it
+       (eye-item7/expose-before.json: from r30-h, r60-h, r90-h, r150-h, r270-h, r300-h, r330-h at z 20.3, and r30-e, r300-e, r330-e at
+       the top, z 41 to 44, a ray runs through to the far side of the castle or to sky). One box in the wall's tone, 0.02 m inside its
+       four sides so no face lies in another's plane. v27: on by default after the blind look passed (Fawkes 7.30 am); ?strip=0 leaves it out. */
+    /* v24 (8 Nov 2026, eye-item7/v24/method-v2.md): v23's column covered faces that were already there, 0.18 to 0.43 m nearer the camera, and the
+       massing renders paler than the floor groups, so it read as a pale proud column. The real gap, by ray (expose-bands.json, bands on), is the
+       top, z 40.9 to 46.3, and three 0.7 m bands, 9.7 to 10.4, 20.1 to 20.8, 25.3 to 26.0: nothing else. Each piece is one outer face (no caps, no
+       ends, as bands() does), 0.01 m behind the innermost +y face beside it at the exposed x (plane-b.json), running 0.02 m into the slab at each end;
+       the bands in `raise` times 0.80 (?stripk=, the floor groups render 0.78 to 0.83 of the massing at one colour), the top in `raise`. 9.7 clears
+       the lancets' top at 8.8 (card 3238, whose faces stay unwalled). On by default since v27, ?strip=0 leaves it out; judged with ?bands=1. */
+    if (!/[?&]strip=0/.test(location.search)) {   /* v27 (8 Nov 2026, Fawkes 7.30 am: item 7 v27 PASSED): ON by default, ?strip=0 leaves it out */
+      var sk = +((/[?&]stripk=([0-9.]+)/.exec(location.search) || [])[1] || 0.8), tn = GREYS.raise;
+      GREYS.stripBand = ((tn >> 16 & 255) * sk << 16) | ((tn >> 8 & 255) * sk << 8) | ((tn & 255) * sk | 0);
+      /* v25 (8 Nov 2026, eye-item7/v25/result.md): the top's own k, ?topk= (default 1, the v24 tone); the one retune M5 allows is run with ?topk=1.2 */
+      var tk = +((/[?&]topk=([0-9.]+)/.exec(location.search) || [])[1] || 1), cl = function (v) { return Math.min(255, Math.round(v * tk)); };
+      GREYS.stripTop = (cl(tn >> 16 & 255) << 16) | (cl(tn >> 8 & 255) << 8) | cl(tn & 255);
+      [['stripBand', 9.7, 10.4, 69.79, 67.9], ['stripBand', 20.1, 20.8, 69.24, 68.76], ['stripBand', 25.3, 26.0, 69.24, 67.9], ['stripTop', 40.9, 46.3, 69.54, 67.9]].forEach(function (s) {
+        quad(s[0], [72.02, s[3], s[1] - 0.02], [87.98, s[3], s[1] - 0.02], [87.98, s[3], s[2] + 0.02], [72.02, s[3], s[2] + 0.02]);
+        /* v26 (8 Nov 2026, Fawkes 6.38 am; eye-item7/v26/result.md): the east end face. Rays from the east slipped past the end of the single face at
+           x 87.5 (z 45.6 and 41.3) into the void behind it; an end face at x 87.98 from the strip's back (y 69.0) to the piece's own plane closes it.
+           A fix by cause to the geometry, not a retune of a tuning number.
+           v27 (8 Nov 2026, Fawkes 7.05 am; eye-item7/v27/south.json): the r150-e ray crosses x 88 at y 68.09, south of the face's back edge (69.0), so the
+           face runs back (lower y) to the next solid along x 87.98 or to y 67.9, whichever is nearer: s[4]. Measured from y 69.0 at each piece's mid height:
+           the top, the 9.7 band and the 25.3 band find nothing nearer than the stair hall's wall at y 50.8 or 59.4, so 67.9; the 20.1 band starts inside a
+           mesh whose south face is y 68.76, so 68.76 (the face stays inside it). */
+        quad(s[0], [87.98, s[4], s[1] - 0.02], [87.98, s[3], s[1] - 0.02], [87.98, s[3], s[2] + 0.02], [87.98, s[4], s[2] + 0.02]); });
+    }
     if (x3222) (M.rooms || []).forEach(function (r) {
       if (!r.corbel && !r.cap) return;
       var c = r.shape && r.shape.circle; if (!c) return;
