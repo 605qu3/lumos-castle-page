@@ -2380,6 +2380,12 @@ window.CastleShell = { build: function (F, M, placeId, o) {
        side is no model place (the gate arch onto the grounds) builds no dark recess: the view draws the outside itself,
        and the 3 m box stood out of the Astronomy drum's foot as a black block on legs. Every other view unchanged */
     if (o.exterior && !findPlace(M, w.to)) return;
+    /* v181 (req 3189's reshoot, P03): castle-exterior.js's own floor builds never pass o.exterior, and the dovecote
+       stair's far side is a model place, so the 3 m dark box behind its head arch (beyond-dovecote-stair-arch, bucket
+       31.2) stood 1.4 m proud of the drum's face, its back faces a black hook from the lawn. Under the outside view
+       (EXT: o.exterior or the address's exterior=1) no way builds the box: every place is drawn by its own floor or
+       shaft build, so there is no dark to stand in for. The walk unchanged */
+    if (EXT) return;
     var depth = 3.0, rec = slab(w.w + 0.4, w.h + 0.2, depth, F.solid(0x141210), 'way');
     rec.position.set(w.mid.x - w.inward.x * (depth / 2 + 0.9), w.mid.y + w.sill + w.h / 2, w.mid.z - w.inward.z * (depth / 2 + 0.9));
     rec.rotation.y = Math.atan2(w.inward.x, w.inward.z); rec.material.side = THREE.BackSide; rec.name = 'beyond-' + w.id;
