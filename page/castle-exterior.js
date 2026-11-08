@@ -311,7 +311,7 @@
       P.push({ q: q, poly: ar < 0 ? q.poly.slice().reverse() : q.poly, cw: ar < 0, b: [x0, y0, x1, y1], f: q.floor, c: q.ceiling });
     });
     function covers(R, x, y) { return x >= R.b[0] && x <= R.b[2] && y >= R.b[1] && y <= R.b[3] && inPoly(R.poly, x, y); }
-    var tones = {}, later = [], MAXGAP = 1.25;
+    var tones = {}, later = [], gaps = {}, MAXGAP = 1.25, STEP = 0.25;
     function lum(h) { return ((h >> 16 & 255) * 0.3 + (h >> 8 & 255) * 0.59 + (h & 255) * 0.11) / 255; }
     var T = {}, pieces = 0, stretches = 0, tall = 0, faced = 0, bare = 0;
     function quad(col, a, b, c, d) { var arr = T[col] || (T[col] = []); [a, b, c, a, c, d].forEach(function (p) { var v = TL(p[0], p[1], p[2]); arr.push(v.x, v.y, v.z); }); }
@@ -323,7 +323,7 @@
         var ux = dx / L, uy = dy / L, nx = uy, ny = -ux;
         var wl = Q.q.walls, t = Array.isArray(wl) ? wl[Q.cw ? (n - 1 - i - 1 + n) % n : i] : (wl && typeof wl === 'object' ? wl[['south', 'east', 'north', 'west'][i]] : null);
         t = t || Q.q.wall || 0.5;
-        var steps = Math.max(1, Math.round(L)), runs = [], cur = null;
+        var steps = Math.max(1, Math.ceil(L / STEP)), runs = [], cur = null;
         for (var s = 0; s < steps; s++) {
           var m = (s + 0.5) / steps * L, px = a[0] + ux * m, py = a[1] + uy * m, ox = px + nx * 0.1, oy = py + ny * 0.1, ext = true, up = Infinity;
           for (var r = 0; r < P.length; r++) {
@@ -332,7 +332,7 @@
             if (R.f >= top - 0.05 && R.f < up && (covers(R, px - nx * 0.1, py - ny * 0.1) || covers(R, ox, oy) || covers(R, px + nx * t / 2, py + ny * t / 2))) up = R.f;
           }
           var z1 = ext && up < Infinity && up - top > 0.02 ? up : null, off = t, col = null, dbg = null;
-          if (z1 != null && z1 - top > MAXGAP) { tall++; z1 = null; }   /* a slab gap is 0.7 m; a taller gap is absent storeys, the Architect's (req 3191), not a band */
+          if (z1 != null && z1 - top > MAXGAP) { tall++; var hg = probe(px, py, nx, ny, top + 0.35), walled = hg && hg.off > -0.1 && hg.off < t + 0.4; if (!walled) { var gk = Q.q.id + '@' + Q.f.toFixed(2), g = gaps[gk] || (gaps[gk] = { id: Q.q.id, floor: +Q.f.toFixed(2), ceiling: +top.toFixed(2), up: +z1.toFixed(2), gap: +(z1 - top).toFixed(2), metres: 0 }); g.metres += +(L / steps).toFixed(2); g.gap = Math.max(g.gap, +(z1 - top).toFixed(2)); } z1 = null; }   /* a slab gap is 0.7 m; a taller gap is absent storeys, the Architect's (req 3191), not a band */
           if (z1 != null) {
             var hm = probe(px, py, nx, ny, (top + z1) / 2), hq = probe(px, py, nx, ny, top + Math.min(0.2, (z1 - top) / 2));
             dbg = { hm: hm ? +hm.off.toFixed(2) : null, hq: hq ? +hq.off.toFixed(2) : null };
@@ -366,7 +366,7 @@
       G.add(new THREE.Mesh(bg, new THREE.MeshLambertMaterial({ color: +c, side: THREE.DoubleSide })));
     });
     var log = later.map(function (w) { return { id: w.id, floor: +w.fl.toFixed(2), edge: w.edge, len: w.len, at: w.at, z0: +w.z0.toFixed(2), z1: +w.z1.toFixed(2), h: +(w.z1 - w.z0).toFixed(2), probe: w.dbg }; });
-    return { log: log, group: G, pieces: pieces, tall: tall, faced: faced, bare: bare, probes: probes, places: P.length, tris: tris };
+    return { gaps: Object.keys(gaps).map(function (k) { return gaps[k]; }).sort(function (p1, p2) { return p2.gap - p1.gap; }), log: log, group: G, pieces: pieces, tall: tall, faced: faced, bare: bare, probes: probes, places: P.length, tris: tris };
   }
 
   function placeInto(out, TL) {
@@ -414,7 +414,7 @@
     });
     if (bandsOn) steps.push(function () {
       var s0 = performance.now(), bd; try { bd = bands(TL, gb.scene); } catch (e) { X.skipped.push('bands: ' + String(e && e.stack || e).slice(0, 300)); return; } gb.scene.add(bd.group);
-      X.bands = { log: bd.log, pieces: bd.pieces, tris: Math.round(bd.tris), tallSkipped: bd.tall, faced: bd.faced, bare: bd.bare, probes: bd.probes, places: bd.places, ms: Math.round(performance.now() - s0) };
+      X.bands = { gaps: bd.gaps, log: bd.log, pieces: bd.pieces, tris: Math.round(bd.tris), tallSkipped: bd.tall, faced: bd.faced, bare: bd.bare, probes: bd.probes, places: bd.places, ms: Math.round(performance.now() - s0) };
     });
     steps.push(function () {
       var s0 = performance.now(), m = massing(TL); gb.scene.add(m.group);
