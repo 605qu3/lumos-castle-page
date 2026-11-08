@@ -118,6 +118,30 @@ window.CASTLE_TONES = {
   "far-hills": {
    "hex": "#7c8592",
    "say": "the far hills: heather and bracken gone blue-grey with distance (invented; near farView's provisional)"
+  },
+  "far-pasture": {
+   "hex": "#777650",
+   "say": "the village's rough pasture and the moraine: tussock, rush and bent grass, browner and duller than the castle's grass, never mown (invented)"
+  },
+  "far-scrub": {
+   "hex": "#4d5034",
+   "say": "scrub on the glen's sides and by the lane: gorse, broom and birch, a dark olive with a rust of dead bracken (invented)"
+  },
+  "far-boulders": {
+   "hex": "#8a877b",
+   "say": "the boulder-strewn ground past the stile toward the mountain (GoF 27): the crag's stone, lichened a step paler (invented)"
+  },
+  "far-thatch": {
+   "hex": "#7b6d55",
+   "say": "the cottages' roofs: 'the little thatched cottages' (PoA 10), straw weathered grey-brown, darker than the castle's slate is blue"
+  },
+  "far-cottage": {
+   "hex": "#9e998c",
+   "say": "the cottages' walls: lime-washed rubble gone grey with weather, a step warmer than the castle's far stone (invented; canon gives no colour)"
+  },
+  "far-garden": {
+   "hex": "#5c6a40",
+   "say": "the cottage gardens, fewer houses and larger gardens toward the stile (GoF 27): kale, potatoes and rough hedge, the one worked green, darker than the pasture (invented)"
   }
  },
  "dressing": {

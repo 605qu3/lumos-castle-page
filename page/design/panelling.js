@@ -135,7 +135,14 @@
     var S = SPEC[o.style] || SPEC.tudor, grade = Math.max(0, Math.min(3, o.grade | 0)), G = new THREE.Group();
     var len = o.len, h = Math.min(o.h, o.to || o.h), gaps = o.gaps || [];   // o.to: the panelling stops there, the wall above the shell's
     var top = h - S.cornice - S.frieze, frames = [], panels = [], P = panelGeom(THREE, o.style, grade);
+    /* req 3183, the check (mcgonagalls-office's 33-degree corner by the turret): at an acute inside corner the next wall's
+       face leans over this one, x = z cot(angle) out from the corner, so a square-ended piece d deep runs its front edge
+       into that stone; each piece touching such a corner stops where its front meets the face (cot from the mitre's cot
+       of the half angle: (m*m - 1) / 2m, 0 at a square corner, nothing done at an obtuse or outside one) */
+    var ac = (o.mitre || [0, 0]).map(function (m) { return m > 1 ? (m * m - 1) / (2 * m) : 0; });
+    var trimEnds = function (x0, x1, d) { return [x0 < 1e-3 ? Math.max(x0, (d + 0.005) * ac[0]) : x0, x1 > len - 1e-3 ? Math.min(x1, len - (d + 0.005) * ac[1]) : x1]; };
     var unit = new THREE.BoxGeometry(1, 1, 1), box = function (x0, x1, y0, y1, d) {
+      var te = trimEnds(x0, x1, d); x0 = te[0]; x1 = te[1]; if (x1 - x0 < 0.01) return;
       frames.push([(x0 + x1) / 2, (y0 + y1) / 2, (d - BEAR) / 2, x1 - x0, y1 - y0, d + BEAR]);   // its back 1 cm into the wall
     };
     /* the bands, bottom to top: the plinth, the lowest rank to the chair rail, the ranks above to the frieze */
@@ -166,8 +173,11 @@
     /* the frieze and the cornice over every clear stretch at their height (a window that reaches them breaks them) */
     var tops = runs(len, gaps, top, h);
     tops.forEach(function (u, k) {
-      var ul = u[1] - u[0], fr = new THREE.Mesh(new THREE.BoxGeometry(ul, S.frieze, S.proud + BEAR), mats.oak);
-      fr.position.set((u[0] + u[1]) / 2, top + S.frieze / 2, (S.proud - BEAR) / 2); fr.name = 'panelling-frieze-' + k; G.add(fr);
+      u = trimEnds(u[0], u[1], S.proud);   /* req 3183: the frieze clear of an acute corner (the cornice below keeps its mitre) */
+      /* req 3211 (the Architect's seams v1, item 5): the frieze bears 2 mm, 8 mm short of BEAR, so its back never lies in one plane with
+         an opening's lining, which ends 1 cm into the wall (clementine.html's lined bookcase) */
+      var FB = BEAR - 0.008, ul = u[1] - u[0], fr = new THREE.Mesh(new THREE.BoxGeometry(ul, S.frieze, S.proud + FB), mats.oak);
+      fr.position.set((u[0] + u[1]) / 2, top + S.frieze / 2, (S.proud - FB) / 2); fr.name = 'panelling-frieze-' + k; G.add(fr);
       if (grade >= 2) {
         var tex = friezeTexture(THREE, o.style, mats.carve != null ? mats.carve : 0x684e38, 128);
         tex.repeat.set(ul / (S.frieze * 2), 1);
@@ -177,9 +187,14 @@
     });
     var cs = new THREE.Shape(), C = S.cornice;   // the cornice in section: a fillet, a cove and a projecting top
     var cTop = C + (h >= o.h - 1e-3 ? BEAR : 0);   // to the ceiling: 1 cm into it
-    cs.moveTo(-BEAR, 0); cs.lineTo(S.proud + 0.01, 0); cs.lineTo(S.proud + 0.01, C * 0.18);
-    cs.quadraticCurveTo(S.proud + 0.02, C * 0.75, S.proud + C * 0.7, C * 0.8); cs.lineTo(S.proud + C * 0.7, C); cs.lineTo(S.proud + C * 0.7, cTop); cs.lineTo(-BEAR, cTop); cs.closePath();
+    var CB = BEAR - 0.008;   // req 3211: the cornice's back, like the frieze's, 8 mm short of a lining's end 1 cm in
+    cs.moveTo(-CB, 0); cs.lineTo(S.proud + 0.01, 0); cs.lineTo(S.proud + 0.01, C * 0.18);
+    cs.quadraticCurveTo(S.proud + 0.02, C * 0.75, S.proud + C * 0.7, C * 0.8); cs.lineTo(S.proud + C * 0.7, C); cs.lineTo(S.proud + C * 0.7, cTop); cs.lineTo(-CB, cTop); cs.closePath();
     tops.forEach(function (u, k) {
+      /* req 3183, the check: a run too short to take its mitre (below) at an acute corner stops square where its
+         projecting top meets the next wall's face (mcgonagalls-office's 0.57 m side, 8.5 cm into the stone) */
+      var mm = Math.max(1, Math.abs(u[0] < 1e-3 && o.mitre ? o.mitre[0] : 0), Math.abs(u[1] > len - 1e-3 && o.mitre ? o.mitre[1] : 0));
+      if (!(u[1] - u[0] > 2.2 * (S.proud + C * 0.7) * mm)) u = trimEnds(u[0], u[1], S.proud + C * 0.7);
       var L = u[1] - u[0], cg = new THREE.ExtrudeGeometry(cs, { depth: L, bevelEnabled: false, curveSegments: 6 });
       /* mitred where the run meets the next wall's cornice at a corner (o.mitre: [start, end], the cot of half the
          corner's angle; 1 a square inside corner, below 0 an outside one), so the two never lie in one plane. Before the
@@ -198,12 +213,16 @@
     });
     /* the overdoor at grade 3: the four beasts in a board over each door's head, in the first rank above it */
     if (grade >= 3) gaps.filter(function (g) { return g.door; }).forEach(function (g, k) {
-      var ow = Math.min(2.4, Math.max(1.2, (g.x1 - g.x0) + 0.6)), oh = ow / 4;
+      /* req 3183, the check: the board and its frame stay on their own wall, 6 cm short of each end (dumbledores-office's
+         1.18 m flat sides took a 1.92 m board 0.37 m past both ends into the next side's stone); under 0.6 m, none */
+      var ow = Math.min(2.4, Math.max(1.2, (g.x1 - g.x0) + 0.6), len - 0.2), oh = ow / 4;
+      if (ow < 0.6) return;
+      var oc = Math.max(0.1 + ow / 2, Math.min(len - 0.1 - ow / 2, (g.x0 + g.x1) / 2));
       var ot = overdoorTexture(THREE, mats.carve != null ? mats.carve : 0x684e38, 512);
       var om = new THREE.Mesh(new THREE.PlaneGeometry(ow, oh), new THREE.MeshLambertMaterial({ map: ot }));
-      om.position.set((g.x0 + g.x1) / 2, Math.min(top - oh / 2 - 0.05, g.y1 + 0.12 + oh / 2), S.proud + 0.008 + LIFT);
+      om.position.set(oc, Math.min(top - oh / 2 - 0.05, g.y1 + 0.12 + oh / 2), S.proud + 0.008 + LIFT);
       om.name = 'panelling-overdoor-' + k; G.add(om);
-      box((g.x0 + g.x1) / 2 - ow / 2 - 0.04, (g.x0 + g.x1) / 2 + ow / 2 + 0.04, om.position.y - oh / 2 - 0.04, om.position.y + oh / 2 + 0.04, S.proud + 0.008);
+      box(oc - ow / 2 - 0.04, oc + ow / 2 + 0.04, om.position.y - oh / 2 - 0.04, om.position.y + oh / 2 + 0.04, S.proud + 0.008);
     });
     var fm2 = instanced(THREE, unit, mats.oak, frames, 'panelling-frames'); if (fm2) G.add(fm2);
     var flat = panels.filter(function (a) { return !(P.folds && a[6]); });
@@ -243,6 +262,7 @@
       return Math.abs(t) < 0.05 ? 0 : 1 / t;
     });
     var up = new THREE.Vector3().subVectors(o.toLocal(P[0][0], P[0][1], Q.floor + 1), o.toLocal(P[0][0], P[0][1], Q.floor));
+    var WS = [];   // each wall's run, built once every wall's gaps are known (a corner's return needs its neighbour's)
     for (i = 0; i < n; i++) {
       var a = P[i], b = P[(i + 1) % n], len = Math.hypot(b[0] - a[0], b[1] - a[1]);
       if (len < 0.3) continue;
@@ -253,24 +273,68 @@
       var rev = new THREE.Vector3().crossVectors(ez, ex).dot(up) < 0;
       var s0 = rev ? b : a, ux = ((rev ? a : b)[0] - s0[0]) / len, uy = ((rev ? a : b)[1] - s0[1]) / len;
       var local = (o.openings || []).filter(function (op) { return op.wall === i && typeof op.at === 'number'; })
-        .map(function (op) { var t = rev ? len - op.at : op.at; return { x0: t - op.w / 2, x1: t + op.w / 2, y0: op.sill || 0, y1: (op.sill || 0) + op.h, door: !!op.door }; });
+        .reduce(function (l, op) { return l.concat(gapOf(op, rev ? len - op.at : op.at)); }, []);
       var gaps = (o.openings || []).filter(function (op) {
         if (typeof op.at === 'number') return false;
         var t = (op.at[0] - s0[0]) * ux + (op.at[1] - s0[1]) * uy, dn = (op.at[0] - s0[0]) * nx + (op.at[1] - s0[1]) * ny;
         return t > -0.1 && t < len + 0.1 && Math.abs(dn) < 0.6;
-      }).map(function (op) {
-        var t = (op.at[0] - s0[0]) * ux + (op.at[1] - s0[1]) * uy;
-        return { x0: t - op.w / 2, x1: t + op.w / 2, y0: op.sill || 0, y1: (op.sill || 0) + op.h, door: !!op.door };
-      }).concat(local);
+      }).reduce(function (l, op) {
+        return l.concat(gapOf(op, (op.at[0] - s0[0]) * ux + (op.at[1] - s0[1]) * uy));
+      }, []).concat(local);
       var mi = rev ? [mit[(i + 1) % n], mit[i]] : [mit[i], mit[(i + 1) % n]];
-      var W = wall(THREE, { len: len, h: h, to: o.to, style: o.style, grade: o.grade, gaps: gaps, owner: Q.id + '-panelling', mitre: mi }, o.mats);
       if (rev) { var T = A; A = B; B = T; ex.negate(); }
-      var ey = new THREE.Vector3().crossVectors(ez, ex);
-      W.matrixAutoUpdate = false;
-      W.matrix.makeBasis(ex, ey, ez).setPosition(A);
-      W.name = Q.id + '-panelling-' + i; G.add(W);
+      WS[i] = { len: len, gaps: gaps, mi: mi, A: A, ex: ex, ez: ez, v0: rev ? (i + 1) % n : i, v1: rev ? i : (i + 1) % n };
     }
+    /* req 3183, the check (pomfrey-office): a dressed opening whose dressing runs into an inside corner stands its
+       architrave 6 cm proud there, across the next wall's end stile; that wall stops 10 cm short of the corner over the
+       opening's height (its gap's own y), so the panelling returns clear of the moulding */
+    WS.forEach(function (w, j) {
+      w.gaps.forEach(function (g) {
+        if (!g.trim) return;
+        [[g.x0 < 0.02, w.v0], [g.x1 > w.len - 0.02, w.v1]].forEach(function (c) {
+          if (!c[0] || !(mit[c[1]] > 0)) return;
+          WS.forEach(function (u, k) {
+            if (k === j) return;
+            if (u.v0 === c[1]) u.gaps.push({ x0: -0.01, x1: 0.1, y0: g.y0, y1: g.y1, door: false, trim: 0 });
+            else if (u.v1 === c[1]) u.gaps.push({ x0: u.len - 0.1, x1: u.len + 0.01, y0: g.y0, y1: g.y1, door: false, trim: 0 });
+          });
+        });
+      });
+    });
+    WS.forEach(function (w, i) {
+      var W = wall(THREE, { len: w.len, h: h, to: o.to, style: o.style, grade: o.grade, gaps: w.gaps, owner: Q.id + '-panelling', mitre: w.mi }, o.mats);
+      var ey = new THREE.Vector3().crossVectors(w.ez, w.ex);
+      W.matrixAutoUpdate = false;
+      W.matrix.makeBasis(w.ex, ey, w.ez).setPosition(w.A);
+      W.name = Q.id + '-panelling-' + i; G.add(W);
+    });
     G.name = Q.id + '-panelling';
+    return G;
+  }
+
+  /* req 3183 (the Furnisher's clash cause 7): an opening the shell dresses stops the panelling at its dressing's outer
+     edge, not at the cut, or the last panel sinks into the jamb's base. The opening carries its dressing as trim (metres
+     from the cut to the dressing's outer edge along the wall) or as cls and age (with grand, late, hood), read from
+     CastleTrim.mould (page/castle-trim.js, the Architect's: bw, and a hood's ring 0.08 past it over the head). The
+     shell's w is the cut less 2 cm (its ends 1 cm into the reveal); a dressed opening gives that centimetre back. An
+     opening with neither stops at the cut as before (a hidden way, a fire, a bookcase recess). */
+  function trimOf(op) {
+    if (typeof op.trim === 'number') return op.trim;
+    if (op.cls && window.CastleTrim && CastleTrim.mould) { var m = CastleTrim.mould(op.age, op.cls, op); return m && m.bw || 0; }
+    return 0;
+  }
+  /* req 3183, the check (10.45 pm): the dressing's pieces that stand past bw, as castle-trim.js draws them (its lines
+     ~231-298), each a gap of its own, so the panelling stops at them only in the ranks they reach: a window's sill stone
+     0.05 past bw each side and 0.09 under the cut (pomfrey-office, dumbledores-office); a hood's ends and label stops
+     0.10 past bw, from the stops' feet (at most 0.34 + 0.12 under the head's top, the P5 hood) or a pointed head's
+     springing up to the head. A list: the opening's own gap first, then these (never doors, so no overdoor rides them) */
+  function gapOf(op, t) {
+    var sill = op.sill || 0, d = trimOf(op), e = d ? d + 0.01 : 0, hood = d && op.hood ? 0.08 : 0, top = sill + op.h;
+    var G = [{ x0: t - op.w / 2 - e, x1: t + op.w / 2 + e, y0: d && sill > 0.05 ? Math.max(0, sill - e) : sill, y1: top + (d ? e + 0.01 + hood : 0), door: !!op.door, trim: d }];
+    if (d && sill > 0.05) G.push({ x0: t - op.w / 2 - e - 0.05, x1: t + op.w / 2 + e + 0.05, y0: Math.max(0, sill - 0.11), y1: sill + 0.01, door: false, trim: d });
+    if (d && op.hood) G.push({ x0: t - op.w / 2 - e - 0.11, x1: t + op.w / 2 + e + 0.11, y0: Math.max(sill, Math.min(top + d - 0.47, sill + op.h * 0.55)), y1: top + e + 0.01 + hood, door: false, trim: d });
+    /* the P6 and P7 architrave's lugs, 0.07 past bw from 0.30 under the head (castle-trim ~297), where the opening says so */
+    if (d && op.lugs) G.push({ x0: t - op.w / 2 - e - 0.08, x1: t + op.w / 2 + e + 0.08, y0: Math.max(sill, top - 0.31), y1: top + e, door: false, trim: d });
     return G;
   }
 
