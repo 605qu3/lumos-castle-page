@@ -162,7 +162,18 @@ function findPlace(M, id) {
     var sops = (M.openings || []).filter(function (op) { return op.at && (op.between || []).indexOf(st.id) >= 0; });
     var wide = Math.max.apply(null, sops.map(function (op) { return op.w || 1; }).concat([0.8]));
     var sn = Math.max(8, Math.min(SIDES, Math.floor(Math.PI / Math.atan((wide + 0.1) / (2 * srr)))));
-    var soff = sops[0] ? angle(scc, toSite(M, sops[0].group || null, sops[0].at)) : 0, sh = 180 / sn;
+    var soff = sops[0] ? angle(scc, toSite(M, sops[0].group || null, sops[0].at)) : 0;
+    /* v196 (the Slytherin stair, after req 3231): every door on a side's middle, not only the first; at 13 sides the
+       stair's foot door, half a turn from its head door, fell on a corner, so one face hid its jamb and a slit showed by
+       the leaf. The most sides (from the widest door's limit down by at most 4, never under 8) on which each door's width
+       lies inside one side, so a round shaft never turns coarse for it; where none fits, the first door's as before.
+       Changes the Slytherin stair (13 to 12) and the fern well (17 to 16), no other */
+    var sangs = sops.map(function (op) { return { a: angle(scc, toSite(M, op.group || null, op.at)), h: Math.atan(((op.w || 1) / 2 + 0.05) / srr) * 180 / Math.PI }; });
+    for (var tn = sn; tn >= Math.max(8, sn - 4); tn--) {
+      var fits = sangs.every(function (d) { var st2 = 360 / tn, k = (((d.a - soff) % st2) + st2) % st2; return Math.min(k, st2 - k) + d.h <= st2 / 2; });
+      if (fits) { sn = tn; break; }
+    }
+    var sh = 180 / sn;
     var scp = arcPts(scc, srr / Math.cos(sh * Math.PI / 180), soff + sh, soff + 360 + sh, sn).slice(0, sn);
     /* v25 (model v57, the West Tower's): `from` and `to`, where not given, its first and last `floors` */
     var sfrom = st.from != null ? st.from : levelZ(M, st.floors[0]), sto = st.to != null ? st.to : levelZ(M, st.floors[st.floors.length - 1]);
