@@ -1,0 +1,512 @@
+{
+ "chain": "clock-room-1897",
+ "about": "The clock room of 1897 (clock-room-6, floor 6): the hour struck out of step and the lesson bell given a hand, on Events' clock (Magic's req 3256). The dawn winding is a sound cue only (docs/magic/sound-schedule-6.md); the one-handed and slow clocks are Interiors' pieces, no record. The place name `clock room` is provisional until the Architect's model names it.",
+ "first_visit": [],
+ "room": [],
+ "records": [
+  {
+   "id": "clock-room-1897.hour-00",
+   "tier": "fixed",
+   "source": "device",
+   "leans": [],
+   "weight": 1,
+   "moment": "clock 00:00",
+   "when": [
+    "place = clock room",
+    "era = 1890s"
+   ],
+   "show": [
+    "the room's clocks strike the hour out of step, one after another over about a minute, a small one last and late"
+   ],
+   "starts": [],
+   "canon": "Magic's req 3256 (docs/magic/rooms.md, The clock room, 1897, read in the canon tool 8 November 2026): the hour, each clock in turn, a small one late (PS 14 L4924, CoS 9 L9508 for a clock chiming somewhere); ours as marked there; the clocks are heard as clocks, nothing glows or chimes to mark magic; who winds and who rings is left to Mr. Grimbleton's round"
+  },
+  {
+   "id": "clock-room-1897.hour-01",
+   "tier": "fixed",
+   "source": "device",
+   "leans": [],
+   "weight": 1,
+   "moment": "clock 01:00",
+   "when": [
+    "place = clock room",
+    "era = 1890s"
+   ],
+   "show": [
+    "the room's clocks strike the hour out of step, one after another over about a minute, a small one last and late"
+   ],
+   "starts": [],
+   "canon": "Magic's req 3256 (docs/magic/rooms.md, The clock room, 1897, read in the canon tool 8 November 2026): the hour, each clock in turn, a small one late (PS 14 L4924, CoS 9 L9508 for a clock chiming somewhere); ours as marked there; the clocks are heard as clocks, nothing glows or chimes to mark magic; who winds and who rings is left to Mr. Grimbleton's round"
+  },
+  {
+   "id": "clock-room-1897.hour-02",
+   "tier": "fixed",
+   "source": "device",
+   "leans": [],
+   "weight": 1,
+   "moment": "clock 02:00",
+   "when": [
+    "place = clock room",
+    "era = 1890s"
+   ],
+   "show": [
+    "the room's clocks strike the hour out of step, one after another over about a minute, a small one last and late"
+   ],
+   "starts": [],
+   "canon": "Magic's req 3256 (docs/magic/rooms.md, The clock room, 1897, read in the canon tool 8 November 2026): the hour, each clock in turn, a small one late (PS 14 L4924, CoS 9 L9508 for a clock chiming somewhere); ours as marked there; the clocks are heard as clocks, nothing glows or chimes to mark magic; who winds and who rings is left to Mr. Grimbleton's round"
+  },
+  {
+   "id": "clock-room-1897.hour-03",
+   "tier": "fixed",
+   "source": "device",
+   "leans": [],
+   "weight": 1,
+   "moment": "clock 03:00",
+   "when": [
+    "place = clock room",
+    "era = 1890s"
+   ],
+   "show": [
+    "the room's clocks strike the hour out of step, one after another over about a minute, a small one last and late"
+   ],
+   "starts": [],
+   "canon": "Magic's req 3256 (docs/magic/rooms.md, The clock room, 1897, read in the canon tool 8 November 2026): the hour, each clock in turn, a small one late (PS 14 L4924, CoS 9 L9508 for a clock chiming somewhere); ours as marked there; the clocks are heard as clocks, nothing glows or chimes to mark magic; who winds and who rings is left to Mr. Grimbleton's round"
+  },
+  {
+   "id": "clock-room-1897.hour-04",
+   "tier": "fixed",
+   "source": "device",
+   "leans": [],
+   "weight": 1,
+   "moment": "clock 04:00",
+   "when": [
+    "place = clock room",
+    "era = 1890s"
+   ],
+   "show": [
+    "the room's clocks strike the hour out of step, one after another over about a minute, a small one last and late"
+   ],
+   "starts": [],
+   "canon": "Magic's req 3256 (docs/magic/rooms.md, The clock room, 1897, read in the canon tool 8 November 2026): the hour, each clock in turn, a small one late (PS 14 L4924, CoS 9 L9508 for a clock chiming somewhere); ours as marked there; the clocks are heard as clocks, nothing glows or chimes to mark magic; who winds and who rings is left to Mr. Grimbleton's round"
+  },
+  {
+   "id": "clock-room-1897.hour-05",
+   "tier": "fixed",
+   "source": "device",
+   "leans": [],
+   "weight": 1,
+   "moment": "clock 05:00",
+   "when": [
+    "place = clock room",
+    "era = 1890s"
+   ],
+   "show": [
+    "the room's clocks strike the hour out of step, one after another over about a minute, a small one last and late"
+   ],
+   "starts": [],
+   "canon": "Magic's req 3256 (docs/magic/rooms.md, The clock room, 1897, read in the canon tool 8 November 2026): the hour, each clock in turn, a small one late (PS 14 L4924, CoS 9 L9508 for a clock chiming somewhere); ours as marked there; the clocks are heard as clocks, nothing glows or chimes to mark magic; who winds and who rings is left to Mr. Grimbleton's round"
+  },
+  {
+   "id": "clock-room-1897.hour-06",
+   "tier": "fixed",
+   "source": "device",
+   "leans": [],
+   "weight": 1,
+   "moment": "clock 06:00",
+   "when": [
+    "place = clock room",
+    "era = 1890s"
+   ],
+   "show": [
+    "the room's clocks strike the hour out of step, one after another over about a minute, a small one last and late"
+   ],
+   "starts": [],
+   "canon": "Magic's req 3256 (docs/magic/rooms.md, The clock room, 1897, read in the canon tool 8 November 2026): the hour, each clock in turn, a small one late (PS 14 L4924, CoS 9 L9508 for a clock chiming somewhere); ours as marked there; the clocks are heard as clocks, nothing glows or chimes to mark magic; who winds and who rings is left to Mr. Grimbleton's round"
+  },
+  {
+   "id": "clock-room-1897.hour-07",
+   "tier": "fixed",
+   "source": "device",
+   "leans": [],
+   "weight": 1,
+   "moment": "clock 07:00",
+   "when": [
+    "place = clock room",
+    "era = 1890s"
+   ],
+   "show": [
+    "the room's clocks strike the hour out of step, one after another over about a minute, a small one last and late"
+   ],
+   "starts": [],
+   "canon": "Magic's req 3256 (docs/magic/rooms.md, The clock room, 1897, read in the canon tool 8 November 2026): the hour, each clock in turn, a small one late (PS 14 L4924, CoS 9 L9508 for a clock chiming somewhere); ours as marked there; the clocks are heard as clocks, nothing glows or chimes to mark magic; who winds and who rings is left to Mr. Grimbleton's round"
+  },
+  {
+   "id": "clock-room-1897.hour-08",
+   "tier": "fixed",
+   "source": "device",
+   "leans": [],
+   "weight": 1,
+   "moment": "clock 08:00",
+   "when": [
+    "place = clock room",
+    "era = 1890s"
+   ],
+   "show": [
+    "the room's clocks strike the hour out of step, one after another over about a minute, a small one last and late"
+   ],
+   "starts": [],
+   "canon": "Magic's req 3256 (docs/magic/rooms.md, The clock room, 1897, read in the canon tool 8 November 2026): the hour, each clock in turn, a small one late (PS 14 L4924, CoS 9 L9508 for a clock chiming somewhere); ours as marked there; the clocks are heard as clocks, nothing glows or chimes to mark magic; who winds and who rings is left to Mr. Grimbleton's round"
+  },
+  {
+   "id": "clock-room-1897.hour-09",
+   "tier": "fixed",
+   "source": "device",
+   "leans": [],
+   "weight": 1,
+   "moment": "clock 09:00",
+   "when": [
+    "place = clock room",
+    "era = 1890s"
+   ],
+   "show": [
+    "the room's clocks strike the hour out of step, one after another over about a minute, a small one last and late"
+   ],
+   "starts": [],
+   "canon": "Magic's req 3256 (docs/magic/rooms.md, The clock room, 1897, read in the canon tool 8 November 2026): the hour, each clock in turn, a small one late (PS 14 L4924, CoS 9 L9508 for a clock chiming somewhere); ours as marked there; the clocks are heard as clocks, nothing glows or chimes to mark magic; who winds and who rings is left to Mr. Grimbleton's round"
+  },
+  {
+   "id": "clock-room-1897.hour-10",
+   "tier": "fixed",
+   "source": "device",
+   "leans": [],
+   "weight": 1,
+   "moment": "clock 10:00",
+   "when": [
+    "place = clock room",
+    "era = 1890s"
+   ],
+   "show": [
+    "the room's clocks strike the hour out of step, one after another over about a minute, a small one last and late"
+   ],
+   "starts": [],
+   "canon": "Magic's req 3256 (docs/magic/rooms.md, The clock room, 1897, read in the canon tool 8 November 2026): the hour, each clock in turn, a small one late (PS 14 L4924, CoS 9 L9508 for a clock chiming somewhere); ours as marked there; the clocks are heard as clocks, nothing glows or chimes to mark magic; who winds and who rings is left to Mr. Grimbleton's round"
+  },
+  {
+   "id": "clock-room-1897.hour-11",
+   "tier": "fixed",
+   "source": "device",
+   "leans": [],
+   "weight": 1,
+   "moment": "clock 11:00",
+   "when": [
+    "place = clock room",
+    "era = 1890s"
+   ],
+   "show": [
+    "the room's clocks strike the hour out of step, one after another over about a minute, a small one last and late"
+   ],
+   "starts": [],
+   "canon": "Magic's req 3256 (docs/magic/rooms.md, The clock room, 1897, read in the canon tool 8 November 2026): the hour, each clock in turn, a small one late (PS 14 L4924, CoS 9 L9508 for a clock chiming somewhere); ours as marked there; the clocks are heard as clocks, nothing glows or chimes to mark magic; who winds and who rings is left to Mr. Grimbleton's round"
+  },
+  {
+   "id": "clock-room-1897.hour-12",
+   "tier": "fixed",
+   "source": "device",
+   "leans": [],
+   "weight": 1,
+   "moment": "clock 12:00",
+   "when": [
+    "place = clock room",
+    "era = 1890s"
+   ],
+   "show": [
+    "the room's clocks strike the hour out of step, one after another over about a minute, a small one last and late"
+   ],
+   "starts": [],
+   "canon": "Magic's req 3256 (docs/magic/rooms.md, The clock room, 1897, read in the canon tool 8 November 2026): the hour, each clock in turn, a small one late (PS 14 L4924, CoS 9 L9508 for a clock chiming somewhere); ours as marked there; the clocks are heard as clocks, nothing glows or chimes to mark magic; who winds and who rings is left to Mr. Grimbleton's round"
+  },
+  {
+   "id": "clock-room-1897.hour-13",
+   "tier": "fixed",
+   "source": "device",
+   "leans": [],
+   "weight": 1,
+   "moment": "clock 13:00",
+   "when": [
+    "place = clock room",
+    "era = 1890s"
+   ],
+   "show": [
+    "the room's clocks strike the hour out of step, one after another over about a minute, a small one last and late"
+   ],
+   "starts": [],
+   "canon": "Magic's req 3256 (docs/magic/rooms.md, The clock room, 1897, read in the canon tool 8 November 2026): the hour, each clock in turn, a small one late (PS 14 L4924, CoS 9 L9508 for a clock chiming somewhere); ours as marked there; the clocks are heard as clocks, nothing glows or chimes to mark magic; who winds and who rings is left to Mr. Grimbleton's round"
+  },
+  {
+   "id": "clock-room-1897.hour-14",
+   "tier": "fixed",
+   "source": "device",
+   "leans": [],
+   "weight": 1,
+   "moment": "clock 14:00",
+   "when": [
+    "place = clock room",
+    "era = 1890s"
+   ],
+   "show": [
+    "the room's clocks strike the hour out of step, one after another over about a minute, a small one last and late"
+   ],
+   "starts": [],
+   "canon": "Magic's req 3256 (docs/magic/rooms.md, The clock room, 1897, read in the canon tool 8 November 2026): the hour, each clock in turn, a small one late (PS 14 L4924, CoS 9 L9508 for a clock chiming somewhere); ours as marked there; the clocks are heard as clocks, nothing glows or chimes to mark magic; who winds and who rings is left to Mr. Grimbleton's round"
+  },
+  {
+   "id": "clock-room-1897.hour-15",
+   "tier": "fixed",
+   "source": "device",
+   "leans": [],
+   "weight": 1,
+   "moment": "clock 15:00",
+   "when": [
+    "place = clock room",
+    "era = 1890s"
+   ],
+   "show": [
+    "the room's clocks strike the hour out of step, one after another over about a minute, a small one last and late"
+   ],
+   "starts": [],
+   "canon": "Magic's req 3256 (docs/magic/rooms.md, The clock room, 1897, read in the canon tool 8 November 2026): the hour, each clock in turn, a small one late (PS 14 L4924, CoS 9 L9508 for a clock chiming somewhere); ours as marked there; the clocks are heard as clocks, nothing glows or chimes to mark magic; who winds and who rings is left to Mr. Grimbleton's round"
+  },
+  {
+   "id": "clock-room-1897.hour-16",
+   "tier": "fixed",
+   "source": "device",
+   "leans": [],
+   "weight": 1,
+   "moment": "clock 16:00",
+   "when": [
+    "place = clock room",
+    "era = 1890s"
+   ],
+   "show": [
+    "the room's clocks strike the hour out of step, one after another over about a minute, a small one last and late"
+   ],
+   "starts": [],
+   "canon": "Magic's req 3256 (docs/magic/rooms.md, The clock room, 1897, read in the canon tool 8 November 2026): the hour, each clock in turn, a small one late (PS 14 L4924, CoS 9 L9508 for a clock chiming somewhere); ours as marked there; the clocks are heard as clocks, nothing glows or chimes to mark magic; who winds and who rings is left to Mr. Grimbleton's round"
+  },
+  {
+   "id": "clock-room-1897.hour-17",
+   "tier": "fixed",
+   "source": "device",
+   "leans": [],
+   "weight": 1,
+   "moment": "clock 17:00",
+   "when": [
+    "place = clock room",
+    "era = 1890s"
+   ],
+   "show": [
+    "the room's clocks strike the hour out of step, one after another over about a minute, a small one last and late"
+   ],
+   "starts": [],
+   "canon": "Magic's req 3256 (docs/magic/rooms.md, The clock room, 1897, read in the canon tool 8 November 2026): the hour, each clock in turn, a small one late (PS 14 L4924, CoS 9 L9508 for a clock chiming somewhere); ours as marked there; the clocks are heard as clocks, nothing glows or chimes to mark magic; who winds and who rings is left to Mr. Grimbleton's round"
+  },
+  {
+   "id": "clock-room-1897.hour-18",
+   "tier": "fixed",
+   "source": "device",
+   "leans": [],
+   "weight": 1,
+   "moment": "clock 18:00",
+   "when": [
+    "place = clock room",
+    "era = 1890s"
+   ],
+   "show": [
+    "the room's clocks strike the hour out of step, one after another over about a minute, a small one last and late"
+   ],
+   "starts": [],
+   "canon": "Magic's req 3256 (docs/magic/rooms.md, The clock room, 1897, read in the canon tool 8 November 2026): the hour, each clock in turn, a small one late (PS 14 L4924, CoS 9 L9508 for a clock chiming somewhere); ours as marked there; the clocks are heard as clocks, nothing glows or chimes to mark magic; who winds and who rings is left to Mr. Grimbleton's round"
+  },
+  {
+   "id": "clock-room-1897.hour-19",
+   "tier": "fixed",
+   "source": "device",
+   "leans": [],
+   "weight": 1,
+   "moment": "clock 19:00",
+   "when": [
+    "place = clock room",
+    "era = 1890s"
+   ],
+   "show": [
+    "the room's clocks strike the hour out of step, one after another over about a minute, a small one last and late"
+   ],
+   "starts": [],
+   "canon": "Magic's req 3256 (docs/magic/rooms.md, The clock room, 1897, read in the canon tool 8 November 2026): the hour, each clock in turn, a small one late (PS 14 L4924, CoS 9 L9508 for a clock chiming somewhere); ours as marked there; the clocks are heard as clocks, nothing glows or chimes to mark magic; who winds and who rings is left to Mr. Grimbleton's round"
+  },
+  {
+   "id": "clock-room-1897.hour-20",
+   "tier": "fixed",
+   "source": "device",
+   "leans": [],
+   "weight": 1,
+   "moment": "clock 20:00",
+   "when": [
+    "place = clock room",
+    "era = 1890s"
+   ],
+   "show": [
+    "the room's clocks strike the hour out of step, one after another over about a minute, a small one last and late"
+   ],
+   "starts": [],
+   "canon": "Magic's req 3256 (docs/magic/rooms.md, The clock room, 1897, read in the canon tool 8 November 2026): the hour, each clock in turn, a small one late (PS 14 L4924, CoS 9 L9508 for a clock chiming somewhere); ours as marked there; the clocks are heard as clocks, nothing glows or chimes to mark magic; who winds and who rings is left to Mr. Grimbleton's round"
+  },
+  {
+   "id": "clock-room-1897.hour-21",
+   "tier": "fixed",
+   "source": "device",
+   "leans": [],
+   "weight": 1,
+   "moment": "clock 21:00",
+   "when": [
+    "place = clock room",
+    "era = 1890s"
+   ],
+   "show": [
+    "the room's clocks strike the hour out of step, one after another over about a minute, a small one last and late"
+   ],
+   "starts": [],
+   "canon": "Magic's req 3256 (docs/magic/rooms.md, The clock room, 1897, read in the canon tool 8 November 2026): the hour, each clock in turn, a small one late (PS 14 L4924, CoS 9 L9508 for a clock chiming somewhere); ours as marked there; the clocks are heard as clocks, nothing glows or chimes to mark magic; who winds and who rings is left to Mr. Grimbleton's round"
+  },
+  {
+   "id": "clock-room-1897.hour-22",
+   "tier": "fixed",
+   "source": "device",
+   "leans": [],
+   "weight": 1,
+   "moment": "clock 22:00",
+   "when": [
+    "place = clock room",
+    "era = 1890s"
+   ],
+   "show": [
+    "the room's clocks strike the hour out of step, one after another over about a minute, a small one last and late"
+   ],
+   "starts": [],
+   "canon": "Magic's req 3256 (docs/magic/rooms.md, The clock room, 1897, read in the canon tool 8 November 2026): the hour, each clock in turn, a small one late (PS 14 L4924, CoS 9 L9508 for a clock chiming somewhere); ours as marked there; the clocks are heard as clocks, nothing glows or chimes to mark magic; who winds and who rings is left to Mr. Grimbleton's round"
+  },
+  {
+   "id": "clock-room-1897.hour-23",
+   "tier": "fixed",
+   "source": "device",
+   "leans": [],
+   "weight": 1,
+   "moment": "clock 23:00",
+   "when": [
+    "place = clock room",
+    "era = 1890s"
+   ],
+   "show": [
+    "the room's clocks strike the hour out of step, one after another over about a minute, a small one last and late"
+   ],
+   "starts": [],
+   "canon": "Magic's req 3256 (docs/magic/rooms.md, The clock room, 1897, read in the canon tool 8 November 2026): the hour, each clock in turn, a small one late (PS 14 L4924, CoS 9 L9508 for a clock chiming somewhere); ours as marked there; the clocks are heard as clocks, nothing glows or chimes to mark magic; who winds and who rings is left to Mr. Grimbleton's round"
+  },
+  {
+   "id": "clock-room-1897.bell-morning",
+   "tier": "fixed",
+   "source": "device",
+   "leans": [],
+   "weight": 1,
+   "moment": "clock 09:00",
+   "when": [
+    "place = clock room",
+    "era = 1890s",
+    "weekday != saturday",
+    "weekday != sunday",
+    "occasion != christmas",
+    "occasion != christmas day",
+    "occasion != easter",
+    "occasion != start of term",
+    "occasion != leaving feast"
+   ],
+   "show": [
+    "a brass rod in the north wall rises a hand's breadth and drops, and far off a bell rings for lessons"
+   ],
+   "starts": [],
+   "canon": "Magic's req 3256 (docs/magic/rooms.md, The clock room, 1897, read in the canon tool 8 November 2026): CoS 6 L8503, L8595, the bell that starts and ends lessons; the brass rod and lever off the master clock are ours; the clocks are heard as clocks, nothing glows or chimes to mark magic; who winds and who rings is left to Mr. Grimbleton's round"
+  },
+  {
+   "id": "clock-room-1897.bell-noon",
+   "tier": "fixed",
+   "source": "device",
+   "leans": [],
+   "weight": 1,
+   "moment": "clock 12:30",
+   "when": [
+    "place = clock room",
+    "era = 1890s",
+    "weekday != saturday",
+    "weekday != sunday",
+    "occasion != christmas",
+    "occasion != christmas day",
+    "occasion != easter",
+    "occasion != start of term",
+    "occasion != leaving feast"
+   ],
+   "show": [
+    "the brass rod in the north wall rises a hand's breadth and drops, and far off a bell rings the morning's end"
+   ],
+   "starts": [],
+   "canon": "Magic's req 3256 (docs/magic/rooms.md, The clock room, 1897, read in the canon tool 8 November 2026): CoS 6 L8503, L8595, the bell that starts and ends lessons; the brass rod and lever off the master clock are ours; the clocks are heard as clocks, nothing glows or chimes to mark magic; who winds and who rings is left to Mr. Grimbleton's round"
+  },
+  {
+   "id": "clock-room-1897.bell-afternoon",
+   "tier": "fixed",
+   "source": "device",
+   "leans": [],
+   "weight": 1,
+   "moment": "clock 13:30",
+   "when": [
+    "place = clock room",
+    "era = 1890s",
+    "weekday != saturday",
+    "weekday != sunday",
+    "occasion != christmas",
+    "occasion != christmas day",
+    "occasion != easter",
+    "occasion != start of term",
+    "occasion != leaving feast"
+   ],
+   "show": [
+    "the brass rod in the north wall rises a hand's breadth and drops, and far off a bell rings for the afternoon's lessons"
+   ],
+   "starts": [],
+   "canon": "Magic's req 3256 (docs/magic/rooms.md, The clock room, 1897, read in the canon tool 8 November 2026): CoS 6 L8503, L8595, the bell that starts and ends lessons; the brass rod and lever off the master clock are ours; the clocks are heard as clocks, nothing glows or chimes to mark magic; who winds and who rings is left to Mr. Grimbleton's round"
+  },
+  {
+   "id": "clock-room-1897.bell-evening",
+   "tier": "fixed",
+   "source": "device",
+   "leans": [],
+   "weight": 1,
+   "moment": "clock 18:00",
+   "when": [
+    "place = clock room",
+    "era = 1890s",
+    "weekday != saturday",
+    "weekday != sunday",
+    "occasion != christmas",
+    "occasion != christmas day",
+    "occasion != easter",
+    "occasion != start of term",
+    "occasion != leaving feast"
+   ],
+   "show": [
+    "the brass rod in the north wall rises a hand's breadth and drops, and far off a bell rings the day's lessons over"
+   ],
+   "starts": [],
+   "canon": "Magic's req 3256 (docs/magic/rooms.md, The clock room, 1897, read in the canon tool 8 November 2026): CoS 6 L8503, L8595, the bell that starts and ends lessons; the brass rod and lever off the master clock are ours; the clocks are heard as clocks, nothing glows or chimes to mark magic; who winds and who rings is left to Mr. Grimbleton's round"
+  }
+ ]
+}
