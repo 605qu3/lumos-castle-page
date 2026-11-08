@@ -162,15 +162,25 @@
        at 1.5 m under the eaves finds the wall's outer face (up to 1.5 m outside the rect, 0.5 m inside); where a ray just under
        the eaves finds nothing in front of that face, a wall piece closes it from 1.25 m under the eaves to the eaves, 0.05 m
        behind the face; the roof's side is carried out to the face where most samples find one. ?eavesfit=1 puts it in. */
-    var eavesFit = /[?&]eavesfit=1(&|$)/.test(location.search)   /* OFF by default (wrap 1.30 am): at close-n the 40.1 face probe finds no wall on nr-east's north (rays run in to y 61), so nothing closed there, yet it placed 1063 pieces on other roofs unchecked */, erc = new THREE.Raycaster();
+    /* v18 (a build with eavesfit=1 ran past 400 s: 20 casts a sample against the whole scene on every pitched roof): fitted
+       only on the parts named, req 3232's nr-east and nr-gable by default (?eavesfit=1), ?eavesfit=all for every part or
+       ?eavesfit=<id,id>; and each part's casts go only to the meshes whose box lies within 4 m of its rect and 7 m under its
+       eaves */
+    var eavesIds = ((location.search.match(/[?&]eavesfit=([^&]+)/) || [])[1] || ''), eavesAll = eavesIds === 'all';
+    eavesIds = eavesIds === '1' ? ['nr-east', 'nr-gable'] : decodeURIComponent(eavesIds).split(',');
+    var eavesFit = /[?&]eavesfit=[^&0]/.test(location.search)   /* OFF by default (wrap 1.30 am): at close-n the 40.1 face probe finds no wall on nr-east's north (rays run in to y 61), so nothing closed there, yet it placed 1063 pieces on other roofs unchecked */, erc = new THREE.Raycaster();
     X.eaves = [];
     function fitEaves(p) {
       var r = p.rect.slice(), e = p.eaves, sides = [[0, 1, r[3], r[0], r[2], true], [0, -1, r[1], r[0], r[2], true], [1, 0, r[2], r[1], r[3], false], [-1, 0, r[0], r[1], r[3], false]], log = { id: p.id, ext: [], closed: 0 };
       if (scene) scene.updateMatrixWorld(true);
+      var near = [], bb = new THREE.Box3(), lo = TL(r[0] - 4, r[1] - 4, e - 7), hi = TL(r[2] + 4, r[3] + 4, e + 1), zone = new THREE.Box3().setFromPoints([lo, hi]);
+      scene.traverse(function (q) { if (!q.isMesh || q.visible === false || /^exterior-massing$/.test(q.parent && q.parent.name || '')) return;
+        bb.setFromObject(q); if (bb.intersectsBox(zone)) near.push(q); });
+      log.near = near.length;
       function cast(s, L, nx, ny, alongX, z, far) {
         var o = alongX ? TL(s, L + ny * 3, z) : TL(L + nx * 3, s, z), t = alongX ? TL(s, L - ny * 1, z) : TL(L - nx * 1, s, z);
         erc.set(o, t.sub(o).normalize()); erc.far = far;
-        var h = erc.intersectObject(scene, true).filter(function (q) { return q.object.isMesh && q.object.visible !== false && !/^exterior-massing$/.test(q.object.parent && q.object.parent.name || ''); })[0];
+        var h = erc.intersectObjects(near, false).filter(function (q) { return q.object.isMesh && q.object.visible !== false && !/^exterior-massing$/.test(q.object.parent && q.object.parent.name || ''); })[0];
         return h ? 3 - h.distance : null; }
       sides.forEach(function (S, k) {
         var nx = S[0], ny = S[1], L = S[2], alongX = S[5], offs = [], n = 0;
@@ -194,7 +204,7 @@
       X.eaves.push(log); return r; }
     function roofPart(p, massPar) {
       var e = p.eaves, h = p.ridge != null ? p.ridge : e;
-      if (eavesFit && scene && (p.kind === 'hip' || p.kind === 'gable' || p.kind === 'crow')) p = Object.assign({}, p, { rect: fitEaves(p) });
+      if (eavesFit && scene && (eavesAll || eavesIds.indexOf(p.id) >= 0) && (p.kind === 'hip' || p.kind === 'gable' || p.kind === 'crow')) p = Object.assign({}, p, { rect: fitEaves(p) });
       if (p.kind === 'hip') hip(p.rect, e, h);
       else if (p.kind === 'gable' || p.kind === 'crow') gable(p.rect, e, h);
       else if (p.kind === 'flat') flat(p.rect, e, p.parapet != null ? p.parapet : massPar);
@@ -315,9 +325,21 @@
           if (best != null) q[dir > 0 ? 1 : 0] = best - dir * 0.05; });
         return q; }
       /* the foot only where the hall's face below is solid too (a first foot covered the window slot under the south strip) */
-      var footW = [], footS = [];
+      var footW = [], footS = [], FE = +((location.search.match(/[?&]footend=([\d.]+)/) || [])[1] || -1);
+      /* v18 (the sliver left by v17, picks-sliver.json, probe of 8 November 2.40 am): the shaft's west face is not one x. It
+         recedes east as the foot runs north (x 91.48 at y -2, 91.68 at -1.4, 92.27 at -0.85), so a foot cut square at one x
+         left a plan triangle open, the shaft's facets and the hall face (y -0.8) showing through it. The foot's end now
+         follows the deepest point of that face: level rays east across the foot's whole depth, every 0.2 m, at two heights,
+         and the foot runs 0.15 m past the furthest hit, at most 1.5 m (the shaft runs on to x 100). ?footend=<m> gives the
+         old fixed run (0.45 for v17, 0 for v16's stop) */
+      function footEnd(b, o, i) { var far = b, z;
+        for (var y = o + 0.05; y < i; y += 0.2) [Rz.z0 - 1.5, Rz.z0 - 3].forEach(function (z) {
+          var a = TL(b - 0.5, y, z), t = TL(b + 0.5, y, z); rc.set(a, t.sub(a).normalize()); rc.far = 2;
+          var h = scene ? rc.intersectObject(scene, true).filter(function (k) { return k.object.isMesh && k.object.visible !== false && !/^exterior-massing$/.test(k.object.parent && k.object.parent.name || ''); })[0] : null;
+          if (h) { var at = b - 0.5 + h.distance; if (at > far) far = at; } });
+        return Math.min(far + 0.15, b + 1.5); }
       west.forEach(function (w) { bridge(runs(w[0], w[1], function (y) { return solid(R0[0], y, -1, 0, Rz.z0 - FH + 0.25, Rz.z0); }), w[0], w[1]).forEach(function (f) { footW.push(f); var g = meet(f, false, R0[0], -1); if (f[0] <= R0[1] + 0.01) g[0] = f[0]; foot(g[0], g[1], R0[0], R0[0] + P, false); }); });
-      south.forEach(function (w) { bridge(runs(w[0], w[1], function (x) { return solid(x, R0[1], 0, -1, Rz.z0 - FH + 0.25, Rz.z0); }), w[0], w[1]).forEach(function (f) { footS.push(f); var g = meet(f, true, R0[1], -1); if (f[0] <= R0[0] + P + 0.01) g[0] = f[0]; foot(g[0], g[1], R0[1], R0[1] + P, true); }); });
+      south.forEach(function (w) { bridge(runs(w[0], w[1], function (x) { return solid(x, R0[1], 0, -1, Rz.z0 - FH + 0.25, Rz.z0); }), w[0], w[1]).forEach(function (f) { footS.push(f); var g = meet(f, true, R0[1], -1); if (f[0] <= R0[0] + P + 0.01) g[0] = f[0]; if (g[1] < f[1] - 0.01) g[1] = FE >= 0 ? g[1] + FE : footEnd(g[1], R0[1], R0[1] + P); (X3222.footEnds = X3222.footEnds || []).push(+g[1].toFixed(2)); foot(g[0], g[1], R0[1], R0[1] + P, true); });   /* v17 (Fawkes, 2.06 am, row 3's slanted cut): stopped 0.05 short of the round shaft, the foot's end showed the hall face (y -0.8) through the gap at x 91.3 to 91.7 (picks-plinth.json); it runs FE (0.45, ?footend=) on into the shaft */ });
       X3222.footW = footW; X3222.footS = footS;
       /* v15 (r240-g, Fawkes's look 1.06 am; picks at the stand, pick-v14.json and pick-v14b.json): (b) the west strip is a
          2.1 m return (y -2 to 0.1, where a floor-36.4 room stands proud of x 66 at y 0.15); its courses, seen end-on from the
