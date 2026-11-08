@@ -311,7 +311,7 @@
       P.push({ q: q, poly: ar < 0 ? q.poly.slice().reverse() : q.poly, cw: ar < 0, b: [x0, y0, x1, y1], f: q.floor, c: q.ceiling });
     });
     function covers(R, x, y) { return x >= R.b[0] && x <= R.b[2] && y >= R.b[1] && y <= R.b[3] && inPoly(R.poly, x, y); }
-    var tones = {}, later = [];
+    var tones = {}, later = [], MAXGAP = 1.25;
     function lum(h) { return ((h >> 16 & 255) * 0.3 + (h >> 8 & 255) * 0.59 + (h & 255) * 0.11) / 255; }
     var T = {}, pieces = 0, stretches = 0, tall = 0, faced = 0, bare = 0;
     function quad(col, a, b, c, d) { var arr = T[col] || (T[col] = []); [a, b, c, a, c, d].forEach(function (p) { var v = TL(p[0], p[1], p[2]); arr.push(v.x, v.y, v.z); }); }
@@ -331,10 +331,11 @@
             if (R.f < top - 0.1 && R.c > Q.f + 0.1 && covers(R, ox, oy)) { ext = false; break; }
             if (R.f >= top - 0.05 && R.f < up && (covers(R, px - nx * 0.1, py - ny * 0.1) || covers(R, ox, oy) || covers(R, px + nx * t / 2, py + ny * t / 2))) up = R.f;
           }
-          var z1 = ext && up < Infinity && up - top > 0.02 ? up : null, off = t, col = null;
-          if (z1 != null && z1 - top > 12) { tall++; z1 = null; }
+          var z1 = ext && up < Infinity && up - top > 0.02 ? up : null, off = t, col = null, dbg = null;
+          if (z1 != null && z1 - top > MAXGAP) { tall++; z1 = null; }   /* a slab gap is 0.7 m; a taller gap is absent storeys, the Architect's (req 3191), not a band */
           if (z1 != null) {
             var hm = probe(px, py, nx, ny, (top + z1) / 2), hq = probe(px, py, nx, ny, top + Math.min(0.2, (z1 - top) / 2));
+            dbg = { hm: hm ? +hm.off.toFixed(2) : null, hq: hq ? +hq.off.toFixed(2) : null };
             if ((hm && hm.off > -0.1 && hm.off < t + 0.4) || (hq && hq.off > -0.1 && hq.off < t + 0.4)) { z1 = null; faced++; }
             else {
               var lo = [probe(px, py, nx, ny, top - 0.15), probe(px, py, nx, ny, top - 0.7)].filter(function (h) { return h && h.off > 0.05 && h.off < t + 0.4; });
@@ -345,14 +346,14 @@
             }
           }
           if (z1 != null && cur && Math.abs(cur.z1 - z1) < 0.01 && Math.abs(cur.off - off) < 0.02 && cur.col === col) cur.s1 = (s + 1) / steps * L;
-          else if (z1 != null) runs.push(cur = { s0: s / steps * L, s1: (s + 1) / steps * L, z1: z1, off: off, col: col });
+          else if (z1 != null) runs.push(cur = { s0: s / steps * L, s1: (s + 1) / steps * L, z1: z1, off: off, col: col, dbg: dbg });
           else cur = null;
         }
         runs.forEach(function (R) {
           stretches++;
           var e0 = R.s0 < 0.01 ? t : 0, e1 = R.s1 > L - 0.01 ? t : 0;
           var A = [a[0] + ux * (R.s0 - e0 * 0) + nx * (R.off - 0.01), a[1] + uy * R.s0 + ny * (R.off - 0.01)], B = [a[0] + ux * (R.s1 + e1) + nx * (R.off - 0.01), a[1] + uy * (R.s1 + e1) + ny * (R.off - 0.01)];
-          later.push({ col: R.col, A: A, B: B, z0: top, z1: R.z1 });
+          later.push({ col: R.col, A: A, B: B, z0: top, z1: R.z1, id: Q.q.id, fl: Q.f, edge: i, len: +(R.s1 - R.s0).toFixed(1), at: [+A[0].toFixed(1), +A[1].toFixed(1)], dbg: R.dbg });
         });
       }
     });
@@ -364,7 +365,8 @@
       bg.computeVertexNormals(); bg.computeBoundingSphere(); tris += T[c].length / 9;
       G.add(new THREE.Mesh(bg, new THREE.MeshLambertMaterial({ color: +c, side: THREE.DoubleSide })));
     });
-    return { group: G, pieces: pieces, tall: tall, faced: faced, bare: bare, probes: probes, places: P.length, tris: tris };
+    var log = later.map(function (w) { return { id: w.id, floor: +w.fl.toFixed(2), edge: w.edge, len: w.len, at: w.at, z0: +w.z0.toFixed(2), z1: +w.z1.toFixed(2), h: +(w.z1 - w.z0).toFixed(2), probe: w.dbg }; });
+    return { log: log, group: G, pieces: pieces, tall: tall, faced: faced, bare: bare, probes: probes, places: P.length, tris: tris };
   }
 
   function placeInto(out, TL) {
@@ -412,7 +414,7 @@
     });
     if (bandsOn) steps.push(function () {
       var s0 = performance.now(), bd; try { bd = bands(TL, gb.scene); } catch (e) { X.skipped.push('bands: ' + String(e && e.stack || e).slice(0, 300)); return; } gb.scene.add(bd.group);
-      X.bands = { pieces: bd.pieces, tris: Math.round(bd.tris), tallSkipped: bd.tall, faced: bd.faced, bare: bd.bare, probes: bd.probes, places: bd.places, ms: Math.round(performance.now() - s0) };
+      X.bands = { log: bd.log, pieces: bd.pieces, tris: Math.round(bd.tris), tallSkipped: bd.tall, faced: bd.faced, bare: bd.bare, probes: bd.probes, places: bd.places, ms: Math.round(performance.now() - s0) };
     });
     steps.push(function () {
       var s0 = performance.now(), m = massing(TL); gb.scene.add(m.group);
