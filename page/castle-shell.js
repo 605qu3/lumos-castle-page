@@ -340,6 +340,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
   function toLocal(sx, sy, sz) { return new THREE.Vector3(sx - cx, (sz == null ? z0 : sz) - z0, -(sy - cy)); }
 
   var group = new THREE.Group();
+  var EXT = !!(o && o.exterior) || /(^|[?&])exterior=1(&|$)/.test(location.search);   /* req 3189: the outside view */
   var mats = {};
   for (var k in GREY) mats[k] = F.solid(GREY[k]);
   mats.wall.side = THREE.DoubleSide;
@@ -506,8 +507,13 @@ window.CastleShell = { build: function (F, M, placeId, o) {
      arches, so the arch shows its steps turning away round the wall, not a dark recess: a landing in the arch's near
      half, ten treads on from its middle (up from the foot, down from the head), the wall's outer face and the ceiling stepping with them,
      closed past sight by the curve. The way still takes him to the room at its other end (v13) */
-  function arcStub(s, Q, w, id) {
+  /* req 3189 (Exterior's E2, P03): the room's wall is cut for the arch through its whole depth, so the stub's back wall at
+     r_out + 0.1 left the drum's outer face open over the stair (a black hole in the south-east tower from the lawn). Its
+     back wall now stands to the room's outer face less 2 cm (rW: the arch's radius plus the wall's depth), hidden in the
+     masonry where the wall stands and closing the cut where it does not */
+  function arcStub(s, Q, w, id, oat, tW) {
     var A = s.arc, c = A.c, ri = A.r_in, ro = A.r_out, b0 = A.bearings[0], b1 = A.bearings[1];
+    var rW = oat && tW ? Math.max(ro + 0.1, Math.hypot(oat[0] - c[0], oat[1] - c[1]) + tW - 0.02) : ro + 0.1;
     var sweep = ((b1 - b0) % 360 + 360) % 360, n = s.treads || 20, db = sweep / n, rise = s.rise || (s.to - s.from) / n;
     var foot = Math.abs(Q.floor - s.from) <= Math.abs(Q.floor - s.to), dir = foot ? 1 : -1, bA = foot ? b0 : b1;
     var half = (w / 2 + 0.1) / ri * 180 / Math.PI, HEAD = 2.0, N = Math.min(10, n);
@@ -521,15 +527,15 @@ window.CastleShell = { build: function (F, M, placeId, o) {
     var fz = Q.floor, lo = foot ? fz : fz - N * rise;
     seg(bA - dir * half, bA, fz - 0.3, fz, ri - 0.02, ro, mats.floor, 'floor', 'landing');
     seg(bA - dir * half, bA, fz + HEAD, fz + HEAD + 0.2, ri - 0.02, ro, mats.ceil, 'ceiling', 'landing-ceil');
-    seg(bA - dir * half, bA, lo - 0.6, fz + HEAD + 0.2, ro, ro + 0.1, mats.wall, 'wall', 'landing-wall');
+    seg(bA - dir * half, bA, lo - 0.6, fz + HEAD + 0.2, ro, rW, mats.wall, 'wall', 'landing-wall');
     for (var k = 1; k <= N; k++) {
       var bS = bA + dir * (k - 1) * db, bE = bS + dir * db, top = fz + dir * k * rise;
       seg(bS, bE, foot ? fz - 0.3 : top - 0.4, top, ri - 0.02, ro, mats.stair, 'stair', 'tread-' + k);
       seg(bS, bE, Math.max(top, fz) + HEAD, Math.max(top, fz) + HEAD + 0.2, ri - 0.02, ro, mats.ceil, 'ceiling', 'ceil-' + k);
-      seg(bS, bE, lo - 0.6, Math.max(top, fz) + HEAD + 0.2, ro, ro + 0.1, mats.wall, 'wall', 'wall-' + k);
+      seg(bS, bE, lo - 0.6, Math.max(top, fz) + HEAD + 0.2, ro, rW, mats.wall, 'wall', 'wall-' + k);
     }
     var bZ = bA + dir * N * db;
-    seg(bZ, bZ + dir * 1.5, lo - 0.6, fz + N * rise + HEAD + 0.2, ri - 0.02, ro + 0.1, mats.wall, 'wall', 'end');
+    seg(bZ, bZ + dir * 1.5, lo - 0.6, fz + N * rise + HEAD + 0.2, ri - 0.02, rW, mats.wall, 'wall', 'end');
   }
   /* v10: a floor or ceiling the shape of a place's area (a round room's, a ring's with its hole), at height z */
   function areaMesh(Q, z, mat, layer) {
@@ -1910,7 +1916,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
         var to = other(g.op, Q.id), via = isWay(g.op.kind) ? viaStair(M, to, Q.id) : null;
         if (via) {
           var sv = (M.stairs || []).filter(function (x) { return slug(x.id) === to; })[0];
-          if (sv && sv.arc) arcStub(sv, Q, w, g.op.id);
+          if (sv && sv.arc) arcStub(sv, Q, w, g.op.id, g.op.at, t);
           to = via;
         }
         /* a way above RAISED (the landing bay's mouth at +34.42) is reached on its own floor, its sill */
@@ -2367,7 +2373,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
     /* v13: a way on through a stair in the wall shows the stair's dark beyond its mouth, the room at its far end a tap away */
     if (w.via) { w.built = !!Q; Q = null; }
     /* a built room (one with its own page) is never shelled: the way takes him to its page (line 5's rule) */
-    if (Q && Q.rec && Q.rec.page) { w.built = true; w.page = Q.rec.page; }
+    if (Q && Q.rec && Q.rec.page) { w.built = true; w.page = Q.rec.page; if (EXT) { pageBody(Q, w); return; } }
     /* v13: a deep way (the flanker's arch through the spur's 1.2) finds its far room at its far face, as its gap does */
     else if (Q && onEdge(Q.poly, w.at, w.depth > 1.0 || Q.shaft ? w.depth + 0.2 : null)) { out.places.push(Q); buildPlace(Q); w.built = true; return; }
     /* v179 (req 3188, Exterior's E1 P01): under the outside view (o.exterior, shell.html's &exterior) a way whose far
@@ -2379,6 +2385,34 @@ window.CastleShell = { build: function (F, M, placeId, o) {
     rec.rotation.y = Math.atan2(w.inward.x, w.inward.z); rec.material.side = THREE.BackSide; rec.name = 'beyond-' + w.id;
     group.add(rec);
   });
+  /* req 3189 (Exterior's E2, P13): the outside view leaves out a room with its own page (castle-exterior.js), so the stair
+     hall's mouth onto the Fat Lady's corridor (corridor-mouth, x 68, +34.42 to +40.9) opened onto air, an arched window
+     against the block's edge from the south-west. Under the outside view only (o.exterior, or the address's exterior=1 for
+     castle-exterior.js's own floor builds), a way onto such a room draws that room's body: one plain stone prism of its
+     plan, 0.3 m outset (its walls' least), from 0.3 under the lower of its floor and the way's sill to 0.3 over its ceiling.
+     Once a page load per room (window.CastleShellPageBodies), so the floor builds do not stack copies. Never in a walk */
+  function pageBody(Q, w) {
+    var PB = window.CastleShellPageBodies = window.CastleShellPageBodies || {};
+    if (PB[Q.id] || !Q.poly || Q.poly.length < 3) return;
+    PB[Q.id] = P.id;
+    var pts = Q.poly, n = pts.length, area = 0, d = 0.3, outP = [];
+    for (var k = 0; k < n; k++) { var p0 = pts[k], p1 = pts[(k + 1) % n]; area += p0[0] * p1[1] - p1[0] * p0[1]; }
+    var sg = area > 0 ? 1 : -1;   /* counter-clockwise: the outward normal of an edge (dx, dy) is (dy, -dx) */
+    for (var k = 0; k < n; k++) {
+      var a0 = pts[(k + n - 1) % n], a1 = pts[k], a2 = pts[(k + 1) % n];
+      var e1 = [a1[0] - a0[0], a1[1] - a0[1]], e2 = [a2[0] - a1[0], a2[1] - a1[1]], l1 = Math.hypot(e1[0], e1[1]) || 1, l2 = Math.hypot(e2[0], e2[1]) || 1;
+      var n1 = [sg * e1[1] / l1, -sg * e1[0] / l1], n2 = [sg * e2[1] / l2, -sg * e2[0] / l2], dt = 1 + n1[0] * n2[0] + n1[1] * n2[1];
+      var f = dt > 0.2 ? d / dt : d;
+      outP.push([a1[0] + (n1[0] + n2[0]) * f, a1[1] + (n1[1] + n2[1]) * f]);
+    }
+    var low = Math.min(Q.floor, P.floor + (w.sill || 0)) - 0.3, high = (Q.ceiling != null ? Q.ceiling : Q.floor + 4.5) + 0.3;
+    var sh = new THREE.Shape();
+    outP.forEach(function (q, k) { var x = q[0] - cx, y = q[1] - cy; if (k) sh.lineTo(x, y); else sh.moveTo(x, y); });
+    var m = F.register(new THREE.Mesh(new THREE.ExtrudeGeometry(sh, { depth: high - low, bevelEnabled: false }), mats.wall), LAYER.wall);
+    m.rotation.x = -Math.PI / 2; m.position.y = low - z0;
+    m.name = 'page-body-' + Q.id; m.userData.owner = Q.id; group.add(m);
+    (out.pageBodies = out.pageBodies || []).push({ id: Q.id, from: P.id, low: +low.toFixed(2), high: +high.toFixed(2) });
+  }
   /* v24 (model v54): an open side of this place over another's air (an opening with `over`: the first-floor corridor's
      landing over the Entrance Hall) builds that place in the same frame, as a mouth does; nothing to walk through */
   (M.openings || []).forEach(function (op) {
