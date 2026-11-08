@@ -416,7 +416,10 @@ if (NIGHT_HALL) {   /* the night sky's hue at full strength, so the fill is a fi
 scene.add(new THREE.HemisphereLight(fillCol, 0x3a332c, FILL));
 /* req 3199, Godric's 1 (7 November 2026, 5.56 pm): the floor's warm bounce from below, so a corbel's or a window
    head's underside is lit warm, never black (req 3175 fault 1, oriel dots 4, 8, 9); ?bounce=0 takes it off */
-if (Q.get('bounce') !== '0') scene.add(new THREE.HemisphereLight(0x000000, 0x9a8466, 0.55));
+var BOUNCE = Q.get('bounce') != null && !isNaN(+Q.get('bounce')) ? +Q.get('bounce') : DAY && !WINDOWLESS && !W5B_LIT ? 1.8 : 0.55;   /* ?bounce=<n> its strength; by day 1.8 (oriel dot 8,
+   7 November 2026, 7.50 pm: a window head's underside read 71 against its reveal's 195; at 1.8, 112 against 199, walls 2.7% and
+   floors 1% lighter); at night, windowless or lamp-lit 0.55 as before, since at 1.8 by night undersides outshone the walls (87 to 66) */
+if (BOUNCE > 0) scene.add(new THREE.HemisphereLight(0x000000, 0x9a8466, BOUNCE));
 var sun = new THREE.DirectionalLight(0xfff1dc, !PAINT_ON ? 0.45 : DAY && !WINDOWLESS && !W5B_LIT ? 0.15 : 0); sun.position.set(-6, 14, 9); scene.add(sun);
 scene.add(new THREE.AmbientLight(0xffffff, PAINT_ON ? 0.02 : 0.12));
 /* the torches' light without the torches (PS 7: "stone walls lit with flaming torches"): four warm lights a place at
