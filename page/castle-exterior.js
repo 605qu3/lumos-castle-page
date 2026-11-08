@@ -108,8 +108,8 @@
   /* the massing: triangles per material, every vertex through the main toLocal */
   var builtPlaces = [];
   function keepPlaces(out) { (out.places || []).forEach(function (q) { builtPlaces.push(q); }); }
-  var GREYS = { filler: 0xb9b2a6, roof: 0x5f6670, parapet: 0x8a857e, ground: 0x7d8a5c, rock: 0x8b8478, water: 0x6f8797 };
-  function massing(TL) {
+  var GREYS = { raiseFoot: 0xb8b2a8, filler: 0xb9b2a6, roof: 0x5f6670, parapet: 0x8a857e, ground: 0x7d8a5c, rock: 0x8b8478, water: 0x6f8797, raise: 0xa39d92, raiseCourse: 0x868077, slit: 0x18181a };   /* raise and raiseCourse are set from the probed wall tone (req 3222) */
+  function massing(TL, scene) {
     var T = {}; Object.keys(GREYS).forEach(function (k) { T[k] = []; });
     function tri(k, a, b, c) { [a, b, c].forEach(function (p) { var v = TL(p[0], p[1], p[2]); T[k].push(v.x, v.y, v.z); }); }
     function quad(k, a, b, c, d) { tri(k, a, b, c); tri(k, a, c, d); }
@@ -156,8 +156,45 @@
       var n = 32, A = circ(c, ro, n), B = circ(c, ri, n); wallRing('parapet', A, z0, z1); wallRing('parapet', B, z0, z1);
       A.forEach(function (a, i) { var j = (i + 1) % n; quad('parapet', [a[0], a[1], z1], [A[j][0], A[j][1], z1], [B[j][0], B[j][1], z1], [B[i][0], B[i][1], z1]); });
     }
+    /* req 3232 (Architect, 8 November 2026; model v300 raised nr-east and nr-gable's eaves 38.6 to 41.6): the walls were drawn
+       to the rooms' tops (40.9) and the hip's foot stood 0.8 m behind the wall's outer face (roof rect y 72, face y 72.8), so a
+       0.7 m open strip and a dark wedge showed under the eaves. For a pitched part, each side is probed every 0.5 m: a level ray
+       at 1.5 m under the eaves finds the wall's outer face (up to 1.5 m outside the rect, 0.5 m inside); where a ray just under
+       the eaves finds nothing in front of that face, a wall piece closes it from 1.25 m under the eaves to the eaves, 0.05 m
+       behind the face; the roof's side is carried out to the face where most samples find one. ?eavesfit=1 puts it in. */
+    var eavesFit = /[?&]eavesfit=1(&|$)/.test(location.search)   /* OFF by default (wrap 1.30 am): at close-n the 40.1 face probe finds no wall on nr-east's north (rays run in to y 61), so nothing closed there, yet it placed 1063 pieces on other roofs unchecked */, erc = new THREE.Raycaster();
+    X.eaves = [];
+    function fitEaves(p) {
+      var r = p.rect.slice(), e = p.eaves, sides = [[0, 1, r[3], r[0], r[2], true], [0, -1, r[1], r[0], r[2], true], [1, 0, r[2], r[1], r[3], false], [-1, 0, r[0], r[1], r[3], false]], log = { id: p.id, ext: [], closed: 0 };
+      if (scene) scene.updateMatrixWorld(true);
+      function cast(s, L, nx, ny, alongX, z, far) {
+        var o = alongX ? TL(s, L + ny * 3, z) : TL(L + nx * 3, s, z), t = alongX ? TL(s, L - ny * 1, z) : TL(L - nx * 1, s, z);
+        erc.set(o, t.sub(o).normalize()); erc.far = far;
+        var h = erc.intersectObject(scene, true).filter(function (q) { return q.object.isMesh && q.object.visible !== false && !/^exterior-massing$/.test(q.object.parent && q.object.parent.name || ''); })[0];
+        return h ? 3 - h.distance : null; }
+      sides.forEach(function (S, k) {
+        var nx = S[0], ny = S[1], L = S[2], alongX = S[5], offs = [], n = 0;
+        /* v16 (picks at close-n, eye-3232/pick-col): on nr-east the seventh floor's north wall stands at y 69.8 (top 40.9),
+           3 m behind the floor below's face at y 72.8, so the 1.5 m probe met the set-back wall or ran in. Now each sample
+           casts every 0.3 m from just under the eaves down 6 m: the outermost face found (-0.5 to 1.5 m off the rect's edge)
+           is the wall's face, its highest hit is the face's top, and above that top a wall piece is drawn on that face's line
+           up to the eaves, closing the open shelf as wall body (as req 3221 item 7 ruled the Entrance Hall's strip) */
+        for (var u = S[3] + 0.25; u < S[4]; u += 0.5) { n++;
+          var hs = []; for (var z = e - 0.15; z > e - 6; z -= 0.3) { var g = cast(u, L, nx, ny, alongX, z, 7); hs.push([z, g]); }
+          var f = null; hs.forEach(function (H) { if (H[1] != null && H[1] <= 1.5 && H[1] >= -0.5 && (f == null || H[1] > f)) f = H[1]; });
+          if (f == null) continue; offs.push(f);
+          var top = null; hs.forEach(function (H) { if (top == null && H[1] != null && Math.abs(H[1] - f) < 0.1) top = H[0]; });
+          if (top != null && top < e - 0.2) { var w = f - 0.05, A = u - 0.25, B = Math.min(S[4], u + 0.25), zb = top - 0.2;
+            if (alongX) quad('raise', [A, L + ny * w, zb], [B, L + ny * w, zb], [B, L + ny * w, e], [A, L + ny * w, e]);
+            else quad('raise', [L + nx * w, A, zb], [L + nx * w, B, zb], [L + nx * w, B, e], [L + nx * w, A, e]);
+            log.closed++; } }
+        var ext = offs.length >= n / 2 ? Math.max(0, offs.sort(function (x, y) { return x - y; })[offs.length >> 1]) : 0;
+        log.ext.push(+ext.toFixed(2));
+        if (k === 0) r[3] += ext; else if (k === 1) r[1] -= ext; else if (k === 2) r[2] += ext; else r[0] -= ext; });
+      X.eaves.push(log); return r; }
     function roofPart(p, massPar) {
       var e = p.eaves, h = p.ridge != null ? p.ridge : e;
+      if (eavesFit && scene && (p.kind === 'hip' || p.kind === 'gable' || p.kind === 'crow')) p = Object.assign({}, p, { rect: fitEaves(p) });
       if (p.kind === 'hip') hip(p.rect, e, h);
       else if (p.kind === 'gable' || p.kind === 'crow') gable(p.rect, e, h);
       else if (p.kind === 'flat') flat(p.rect, e, p.parapet != null ? p.parapet : massPar);
@@ -208,12 +245,158 @@
         wallRing('parapet', rectPts(C.rect), z0, C.eaves); hip(C.rect, C.eaves, C.ridge); }
       if (t.turret) { var U = t.turret, ut = (t.top != null ? t.top : t.eaves) + 1; drum('parapet', U.c, U.r, t.eaves, ut, 24); if (U.cap != null) cone(U.c, U.r + 0.2, ut, U.cap, 24); }
     });
+    /* req 3222 (model v298, ledger 370): a mass's raise as filler with its flat lead and parapet; a round room's corbel
+       courses (stepped, narrowing downward to z0), its outer drum up to its ceiling, and its bell cap */
+    var x3222 = !/(^|[?&])x3222=0(&|$)/.test(location.search);   /* ?x3222=0 leaves req 3222's pieces out, for a fair before */
+    if (x3222) (M.masses || []).forEach(function (m) {
+      var Rz = m.raise; if (!Rz || !Rz.rect) return;
+      /* rework (Fawkes's look, 11.45 pm): a whole box stood on the rooms' own east and north faces and covered their windows
+         (P04, r120-e). The raise is drawn only where it stands proud: its outer 2 m on the west and south (the model: "2 m
+         proud of the stair hall's west and south faces", no room there), the leads over it all, and its machicolated top as
+         a course 0.35 m proud under the parapet on those two faces, so the raise reads as its own block */
+      /* rework 2 (Fawkes's look, 0.17 am, r240-g): the south strip ran on past the stair hall as one pale plane over a window
+         slot and ended ragged. Now a ray from outside at each 0.5 m along each strip, at every 1.5 m of its height, must meet
+         a lit wall face within 2.6 m (the stair hall's face behind the 2 m strip): only those runs are built, so the strip stops
+         where the hall stops or a window opens; it takes the commonest hit wall tone, not the pale filler, and a thin course
+         every 2.6 m in a darker shade reads as coursed stone */
+      var FB = +((location.search.match(/[?&]raisefootblue=([\d.]+)/) || [])[1] || 1.05), FL = +((location.search.match(/[?&]raisefootlight=([\d.]+)/) || [])[1] || 1.25), FH = +((location.search.match(/[?&]raisefoot=([\d.]+)/) || [])[1] || 4), R0 = Rz.rect, P = 2, mz = Rz.z1 - 1.2, rc = new THREE.Raycaster(), hits = {}, ok = [];
+      if (scene) scene.updateMatrixWorld(true);
+      function solid(x, y, nx, ny, zA, zB) {   /* outer face point, outward normal; heights zA to zB (default the strip's) */
+        if (zA == null) { zA = Rz.z0 + 0.75; zB = mz - 0.3; }
+        for (var z = zA; z < zB; z += 1.5) {
+          var o = TL(x + nx * 3, y + ny * 3, z), e = TL(x - nx * 2.6, y - ny * 2.6, z), d = e.clone().sub(o), L = d.length();
+          rc.set(o, d.normalize()); rc.far = L;
+          var h = scene ? rc.intersectObject(scene, true).filter(function (q) { return q.object.isMesh && q.object.visible !== false && /^exterior-massing$/.test(q.object.parent && q.object.parent.name || '') === false; })[0] : null;
+          var col = h && h.object.material && h.object.material.color ? h.object.material.color.getHex() : null;
+          if (col == null || ((col >> 16 & 255) * 0.3 + (col >> 8 & 255) * 0.59 + (col & 255) * 0.11) / 255 < 0.3) return false;
+          if (zA >= Rz.z0) hits[col] = (hits[col] || 0) + 1;
+        }
+        return true;
+      }
+      function runs(a, b, at) { var out = [], cur = null; for (var s = a; s < b - 0.01; s += 0.5) { var m = Math.min(b, s + 0.5);
+          if (at(s + 0.25)) { if (cur && Math.abs(cur[1] - s) < 0.01) cur[1] = m; else out.push(cur = [s, m]); } else cur = null; } return out; }
+      /* v14 (r240-g, rows 3-4): a pick at the stand showed the west strip starting at y -1, not the corner's -2, so a 2 by 1 m
+         bite at the turret corner showed the south strip's end face and every course stepped round it; and three 0.5 m gaps
+         broke the west strip into short boxes whose course ends read as zigzags. Gaps up to 1 m are bridged (a slot that narrow
+         in a 2 m solid is no window from outside; the model's raise is solid there), and a run ending within 1.5 m of the
+         shared corner is carried to it, so the courses wrap the corner unbroken */
+      function bridge(rs, lo, hi) { var o = []; rs.forEach(function (r) { var l = o[o.length - 1]; if (l && r[0] - l[1] <= 1.01) l[1] = r[1]; else o.push(r.slice()); });
+        if (o.length && lo != null && o[0][0] - lo <= 1.51) o[0][0] = lo; if (o.length && hi != null && hi - o[o.length - 1][1] <= 1.51) o[o.length - 1][1] = hi; return o; }
+      var west = bridge(runs(R0[1], R0[3], function (y) { return solid(R0[0], y, -1, 0); }), R0[1], null), south = bridge(runs(R0[0] + P, R0[2], function (x) { return solid(x, R0[1], 0, -1); }), R0[0] + P, null);
+      var tone = 0xa39d92, tc = 0; Object.keys(hits).forEach(function (c) { if (hits[c] > tc) { tc = hits[c]; tone = +c; } });
+      GREYS.raise = tone; GREYS.raiseFoot = ((Math.min(255, (tone >> 16 & 255) * FL) | 0) << 16) | ((Math.min(255, (tone >> 8 & 255) * FL) | 0) << 8) | (Math.min(255, (tone & 255) * FL * FB) | 0);   /* v14: FB (1.05, ?raisefootblue=) takes out the warm cast the foot's light gave it (rendered 44,42,40 beside the wall's 44,43,42; a blind look read a tan slab). v13: the foot's underside takes no sun from the lake, so it is drawn FL (1.25) times lighter (1.6 read as a pale slab, 1.0 dark) to read as lit stone, not a dark slab */
+      GREYS.raiseCourse = ((tone >> 16 & 255) * 0.82 << 16) | ((tone >> 8 & 255) * 0.82 << 8) | ((tone & 255) * 0.82 | 0);
+      var X3222 = window.lumosExterior3222 = { west: west, south: south, tone: tone.toString(16), hits: tc };
+      function foot(a, b, o, i, alongX) {   /* a sloped corbel foot, 2 m tall, from the hall's face up to the strip's outer face:
+           the flat soffit of a 2 m overhang read as a dark underside from the lake (Fawkes, 0.17 am) */
+        function P3(s, t, z) { return alongX ? [s, t, z] : [t, s, z]; }
+        var z = Rz.z0, zl = Rz.z0 - FH;   /* v13: 2 m out over FH (4) m down, nearly upright so it takes the wall's light; at 45 degrees it read from the lake as a dark slab (helper, 0.32 am) */
+        quad('raiseFoot', P3(a, o, z), P3(b, o, z), P3(b, i, zl), P3(a, i, zl));
+        tri('raise', P3(a, o, z), P3(a, i, z), P3(a, i, zl)); tri('raise', P3(b, o, z), P3(b, i, z), P3(b, i, zl));
+      }
+      function strip(r, cr) { box('raise', r, Rz.z0, mz);   /* v13: courses 0.3 m tall, 0.08 proud: at 0.12 m they aliased into dotted, stepped lines from the lake */
+        /* v14: proud only on the outer faces (cr), flush at the run's ends, so a course stops clean against the round shaft */
+        /* v15b: the first course at the strip's foot (z0), where the corbel foot meets it, so the foot's top reads as one line */
+        /* v16 (close shot, loops-v16 picks): the keep-wall-walk's own outer wall (floor 34) stands at y -2.1, 0.1 m proud of the
+           strip, over x 76 to 86, and hid the 0.08 m foot course there; the foot course is 0.15 m proud on the outer faces */
+        if (cr) for (var cz = Rz.z0; cz < mz - 0.5; cz += 2.6) { var c2 = cr.slice(); if (cz === Rz.z0) { if (c2[0] < R0[0]) c2[0] = R0[0] - 0.15; if (c2[1] < R0[1]) c2[1] = R0[1] - 0.15; } box('raiseCourse', c2, cz, cz + 0.3); } }
+      /* v14 (r240-g, the ragged end): a round stair shaft bulges past the south face at x 91.4, so each proud piece (course
+         0.08, parapet 0.35, foot) cut into its ten-sided wall at its own point. A ray 0.4 m out of the face, along the run
+         from 3 m inside each end, finds a built wall standing across it; every proud piece then stops 0.05 m short of that
+         one line, so the ends read as one clean vertical */
+      function meet(r, alongX, face, out) {   /* r = [a, b]; out = outward normal sign of the face; returns the proud pieces' [a, b] */
+        var q = r.slice(), zm = (Rz.z0 + mz) / 2;
+        [[r[1], 1], [r[0], -1]].forEach(function (E) { var e = E[0], dir = E[1], s0 = e - dir * Math.min(3, (r[1] - r[0]) / 2), best = null;
+          [zm - 4, zm, zm + 4, Rz.z0 - FH / 2].forEach(function (z) {
+            var o = alongX ? TL(s0, face + out * 0.4, z) : TL(face + out * 0.4, s0, z), t = alongX ? TL(s0 + dir, face + out * 0.4, z) : TL(face + out * 0.4, s0 + dir, z);
+            rc.set(o, t.sub(o).normalize()); rc.far = Math.abs(e - s0) + 0.5;
+            var h = scene ? rc.intersectObject(scene, true).filter(function (k) { return k.object.isMesh && k.object.visible !== false && !/^exterior-massing$/.test(k.object.parent && k.object.parent.name || ''); })[0] : null;
+            if (h) { var at = s0 + dir * h.distance; if (dir > 0 ? at < e : at > e) best = best == null ? at : (dir > 0 ? Math.min(best, at) : Math.max(best, at)); } });
+          if (best != null) q[dir > 0 ? 1 : 0] = best - dir * 0.05; });
+        return q; }
+      /* the foot only where the hall's face below is solid too (a first foot covered the window slot under the south strip) */
+      var footW = [], footS = [];
+      west.forEach(function (w) { bridge(runs(w[0], w[1], function (y) { return solid(R0[0], y, -1, 0, Rz.z0 - FH + 0.25, Rz.z0); }), w[0], w[1]).forEach(function (f) { footW.push(f); var g = meet(f, false, R0[0], -1); if (f[0] <= R0[1] + 0.01) g[0] = f[0]; foot(g[0], g[1], R0[0], R0[0] + P, false); }); });
+      south.forEach(function (w) { bridge(runs(w[0], w[1], function (x) { return solid(x, R0[1], 0, -1, Rz.z0 - FH + 0.25, Rz.z0); }), w[0], w[1]).forEach(function (f) { footS.push(f); var g = meet(f, true, R0[1], -1); if (f[0] <= R0[0] + P + 0.01) g[0] = f[0]; foot(g[0], g[1], R0[1], R0[1] + P, true); }); });
+      X3222.footW = footW; X3222.footS = footS;
+      /* v15 (r240-g, Fawkes's look 1.06 am; picks at the stand, pick-v14.json and pick-v14b.json): (b) the west strip is a
+         2.1 m return (y -2 to 0.1, where a floor-36.4 room stands proud of x 66 at y 0.15); its courses, seen end-on from the
+         lake, read as short serrated dashes, so a return under 3 m carries no courses and the south courses turn the corner
+         0.38 m and stop there; (c) the course ends at the round stair shaft lay on its re-entrant facets (x 91.3 to 91.7,
+         y -2.1 to -2.7), so they stop CE (0.5) m short of the line where any body meets the run, one vertical on flat wall;
+         (f) the west foot had been cut back from the corner by meet's ray (a dark notch: the strip's open underside at z 34),
+         so a foot starting at the shared corner keeps it, as the strips do */
+      var CE = +((location.search.match(/[?&]courseend=([\d.]+)/) || [])[1] || 0.5), wShort = false;
+      function cend(r, m) { return [m[0] < r[0] - 0.01 || m[0] > r[0] + 0.01 ? m[0] + CE : m[0], m[1] < r[1] - 0.01 ? m[1] - CE : m[1]]; }
+      X3222.meet = [];
+      west.forEach(function (w) { var c0 = w[0] <= R0[1] + 0.01, m = meet(w, false, R0[0], -1); if (c0) m[0] = w[0]; X3222.meet.push(['west', m]);
+        /* v16 (r240-g row v2, the blind look at 1.30 am; picks pick-v15v2): under walls=v2 the west run reads -2 to 18, but a
+           floor-36.4 room stands proud of x 66 from y -0.35 on, so only 1.65 m of the west face shows and its courses read as
+           short dashed returns at the turret end. A ray 0.25 m out of the face, along the run from the corner, finds the
+           first body standing in front; the shown run is what counts as short */
+        var seen = m[1] - m[0];
+        if (c0 && scene) [Rz.z0 + 0.5, (Rz.z0 + mz) / 2, mz - 0.5].forEach(function (z) { var o = TL(R0[0] - 0.25, w[0] + 0.02, z);
+          rc.set(o, TL(R0[0] - 0.25, w[0] + 1, z).sub(o).normalize()); rc.far = seen;
+          var h = rc.intersectObject(scene, true).filter(function (k) { return k.object.isMesh && k.object.visible !== false && !/^exterior-massing$/.test(k.object.parent && k.object.parent.name || ''); })[0];
+          if (h) seen = Math.min(seen, h.distance + 0.02); });
+        X3222.westSeen = seen;
+        var short = seen < 3, ce = cend(w, m); if (short && c0) wShort = true;
+        strip([R0[0], w[0], R0[0] + P, w[1]], short ? null : [R0[0] - 0.08, ce[0] - (c0 ? 0.08 : 0), R0[0] + P, ce[1]]); box('parapet', [R0[0] - 0.35, m[0] - (c0 ? 0.35 : 0), R0[0] + P, short ? w[1] : m[1]], mz, Rz.z1 - 0.3); });   /* v15b: a short return's parapet runs its whole run (to y 2): stopped at 0.1 it left the lead's dark edge bare at x 66 (pick 766,136) */
+      south.forEach(function (s) { var m = meet(s, true, R0[1], -1); if (s[0] <= R0[0] + P + 0.01) m[0] = s[0]; X3222.meet.push(['south', m]);
+        var ce = cend(s, m), x0 = (wShort && s[0] <= R0[0] + P + 0.01) ? R0[0] + CE : ce[0];   /* v15b: a 0.38 m return still read as hooks (blind look, 1.19 am): the courses stop CE short of the corner too */
+        strip([s[0], R0[1], s[1], R0[1] + P], [x0, R0[1] - 0.08, ce[1], R0[1] + 0.3]);
+        /* v15 (req 3230, the Architect, 1.22 am): the south 2 m is the founders' old lake wall with keep-wall-walk inside it
+           (H18: y -1.3 to -0.6, x 76 to 86, floor +34); its face is solid with five arrow loops, 0.1 m wide, sill +34.9, 0.9 m
+           high, dark slits; the white piece the r240-g pick found at y -0.9 is the walk, seen only through a loop. ?loops=0 none */
+        if (!/[?&]loops=0(&|$)/.test(location.search)) [77, 79, 81, 83, 85].forEach(function (lx) { if (lx > m[0] && lx < m[1])
+          quad('slit', [lx - 0.05, R0[1] - 0.12, Rz.z0 + 0.9], [lx + 0.05, R0[1] - 0.12, Rz.z0 + 0.9], [lx + 0.05, R0[1] - 0.12, Rz.z0 + 1.8], [lx - 0.05, R0[1] - 0.12, Rz.z0 + 1.8]);   /* v16: on the walk's own wall face (y -2.1), not behind it */ }); box('parapet', [m[0], R0[1] - 0.35, m[1], R0[1] + P], mz, Rz.z1 - 0.3); });
+      box('roof', R0, Rz.z1 - 0.3, Rz.z1); parapetRect(R0, Rz.z1, Rz.z1 + 0.6);
+    });
+    if (x3222) (M.rooms || []).forEach(function (r) {
+      if (!r.corbel && !r.cap) return;
+      var c = r.shape && r.shape.circle; if (!c) return;
+      var fz = roomFloor(M, r), top = fz + (r.ceiling - r.floor), R = r.corbel ? r.corbel.r : r.cap.r;
+      if (r.corbel) {
+        var z0 = r.corbel.z0, n = 3, h = (fz - z0) / n;
+        /* each course its own ledge (rework: walls alone read as one taper): its soffit and top as rings, in the parapet tone */
+        for (var i = 0; i < n; i++) {
+          var ri = R * (0.45 + 0.55 * (i + 1) / n), rp = i ? R * (0.45 + 0.55 * i / n) : 0, zb = z0 + i * h;
+          drum('parapet', c, ri, zb, zb + h, 24);
+          cap('parapet', circ(c, ri, 24), rp ? [circ(c, rp, 24)] : null, zb);
+        }
+        drum('raise', c, R - 0.06, fz, top, 48);   /* v15: in the wall's own tone: the pale filler showed through the joints of the room's ring wall as vertical streaks (pick at 790,110: the wall at 64.56, the filler 0.06 behind) */   /* v14: just inside the room's own outer wall (r 1.4 + 0.5 = 1.9 = R): drawn on it, the two z-fought into vertical streaks (blind look, r240-g) */
+      }
+      if (r.cap && r.cap.kind === 'bell') cone(c, r.cap.r + 0.2, r.cap.z0, r.cap.ridge, 24);
+    });
     /* the ground */
-    var lake = SITE.filter(function (s) { return s.id === 'lake'; })[0], LO = -46;
+    var lake = SITE.filter(function (s) { return s.id === 'lake'; })[0], LR = (M.grounds || []).filter(function (g) { return g.id === 'lake'; })[0],
+        LO = LR && LR.level_m != null ? +LR.level_m : -82;   /* v13 (Fawkes, 0.37 am): the loch from the model's lake row, -82 since req 3025; it was a fixed -46 (as the Architect's sections tool, 41323812e) */
     var sq = [[80 - 800, -800], [80 + 800, -800], [80 + 800, 800], [80 - 800, 800]];
     cap('ground', sq, lake ? [lake.poly] : null, -20); wallRing('rock', sq, LO, -20);
     if (lake) { wallRing('rock', lake.poly, LO, -20); cap('water', lake.poly, null, LO); }
     var pl = [-30, -6, 190, 110]; cap('ground', rectPts(pl), null, 0); wallRing('rock', rectPts(pl), LO, 0);
+    /* req 3227 (Architect, 7 November 2026): a low place standing beyond the plateau's lake face showed its underside from the
+       lake (P36, r240-g: a ray-pick at Exterior's station hits the -5.2 floor's slab at x 129 to 161 out to y -12; the
+       Architect's hits shell-grotto, round under the south-west drum, to y -7). The rock carries them: under every built place
+       at or below the ground with any corner outside the plateau, a rock prism on its plan from the lake bed to its floor. */
+    var rocked = 0, noRock = ((/[?&]norock=([^&]*)/.exec(location.search) || [])[1] || '').split(',');
+    function bbox(P2) { var r = [Infinity, Infinity, -Infinity, -Infinity]; P2.forEach(function (p) { r[0] = Math.min(r[0], p[0]); r[1] = Math.min(r[1], p[1]); r[2] = Math.max(r[2], p[0]); r[3] = Math.max(r[3], p[1]); }); return r; }
+    builtPlaces.forEach(function (q) {
+      if (noRock.indexOf(q.id) >= 0) return;
+      if (!q.poly || q.poly.length < 3 || q.floor == null || q.floor > 0.5 || q.floor <= LO + 0.1) return;
+      /* only a place crossing the lake face (the greenhouses stand on the grounds' own prisms), and only the lowest place at
+         its spot: a first run put rock under lake-tower-g (floor 0) that swallowed lake-tower-b (-5.2) and its windows */
+      if (!q.poly.some(function (p) { return p[1] < pl[1] && p[0] > pl[0] && p[0] < pl[2]; })) return;
+      var qb = bbox(q.poly);
+      /* the rock extends the cliff, it builds no island: a place standing wholly clear of the face (slytherin-common-room,
+         5 m out at y -11, 41 m above the water, named "under the lake") got a bluff that hid the cliff's lit stack behind it
+         from the lake (Exterior, 8 November 2026); its placement is the model's, raised to the Architect */
+      if (qb[3] < pl[1] - 1.5) return;
+      if (builtPlaces.some(function (o) { if (o === q || !o.poly || o.floor == null || o.floor >= q.floor - 0.1 || o.floor <= LO + 0.1) return false;
+        var ob = bbox(o.poly); return Math.min(qb[2], ob[2]) - Math.max(qb[0], ob[0]) > 0.3 && Math.min(qb[3], ob[3]) - Math.max(qb[1], ob[1]) > 0.3; })) return;
+      wallRing('rock', q.poly, LO, q.floor - 0.02); cap('rock', q.poly, null, q.floor - 0.02); rocked++;
+      (window.lumosExteriorRocked = window.lumosExteriorRocked || []).push([q.id, +q.floor.toFixed(2), q.poly.map(function (p) { return [+p[0].toFixed(1), +p[1].toFixed(1)]; })]);
+    });
     SITE.forEach(function (s) {
       if (s.id === 'lake' || s.level <= LO + 0.05) return;
       var polys = [];
@@ -255,6 +438,9 @@
   var bandCourse = (function () { var m = location.search.match(/[?&]bandcourse=([0-9.]+)/); return m ? +m[1] : 0.15; })();   /* req 3215 v5 trial: a string course this many metres proud of the wall below, at each band's foot */
   var bandTint = (function () { var m = location.search.match(/[?&]bandtint=([0-9.]+)/); return m ? +m[1] : 1.3; })();
   var bandCourseH = (function () { var m = location.search.match(/[?&]bandcourseh=([0-9.]+)/); return m ? +m[1] : 0.35; })();
+  var bandFill = /(^|[?&])bandfill=1(&|$)/.test(location.search);   /* req 3226 (Architect, from 3221): with bands=1, a room above up to 1.0 m
+     inboard counts as the floor above; a gap taller than MAXGAP is filled to the floor above only where no real face stands
+     anywhere in it; and every built place with no place over some of it gets a lid. Off by default until Fawkes's blind look */
   var bandDebug = /(^|[?&])banddebug=1(&|$)/.test(location.search);   /* req 3215 v5: every band piece flat unlit red, to see where the bands stand */
   function inPoly(pts, x, y) {
     var c = false;
@@ -269,7 +455,7 @@
        slit's mid height through each 1 m step finds any face near the wall plane (a taller wall, a ledge): none, and the
        step is open. The piece is one outer face only, set back 0.01 m from the innermost face found just below the slit (so
        never proud of a ledge), in that face's own material colour; no ends, no overlap into the wall, so no joint marks. */
-    var roundSkipped = 0, seen = {}, P = [], probes = 0, CELL = 4, grid = {}, tri9 = [], tcol = [], stamp = [], qn = 0;
+    var roundSkipped = 0, seen = {}, P = [], probes = 0, CELL = 4, grid = {}, gridS = {}, tri9 = [], tcol = [], stamp = [], qn = 0;
     /* a grid over the baked walls (normals within 60 degrees of level) so a probe tests a few triangles, not the castle */
     scene.updateMatrixWorld(true);
     (function () {
@@ -282,17 +468,19 @@
         for (var k = 0; k + 2 < cnt; k += 3) {
           va.fromBufferAttribute(P0, ix ? ix.getX(k) : k).applyMatrix4(mw); vb.fromBufferAttribute(P0, ix ? ix.getX(k + 1) : k + 1).applyMatrix4(mw); vc.fromBufferAttribute(P0, ix ? ix.getX(k + 2) : k + 2).applyMatrix4(mw);
           e1.subVectors(vb, va); e2.subVectors(vc, va); nn.crossVectors(e1, e2).normalize();
-          if (Math.abs(nn.y) > 0.5) continue;
+          var slopedT = Math.abs(nn.y) > 0.5; if (slopedT && !(bandFill && Math.abs(nn.y) < 0.94)) continue;   /* req 3226 r30-h: a sloped cap (30 to 70 degrees off vertical) goes in its own grid, read only by the fill's walled test */
           var id = tri9.length / 9; tri9.push(va.x, va.y, va.z, vb.x, vb.y, vb.z, vc.x, vc.y, vc.z); tcol.push(col);
+          var GR = slopedT ? gridS : grid;
           var cx0 = Math.floor(Math.min(va.x, vb.x, vc.x) / CELL), cx1 = Math.floor(Math.max(va.x, vb.x, vc.x) / CELL),
               cz0 = Math.floor(Math.min(va.z, vb.z, vc.z) / CELL), cz1 = Math.floor(Math.max(va.z, vb.z, vc.z) / CELL);
           if ((cx1 - cx0 + 1) * (cz1 - cz0 + 1) > 400) continue;
-          for (var cx = cx0; cx <= cx1; cx++) for (var cz = cz0; cz <= cz1; cz++) { var key = cx + ',' + cz; (grid[key] || (grid[key] = [])).push(id); }
+          for (var cx = cx0; cx <= cx1; cx++) for (var cz = cz0; cz <= cz1; cz++) { var key = cx + ',' + cz; (GR[key] || (GR[key] = [])).push(id); }
         }
       });
     })();
-    var S0v = new THREE.Vector3(), S1v = new THREE.Vector3(), dv = new THREE.Vector3();
-    function probe(px, py, nx, ny, z) {
+    var gridB = grid, S0v = new THREE.Vector3(), S1v = new THREE.Vector3(), dv = new THREE.Vector3();
+    function probe(px, py, nx, ny, z, gsel) {
+      var grid = gsel || gridB;
       var S0 = TL(px + nx * 3, py + ny * 3, z), S1 = TL(px, py, z); S0v.copy(S0); S1v.copy(S1);
       var len = dv.subVectors(S1v, S0v).length(); dv.multiplyScalar(1 / len); probes++; qn++;
       var far = len * 4 / 3, best = Infinity, bc = null, ox = S0v.x, oy = S0v.y, oz = S0v.z, dx = dv.x, dy = dv.y, dz = dv.z;
@@ -325,7 +513,13 @@
     function covers(R, x, y) { return x >= R.b[0] && x <= R.b[2] && y >= R.b[1] && y <= R.b[3] && inPoly(R.poly, x, y); }
     var tones = {}, later = [], gaps = {}, MAXGAP = 1.25, STEP = 0.25;
     function lum(h) { return ((h >> 16 & 255) * 0.3 + (h >> 8 & 255) * 0.59 + (h & 255) * 0.11) / 255; }
-    var T = {}, pieces = 0, stretches = 0, tall = 0, faced = 0, bare = 0;
+    var T = {}, pieces = 0, stretches = 0, tall = 0, faced = 0, bare = 0, fillTall = 0, fillWalled = 0, fillSloped = 0, fillSolid = 0, lids = [];
+    /* req 3221 item 3 (the Architect, ledger 374, 8 November 2026): these gaps are solid wall, no room to add (mirror-passage-b at
+       the Great Hall's north and cross walls, ice-house-way in the West Tower's 3.2 m drum wall, sw-turret-passage in the south-west
+       drum's wall): the fill draws them whole even where a face stands part way up. drum-back-store-b gets none (the Gryffindor
+       drum's wall, a curve length; round places are not banded). second-floor-corridor, defence-passage and stone-bay are seams
+       within 0.5 m that wait on this fill's re-run */
+    var SOLIDWALL = ['mirror-passage-b', 'ice-house-way', 'sw-turret-passage'];
     function quad(col, a, b, c, d) { var arr = T[col] || (T[col] = []); [a, b, c, a, c, d].forEach(function (p) { var v = TL(p[0], p[1], p[2]); arr.push(v.x, v.y, v.z); }); }
     P.forEach(function (Q) {
       var E = Q.poly, top = Q.c, n = E.length;
@@ -341,9 +535,15 @@
           for (var r = 0; r < P.length; r++) {
             var R = P[r]; if (R === Q) continue;
             if (R.f < top - 0.1 && R.c > Q.f + 0.1 && covers(R, ox, oy)) { ext = false; break; }
-            if (R.f >= top - 0.05 && R.f < up && (covers(R, px - nx * 0.1, py - ny * 0.1) || covers(R, ox, oy) || covers(R, px + nx * t / 2, py + ny * t / 2))) up = R.f;
+            if (R.f >= top - 0.05 && R.f < up && (covers(R, px - nx * 0.1, py - ny * 0.1) || covers(R, ox, oy) || covers(R, px + nx * t / 2, py + ny * t / 2) || (bandFill && covers(R, px - nx * 1.0, py - ny * 1.0)))) up = R.f;
           }
           var z1 = ext && up < Infinity && up - top > 0.02 ? up : null, off = t, col = null, dbg = null;
+          if (bandFill && z1 != null && z1 - top > MAXGAP) {   /* req 3226: the whole gap, but only where no face stands at any height in it (v2 covered real storeys and windows as flat slabs) */
+            var walledAny = false;
+            for (var hz = top + 0.2; hz < z1 - 0.1 && !walledAny; hz += 0.5) { var hh = probe(px, py, nx, ny, hz), hs = probe(px, py, nx, ny, hz, gridS); if ((hh && hh.off > -0.1 && hh.off < t + 0.4) || (hs && hs.off > -0.1 && hs.off < t + 0.4)) { walledAny = true; if (hs && !(hh && hh.off > -0.1 && hh.off < t + 0.4)) fillSloped++; } }
+            if (walledAny && SOLIDWALL.indexOf(Q.q.id) >= 0) { walledAny = false; fillSolid++; }
+            if (walledAny) { z1 = null; fillWalled++; } else fillTall++;
+          }
           if (z1 != null && z1 - top > MAXGAP) { tall++; var hg = probe(px, py, nx, ny, top + 0.35), walled = hg && hg.off > -0.1 && hg.off < t + 0.4; if (!walled) { var gk = Q.q.id + '@' + Q.f.toFixed(2), g = gaps[gk] || (gaps[gk] = { id: Q.q.id, floor: +Q.f.toFixed(2), ceiling: +top.toFixed(2), up: +z1.toFixed(2), gap: +(z1 - top).toFixed(2), metres: 0 }); g.metres += +(L / steps).toFixed(2); g.gap = Math.max(g.gap, +(z1 - top).toFixed(2)); } z1 = null; }   /* a slab gap is 0.7 m; a taller gap is absent storeys, the Architect's (req 3191), not a band */
           if (z1 != null) {
             var hm = probe(px, py, nx, ny, (top + z1) / 2), hq = probe(px, py, nx, ny, top + Math.min(0.2, (z1 - top) / 2));
@@ -369,6 +569,20 @@
         });
       }
     });
+    /* req 3226 (3): only the Architect's 26 rows (docs/architect/r3221/out.json, classes c-ends and d-underground, the true
+       ends, and unbuilt-notInYear, the room above built only in a later book; east-courtyard left out, an open court): a lid
+       wherever no built place stands over part of them. A first run lidding every place so open closed the courts (203 lids) */
+    var LIDS = ["stone-last-chamber", "stone-troll-room", "stone-potions-room", "potions-dungeon", "cliff-vault", "old-textbooks-store", "teachers-office-2-north", "east-lift-shaft-2", "right-hand-corridor-3", "tapestry-passage-3-west", "lamp-candle-cupboard-3", "defence-store", "keep-east-stairwell", "east-wing-corridor-4", "west-wing-corridor-4", "landscape-painting-corridor-4", "revision-rooms-4", "disused-classroom-4-east", "elves-linen-room-4-east", "staff-bedroom-4-east", "fourth-floor-washroom", "runes-teachers-study-4", "tudor-bay-4-cushion-store", "dormitory-linen-store-5", "true-hide-5", "decoy-cupboard-5"];
+    if (bandFill) P.forEach(function (Q) {
+      if (LIDS.indexOf(Q.q.id) < 0) return;
+      var b = Q.b, open = 0, all = 0;
+      for (var gx = b[0] + 0.5; gx < b[2]; gx += 1) for (var gy = b[1] + 0.5; gy < b[3]; gy += 1) {
+        if (!inPoly(Q.poly, gx, gy)) continue; all++;
+        var cov = false; for (var r = 0; r < P.length && !cov; r++) { var R = P[r]; if (R !== Q && R.f >= Q.c - 0.05 && covers(R, gx, gy)) cov = true; }
+        if (!cov) open++;
+      }
+      if (open) lids.push({ Q: Q, open: open, all: all });
+    });
     var modal = 0xa39d92, mc = 0; Object.keys(tones).forEach(function (c) { if (tones[c] > mc) { mc = tones[c]; modal = +c; } });
     function paler(h) { var k = bandTint; return (Math.min(255, Math.round((h >> 16 & 255) * k)) << 16) | (Math.min(255, Math.round((h >> 8 & 255) * k)) << 8) | Math.min(255, Math.round((h & 255) * k)); }   /* the course in dressed stone, paler than the wall */
     later.forEach(function (w) { quad(w.col != null ? w.col : modal, [w.A[0], w.A[1], w.z0], [w.B[0], w.B[1], w.z0], [w.B[0], w.B[1], w.z1], [w.A[0], w.A[1], w.z1]); pieces++;
@@ -378,6 +592,12 @@
         quad(cc, [A2[0], A2[1], w.z0 + H], [B2[0], B2[1], w.z0 + H], [w.B[0], w.B[1], w.z0 + H], [w.A[0], w.A[1], w.z0 + H]);
         quad(cc, [w.A[0], w.A[1], w.z0], [w.B[0], w.B[1], w.z0], [B2[0], B2[1], w.z0], [A2[0], A2[1], w.z0]); }
     });
+    lids.forEach(function (Ld) {   /* a 0.3 m lid on the place's own line at its ceiling: faces round, lead on top */
+      var E = Ld.Q.poly, z0 = Ld.Q.c, zt = z0 + 0.3, n = E.length, lc = bandDebug ? 0xff0000 : modal;
+      for (var i = 0; i < n; i++) { var a = E[i], b = E[(i + 1) % n]; quad(lc, [a[0], a[1], z0], [b[0], b[1], z0], [b[0], b[1], zt], [a[0], a[1], zt]); }
+      var c2 = E.map(function (p) { return new THREE.Vector2(p[0], p[1]); }), fs = THREE.ShapeUtils.triangulateShape(c2, []), arr = T[bandDebug ? 0xff0000 : GREYS.roof] || (T[bandDebug ? 0xff0000 : GREYS.roof] = []);
+      fs.forEach(function (f) { f.forEach(function (j) { var v = TL(E[j][0], E[j][1], zt); arr.push(v.x, v.y, v.z); }); });
+    });
     var G = new THREE.Group(), tris = 0; G.name = 'exterior-bands';
     Object.keys(T).forEach(function (c) {
       var bg = new THREE.BufferGeometry(); bg.setAttribute('position', new THREE.Float32BufferAttribute(T[c], 3));
@@ -385,7 +605,8 @@
       G.add(new THREE.Mesh(bg, bandDebug ? new THREE.MeshBasicMaterial({ color: 0xff0000, side: THREE.DoubleSide }) : new THREE.MeshLambertMaterial({ color: +c, side: THREE.DoubleSide })));
     });
     var log = later.map(function (w) { return { id: w.id, floor: +w.fl.toFixed(2), edge: w.edge, len: w.len, at: w.at, z0: +w.z0.toFixed(2), z1: +w.z1.toFixed(2), h: +(w.z1 - w.z0).toFixed(2), probe: w.dbg }; });
-    return { gaps: Object.keys(gaps).map(function (k) { return gaps[k]; }).sort(function (p1, p2) { return p2.gap - p1.gap; }), log: log, group: G, pieces: pieces, tall: tall, faced: faced, bare: bare, probes: probes, places: P.length, roundSkipped: roundSkipped, tris: tris };
+    return { gaps: Object.keys(gaps).map(function (k) { return gaps[k]; }).sort(function (p1, p2) { return p2.gap - p1.gap; }), log: log, group: G, pieces: pieces, tall: tall, faced: faced, bare: bare, probes: probes, places: P.length, roundSkipped: roundSkipped, tris: tris,
+      fill: bandFill ? { tallFilled: fillTall, tallWalled: fillWalled, solid: fillSolid, lids: lids.map(function (L) { return { id: L.Q.q.id, floor: +L.Q.f.toFixed(2), ceiling: +L.Q.c.toFixed(2), open: L.open, of: L.all }; }) } : null };
   }
 
   function placeInto(out, TL) {
@@ -433,10 +654,10 @@
     });
     if (bandsOn) steps.push(function () {
       var s0 = performance.now(), bd; try { bd = bands(TL, gb.scene); } catch (e) { X.skipped.push('bands: ' + String(e && e.stack || e).slice(0, 300)); return; } gb.scene.add(bd.group);
-      X.bands = { gaps: bd.gaps, log: bd.log, pieces: bd.pieces, tris: Math.round(bd.tris), tallSkipped: bd.tall, roundSkipped: bd.roundSkipped, faced: bd.faced, bare: bd.bare, probes: bd.probes, places: bd.places, ms: Math.round(performance.now() - s0) };
+      X.bands = { gaps: bd.gaps, log: bd.log, pieces: bd.pieces, tris: Math.round(bd.tris), tallSkipped: bd.tall, roundSkipped: bd.roundSkipped, faced: bd.faced, bare: bd.bare, probes: bd.probes, places: bd.places, fill: bd.fill, ms: Math.round(performance.now() - s0) };
     });
     steps.push(function () {
-      var s0 = performance.now(), m = massing(TL); gb.scene.add(m.group);
+      var s0 = performance.now(), m = massing(TL, gb.scene); gb.scene.add(m.group);
       X.massing = { tris: Math.round(m.tris), ms: Math.round(performance.now() - s0) };
     });
     (function next() {
@@ -452,6 +673,12 @@
     if (!gb || !gb.scene || !gb.camera || !page) return;
     clearInterval(poll);
     gb.scene.fog = null; gb.camera.far = 3000; gb.camera.updateProjectionMatrix();
+    /* req 3222 rework (7 November 2026): shell.html's floor bounce (req 3199, an upward warm hemisphere at 1.8 by day, for
+       undersides inside) lit every outer face and doubled the outside's brightness from the 4.20 pm eye pass (r120-e mean 45
+       to 80; with ?bounce=0, 45 again). Outdoors the ground is grass, not a lit floor: the bounce is off here unless ?bounce= is given. */
+    if (!/(^|[?&])bounce=/.test(location.search)) gb.scene.traverse(function (o) {
+      if (o.isHemisphereLight && o.color && o.color.getHex() === 0 && o.groundColor && o.groundColor.getHex() === 0x9a8466) o.intensity = 0;
+    });
     setTimeout(function () { run(gb); }, 0);
   }, 100);
 })();
