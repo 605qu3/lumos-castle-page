@@ -3355,6 +3355,17 @@ window.CastleShell = { build: function (F, M, placeId, o) {
         var rz = sg.zr[r] || [], z = sg.z || [], z0 = w.Q.floor, z1 = w.Q.floor + HE;
         if (z[0] != null && rz[0] != null && z[0] > rz[0] + 1e-3) z0 = z[0];
         if (z[1] != null && rz[1] != null && z[1] < rz[1] - 1e-3) z1 = Math.min(z[1], z1);
+        /* v195 (req 3191, Godric's 2 on 3223: plain stone, no ledge): an outer face that ends at its room's ceiling runs
+           on up through the slab to the lowest floor above it within 1.25 m (the 0.7 band), so no slit shows between
+           storeys; with no floor that close above (a roof, an absent storey: req 3221) it stops as before */
+        if (sg.kind === 'exterior' && Math.abs(z1 - (w.Q.floor + HE)) < 1e-3) {
+          var nf = Infinity;
+          places.forEach(function (q) { if (q.z0 > z1 + 0.01 && q.z0 <= z1 + 1.25 && q.z0 < nf) nf = q.z0; });
+          /* the stacked outside view builds each storey alone, so the floor above is not among its places: the model's
+             storey heights stand for it (a helper's picks, 8 November 2026: the slit at z 20.1 to 20.8 on every side) */
+          (M.levels || []).forEach(function (lv) { if (lv.z > z1 + 0.01 && lv.z <= z1 + 1.25 && lv.z < nf) nf = lv.z; });
+          if (nf < Infinity) z1 = nf;
+        }
         if (z1 - z0 > 1e-3) { lo = Math.min(lo, z0); top = Math.max(top, z1); }
       });
       if (!(top - lo > 1e-3)) return;

@@ -5,7 +5,7 @@
    stops 1 cm short of a face it ends against; seams before any shot. */
 window.SHELL_W5A = {
   mats: { tin: 0x8a8a82, amber: 0xb07a1e, blue: 0x23407a, ruby: 0x8a1c22, lavender: 0x6d6585, petals: 0xa89a8e, copper: 0x8a4a2a, steel: 0x8f9296, dust: 0x77706a,
-    deal: 0xa88a5e, mahog: 0x5a2a1e, scarlet: 0x8a1c1c, blanket: 0x7e7262, tartan: 0x6a2a2a, ink: 0x1a1c2a, tallow: 0xe0d4a8, flame: 0xffd890 },
+    deal: 0xa88a5e, mahog: 0x5a2a1e, scarlet: 0x8a1c1c, blanket: 0x7e7262, tartan: 0x6a2a2a, ink: 0x1a1c2a, tallow: 0xe0d4a8, flame: 0xffd890, slygreen: 0x1f4a32 },   /* slygreen (req 3231): the house's tapestry, not the tartan's red */
   things: {
     /* G-THINGS tudor-bay-g */
     /* docs/interiors/ground-floor-voids-1031.md (req 2272): two stone benches either side of the lake window, heather pots on the sill ledge, the roped plate-box crate, boot scrapers at the arch, the rain barrel, the tripod legs on pegs, the unlit lantern; the arch and its walkway kept clear */
@@ -6746,7 +6746,7 @@ window.SHELL_W5A = {
   /* G-HANG slytherin-common-room */
   /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 3 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
   add('slytherin-common-room', [
-    ['b', 77.45, 4.45, 2.0, 80.45, 4.51, 4.2, 'tartan'], ['b', 89.55, -5.85, 1.15, 89.61, -5.25, 1.95, 'gilt'], ['b', 89.55, -5.15, 1.15, 89.61, -4.55, 1.95, 'gilt'], ['b', 57.59, -7.45, 1.15, 57.65, -6.85, 1.95, 'gilt']]);
+    ['b', 77.45, 4.45, 2.0, 80.45, 4.51, 4.2, 'slygreen'], ['b', 89.55, -5.85, 1.15, 89.61, -5.25, 1.95, 'gilt'], ['b', 89.55, -5.15, 1.15, 89.61, -4.55, 1.95, 'gilt'], ['b', 57.59, -7.45, 1.15, 57.65, -6.85, 1.95, 'gilt']]);
   /* G-HANG end slytherin-common-room */
   /* G-HANG spell-practice-room */
   /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 1 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
@@ -21186,8 +21186,12 @@ window.SHELL_W5A = {
 (function (T) {
   T['slytherin-common-room'] = T['slytherin-common-room'] || { items: [] };
   T['slytherin-common-room'].items = T['slytherin-common-room'].items.concat([
-    ['b', 72.75, 4.0, 0.0, 74.55, 4.5, 1.3, 'stone'],
-    ['b', 73.15, 3.98, 0.1, 74.15, 4.5, 1.0, 'black'],
+    /* req 3231 (d): the hearth's opening a true firebox: two jambs and a lintel round a dark back, the flame in front of it */
+    ['b', 72.75, 4.0, 0.0, 73.15, 4.5, 1.3, 'stone'],
+    ['b', 74.15, 4.0, 0.0, 74.55, 4.5, 1.3, 'stone'],
+    ['b', 73.15, 4.0, 1.0, 74.15, 4.5, 1.3, 'stone'],
+    ['b', 73.16, 4.44, 0.0, 74.14, 4.49, 0.99, 'black'],
+    ['b', 73.16, 4.01, 0.0, 74.14, 4.44, 0.1, 'black'],
     ['b', 73.4, 4.1, 0.12, 73.9, 4.4, 0.45, 'flame'],
     ['b', 72.95, 3.8, 0.0, 74.35, 4.0, 0.18, 'iron'],
     ['b', 72.6, 3.85, 1.3, 74.7, 4.5, 1.38, 'oak'],
