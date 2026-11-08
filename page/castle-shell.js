@@ -1532,7 +1532,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
       var rm = (M.rooms || []).filter(function (r) { return slug(r.id) === Q.id; })[0];
       var md = window.CastleTrim.mould(rm && rm.age || 'P3', cls, { late: !!(rm && rm.late), grand: !!g.op.grand }), mv = cls === 'door' ? (DPRE ? DPRE.mv : g.op.hmv || null) : null;
       if (mv) for (var mk in mv) md[mk] = mv[mk];
-      return { trim: md.bw, hood: cls === 'door' && !!md.hood };
+      return { trim: md.bw, hood: cls === 'door' && !!md.hood, lugs: !!md.lugs };   /* v192 (req 3220): a late P6 door's architrave ears (castle-trim.js:57-58; no other age or class has lugs), so panelling.js stops past them */
     }
     if (row && row.dress === 'panelled' && (!Q.area || (Q.round && !Q.shaft)) && !Q.loops && Q.ceiling != null && window.CastlePanelling) {
       var pops = [];
@@ -1542,7 +1542,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
         /* v178 (req 3184): a dressed opening carries its dressing (trim, hood), so Design's panelling.js stops at its outer edge */
         var dr = dressOf(g, g.s1 - g.s0);
         pops.push({ wall: i, at: (g.s0 + g.s1) / 2, w: Math.max(0.1, g.s1 - g.s0 - 0.02), sill: g.sill > 0.05 ? g.sill + 0.01 : g.sill,
-          h: g.h - g.sill - (g.sill > 0.05 ? 0.02 : 0.01), door: g.sill < 0.05 && !g.niche, trim: dr ? dr.trim : undefined, hood: dr ? dr.hood : undefined });
+          h: g.h - g.sill - (g.sill > 0.05 ? 0.02 : 0.01), door: g.sill < 0.05 && !g.niche, trim: dr ? dr.trim : undefined, hood: dr ? dr.hood : undefined, lugs: dr ? dr.lugs : undefined });
       }); });
       (M.features || []).forEach(function (ft) {
         if (!ft.at || !ft.w || !/fireplace/.test(ft.kind || '') || !ft.room || (ft.room !== Q.id && slug(ft.room) !== Q.id)) return;
@@ -1693,8 +1693,54 @@ window.CastleShell = { build: function (F, M, placeId, o) {
         run.hides.push([r0, r1, Math.max(0, q.floor - Q.floor), Math.min(HE, qt - Q.floor), Math.max(0.02, n0 / 2), wide ? n0 : null]);
         (out.hideSkins = out.hideSkins || []).push(Q.id + ' wall ' + i + ' skin ' + q.id + ' ' + r0.toFixed(2) + '-' + r1.toFixed(2));
       });
+      /* v194 (req 3175, seams 1107 fault 3; the Architect, 8 November 2026): where a hidden place and a walked one share a wall line from
+         opposite sides, the walked place keeps the line and the hidden place's wall leaves that stretch, so a hidden room's
+         wall never stands in a passage (peeves-lumber-room's west wall stood 0.8 into drum-bend-g-east, a pier at its
+         corbel); the walked wall is then cut to its 2 cm skin over the hide by the hides pass below, as for any hide.
+         Before, the longer of the two kept the line, whichever stood on the walked side */
+      var isHide = function (q) { return !!(q.rec && (q.rec.use === 'hidden' || onlyHidden(M)[q.id] === true || (M.openings || []).some(function (o) { return o.hatch && o.inside && slug(o.inside) === q.id; }))); };
+      run.hide = isHide(Q);
+      /* the walked wall over a hide's side that lies on its line: the hides pass below reads a hide's whole box, which a notched
+         plan (peeves-lumber-room's nook, drawn in an L) reaches across the line, so the stretch is skinned here, 2 cm as there */
+      if (!run.hide) besideQs(Q).forEach(function (q) {
+        if (q.id === Q.id || q.area || !q.poly || !isHide(q)) return;
+        var qt = q.ceiling != null ? q.ceiling : q.floor + 3;
+        if (q.floor >= Q.floor + HE - 0.05 || qt <= Q.floor + 0.05) return;
+        if (Math.min.apply(null, q.poly.map(function (p) { return (p[0] - a[0]) * nx + (p[1] - a[1]) * ny; })) >= -0.02) return;   /* a hide inside the wall's depth is the pass below's */
+        q.poly.forEach(function (p, k) {
+          var p2 = q.poly[(k + 1) % q.poly.length], qx = p2[0] - p[0], qy = p2[1] - p[1], qL = Math.hypot(qx, qy);
+          if (qL < 0.05 || (qx * ux + qy * uy) / qL > -0.99) return;
+          if (Math.abs((p[0] - a[0]) * nx + (p[1] - a[1]) * ny) > 0.05 || Math.abs((p2[0] - a[0]) * nx + (p2[1] - a[1]) * ny) > 0.05) return;
+          var sa = (p[0] - a[0]) * ux + (p[1] - a[1]) * uy, sb = (p2[0] - a[0]) * ux + (p2[1] - a[1]) * uy;
+          var r0 = Math.max(0, Math.min(sa, sb)), r1 = Math.min(L, Math.max(sa, sb));
+          if (r1 - r0 < 0.05) return;
+          run.hides.push([r0, r1, Math.max(0, q.floor - Q.floor), Math.min(HE, qt - Q.floor), 0.02, null]);
+          (out.hideSkins = out.hideSkins || []).push(Q.id + ' wall ' + i + ' skin ' + q.id + ' ' + r0.toFixed(2) + '-' + r1.toFixed(2) + ' (side on the line)');
+        });
+      });
+      /* only where the hidden place's plan crosses this wall's line (a notched plan: its other part lies on the walked side), so a
+         rectangular hidden room keeps what the longer-wall rule gave it */
+      run.wraps = run.hide && !!Q.poly && Q.poly.some(function (p) { return (p[0] - a[0]) * nx + (p[1] - a[1]) * ny > 0.02; });
+      if (run.wraps) besideQs(Q).forEach(function (q) {
+        if (q.id === Q.id || q.area || !q.poly || isHide(q)) return;
+        var qt = q.ceiling != null ? q.ceiling : q.floor + 3;
+        if (q.floor >= Q.floor + HE - 0.05 || qt <= Q.floor + 0.05) return;
+        q.poly.forEach(function (p, k) {
+          var p2 = q.poly[(k + 1) % q.poly.length], qx = p2[0] - p[0], qy = p2[1] - p[1], qL = Math.hypot(qx, qy);
+          if (qL < 0.05 || (qx * ux + qy * uy) / qL > -0.99) return;
+          if (Math.abs((p[0] - a[0]) * nx + (p[1] - a[1]) * ny) > 0.05 || Math.abs((p2[0] - a[0]) * nx + (p2[1] - a[1]) * ny) > 0.05) return;
+          var sa = (p[0] - a[0]) * ux + (p[1] - a[1]) * uy, sb = (p2[0] - a[0]) * ux + (p2[1] - a[1]) * uy;
+          var r0 = Math.max(0, Math.min(sa, sb)), r1 = Math.min(L, Math.max(sa, sb));
+          if (r1 - r0 < 0.05) return;
+          var qm = onEdge(Q.poly, [(p[0] + p2[0]) / 2, (p[1] + p2[1]) / 2]);
+          if (qm && qm.d < 0.05) return;   /* that side is this wall's own (sharedE: the walked place does not build it), so it stays */
+          YL.push([r0, r1, Math.max(0, q.floor - Q.floor), Math.min(HE, qt - Q.floor)]);
+          (out.hideLeaves = out.hideLeaves || []).push(Q.id + ' wall ' + i + ' leaves ' + q.id + ' ' + r0.toFixed(2) + '-' + r1.toFixed(2));
+        });
+      });
       wallRuns.forEach(function (R) {
         if (R.gone || R.owner === Q.id) return;
+        if (R.hide !== run.hide && (run.wraps || R.wraps)) return;   /* seams 1107: the notched hide's wall left the stretch (above, or when R was built); the walked wall is skinned over it */
         if (run.wells.indexOf(R.owner) >= 0 || (R.wells || []).indexOf(Q.id) >= 0) return;   /* v128: the well keeps its own */
         var d0 = (R.a[0] - a[0]) * nx + (R.a[1] - a[1]) * ny, d1 = (R.b[0] - a[0]) * nx + (R.b[1] - a[1]) * ny;
         if (Math.abs(d0) > 0.05 || Math.abs(d1) > 0.05) return;
@@ -3825,6 +3871,8 @@ function farView(F, M, toLocal, panes, paneMat, shaft) {
     parts.forEach(function (p) { prism(rect(p.rect), BASE, p.eaves, 'far-stone'); roof(p.rect, p.eaves, p.ridge, p.kind); });
     if (r.flat) prism(rect(r.flat.rect), BASE, r.flat.lead || r.flat.z, 'far-stone');
   });
+  /* v193 (req 3197 b): the model's works, solids on the lawn (the P5 spur), a plain prism to the parapet from the fill's base */
+  (M.works || []).forEach(function (w) { if (w.poly && w.poly.length > 2) prism(w.poly, w.base, w.parapet || w.top, 'far-stone'); });
   (M.towers || []).forEach(function (t) {
     if (!t.c || !t.r) return;
     var top = t.top || t.eaves || 40, low = /^7/.test(t.floors || '') ? 36.4 : BASE;

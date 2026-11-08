@@ -160,7 +160,7 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <div id="roomnote" hidden></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="castle.js?v=15"></script>
-<script src="castle-model.js?v=596"></script>
+<script src="castle-model.js?v=601"></script>
 <!-- the floor files: tools/castle-floor.py writes this block, never by hand -->
 <script src="castle-model-B.js?v=5"></script>
 <script src="castle-model-G.js?v=14"></script>
@@ -169,8 +169,8 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <script src="castle-model-3.js?v=8"></script>
 <script src="castle-model-4.js?v=8"></script>
 <script src="castle-model-5.js?v=9"></script>
-<script src="castle-model-6.js?v=6"></script>
-<script src="castle-model-7.js?v=11"></script>
+<script src="castle-model-6.js?v=7"></script>
+<script src="castle-model-7.js?v=12"></script>
 <!-- /the floor files -->
 <script src="castle-paint.js?v=117"></script>
 <script src="design/room-tags-G.js?v=1"></script>
@@ -180,7 +180,7 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <script src="design/stone-face.js?v=1"></script>
 <script>/* the Architect's 392nd, Godric's 1 on req 2246 (31 October 2026): the stone face on every stone, all floors, not only late-pale; ?faceall=0 lays it back to flat for a comparison */
 if (!/[?&]faceall=0/.test(location.search) && window.CastleStoneFace) ['founders-rubble', 'tudor-pink', 'high-grey', 'houses-sandstone'].forEach(function (s) { CastleStoneFace.FACED[s] = true; });</script>
-<script src="design/ceilings.js?v=13"></script>
+<script src="design/ceilings.js?v=14"></script>
 <script src="design/panelling.js?v=2"></script>
 <script src="design/ironwork.js?v=2"></script>
 <script src="charms/spells.js?v=41"></script>
@@ -190,8 +190,8 @@ if (!/[?&]faceall=0/.test(location.search) && window.CastleStoneFace) ['founders
 <script src="design/lake-views.js?v=1"></script>
 <script src="castle-walls-v2.js?v=6"></script>
 <script src="castle-strip.js?v=2"></script>
-<script src="castle-shell.js?v=191"></script>
-<script src="castle-exterior.js?v=22"></script>
+<script src="castle-shell.js?v=194"></script>
+<script src="castle-exterior.js?v=27"></script>
 <script src="shell-w5b.js?v=24"></script>
 <script src="depth-ties.js?v=1"></script>
 <script src="corridor/suit.js?v=6"></script>
@@ -9141,7 +9141,9 @@ var STORE = PLACE !== 'drum-room-g' || !shell ? null : (function () {
   var BN = grp(44.9, -1.9, toC(44.9, -1.9));
   cyl(BN, 0.15, 0.04, 0, 0.02, 0, iron); cyl(BN, 0.02, 2.0, 0, 1.0, 0, oakD);
   cyl(BN, 0.065, 1.3, 0, 1.3, 0.02, wool); cyl(BN, 0.07, 0.04, 0, 1.0, 0.02, gilt); cyl(BN, 0.07, 0.04, 0, 1.6, 0.02, gilt);
-  box(ST, 0.5, 0.1, 0.42, 0.35, 0.49, 0.03, wool); box(ST, 0.44, 0.1, 0.38, 0.33, 0.59, 0.05, green); box(ST, 0.4, 0.09, 0.36, 0.36, 0.68, 0.02, mat(0x8a6c48, 0.95));
+  /* req 3213 (Godric, 8 November 2026, 7.43 am: 1): the three cushions stacked at the settle's north end against its arm (the arm's inner
+     face at x -0.74, 1 cm clear), each a little narrower, clear of P2 and P3; they stood at its south end and ran into P3's sitter */
+  box(ST, 0.46, 0.1, 0.4, -0.5, 0.49, 0.03, wool); box(ST, 0.4, 0.1, 0.36, -0.53, 0.59, 0.05, green); box(ST, 0.36, 0.09, 0.32, -0.55, 0.68, 0.02, mat(0x8a6c48, 0.95));
   cyl(ST, 0.25, 0.1, -0.2, 0.05, 0.7, wool);
   box(grp(45.35, 3.65, toC(45.35, 3.65)), 0.55, 1.05, 0.5, 0, 0.52, 0, sheetM);
   var LN = grp(41.4, 3.3, toC(41.4, 3.3));
