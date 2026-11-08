@@ -851,7 +851,7 @@ var FIRES = (function () {
   return out;
 })();
 var ceiling = shell.group.getObjectByName(PLACE + '-ceiling');
-var skyMat = new THREE.MeshBasicMaterial({ color: 0x223050, side: THREE.DoubleSide });
+var skyMat = new THREE.MeshBasicMaterial({ color: 0x223050, side: THREE.DoubleSide, polygonOffset: true, polygonOffsetFactor: 1, polygonOffsetUnits: 4 });   /* drawn a rank behind, so Design's bosses (0.9 to 2.9 mm over the crown) always win against the sky; the plane stays at the walls' tops, no slit (seams v1 item 6) */
 if (ceiling) ceiling.material = skyMat;
 /* the windows, the doors and the light through them, the Architect's req 472 (docs/handoff/architect.md, *The Great Hall's
    windows, doors and outside*), mapped here: each opening shows the sky; a patch of direct sun on the floor only while
