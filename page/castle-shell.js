@@ -3272,8 +3272,23 @@ window.CastleShell = { build: function (F, M, placeId, o) {
           if (uH.some(function (o) { return o !== h && o.s0 <= h.s0 + 0.01 && o.s1 >= h.s1 - 0.01 && o.z0 <= h.z1 - h.up + 0.01 &&
             Math.min(CastleStrip.topAt(o, h.s0), CastleStrip.topAt(o, (h.s0 + h.s1) / 2), CastleStrip.topAt(o, h.s1)) >= h.z1 - 0.01; })) return;
           var up = Math.min(h.up, h.z1 - h.z0 - 0.01), sp = h.z1 - up;
-          var C = CastleStrip.outline(h, sp).filter(function (q) { return q[1] >= sp - 1e-6; });
-          C = C.slice(1, C.length - 1);   /* the springing to the springing, without the jambs' feet */
+          /* v175 (oriel dots 4 and 14, 7 November 2026): lined from springing to springing, a pointed head's casing ended
+             with its foot in mid-air; it now runs down both jambs to the hole's sill or floor, as v1's casing did */
+          var C = CastleStrip.outline(h, h.z0);
+          /* a side the strip's end clips is no jamb (the hole runs on into the next strip): its lining stood across the
+             passage and the inspector's blind rays met it (27 rows on v175's first run), so that side starts at the springing */
+          if (h.s0 <= x0L + 0.005) C = C.slice(1);
+          if (h.s1 >= x1L - 0.005) C = C.slice(0, C.length - 1);
+          /* nor is a jamb where another hole of this strip stands over it (different openings that overlap stay apart,
+             castle-strip unite): its foot is raised to that hole's top there, and dropped if that reaches the springing */
+          var footAt = function (x) {
+            var z = h.z0;
+            uH.forEach(function (o) { if (o !== h && o.s0 < x - 0.005 && o.s1 > x + 0.005 && o.z0 <= z + 0.005) z = Math.max(z, CastleStrip.topAt(o, x)); });
+            return z;
+          };
+          if (C.length && Math.abs(C[0][0] - h.s0) < 1e-6 && C[0][1] < sp - 1e-6) { var fL = footAt(h.s0); if (fL >= sp - 0.005) C = C.slice(1); else C[0] = [h.s0, fL]; }
+          var nL = C.length - 1;
+          if (nL >= 0 && Math.abs(C[nL][0] - h.s1) < 1e-6 && C[nL][1] < sp - 1e-6) { var fR = footAt(h.s1); if (fR >= sp - 0.005) C = C.slice(0, nL); else C[nL] = [h.s1, fR]; }
           if (C.length < 3) return;
           var dpt = sg.off[1] - sg.off[0], pos = [], uv = [], acc = 0, I = 0.003;
           var off = C.map(function (q, k) {
