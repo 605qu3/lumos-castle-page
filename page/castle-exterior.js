@@ -240,6 +240,79 @@
     return { group: G, tris: tris };
   }
 
+  /* The slab band (req 3215 from 3191, 7 November 2026): a room's walls stop at its ceiling, 0.7 m under the next floor, and
+     nothing faces the band outside, so the outer faces show a black slit. For every built place with a plan, each outer
+     stretch (no other place beside it over the wall's height, tested at 1 m steps 0.1 m out) gets a plain wall piece from
+     the wall's top up to the lowest floor above that covers the stretch (a point 0.1 m inside, 0.1 m outside or mid-wall);
+     none above means roof, so no band. Same line and thickness as the wall below. Round places are not banded (the tower
+     drums have their filler). ?bands=0 leaves it out, for the before shot. */
+  var bandsOn = !/(^|[?&])bands=0(&|$)/.test(location.search);
+  function inPoly(pts, x, y) {
+    var c = false;
+    for (var i = 0, j = pts.length - 1; i < pts.length; j = i++) {
+      var pi = pts[i], pj = pts[j];
+      if ((pi[1] > y) !== (pj[1] > y) && x < (pj[0] - pi[0]) * (y - pi[1]) / (pj[1] - pi[1]) + pi[0]) c = !c;
+    }
+    return c;
+  }
+  function bands(TL) {
+    var seen = {}, P = [];
+    builtPlaces.forEach(function (q) {
+      if (!q.poly || q.poly.length < 3 || q.area || q.ceiling == null) return;
+      var k = q.id + '@' + q.floor.toFixed(2); if (seen[k]) return; seen[k] = 1;
+      var x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity, ar = 0;
+      q.poly.forEach(function (p, i) { var n = q.poly[(i + 1) % q.poly.length]; ar += p[0] * n[1] - n[0] * p[1];
+        x0 = Math.min(x0, p[0]); x1 = Math.max(x1, p[0]); y0 = Math.min(y0, p[1]); y1 = Math.max(y1, p[1]); });
+      P.push({ q: q, poly: ar < 0 ? q.poly.slice().reverse() : q.poly, cw: ar < 0, b: [x0, y0, x1, y1], f: q.floor, c: q.ceiling });
+    });
+    function covers(R, x, y) { return x >= R.b[0] && x <= R.b[2] && y >= R.b[1] && y <= R.b[3] && inPoly(R.poly, x, y); }
+    var tri = [], pieces = 0, stretches = 0, tall = 0;
+    function quad(a, b, c, d) { [a, b, c, a, c, d].forEach(function (p) { var v = TL(p[0], p[1], p[2]); tri.push(v.x, v.y, v.z); }); }
+    P.forEach(function (Q) {
+      var E = Q.poly, top = Q.c, n = E.length;
+      for (var i = 0; i < n; i++) {
+        var a = E[i], b = E[(i + 1) % n], dx = b[0] - a[0], dy = b[1] - a[1], L = Math.hypot(dx, dy);
+        if (L < 0.3) continue;
+        var ux = dx / L, uy = dy / L, nx = uy, ny = -ux;
+        var wl = Q.q.walls, t = Array.isArray(wl) ? wl[Q.cw ? (n - 1 - i - 1 + n) % n : i] : (wl && typeof wl === 'object' ? wl[['south', 'east', 'north', 'west'][i]] : null);
+        t = t || Q.q.wall || 0.5;
+        var steps = Math.max(1, Math.round(L)), runs = [], cur = null;
+        for (var s = 0; s < steps; s++) {
+          var m = (s + 0.5) / steps * L, px = a[0] + ux * m, py = a[1] + uy * m, ox = px + nx * 0.1, oy = py + ny * 0.1, ext = true, up = Infinity;
+          for (var r = 0; r < P.length; r++) {
+            var R = P[r]; if (R === Q) continue;
+            if (R.f < top - 0.1 && R.c > Q.f + 0.1 && covers(R, ox, oy)) { ext = false; break; }
+            if (R.f >= top - 0.05 && R.f < up && (covers(R, px - nx * 0.1, py - ny * 0.1) || covers(R, ox, oy) || covers(R, px + nx * t / 2, py + ny * t / 2))) up = R.f;
+          }
+          var z1 = ext && up < Infinity && up - top > 0.02 ? up : null;
+          if (z1 != null && z1 - top > 12) { tall++; z1 = null; }
+          if (z1 != null && cur && Math.abs(cur.z1 - z1) < 0.01) cur.s1 = (s + 1) / steps * L;
+          else if (z1 != null) runs.push(cur = { s0: s / steps * L, s1: (s + 1) / steps * L, z1: z1 });
+          else cur = null;
+        }
+        runs.forEach(function (R) {
+          stretches++;
+          var e0 = R.s0 < 0.01 ? t : 0, e1 = R.s1 > L - 0.01 ? t : 0;   /* a run reaching a corner runs on by the wall's thickness */
+          var s0 = R.s0 - e0 * 0, s1 = R.s1 + e1;
+          var A = [a[0] + ux * s0, a[1] + uy * s0], B = [a[0] + ux * s1, a[1] + uy * s1];
+          var A2 = [A[0] + nx * t, A[1] + ny * t], B2 = [B[0] + nx * t, B[1] + ny * t], z0 = top - 0.02, z1 = R.z1 + 0.02;
+          quad([A2[0], A2[1], z0], [B2[0], B2[1], z0], [B2[0], B2[1], z1], [A2[0], A2[1], z1]);   /* outer face */
+          quad([B[0], B[1], z0], [A[0], A[1], z0], [A[0], A[1], z1], [B[0], B[1], z1]);            /* inner face */
+          quad([A[0], A[1], z0], [A2[0], A2[1], z0], [A2[0], A2[1], z1], [A[0], A[1], z1]);        /* ends */
+          quad([B2[0], B2[1], z0], [B[0], B[1], z0], [B[0], B[1], z1], [B2[0], B2[1], z1]);
+          pieces++;
+        });
+      }
+    });
+    var G = new THREE.Group(); G.name = 'exterior-bands';
+    if (tri.length) {
+      var bg = new THREE.BufferGeometry(); bg.setAttribute('position', new THREE.Float32BufferAttribute(tri, 3));
+      bg.computeVertexNormals(); bg.computeBoundingSphere();
+      G.add(new THREE.Mesh(bg, new THREE.MeshLambertMaterial({ color: 0xa39d92, side: THREE.DoubleSide })));
+    }
+    return { group: G, pieces: pieces, tall: tall, places: P.length, tris: tri.length / 9 };
+  }
+
   function placeInto(out, TL) {
     var a = TL(0, 0, 0), b = out.toLocal(0, 0, 0);
     out.group.position.copy(a.sub(b));
@@ -282,6 +355,10 @@
       });
       var bk = bake(gs, 'exterior-shafts'); gb.scene.add(bk.group); X.shafts.meshes = bk.meshes;
       X.shafts.ms = Math.round(performance.now() - s0);
+    });
+    if (bandsOn) steps.push(function () {
+      var s0 = performance.now(), bd = bands(TL); gb.scene.add(bd.group);
+      X.bands = { pieces: bd.pieces, tris: Math.round(bd.tris), tallSkipped: bd.tall, places: bd.places, ms: Math.round(performance.now() - s0) };
     });
     steps.push(function () {
       var s0 = performance.now(), m = massing(TL); gb.scene.add(m.group);
