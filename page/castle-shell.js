@@ -443,6 +443,77 @@ window.CastleShell = { build: function (F, M, placeId, o) {
     var v = row.mass.axis === 'y' ? sy : sx, r = row.mass.runs.filter(function (q) { return v >= q[0] && v <= q[1]; })[0];
     return r ? r[2] : row.stone;
   }
+  /* v187 (req 3175 fault 1, the corbels' black undersides): a downward face is lit only by the hemispheres' ground colour,
+     and a windowless place (every drum bend, the dungeon, the passages: shell.html clamps FILL to 0.15 there) gives that ground
+     almost nothing, while the stone is as dark as its walls' base (#2a2114) and the walls are lit by torches from the side, so a
+     corbel's underside read black beside them. A corbel stone takes its wall's material with a warm bounce on its downward faces
+     alone (world normal y < 0, the facing's mortar still showing): never black, still darker than the lit faces. The clone keeps
+     the facing's shader and gives its own program key */
+  /* v188 (req 3175 fault 1 sent back by Fawkes, 8 November 2026, 2.15 am: v187's bounce was a fixed amount, so it overshot where
+     the torches are strong, the underside paler than the corbel's front, and drowned the edges in the dark dungeon). Now a
+     downward face is lit as if it faced the room (the corbel's own out-from-the-wall direction, the geometry's aOut, which
+     corbelOut sets), torch falloff and all, then held at UNDER of that: always a clear step darker than the front, never black,
+     its mortar and edges still reading. A corbel without aOut keeps its own shading */
+  var UNDER = 0.82;   /* 0.8 measured 0.84 to 0.91 of the front (the underside sits nearer the ceiling, further from the torches) */
+  function corbelOut(mesh, x, y, z) {
+    var g = mesh.geometry, n = g.attributes.position.count, a = new Float32Array(n * 3);
+    for (var i = 0; i < n; i++) { a[i * 3] = x; a[i * 3 + 1] = y; a[i * 3 + 2] = z; }
+    g.setAttribute('aOut', new THREE.BufferAttribute(a, 3));
+    if (g.attributes.uv) g.setAttribute('aCuv', g.attributes.uv.clone());   /* v190: the face's own 0-1, for its arris */
+    return mesh;
+  }
+  /* v189 (req 3175 fault 1 sent back by Fawkes, 8 November 2026, 2.52 am, on the potions-dungeon corridor: the underside
+     carried its wall's coursing, big rounded stones and dark mortar bands, the facing's map laid flat in world x and z, so it
+     read see-through, a vent or a bottomless box). A corbel is one block of dressed stone: its downward faces take the
+     facing's mean colour (the map's own average, so the tone is unchanged) with only UNDER_GRAIN of the map's contrast left
+     as tooling, no courses or joints of the wall's. Its front and sides keep the wall's facing; the clone in corbelMat
+     rewrites only that one line of the facing's shader (page/design/stone-face.js), untouched where the line is absent */
+  var UNDER_GRAIN = 0.0;   /* v190: 0.15 left the wall's bands as a faint film (blind helper, 3.05 am) */
+  /* v190 (v189's blind look: in the dungeon the plain dark underside framed by paler sides read as a shallow tray or recess):
+     a dressed block's arris catches the light, so the underside's own edges are lifted, a band ARRIS_W of the face wide,
+     ARRIS_LIFT brighter at the corner fading to the plain face, the cue that the face is the near surface of a solid block.
+     The face's own 0-1 coordinates ride in aCuv (corbelOut copies the box's uv; mergeDrawn carries it) */
+  var ARRIS_W = 0.14, ARRIS_SOFT = 0.14, ARRIS_LIFT = 0.00, STIPPLE = 0.16;   /* v191: STIPPLE is the stone's fine speckle on the underside (hash per 1/96 unit); ARRIS_SOFT the fade width of the arris, small = a crisp chamfer */
+  var FACE_LINE = 'diffuseColor.rgb *= pow(texture2D(faceMap, fuv * 0.25).rgb, vec3(2.2));';
+  function faceMean(m) {
+    var k = m.userData && m.userData.faced, t = k && window.CastleStoneFace && CastleStoneFace.maps[k], cv = t && t.image;
+    if (!cv || !cv.getContext) return null;
+    if (cv.userData && cv.userData.mean) return cv.userData.mean;
+    var d = cv.getContext('2d').getImageData(0, 0, cv.width, cv.height).data, sum = [0, 0, 0], n = 0;
+    for (var i = 0; i < d.length; i += 16) { for (var j = 0; j < 3; j++) sum[j] += Math.pow(d[i + j] / 255, 2.2); n++; }
+    var mean = sum.map(function (v) { return (v / n).toFixed(4); }).join(', ');
+    cv.userData = { mean: mean }; return mean;
+  }
+  function corbelMat(m) {
+    if (!m || !m.color) return m;
+    var c = m.userData.corbelM;
+    if (!c) {
+      var was = m.onBeforeCompile; c = m.clone(); c.userData = Object.assign({}, m.userData);
+      var fMean = faceMean(m);
+      c.onBeforeCompile = function (sh) {
+        if (was) was.call(this, sh);
+        if (fMean) sh.fragmentShader = sh.fragmentShader.replace(FACE_LINE, 'vec3 fTex = pow(texture2D(faceMap, fuv * 0.25).rgb, vec3(2.2));\n' +
+          'float fDown = smoothstep(0.5, 0.9, -normalize(vFaceN).y);\n' +
+          'diffuseColor.rgb *= mix(fTex, mix(vec3(' + fMean + '), fTex, ' + UNDER_GRAIN.toFixed(2) + '), fDown);\n' +
+          'vec2 eA = min(vCuv, 1.0 - vCuv);\nfloat arr = 1.0 - smoothstep(' + (ARRIS_W - ARRIS_SOFT).toFixed(3) + ', ' + ARRIS_W.toFixed(3) + ', min(eA.x, eA.y));\n' +
+          'diffuseColor.rgb *= 1.0 + ' + ARRIS_LIFT.toFixed(2) + ' * arr * fDown * step(0.25, dot(vOut, vOut));\n' +
+          'float sH = fract(sin(dot(floor(fuv * 96.0), vec2(12.9898, 78.233))) * 43758.5453);\n' +
+          'diffuseColor.rgb *= 1.0 + ' + STIPPLE.toFixed(3) + ' * (sH - 0.5) * fDown;');
+        sh.vertexShader = 'attribute vec3 aOut;\nattribute vec2 aCuv;\nvarying vec3 vOut;\nvarying vec2 vCuv;\n' + sh.vertexShader.replace('#include <project_vertex>',
+          '#include <project_vertex>\nvOut = normalMatrix * aOut;\nvCuv = aCuv;');
+        sh.fragmentShader = 'varying vec3 vOut;\nvarying vec2 vCuv;\n' + sh.fragmentShader.replace('#include <normal_fragment_maps>',
+          '#include <normal_fragment_maps>\nfloat cDown = 0.0;\nif (dot(vOut, vOut) > 0.25) {\n' +
+          '  cDown = smoothstep(0.5, 0.9, -normalize((vec4(normal, 0.0) * viewMatrix).xyz).y);\n' +
+          '  normal = normalize(mix(normal, normalize(vOut), cDown));\n}').replace('#include <lights_fragment_end>',
+          '#include <lights_fragment_end>\nreflectedLight.directDiffuse *= mix(1.0, ' + UNDER.toFixed(2) + ', cDown);\n' +
+          'reflectedLight.indirectDiffuse *= mix(1.0, ' + UNDER.toFixed(2) + ', cDown);\n' +
+          'reflectedLight.directSpecular *= mix(1.0, ' + UNDER.toFixed(2) + ', cDown);');
+      };
+      c.customProgramCacheKey = function () { return 'corbel-out-v191|' + UNDER + [ARRIS_W, ARRIS_SOFT, ARRIS_LIFT, STIPPLE, UNDER_GRAIN].join(',') + (fMean || '') + '|' + (was ? was.toString() : ''); };
+      m.userData.corbelM = c; c.needsUpdate = true;
+    }
+    return c;
+  }
   function wallMat(row, sx, sy, z) {
     var st = stoneAt(row, sx, sy, z), R = TONES && TONES.resolved;
     /* a panelled room's walls Design's oak, a limewashed room's its plaster, till tones.js gives "<stone>/panelled" its own */
@@ -1148,7 +1219,14 @@ window.CastleShell = { build: function (F, M, placeId, o) {
         }
       }
       CV = window.CastleCeilings.forPlace(THREE, QC, { toLocal: toLocal, kind: row.ceiling,
-        mats: { vault: mats.ceil, stone: stoneM, beam: paintMat(tone('oak-beams'), true) } });
+        mats: { vault: mats.ceil, stone: stoneM, corbel: corbelMat(stoneM), beam: paintMat(tone('oak-beams'), true) } });
+      /* v188: ceilings.js's beam corbels each face the room along the beam's span, away from their own wall end */
+      if (CV) CV.group.traverse(function (o) {
+        if (o.userData.corbel && o.material === corbelMat(stoneM)) {
+          var s = o.userData.end || 0;
+          if (o.userData.axis === 'x') corbelOut(o, 0, 0, -s); else corbelOut(o, -s, 0, 0);
+        }
+      });
       if (CV && QC !== Q && VB && VB.corbels) {
         CV.group.children.filter(function (o) { return o.name.indexOf(Q.id + '-pier-') === 0; }).forEach(function (o) { CV.group.remove(o); });
         VB.corbels.forEach(function (p, k) {
@@ -1157,7 +1235,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
           /* v37 (Godric's 1 on design-corbels-bow-1020): as Design's beam corbels in ceilings.js, the face filling it and bowed;
              0.28 high, not their 0.42, since the Potions shelves' tops stand 0.30 under the springing */
           var CH = 0.28, a = toLocal(cxs, cys, Q.floor + VB.springs - CH / 2), b = toLocal(cxs + (onX ? 1 : 0), cys + (onX ? 0 : 1), Q.floor);
-          var cb = slab(0.37, CH, 0.4, stoneM, 'wall');
+          var cb = corbelOut(slab(0.37, CH, 0.4, corbelMat(stoneM), 'wall'), n, 0, 0);   /* v188: out from its wall, local +x (its rotation below) */
           cb.position.copy(a); cb.rotation.y = Math.atan2(b.z - toLocal(cxs, cys, Q.floor).z, b.x - toLocal(cxs, cys, Q.floor).x) * -1;
           cb.name = Q.id + '-corbel-' + k; CV.group.add(cb);
           /* v34 (req 716, Design's 756): its carved face, the atlas cell CastleCeilings.faces.cell(id, k), on a plane
@@ -2391,7 +2469,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
     /* v13: a way on through a stair in the wall shows the stair's dark beyond its mouth, the room at its far end a tap away */
     if (w.via) { w.built = !!Q; Q = null; }
     /* a built room (one with its own page) is never shelled: the way takes him to its page (line 5's rule) */
-    if (Q && Q.rec && Q.rec.page) { w.built = true; w.page = Q.rec.page; if (EXT) { pageBody(Q, w); return; } }
+    if (Q && Q.rec && Q.rec.page) { w.built = true; w.page = Q.rec.page; if (EXT) { pageShell(Q, w); return; } }
     /* v13: a deep way (the flanker's arch through the spur's 1.2) finds its far room at its far face, as its gap does */
     else if (Q && onEdge(Q.poly, w.at, w.depth > 1.0 || Q.shaft ? w.depth + 0.2 : null)) { out.places.push(Q); buildPlace(Q); w.built = true; return; }
     /* v179 (req 3188, Exterior's E1 P01): under the outside view (o.exterior, shell.html's &exterior) a way whose far
@@ -2415,10 +2493,26 @@ window.CastleShell = { build: function (F, M, placeId, o) {
      castle-exterior.js's own floor builds), a way onto such a room draws that room's body: one plain stone prism of its
      plan, 0.3 m outset (its walls' least), from 0.3 under the lower of its floor and the way's sill to 0.3 over its ceiling.
      Once a page load per room (window.CastleShellPageBodies), so the floor builds do not stack copies. Never in a walk */
-  function pageBody(Q, w) {
+  /* v186 (req 3189 P13, the full shell): under the outside view a way onto a page room builds that room's own shell (its
+     walls, windows and roof as the shells draw any room), so the Fat Lady's corridor's courtyard lancets show from
+     outside, not a blind prism. Once a page load per room, as pageBody; ?pagebody=prism keeps v185's prism, for a fair
+     before. Never in a walk */
+  function pageShell(Q, w) {
+    if (/(^|[?&])pagebody=prism(&|$)/.test(location.search)) return pageBody(Q, w);
     var PB = window.CastleShellPageBodies = window.CastleShellPageBodies || {};
     if (PB[Q.id] || !Q.poly || Q.poly.length < 3) return;
     PB[Q.id] = P.id;
+    out.places.push(Q); buildPlace(Q);
+    (out.pageBodies = out.pageBodies || []).push({ id: Q.id, from: P.id, shell: true });
+    /* its plinth and cap (the Architect's helper's look, 1.36 am): the shell draws no slab under its floor nor lid over its ceiling, so a
+       0.9 m dark slot opened under the wall's foot onto the floor below and a strip over its head; the prism stays there
+       only, from 0.7 under the floor (the slab's depth) to the floor, and from the ceiling to 0.7 over it */
+    var top = Q.ceiling != null ? Q.ceiling : Q.floor + 4.5, lo = Math.min(Q.floor, P.floor + (w.sill || 0));
+    pageBody(Q, w, [[lo - 0.7, Q.floor], [top, top + 0.7]]);
+  }
+  function pageBody(Q, w, bands) {
+    var PB = window.CastleShellPageBodies = window.CastleShellPageBodies || {};
+    if (!bands) { if (PB[Q.id] || !Q.poly || Q.poly.length < 3) return; PB[Q.id] = P.id; }
     var pts = Q.poly, n = pts.length, area = 0, d = 0.3, outP = [];
     for (var k = 0; k < n; k++) { var p0 = pts[k], p1 = pts[(k + 1) % n]; area += p0[0] * p1[1] - p1[0] * p0[1]; }
     var sg = area > 0 ? 1 : -1;   /* counter-clockwise: the outward normal of an edge (dx, dy) is (dy, -dx) */
@@ -2432,10 +2526,13 @@ window.CastleShell = { build: function (F, M, placeId, o) {
     var low = Math.min(Q.floor, P.floor + (w.sill || 0)) - 0.3, high = (Q.ceiling != null ? Q.ceiling : Q.floor + 4.5) + 0.3;
     var sh = new THREE.Shape();
     outP.forEach(function (q, k) { var x = q[0] - cx, y = q[1] - cy; if (k) sh.lineTo(x, y); else sh.moveTo(x, y); });
-    var m = F.register(new THREE.Mesh(new THREE.ExtrudeGeometry(sh, { depth: high - low, bevelEnabled: false }), mats.wall), LAYER.wall);
-    m.rotation.x = -Math.PI / 2; m.position.y = low - z0;
-    m.name = 'page-body-' + Q.id; m.userData.owner = Q.id; group.add(m);
-    (out.pageBodies = out.pageBodies || []).push({ id: Q.id, from: P.id, low: +low.toFixed(2), high: +high.toFixed(2) });
+    (bands || [[low, high]]).forEach(function (bz, bi) {
+      if (!(bz[1] - bz[0] > 0.01)) return;
+      var m = F.register(new THREE.Mesh(new THREE.ExtrudeGeometry(sh, { depth: bz[1] - bz[0], bevelEnabled: false }), mats.wall), LAYER.wall);
+      m.rotation.x = -Math.PI / 2; m.position.y = bz[0] - z0;
+      m.name = 'page-body-' + Q.id + (bands ? '-' + bi : ''); m.userData.owner = Q.id; group.add(m);
+      (out.pageBodies = out.pageBodies || []).push({ id: Q.id, from: P.id, low: +bz[0].toFixed(2), high: +bz[1].toFixed(2) });
+    });
   }
   /* v24 (model v54): an open side of this place over another's air (an opening with `over`: the first-floor corridor's
      landing over the Entrance Hall) builds that place in the same frame, as a mouth does; nothing to walk through */
@@ -3473,18 +3570,19 @@ window.CastleShell = { build: function (F, M, placeId, o) {
     var n = 0;
     bins.forEach(function (list) {
       if (list.length < 2) return;
-      var names = ['position', 'normal', 'uv', 'aFade'].filter(function (a) { return list.every(function (m) { return m.geometry.attributes[a]; }); });
+      var names = ['position', 'normal', 'uv', 'aFade', 'aOut', 'aCuv'].filter(function (a) { return list.every(function (m) { return m.geometry.attributes[a]; }); });
       if (names[0] !== 'position') return;
       var arrs = {}, mx = new THREE.Matrix4();
       names.forEach(function (a) { arrs[a] = []; });
       list.forEach(function (m) {
         var geo = m.geometry.index ? m.geometry.toNonIndexed() : m.geometry.clone();
         geo.applyMatrix4(mx.multiplyMatrices(inv, m.matrixWorld));
+        if (names.indexOf('aOut') >= 0) geo.attributes.aOut.applyNormalMatrix(new THREE.Matrix3().getNormalMatrix(mx));   /* v188: the corbel's out direction into root's frame */
         names.forEach(function (a) { var s = geo.attributes[a].array; for (var i = 0; i < s.length; i++) arrs[a].push(s[i]); });
         geo.dispose();
       });
       var bg = new THREE.BufferGeometry(), f = list[0];
-      names.forEach(function (a) { bg.setAttribute(a, new THREE.Float32BufferAttribute(arrs[a], a === 'uv' ? 2 : a === 'aFade' ? 1 : 3)); });
+      names.forEach(function (a) { bg.setAttribute(a, new THREE.Float32BufferAttribute(arrs[a], a === 'uv' || a === 'aCuv' ? 2 : a === 'aFade' ? 1 : 3)); });
       if (names.indexOf('normal') < 0) bg.computeVertexNormals();
       var one = new THREE.Mesh(bg, f.material);
       one.name = f.name; one.castShadow = f.castShadow; one.receiveShadow = f.receiveShadow; one.renderOrder = f.renderOrder;
