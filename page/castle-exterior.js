@@ -269,7 +269,7 @@
        slit's mid height through each 1 m step finds any face near the wall plane (a taller wall, a ledge): none, and the
        step is open. The piece is one outer face only, set back 0.01 m from the innermost face found just below the slit (so
        never proud of a ledge), in that face's own material colour; no ends, no overlap into the wall, so no joint marks. */
-    var seen = {}, P = [], probes = 0, CELL = 4, grid = {}, tri9 = [], tcol = [], stamp = [], qn = 0;
+    var roundSkipped = 0, seen = {}, P = [], probes = 0, CELL = 4, grid = {}, tri9 = [], tcol = [], stamp = [], qn = 0;
     /* a grid over the baked walls (normals within 60 degrees of level) so a probe tests a few triangles, not the castle */
     scene.updateMatrixWorld(true);
     (function () {
@@ -313,6 +313,9 @@
     }
     builtPlaces.forEach(function (q) {
       if (!q.poly || q.poly.length < 3 || q.area || q.ceiling == null) return;
+      if (q.poly.length >= 8) { var mx = 0, my = 0; q.poly.forEach(function (p) { mx += p[0]; my += p[1]; }); mx /= q.poly.length; my /= q.poly.length;   /* v6: a round place drawn as a many-sided ring is not banded (r270's drum foot showed the facets as dashes) */
+        var rr = q.poly.map(function (p) { return Math.hypot(p[0] - mx, p[1] - my); }), rm = rr.reduce(function (u, v) { return u + v; }, 0) / rr.length;
+        if (rr.every(function (v) { return Math.abs(v - rm) < 0.06 * rm; })) { roundSkipped++; return; } }
       var k = q.id + '@' + q.floor.toFixed(2); if (seen[k]) return; seen[k] = 1;
       var x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity, ar = 0;
       q.poly.forEach(function (p, i) { var n = q.poly[(i + 1) % q.poly.length]; ar += p[0] * n[1] - n[0] * p[1];
@@ -382,7 +385,7 @@
       G.add(new THREE.Mesh(bg, bandDebug ? new THREE.MeshBasicMaterial({ color: 0xff0000, side: THREE.DoubleSide }) : new THREE.MeshLambertMaterial({ color: +c, side: THREE.DoubleSide })));
     });
     var log = later.map(function (w) { return { id: w.id, floor: +w.fl.toFixed(2), edge: w.edge, len: w.len, at: w.at, z0: +w.z0.toFixed(2), z1: +w.z1.toFixed(2), h: +(w.z1 - w.z0).toFixed(2), probe: w.dbg }; });
-    return { gaps: Object.keys(gaps).map(function (k) { return gaps[k]; }).sort(function (p1, p2) { return p2.gap - p1.gap; }), log: log, group: G, pieces: pieces, tall: tall, faced: faced, bare: bare, probes: probes, places: P.length, tris: tris };
+    return { gaps: Object.keys(gaps).map(function (k) { return gaps[k]; }).sort(function (p1, p2) { return p2.gap - p1.gap; }), log: log, group: G, pieces: pieces, tall: tall, faced: faced, bare: bare, probes: probes, places: P.length, roundSkipped: roundSkipped, tris: tris };
   }
 
   function placeInto(out, TL) {
@@ -430,7 +433,7 @@
     });
     if (bandsOn) steps.push(function () {
       var s0 = performance.now(), bd; try { bd = bands(TL, gb.scene); } catch (e) { X.skipped.push('bands: ' + String(e && e.stack || e).slice(0, 300)); return; } gb.scene.add(bd.group);
-      X.bands = { gaps: bd.gaps, log: bd.log, pieces: bd.pieces, tris: Math.round(bd.tris), tallSkipped: bd.tall, faced: bd.faced, bare: bd.bare, probes: bd.probes, places: bd.places, ms: Math.round(performance.now() - s0) };
+      X.bands = { gaps: bd.gaps, log: bd.log, pieces: bd.pieces, tris: Math.round(bd.tris), tallSkipped: bd.tall, roundSkipped: bd.roundSkipped, faced: bd.faced, bare: bd.bare, probes: bd.probes, places: bd.places, ms: Math.round(performance.now() - s0) };
     });
     steps.push(function () {
       var s0 = performance.now(), m = massing(TL); gb.scene.add(m.group);
