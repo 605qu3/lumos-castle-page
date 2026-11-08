@@ -255,8 +255,53 @@
     }
     return c;
   }
-  function bands(TL) {
-    var seen = {}, P = [];
+  function bands(TL, scene) {
+    /* Refit 7 Nov 10.30 pm (req 3215 failed the blind look): fill only where no wall face stands. A ray from outside at the
+       slit's mid height through each 1 m step finds any face near the wall plane (a taller wall, a ledge): none, and the
+       step is open. The piece is one outer face only, set back 0.01 m from the innermost face found just below the slit (so
+       never proud of a ledge), in that face's own material colour; no ends, no overlap into the wall, so no joint marks. */
+    var seen = {}, P = [], probes = 0, CELL = 4, grid = {}, tri9 = [], tcol = [], stamp = [], qn = 0;
+    /* a grid over the baked walls (normals within 60 degrees of level) so a probe tests a few triangles, not the castle */
+    scene.updateMatrixWorld(true);
+    (function () {
+      var va = new THREE.Vector3(), vb = new THREE.Vector3(), vc = new THREE.Vector3(), e1 = new THREE.Vector3(), e2 = new THREE.Vector3(), nn = new THREE.Vector3();
+      scene.traverse(function (o) {
+        if (!o.isMesh || o.name === 'exterior-bands' || !o.geometry || !o.geometry.attributes.position) return;
+        var shownUp = true; for (var a = o; a; a = a.parent) if (!a.visible) shownUp = false; if (!shownUp) return;
+        var P0 = o.geometry.attributes.position, ix = o.geometry.index, cnt = ix ? ix.count : P0.count, mw = o.matrixWorld;
+        var col = o.material && o.material.color ? o.material.color.getHex() : null;
+        for (var k = 0; k + 2 < cnt; k += 3) {
+          va.fromBufferAttribute(P0, ix ? ix.getX(k) : k).applyMatrix4(mw); vb.fromBufferAttribute(P0, ix ? ix.getX(k + 1) : k + 1).applyMatrix4(mw); vc.fromBufferAttribute(P0, ix ? ix.getX(k + 2) : k + 2).applyMatrix4(mw);
+          e1.subVectors(vb, va); e2.subVectors(vc, va); nn.crossVectors(e1, e2).normalize();
+          if (Math.abs(nn.y) > 0.5) continue;
+          var id = tri9.length / 9; tri9.push(va.x, va.y, va.z, vb.x, vb.y, vb.z, vc.x, vc.y, vc.z); tcol.push(col);
+          var cx0 = Math.floor(Math.min(va.x, vb.x, vc.x) / CELL), cx1 = Math.floor(Math.max(va.x, vb.x, vc.x) / CELL),
+              cz0 = Math.floor(Math.min(va.z, vb.z, vc.z) / CELL), cz1 = Math.floor(Math.max(va.z, vb.z, vc.z) / CELL);
+          if ((cx1 - cx0 + 1) * (cz1 - cz0 + 1) > 400) continue;
+          for (var cx = cx0; cx <= cx1; cx++) for (var cz = cz0; cz <= cz1; cz++) { var key = cx + ',' + cz; (grid[key] || (grid[key] = [])).push(id); }
+        }
+      });
+    })();
+    var S0v = new THREE.Vector3(), S1v = new THREE.Vector3(), dv = new THREE.Vector3();
+    function probe(px, py, nx, ny, z) {
+      var S0 = TL(px + nx * 3, py + ny * 3, z), S1 = TL(px, py, z); S0v.copy(S0); S1v.copy(S1);
+      var len = dv.subVectors(S1v, S0v).length(); dv.multiplyScalar(1 / len); probes++; qn++;
+      var far = len * 4 / 3, best = Infinity, bc = null, ox = S0v.x, oy = S0v.y, oz = S0v.z, dx = dv.x, dy = dv.y, dz = dv.z;
+      for (var u = 0; u <= far; u += CELL / 2) {
+        var cl = grid[Math.floor((ox + dx * u) / CELL) + ',' + Math.floor((oz + dz * u) / CELL)]; if (!cl) continue;
+        for (var q = 0; q < cl.length; q++) {
+          var id = cl[q]; if (stamp[id] === qn) continue; stamp[id] = qn;
+          var b = id * 9, ax = tri9[b], ay = tri9[b + 1], az = tri9[b + 2];
+          var e1x = tri9[b + 3] - ax, e1y = tri9[b + 4] - ay, e1z = tri9[b + 5] - az, e2x = tri9[b + 6] - ax, e2y = tri9[b + 7] - ay, e2z = tri9[b + 8] - az;
+          var hx = dy * e2z - dz * e2y, hy = dz * e2x - dx * e2z, hz = dx * e2y - dy * e2x, det = e1x * hx + e1y * hy + e1z * hz;
+          if (Math.abs(det) < 1e-9) continue;
+          var f = 1 / det, sx = ox - ax, sy = oy - ay, sz = oz - az, uu = f * (sx * hx + sy * hy + sz * hz); if (uu < 0 || uu > 1) continue;
+          var qx = sy * e1z - sz * e1y, qy = sz * e1x - sx * e1z, qz = sx * e1y - sy * e1x, vv = f * (dx * qx + dy * qy + dz * qz); if (vv < 0 || uu + vv > 1) continue;
+          var tt = f * (e2x * qx + e2y * qy + e2z * qz); if (tt >= 0 && tt <= far && tt < best) { best = tt; bc = tcol[id]; }
+        }
+      }
+      return best < Infinity ? { off: 3 - best * 3 / len, col: bc } : null;
+    }
     builtPlaces.forEach(function (q) {
       if (!q.poly || q.poly.length < 3 || q.area || q.ceiling == null) return;
       var k = q.id + '@' + q.floor.toFixed(2); if (seen[k]) return; seen[k] = 1;
@@ -266,8 +311,10 @@
       P.push({ q: q, poly: ar < 0 ? q.poly.slice().reverse() : q.poly, cw: ar < 0, b: [x0, y0, x1, y1], f: q.floor, c: q.ceiling });
     });
     function covers(R, x, y) { return x >= R.b[0] && x <= R.b[2] && y >= R.b[1] && y <= R.b[3] && inPoly(R.poly, x, y); }
-    var tri = [], pieces = 0, stretches = 0, tall = 0;
-    function quad(a, b, c, d) { [a, b, c, a, c, d].forEach(function (p) { var v = TL(p[0], p[1], p[2]); tri.push(v.x, v.y, v.z); }); }
+    var tones = {}, later = [];
+    function lum(h) { return ((h >> 16 & 255) * 0.3 + (h >> 8 & 255) * 0.59 + (h & 255) * 0.11) / 255; }
+    var T = {}, pieces = 0, stretches = 0, tall = 0, faced = 0, bare = 0;
+    function quad(col, a, b, c, d) { var arr = T[col] || (T[col] = []); [a, b, c, a, c, d].forEach(function (p) { var v = TL(p[0], p[1], p[2]); arr.push(v.x, v.y, v.z); }); }
     P.forEach(function (Q) {
       var E = Q.poly, top = Q.c, n = E.length;
       for (var i = 0; i < n; i++) {
@@ -284,33 +331,40 @@
             if (R.f < top - 0.1 && R.c > Q.f + 0.1 && covers(R, ox, oy)) { ext = false; break; }
             if (R.f >= top - 0.05 && R.f < up && (covers(R, px - nx * 0.1, py - ny * 0.1) || covers(R, ox, oy) || covers(R, px + nx * t / 2, py + ny * t / 2))) up = R.f;
           }
-          var z1 = ext && up < Infinity && up - top > 0.02 ? up : null;
+          var z1 = ext && up < Infinity && up - top > 0.02 ? up : null, off = t, col = null;
           if (z1 != null && z1 - top > 12) { tall++; z1 = null; }
-          if (z1 != null && cur && Math.abs(cur.z1 - z1) < 0.01) cur.s1 = (s + 1) / steps * L;
-          else if (z1 != null) runs.push(cur = { s0: s / steps * L, s1: (s + 1) / steps * L, z1: z1 });
+          if (z1 != null) {
+            var hm = probe(px, py, nx, ny, (top + z1) / 2), hq = probe(px, py, nx, ny, top + Math.min(0.2, (z1 - top) / 2));
+            if ((hm && hm.off > -0.1 && hm.off < t + 0.4) || (hq && hq.off > -0.1 && hq.off < t + 0.4)) { z1 = null; faced++; }
+            else {
+              var lo = [probe(px, py, nx, ny, top - 0.15), probe(px, py, nx, ny, top - 0.7)].filter(function (h) { return h && h.off > 0.05 && h.off < t + 0.4; });
+              if (lo.length) { lo.sort(function (p1, p2) { return p1.off - p2.off; }); off = lo[0].off;
+                var lit = lo.filter(function (h) { return h.col != null && lum(h.col) >= 0.3; });
+                col = lit.length ? lit[0].col : null; if (col != null) tones[col] = (tones[col] || 0) + 1; }
+              else bare++;
+            }
+          }
+          if (z1 != null && cur && Math.abs(cur.z1 - z1) < 0.01 && Math.abs(cur.off - off) < 0.02 && cur.col === col) cur.s1 = (s + 1) / steps * L;
+          else if (z1 != null) runs.push(cur = { s0: s / steps * L, s1: (s + 1) / steps * L, z1: z1, off: off, col: col });
           else cur = null;
         }
         runs.forEach(function (R) {
           stretches++;
-          var e0 = R.s0 < 0.01 ? t : 0, e1 = R.s1 > L - 0.01 ? t : 0;   /* a run reaching a corner runs on by the wall's thickness */
-          var s0 = R.s0 - e0 * 0, s1 = R.s1 + e1;
-          var A = [a[0] + ux * s0, a[1] + uy * s0], B = [a[0] + ux * s1, a[1] + uy * s1];
-          var A2 = [A[0] + nx * t, A[1] + ny * t], B2 = [B[0] + nx * t, B[1] + ny * t], z0 = top - 0.02, z1 = R.z1 + 0.02;
-          quad([A2[0], A2[1], z0], [B2[0], B2[1], z0], [B2[0], B2[1], z1], [A2[0], A2[1], z1]);   /* outer face */
-          quad([B[0], B[1], z0], [A[0], A[1], z0], [A[0], A[1], z1], [B[0], B[1], z1]);            /* inner face */
-          quad([A[0], A[1], z0], [A2[0], A2[1], z0], [A2[0], A2[1], z1], [A[0], A[1], z1]);        /* ends */
-          quad([B2[0], B2[1], z0], [B[0], B[1], z0], [B[0], B[1], z1], [B2[0], B2[1], z1]);
-          pieces++;
+          var e0 = R.s0 < 0.01 ? t : 0, e1 = R.s1 > L - 0.01 ? t : 0;
+          var A = [a[0] + ux * (R.s0 - e0 * 0) + nx * (R.off - 0.01), a[1] + uy * R.s0 + ny * (R.off - 0.01)], B = [a[0] + ux * (R.s1 + e1) + nx * (R.off - 0.01), a[1] + uy * (R.s1 + e1) + ny * (R.off - 0.01)];
+          later.push({ col: R.col, A: A, B: B, z0: top, z1: R.z1 });
         });
       }
     });
-    var G = new THREE.Group(); G.name = 'exterior-bands';
-    if (tri.length) {
-      var bg = new THREE.BufferGeometry(); bg.setAttribute('position', new THREE.Float32BufferAttribute(tri, 3));
-      bg.computeVertexNormals(); bg.computeBoundingSphere();
-      G.add(new THREE.Mesh(bg, new THREE.MeshLambertMaterial({ color: 0xa39d92, side: THREE.DoubleSide })));
-    }
-    return { group: G, pieces: pieces, tall: tall, places: P.length, tris: tri.length / 9 };
+    var modal = 0xa39d92, mc = 0; Object.keys(tones).forEach(function (c) { if (tones[c] > mc) { mc = tones[c]; modal = +c; } });
+    later.forEach(function (w) { quad(w.col != null ? w.col : modal, [w.A[0], w.A[1], w.z0], [w.B[0], w.B[1], w.z0], [w.B[0], w.B[1], w.z1], [w.A[0], w.A[1], w.z1]); pieces++; });
+    var G = new THREE.Group(), tris = 0; G.name = 'exterior-bands';
+    Object.keys(T).forEach(function (c) {
+      var bg = new THREE.BufferGeometry(); bg.setAttribute('position', new THREE.Float32BufferAttribute(T[c], 3));
+      bg.computeVertexNormals(); bg.computeBoundingSphere(); tris += T[c].length / 9;
+      G.add(new THREE.Mesh(bg, new THREE.MeshLambertMaterial({ color: +c, side: THREE.DoubleSide })));
+    });
+    return { group: G, pieces: pieces, tall: tall, faced: faced, bare: bare, probes: probes, places: P.length, tris: tris };
   }
 
   function placeInto(out, TL) {
@@ -357,8 +411,8 @@
       X.shafts.ms = Math.round(performance.now() - s0);
     });
     if (bandsOn) steps.push(function () {
-      var s0 = performance.now(), bd = bands(TL); gb.scene.add(bd.group);
-      X.bands = { pieces: bd.pieces, tris: Math.round(bd.tris), tallSkipped: bd.tall, places: bd.places, ms: Math.round(performance.now() - s0) };
+      var s0 = performance.now(), bd; try { bd = bands(TL, gb.scene); } catch (e) { X.skipped.push('bands: ' + String(e && e.stack || e).slice(0, 300)); return; } gb.scene.add(bd.group);
+      X.bands = { pieces: bd.pieces, tris: Math.round(bd.tris), tallSkipped: bd.tall, faced: bd.faced, bare: bd.bare, probes: bd.probes, places: bd.places, ms: Math.round(performance.now() - s0) };
     });
     steps.push(function () {
       var s0 = performance.now(), m = massing(TL); gb.scene.add(m.group);
