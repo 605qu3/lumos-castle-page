@@ -333,7 +333,7 @@
     var G = [{ x0: t - op.w / 2 - e, x1: t + op.w / 2 + e, y0: d && sill > 0.05 ? Math.max(0, sill - e) : sill, y1: top + (d ? e + 0.01 + hood : 0), door: !!op.door, trim: d }];
     if (d && sill > 0.05) G.push({ x0: t - op.w / 2 - e - 0.05, x1: t + op.w / 2 + e + 0.05, y0: Math.max(0, sill - 0.11), y1: sill + 0.01, door: false, trim: d });
     if (d && op.hood) G.push({ x0: t - op.w / 2 - e - 0.11, x1: t + op.w / 2 + e + 0.11, y0: Math.max(sill, Math.min(top + d - 0.47, sill + op.h * 0.55)), y1: top + e + 0.01 + hood, door: false, trim: d });
-    /* the P6 and P7 architrave's lugs, 0.07 past bw from 0.30 under the head (castle-trim ~297), where the opening says so */
+    /* the architrave's lugs, 0.07 past bw from 0.30 under the head (castle-trim ~297), where the opening says so: castle-trim gives them only to a late P6 door (castle-trim.js:57-58; req 3220) */
     if (d && op.lugs) G.push({ x0: t - op.w / 2 - e - 0.08, x1: t + op.w / 2 + e + 0.08, y0: Math.max(sill, top - 0.31), y1: top + e, door: false, trim: d });
     return G;
   }
