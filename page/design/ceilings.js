@@ -341,9 +341,71 @@
     return G;
   }
 
+  /* a clustered pier (req 3284, the Entrance Hall's, model v308): a 1.0 square core with a round shaft of 0.7 on each
+     face (a quatrefoil 1.4 across), a base block, a capital ring where the ribs spring, and a springing block */
+  function clusterPier(THREE, x, z, y0, top, mat, name) {
+    var P = new THREE.Group(), ba = 0.2, cap = 0.3, drum = top - ba - cap;
+    var add = function (g, px, py, pz) { var m = new THREE.Mesh(g, mat); m.position.set(px, py, pz); P.add(m); };
+    add(new THREE.BoxGeometry(1.4, ba, 1.4), x, y0 + ba / 2, z);
+    add(new THREE.BoxGeometry(1.0, drum, 1.0), x, y0 + ba + drum / 2, z);
+    [[0.35, 0], [-0.35, 0], [0, 0.35], [0, -0.35]].forEach(function (o) {
+      add(new THREE.CylinderGeometry(0.35, 0.37, drum, 16), x + o[0], y0 + ba + drum / 2, z + o[1]);
+      add(new THREE.CylinderGeometry(0.42, 0.35, cap, 16), x + o[0], y0 + ba + drum + cap / 2, z + o[1]);
+    });
+    P.name = name;
+    return P;
+  }
+
+  /* a rib vault on a grid of piers (req 3284): the model's piers give the bay lines, every cell between them is one
+     rib-vaulted bay (a pointed groin web, two diagonals, a rib on every bay line, a beast boss); every bay rises alike
+     from the springing to the crown over its own span, so neighbours meet along their lines. vault.bays[] names a bay
+     stilted (rect, springs, profile): provisional, its web is lifted toward the wall corner it stands on, from 0 at
+     its pier and wall-pier sides to the full stilt there, so it still meets its neighbours along its open sides, and a
+     shaft carries the springing at that corner */
+  function ribGrid(THREE, Q, B, mats, toLocal) {
+    var G = new THREE.Group(), V = Q.rec.vault, K = bays(Q, B, toLocal), H = heights(Q, 0), rise = H.crown - H.springs;
+    var y = B.y + H.springs, top = B.y + H.crown, beasts = (window.LumosCarving || {}).BEASTS || ['lion', 'eagle', 'badger', 'snake'];
+    var rr = 0.11, k = 0, stilts = [], smooth = function (t) { t = Math.max(0, Math.min(1, t)); return t * t * (3 - 2 * t); };
+    (V.bays || []).forEach(function (b) {
+      if (!b.rect) return;
+      var a = toLocal(b.rect[0], b.rect[1], Q.floor), c = toLocal(b.rect[2], b.rect[3], Q.floor);
+      stilts.push({ x0: Math.min(a.x, c.x), x1: Math.max(a.x, c.x), z0: Math.min(a.z, c.z), z1: Math.max(a.z, c.z), lift: (b.springs || H.springs) - H.springs });
+    });
+    for (var i = 1; i < K.xs.length; i++) for (var j = 1; j < K.zs.length; j++) (function (x0, x1, z0, z1) {
+      var mx = (x0 + x1) / 2, mz = (z0 + z1) / 2, ax = (x1 - x0) / 2, az = (z1 - z0) / 2, mid = (x0 + x1 + z0 + z1) / 4;
+      var st = stilts.filter(function (s) { return Math.abs(s.x0 - x0) < 0.1 && Math.abs(s.x1 - x1) < 0.1 && Math.abs(s.z0 - z0) < 0.1 && Math.abs(s.z1 - z1) < 0.1; })[0];
+      var base = function (x, z) { return Math.max(pointed(az, rise, z - mz), pointed(ax, rise, x - mx)); };
+      var h = base;
+      if (st) {
+        /* the stilt grows toward the bay's outer walls (the sides with no pier line beyond them), not along its open sides */
+        var ex = st.x1 >= B.x1 - 0.1 ? 1 : st.x0 <= B.x0 + 0.1 ? -1 : 0, ez = st.z1 >= B.z1 - 0.1 ? 1 : st.z0 <= B.z0 + 0.1 ? -1 : 0;
+        h = function (x, z) {
+          var tx = ex > 0 ? (x - st.x0) / (st.x1 - st.x0) : ex < 0 ? (st.x1 - x) / (st.x1 - st.x0) : 0;
+          var tz = ez > 0 ? (z - st.z0) / (st.z1 - st.z0) : ez < 0 ? (st.z1 - z) / (st.z1 - st.z0) : 0;
+          var b = base(x, z), w = smooth(tx) * smooth(tz);
+          return b + st.lift * (1 - b / rise) * w;
+        };
+        var sx = ex > 0 ? st.x1 - 0.2 : st.x0 + 0.2, sz = ez > 0 ? st.z1 - 0.2 : st.z0 + 0.2;
+        var sh = new THREE.Mesh(new THREE.CylinderGeometry(0.13, 0.15, st.lift + 0.1, 12), mats.stone);
+        sh.position.set(sx, y + st.lift / 2 - 0.05, sz); sh.name = Q.id + '-stilt-shaft-' + i + '-' + j; G.add(sh);
+      }
+      var w = field(THREE, x0, x1, z0, z1, y, h, mats.vault, SEG); w.name = Q.id + '-web-' + i + '-' + j; G.add(w);
+      G.add(rib(THREE, line(THREE, [x0, z0], [x1, z1], y, h), y, top, rr * 1.3, rr, mats.stone, Q.id + '-diagonal-' + i + '-' + j + 'a'));
+      G.add(rib(THREE, line(THREE, [x1, z0], [x0, z1], y, h), y, top, rr * 1.3, rr, mats.stone, Q.id + '-diagonal-' + i + '-' + j + 'b'));
+      /* the bay lines: one rib on each interior line, drawn by the bay on its low side (x0 / z0 side owns it) */
+      if (i > 1) G.add(rib(THREE, line(THREE, [x0, z0], [x0, z1], y, h), y, top, rr * 1.4, rr * 1.1, mats.stone, Q.id + '-wall-rib-x' + i + '-' + j));
+      if (j > 1) G.add(rib(THREE, line(THREE, [x0, z0], [x1, z0], y, h), y, top, rr * 1.4, rr * 1.1, mats.stone, Q.id + '-wall-rib-z' + i + '-' + j));
+      G.add(boss(THREE, beasts[k++ % 4], mx, y + h(mx, mz), mz, Math.max(0.16, Math.min(0.3, Math.min(ax, az) * 0.09)), mats.stone, Q.id + '-boss-' + i + '-' + j));
+    })(K.xs[i - 1], K.xs[i], K.zs[j - 1], K.zs[j]);
+    K.piers.forEach(function (p, n) { G.add(clusterPier(THREE, p[0], p[1], B.y, H.springs, mats.stone, Q.id + '-pier-' + n)); });
+    return { group: G, flat: false, springs: H.springs, crown: H.crown, bays: (K.xs.length - 1) * (K.zs.length - 1), piers: K.piers.length, stilted: stilts.length };
+  }
+
   /* a rib vault: bays along the long side, about square, the webs a pointed groin, a transverse rib between bays,
      the two diagonals across each, and the beast's boss where they cross, lion, eagle, badger and snake in turn */
-  function ribVault(THREE, Q, B, mats) {
+  function ribVault(THREE, Q, B, mats, toLocal) {
+    var VV = Q.rec && Q.rec.vault;
+    if (toLocal && VV && VV.piers && VV.piers.length && Array.isArray(VV.piers[0])) return ribGrid(THREE, Q, B, mats, toLocal);
     var G = new THREE.Group(), alongX = B.x1 - B.x0 >= B.z1 - B.z0, L = alongX ? B.x1 - B.x0 : B.z1 - B.z0;
     var wide = alongX ? B.z1 - B.z0 : B.x1 - B.x0, n = Math.max(1, Math.round(L / wide)), H = heights(Q, wide / 2), rise = H.crown - H.springs;
     var y = B.y + H.springs, top = B.y + H.crown, beasts = (window.LumosCarving || {}).BEASTS || ['lion', 'eagle', 'badger', 'snake'];
@@ -486,7 +548,7 @@
     if (kind === 'barrel') r = barrel(THREE, Q, B, o.mats);
     else if (kind === 'groin') r = groin(THREE, Q, B, o.mats, o.toLocal);
     else if (kind === 'beams') r = beams(THREE, Q, B, o.mats);
-    else if (kind === 'rib') r = ribVault(THREE, Q, B, o.mats);
+    else if (kind === 'rib') r = ribVault(THREE, Q, B, o.mats, o.toLocal);
     else if (kind === 'star' && V && V.piers) r = starVault(THREE, Q, B, o.mats, o.toLocal);
     else if (kind === 'umbrella') r = umbrella(THREE, Q, B, o.mats, o.toLocal);
     else return null;
