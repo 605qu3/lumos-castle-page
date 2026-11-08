@@ -108,7 +108,7 @@
   /* the massing: triangles per material, every vertex through the main toLocal */
   var builtPlaces = [];
   function keepPlaces(out) { (out.places || []).forEach(function (q) { builtPlaces.push(q); }); }
-  var GREYS = { raiseFoot: 0xb8b2a8, filler: 0xb9b2a6, roof: 0x5f6670, parapet: 0x8a857e, ground: 0x7d8a5c, rock: 0x8b8478, water: 0x6f8797, raise: 0xa39d92, raiseCourse: 0x868077, slit: 0x18181a };   /* raise and raiseCourse are set from the probed wall tone (req 3222) */
+  var GREYS = { raiseFoot: 0xb8b2a8, filler: 0xb9b2a6, roof: 0x5f6670, parapet: 0x8a857e, ground: 0x7d8a5c, rock: 0x8b8478, water: 0x6f8797, raise: 0xa39d92, soffit: 0xd0c9bb, raiseCourse: 0x868077, slit: 0x18181a };   /* raise and raiseCourse are set from the probed wall tone (req 3222) */
   function massing(TL, scene) {
     var T = {}; Object.keys(GREYS).forEach(function (k) { T[k] = []; });
     function tri(k, a, b, c) { [a, b, c].forEach(function (p) { var v = TL(p[0], p[1], p[2]); T[k].push(v.x, v.y, v.z); }); }
@@ -171,7 +171,7 @@
     var eavesFit = /[?&]eavesfit=[^&0]/.test(location.search)   /* OFF by default (wrap 1.30 am): at close-n the 40.1 face probe finds no wall on nr-east's north (rays run in to y 61), so nothing closed there, yet it placed 1063 pieces on other roofs unchecked */, erc = new THREE.Raycaster();
     X.eaves = [];
     function fitEaves(p) {
-      var r = p.rect.slice(), e = p.eaves, sides = [[0, 1, r[3], r[0], r[2], true], [0, -1, r[1], r[0], r[2], true], [1, 0, r[2], r[1], r[3], false], [-1, 0, r[0], r[1], r[3], false]], log = { id: p.id, ext: [], closed: 0 };
+      var r = p.rect.slice(), e = p.eaves, sides = [[0, 1, r[3], r[0], r[2], true], [0, -1, r[1], r[0], r[2], true], [1, 0, r[2], r[1], r[3], false], [-1, 0, r[0], r[1], r[3], false]], log = { id: p.id, ext: [], closed: 0 }, fitted = [false, false, false, false];
       var t0 = performance.now(), nc = 0;
       if (scene) scene.updateMatrixWorld(true);
       var near = [], bb = new THREE.Box3(), lo = TL(r[0] - 4, r[1] - 4, e - 7), hi = TL(r[2] + 4, r[3] + 4, e + 1), zone = new THREE.Box3().setFromPoints([lo, hi]);
@@ -206,7 +206,7 @@
         var h = erc.intersectObjects(soup, false).filter(function (q) { return q.object.isMesh && q.object.visible !== false && !/^exterior-massing$/.test(q.object.parent && q.object.parent.name || ''); })[0];
         return h ? 3 - h.distance : null; }
       sides.forEach(function (S, k) {
-        var nx = S[0], ny = S[1], L = S[2], alongX = S[5], offs = [], n = 0;
+        var nx = S[0], ny = S[1], L = S[2], alongX = S[5], offs = [], n = 0, closedHere = log.closed;
         /* v16 (picks at close-n, eye-3232/pick-col): on nr-east the seventh floor's north wall stands at y 69.8 (top 40.9),
            3 m behind the floor below's face at y 72.8, so the 1.5 m probe met the set-back wall or ran in. Now each sample
            casts every 0.3 m from just under the eaves down 6 m: the outermost face found (-0.5 to 1.5 m off the rect's edge)
@@ -227,8 +227,18 @@
             else quad('raise', [L + nx * w, A, zb], [L + nx * w, B, zb], [L + nx * w, B, e], [L + nx * w, A, e]);
             log.closed++; } }
         var ext = offs.length >= n / 2 ? Math.max(0, offs.sort(function (x, y) { return x - y; })[offs.length >> 1]) : 0;
-        log.ext.push(+ext.toFixed(2));
+        log.ext.push(+ext.toFixed(2)); fitted[k] = ext > 0 || log.closed > closedHere;
         if (k === 0) r[3] += ext; else if (k === 1) r[1] -= ext; else if (k === 2) r[2] += ext; else r[0] -= ext; });
+      /* v20 (req 3232 row 2, picks eye-3232/v20 pick-0 and pick-1: the r30-h dark slivers under the dormer): the fitted wall piece
+         stands 0.05 m behind the roof's eave edge and tops out at the eaves, so a ray rising under the edge slipped through that
+         wedge into the roof space and read the roof's dark underside. A soffit: a level strip at the eaves, from the fitted
+         side's eave line 0.3 m inward along the side's whole length, so every ray under the edge meets it. ?soffit=0 leaves it out. */
+      if (!/[?&]soffit=0/.test(location.search)) {
+        var sd = 0.3; log.soffit = 0;
+        if (fitted[0]) { quad('soffit', [r[0], r[3] - sd, e], [r[2], r[3] - sd, e], [r[2], r[3], e], [r[0], r[3], e]); log.soffit++; }
+        if (fitted[1]) { quad('soffit', [r[0], r[1], e], [r[2], r[1], e], [r[2], r[1] + sd, e], [r[0], r[1] + sd, e]); log.soffit++; }
+        if (fitted[2]) { quad('soffit', [r[2] - sd, r[1], e], [r[2], r[1], e], [r[2], r[3], e], [r[2] - sd, r[3], e]); log.soffit++; }
+        if (fitted[3]) { quad('soffit', [r[0], r[1], e], [r[0] + sd, r[1], e], [r[0] + sd, r[3], e], [r[0], r[3], e]); log.soffit++; } }
       soup.forEach(function (q) { if (near.indexOf(q) < 0) { q.geometry.dispose(); q.material.dispose(); } });
       log.casts = nc; log.ms = Math.round(performance.now() - t0); X.eaves.push(log); return r; }
     function roofPart(p, massPar) {
