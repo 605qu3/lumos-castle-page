@@ -167,11 +167,15 @@
        ?eavesfit=<id,id>; and each part's casts go only to the meshes whose box lies within 4 m of its rect and 7 m under its
        eaves */
     var eavesIds = ((location.search.match(/[?&]eavesfit=([^&]+)/) || [])[1] || ''), eavesAll = eavesIds === 'all';
-    eavesIds = eavesIds === '1' ? ['nr-east', 'nr-gable'] : decodeURIComponent(eavesIds).split(',');
-    var eavesFit = /[?&]eavesfit=[^&0]/.test(location.search)   /* OFF by default (wrap 1.30 am): at close-n the 40.1 face probe finds no wall on nr-east's north (rays run in to y 61), so nothing closed there, yet it placed 1063 pieces on other roofs unchecked */, erc = new THREE.Raycaster();
+    eavesIds = (eavesIds === '' || eavesIds === '1') ? ['nr-east', 'nr-gable'] : decodeURIComponent(eavesIds).split(',');
+    /* v22 (Fawkes, 8 November 2026, 4.28 am, patrol entry on eye-3232/v24): ON by default, nr-east and nr-gable only; ?eavesfit=0 is
+       the off switch, ?eavesfit=all or =<id,id> as before. It was OFF through v21 (wrap 1.30 am: at close-n the 40.1 face probe found
+       no wall on nr-east's north, so nothing closed there, and 1063 pieces were placed on other roofs unchecked; v18 to v21 since
+       limit it to the named parts, make the fit local and add the soffit and side returns). */
+    var eavesFit = !/[?&]eavesfit=0/.test(location.search), erc = new THREE.Raycaster();
     X.eaves = [];
     function fitEaves(p) {
-      var r = p.rect.slice(), e = p.eaves, sides = [[0, 1, r[3], r[0], r[2], true], [0, -1, r[1], r[0], r[2], true], [1, 0, r[2], r[1], r[3], false], [-1, 0, r[0], r[1], r[3], false]], log = { id: p.id, ext: [], closed: 0 }, fitted = [false, false, false, false];
+      var r = p.rect.slice(), e = p.eaves, sides = [[0, 1, r[3], r[0], r[2], true], [0, -1, r[1], r[0], r[2], true], [1, 0, r[2], r[1], r[3], false], [-1, 0, r[0], r[1], r[3], false]], log = { id: p.id, ext: [], closed: 0 }, fitted = [false, false, false, false], sideExt = [0, 0, 0, 0], slotPieces = [];
       var t0 = performance.now(), nc = 0;
       if (scene) scene.updateMatrixWorld(true);
       var near = [], bb = new THREE.Box3(), lo = TL(r[0] - 4, r[1] - 4, e - 7), hi = TL(r[2] + 4, r[3] + 4, e + 1), zone = new THREE.Box3().setFromPoints([lo, hi]);
@@ -212,6 +216,7 @@
            casts every 0.3 m from just under the eaves down 6 m: the outermost face found (-0.5 to 1.5 m off the rect's edge)
            is the wall's face, its highest hit is the face's top, and above that top a wall piece is drawn on that face's line
            up to the eaves, closing the open shelf as wall body (as req 3221 item 7 ruled the Entrance Hall's strip) */
+        var prevP = null;
         for (var u = S[3] + 0.25; u < S[4]; u += 0.5) { n++;
           /* v18: a wall that already reaches the eaves (the first cast, just under them, meets a face in range) needs no
              column of casts under it */
@@ -221,13 +226,22 @@
           if (f == null) continue; offs.push(f);
           var top = null; hs.forEach(function (H) { if (top == null && H[1] != null && Math.abs(H[1] - f) < 0.1) top = H[0]; });
           if (top != null && top < e - 0.2) { var w = f - 0.05, A = u - 0.25, B = Math.min(S[4], u + 0.25), zb = top - 0.2;
+            /* v21 (req 3232 row 3, picks eye-3232/v22 eaves-picks.json: the three small dark notches that show along nr-east's
+               eaves once the fit is on, at model x 126.25, 115.5 and 100.45): where the facade has a 0.5 m slot between two
+               rooms the fitted pieces step 0.8 m (y 72.75 to 71.95) with no side return, and an oblique ray crosses the step
+               into the roof space. A side quad closes each step, from the lower of the two pieces' feet up to the eaves. */
+            if (prevP && Math.abs(prevP.u - (u - 0.5)) < 1e-6 && Math.abs(prevP.w - w) > 0.02 && !/[?&]stepreturn=0/.test(location.search)) { var zr = Math.min(prevP.zb, zb), rl = u - 0.25;
+              if (alongX) quad('raise', [rl, L + ny * prevP.w, zr], [rl, L + ny * w, zr], [rl, L + ny * w, e], [rl, L + ny * prevP.w, e]);
+              else quad('raise', [L + nx * prevP.w, rl, zr], [L + nx * w, rl, zr], [L + nx * w, rl, e], [L + nx * prevP.w, rl, e]); }
+            prevP = { u: u, w: w, zb: zb };
             /* v18: wound to face out on every side (the north and west pieces faced in, picks eye-3232/v18) */
+            slotPieces.push({ k: k, lo: Math.min(A, B), hi: Math.max(A, B), w: w });
             if (ny > 0 || nx < 0) { var sw = A; A = B; B = sw; }
             if (alongX) quad('raise', [A, L + ny * w, zb], [B, L + ny * w, zb], [B, L + ny * w, e], [A, L + ny * w, e]);
             else quad('raise', [L + nx * w, A, zb], [L + nx * w, B, zb], [L + nx * w, B, e], [L + nx * w, A, e]);
             log.closed++; } }
         var ext = offs.length >= n / 2 ? Math.max(0, offs.sort(function (x, y) { return x - y; })[offs.length >> 1]) : 0;
-        log.ext.push(+ext.toFixed(2)); fitted[k] = ext > 0 || log.closed > closedHere;
+        log.ext.push(+ext.toFixed(2)); sideExt[k] = ext; fitted[k] = ext > 0 || log.closed > closedHere;
         if (k === 0) r[3] += ext; else if (k === 1) r[1] -= ext; else if (k === 2) r[2] += ext; else r[0] -= ext; });
       /* v20 (req 3232 row 2, picks eye-3232/v20 pick-0 and pick-1: the r30-h dark slivers under the dormer): the fitted wall piece
          stands 0.05 m behind the roof's eave edge and tops out at the eaves, so a ray rising under the edge slipped through that
@@ -238,7 +252,13 @@
         if (fitted[0]) { quad('soffit', [r[0], r[3] - sd, e], [r[2], r[3] - sd, e], [r[2], r[3], e], [r[0], r[3], e]); log.soffit++; }
         if (fitted[1]) { quad('soffit', [r[0], r[1], e], [r[2], r[1], e], [r[2], r[1] + sd, e], [r[0], r[1] + sd, e]); log.soffit++; }
         if (fitted[2]) { quad('soffit', [r[2] - sd, r[1], e], [r[2], r[1], e], [r[2], r[3], e], [r[2] - sd, r[3], e]); log.soffit++; }
-        if (fitted[3]) { quad('soffit', [r[0], r[1], e], [r[0] + sd, r[1], e], [r[0] + sd, r[3], e], [r[0], r[3], e]); log.soffit++; } }
+        if (fitted[3]) { quad('soffit', [r[0], r[1], e], [r[0] + sd, r[1], e], [r[0] + sd, r[3], e], [r[0], r[3], e]); log.soffit++; }
+        /* v21 (req 3232 row 3): where a piece stands back in a facade slot (0.85 m behind the roof's edge), the overhang's
+           underside showed as a 2 to 3 px dark sliver under the eaves; the soffit runs from the piece out to the edge there too. */
+        slotPieces.forEach(function (P) { var S2 = sides[P.k], edge = sideExt[P.k]; if (!fitted[P.k] || edge - P.w <= 0.1) return;
+          if (S2[5]) quad('soffit', [P.lo, S2[2] + S2[1] * P.w, e], [P.hi, S2[2] + S2[1] * P.w, e], [P.hi, S2[2] + S2[1] * edge, e], [P.lo, S2[2] + S2[1] * edge, e]);
+          else quad('soffit', [S2[2] + S2[0] * P.w, P.lo, e], [S2[2] + S2[0] * P.w, P.hi, e], [S2[2] + S2[0] * edge, P.hi, e], [S2[2] + S2[0] * edge, P.lo, e]);
+          log.soffit++; }); }
       soup.forEach(function (q) { if (near.indexOf(q) < 0) { q.geometry.dispose(); q.material.dispose(); } });
       log.casts = nc; log.ms = Math.round(performance.now() - t0); X.eaves.push(log); return r; }
     function roofPart(p, massPar) {
@@ -622,6 +642,12 @@
           else if (z1 != null) runs.push(cur = { s0: s / steps * L, s1: (s + 1) / steps * L, z1: z1, off: off, col: col, dbg: dbg });
           else cur = null;
         }
+        /* v21 (req 3232 row 3, picks eye-3232/v22 bands-log.json: the two dark notches where the band breaks at r30-h, model x 123.5
+           to 124.0 and 121.3 to 121.5 on y 72.8, classroom-eleven's three runs with 0.5 m holes between them): neighbouring runs of
+           one edge with the same top, depth and tone, a gap of 0.55 m or less apart, are one run. ?bandmerge=0 leaves them apart. */
+        if (!/[?&]bandmerge=0/.test(location.search)) for (var ri = runs.length - 1; ri > 0; ri--) {
+          var P0 = runs[ri - 1], P1 = runs[ri];
+          if (P1.s0 - P0.s1 <= 0.55 && Math.abs(P0.z1 - P1.z1) < 0.01 && Math.abs(P0.off - P1.off) < 0.02 && P0.col === P1.col) { P0.s1 = P1.s1; runs.splice(ri, 1); } }
         runs.forEach(function (R) {
           stretches++;
           var e0 = R.s0 < 0.01 ? t : 0, e1 = R.s1 > L - 0.01 ? t : 0;
