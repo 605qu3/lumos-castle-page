@@ -245,8 +245,8 @@
      stretch (no other place beside it over the wall's height, tested at 1 m steps 0.1 m out) gets a plain wall piece from
      the wall's top up to the lowest floor above that covers the stretch (a point 0.1 m inside, 0.1 m outside or mid-wall);
      none above means roof, so no band. Same line and thickness as the wall below. Round places are not banded (the tower
-     drums have their filler). ?bands=0 leaves it out, for the before shot. */
-  var bandsOn = !/(^|[?&])bands=0(&|$)/.test(location.search);
+     drums have their filler). ?bands=1 puts it in (off by default while it is refitted). */
+  var bandsOn = /(^|[?&])bands=1(&|$)/.test(location.search);   /* off by default from 7 Nov 10.15 pm: req 3215 failed the blind look */
   function inPoly(pts, x, y) {
     var c = false;
     for (var i = 0, j = pts.length - 1; i < pts.length; j = i++) {
