@@ -3417,10 +3417,17 @@ window.CastleShell = { build: function (F, M, placeId, o) {
      by pixel: the combed stripes. Each place's pieces, its stairs and landings with them, are drawn at its own depth
      rank, this place first (rank 0) and each next place one further back, so where two places' faces share a plane
      the nearer-ranked one shows whole. tools/architect-seams.mjs counts the faces still tied */
+  /* v177 (Godric's thin line from an oriel-bay corbel down to the linen-store door head, 7 November 2026, 6.05 pm): the
+     rank's slope term (polygonOffsetFactor) pushes each face back by its own slope, so a wall piece's end face, edge-on,
+     came forward past the front face it sits behind at a T-junction: a line up the jamb, and stray lines across far walls
+     (blind A/B over entrance-hall and stair-hall). A wall piece now takes the rank as units only, 4 a rank; floors and the
+     rest keep the slope term, which grazing thresholds need (units alone broke them in the same A/B). Measured at the
+     oriel's jambs: 67 and 72 down to 10 and 18, what hiding the end faces gives */
   var RANK = {};
   out.places.forEach(function (q, i) { RANK[q.id] = i ? 1 + (i - 1) % 6 : 0; });
   function rankOn(r, s, c, g, mt) { if (!mt || !mt.isMaterial) return; mt.__po = [mt.polygonOffset, mt.polygonOffsetFactor, mt.polygonOffsetUnits];
-    mt.polygonOffset = true; mt.polygonOffsetFactor = this.userData.rank; mt.polygonOffsetUnits = this.userData.rank; }
+    var w = this.userData.layer === LAYER.wall;
+    mt.polygonOffset = true; mt.polygonOffsetFactor = w ? 0 : this.userData.rank; mt.polygonOffsetUnits = w ? 4 * this.userData.rank : this.userData.rank; }
   function rankOff(r, s, c, g, mt) { if (!mt || !mt.__po) return; mt.polygonOffset = mt.__po[0]; mt.polygonOffsetFactor = mt.__po[1]; mt.polygonOffsetUnits = mt.__po[2]; mt.__po = null; }
   group.traverse(function (o) {
     var rk = o.isMesh ? RANK[o.userData.owner] : 0;
