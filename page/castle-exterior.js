@@ -172,15 +172,38 @@
     X.eaves = [];
     function fitEaves(p) {
       var r = p.rect.slice(), e = p.eaves, sides = [[0, 1, r[3], r[0], r[2], true], [0, -1, r[1], r[0], r[2], true], [1, 0, r[2], r[1], r[3], false], [-1, 0, r[0], r[1], r[3], false]], log = { id: p.id, ext: [], closed: 0 };
+      var t0 = performance.now(), nc = 0;
       if (scene) scene.updateMatrixWorld(true);
       var near = [], bb = new THREE.Box3(), lo = TL(r[0] - 4, r[1] - 4, e - 7), hi = TL(r[2] + 4, r[3] + 4, e + 1), zone = new THREE.Box3().setFromPoints([lo, hi]);
       scene.traverse(function (q) { if (!q.isMesh || q.visible === false || /^exterior-massing$/.test(q.parent && q.parent.name || '')) return;
         bb.setFromObject(q); if (bb.intersectsBox(zone)) near.push(q); });
-      log.near = near.length;
+      log.near = near.length; log.msNear = Math.round(performance.now() - t0);
+      /* v19 (req 3232 row 2: 8424 casts at about 10 ms each, 115 s load against 35 s): the casts scanned every triangle of
+         the big merged floor meshes. Now the triangles of the nearby meshes that touch the part's zone are copied once into
+         a small soup, one mesh per material side (so front-only faces still answer only from the front), and every cast
+         goes to the soup: the same faces, so the same hits and the same pieces, at a fraction of the cost.
+         ?eavessoup=0 casts to the meshes as v18 did. */
+      var soup = near;
+      if (!/[?&]eavessoup=0/.test(location.search)) {
+        var bySide = {}, va = new THREE.Vector3(), vb = new THREE.Vector3(), vc = new THREE.Vector3(), tb = new THREE.Box3(), ntri = 0;
+        near.forEach(function (q) {
+          var G = q.geometry, P = G && G.attributes.position; if (!P || Array.isArray(q.material)) { (bySide.raw || (bySide.raw = [])).push(q); return; }
+          var I = G.index, cnt = I ? I.count : P.count, side = q.material.side, arr = bySide[side] || (bySide[side] = []), mw = q.matrixWorld;
+          for (var i = 0; i + 2 < cnt; i += 3) {
+            var ia = I ? I.getX(i) : i, ib = I ? I.getX(i + 1) : i + 1, ic = I ? I.getX(i + 2) : i + 2;
+            va.fromBufferAttribute(P, ia).applyMatrix4(mw); vb.fromBufferAttribute(P, ib).applyMatrix4(mw); vc.fromBufferAttribute(P, ic).applyMatrix4(mw);
+            tb.makeEmpty(); tb.expandByPoint(va); tb.expandByPoint(vb); tb.expandByPoint(vc);
+            if (!tb.intersectsBox(zone)) continue;
+            arr.push(va.x, va.y, va.z, vb.x, vb.y, vb.z, vc.x, vc.y, vc.z); ntri++; } });
+        soup = bySide.raw || [];
+        Object.keys(bySide).forEach(function (sd) { if (sd === 'raw' || !bySide[sd].length) return;
+          var sg = new THREE.BufferGeometry(); sg.setAttribute('position', new THREE.Float32BufferAttribute(bySide[sd], 3)); sg.computeBoundingSphere();
+          var sm = new THREE.Mesh(sg, new THREE.MeshBasicMaterial({ side: +sd })); sm.updateMatrixWorld(true); soup.push(sm); });
+        log.soupTris = ntri; log.msSoup = Math.round(performance.now() - t0); }
       function cast(s, L, nx, ny, alongX, z, far) {
         var o = alongX ? TL(s, L + ny * 3, z) : TL(L + nx * 3, s, z), t = alongX ? TL(s, L - ny * 1, z) : TL(L - nx * 1, s, z);
-        erc.set(o, t.sub(o).normalize()); erc.far = far;
-        var h = erc.intersectObjects(near, false).filter(function (q) { return q.object.isMesh && q.object.visible !== false && !/^exterior-massing$/.test(q.object.parent && q.object.parent.name || ''); })[0];
+        erc.set(o, t.sub(o).normalize()); erc.far = far; nc++;
+        var h = erc.intersectObjects(soup, false).filter(function (q) { return q.object.isMesh && q.object.visible !== false && !/^exterior-massing$/.test(q.object.parent && q.object.parent.name || ''); })[0];
         return h ? 3 - h.distance : null; }
       sides.forEach(function (S, k) {
         var nx = S[0], ny = S[1], L = S[2], alongX = S[5], offs = [], n = 0;
@@ -190,18 +213,24 @@
            is the wall's face, its highest hit is the face's top, and above that top a wall piece is drawn on that face's line
            up to the eaves, closing the open shelf as wall body (as req 3221 item 7 ruled the Entrance Hall's strip) */
         for (var u = S[3] + 0.25; u < S[4]; u += 0.5) { n++;
-          var hs = []; for (var z = e - 0.15; z > e - 6; z -= 0.3) { var g = cast(u, L, nx, ny, alongX, z, 7); hs.push([z, g]); }
+          /* v18: a wall that already reaches the eaves (the first cast, just under them, meets a face in range) needs no
+             column of casts under it */
+          var g0 = cast(u, L, nx, ny, alongX, e - 0.15, 7); if (g0 != null && g0 <= 1.5 && g0 >= -0.5) { offs.push(g0); continue; }
+          var hs = [[e - 0.15, g0]]; for (var z = e - 0.45; z > e - 6; z -= 0.3) { var g = cast(u, L, nx, ny, alongX, z, 7); hs.push([z, g]); }
           var f = null; hs.forEach(function (H) { if (H[1] != null && H[1] <= 1.5 && H[1] >= -0.5 && (f == null || H[1] > f)) f = H[1]; });
           if (f == null) continue; offs.push(f);
           var top = null; hs.forEach(function (H) { if (top == null && H[1] != null && Math.abs(H[1] - f) < 0.1) top = H[0]; });
           if (top != null && top < e - 0.2) { var w = f - 0.05, A = u - 0.25, B = Math.min(S[4], u + 0.25), zb = top - 0.2;
+            /* v18: wound to face out on every side (the north and west pieces faced in, picks eye-3232/v18) */
+            if (ny > 0 || nx < 0) { var sw = A; A = B; B = sw; }
             if (alongX) quad('raise', [A, L + ny * w, zb], [B, L + ny * w, zb], [B, L + ny * w, e], [A, L + ny * w, e]);
             else quad('raise', [L + nx * w, A, zb], [L + nx * w, B, zb], [L + nx * w, B, e], [L + nx * w, A, e]);
             log.closed++; } }
         var ext = offs.length >= n / 2 ? Math.max(0, offs.sort(function (x, y) { return x - y; })[offs.length >> 1]) : 0;
         log.ext.push(+ext.toFixed(2));
         if (k === 0) r[3] += ext; else if (k === 1) r[1] -= ext; else if (k === 2) r[2] += ext; else r[0] -= ext; });
-      X.eaves.push(log); return r; }
+      soup.forEach(function (q) { if (near.indexOf(q) < 0) { q.geometry.dispose(); q.material.dispose(); } });
+      log.casts = nc; log.ms = Math.round(performance.now() - t0); X.eaves.push(log); return r; }
     function roofPart(p, massPar) {
       var e = p.eaves, h = p.ridge != null ? p.ridge : e;
       if (eavesFit && scene && (eavesAll || eavesIds.indexOf(p.id) >= 0) && (p.kind === 'hip' || p.kind === 'gable' || p.kind === 'crow')) p = Object.assign({}, p, { rect: fitEaves(p) });
