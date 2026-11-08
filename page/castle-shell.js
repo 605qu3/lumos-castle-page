@@ -1420,13 +1420,41 @@ window.CastleShell = { build: function (F, M, placeId, o) {
        round rooms): a round room too (the study, dumbledores-office), its plan the SIDES flat sides its wall is built
        of (0.58 m in the study, 1.18 in the office), so each panel stands flat on a flat side and the mitres take the
        15 degrees between them; a shaft or ring still bare */
+    /* v178 (req 3184, the Architect's half of Design's 3183): the v155 head choice, as a function, so the panelling below
+       reads the same head and mould the trim pass (trimGap) draws later in this place; it sets g.op.head once, as before */
+    function doorHead(g, w) {
+      if (TRIM && !DPRE && !g.back && !g.op.head && (isDoor(g.op.kind || '') || (isWay(g.op.kind || '') && w <= 3.5))) {
+        var hAge = function (id) { var r_ = (M.rooms || []).filter(function (r) { return slug(r.id) === id; })[0]; return +String(r_ && r_.age || 'P3').replace(/\D/g, '') || 3; };
+        var hn = Math.min.apply(null, (g.op.between || [Q.id]).map(function (b) { return hAge(slug(b)); }));
+        var hcl = g.op.grand || hn <= 2 ? 1 : hn >= 5 || (hn === 4 && Q.floor > 15) ? 3 : 2;
+        g.op.head = hcl === 3 ? 'tudor' : 'pointed'; g.op.hmv = hcl === 1 ? { hood: 0.18, stop: true } : { hood: 0 };
+        window.__headMix = window.__headMix || { 1: 0, 2: 0, 3: 0 }; window.__headMix[hcl]++;
+      }
+    }
+    /* v178: the inner face's dressing as trimGap draws it (the same class test, age, late, grand and door moulding): its
+       band's width bw past the cut and whether a hood rides over the head (a door's, never a window's inside); null where
+       the face takes none (no TRIM, the back of a thick wall, a hidden way, a round window, a wide way) */
+    function dressOf(g, w) {
+      if (!TRIM || g.back || g.spill) return null;
+      var k = g.op.kind || '', cls = /hidden|window, round/.test(k) ? null : /loop|slit|squint|grating|cleft/.test(k) ? 'loop'
+        : /window|lancet|oriel|dormer/.test(k) ? 'window' : isDoor(k) || (isWay(k) && w <= 3.5) ? 'door' : null;
+      if (!cls) return null;
+      if (cls === 'loop') return { trim: 0.1, hood: false };   /* castle-trim's loopMould('in') */
+      doorHead(g, w);
+      var rm = (M.rooms || []).filter(function (r) { return slug(r.id) === Q.id; })[0];
+      var md = window.CastleTrim.mould(rm && rm.age || 'P3', cls, { late: !!(rm && rm.late), grand: !!g.op.grand }), mv = cls === 'door' ? (DPRE ? DPRE.mv : g.op.hmv || null) : null;
+      if (mv) for (var mk in mv) md[mk] = mv[mk];
+      return { trim: md.bw, hood: cls === 'door' && !!md.hood };
+    }
     if (row && row.dress === 'panelled' && (!Q.area || (Q.round && !Q.shaft)) && !Q.loops && Q.ceiling != null && window.CastlePanelling) {
       var pops = [];
       gaps.forEach(function (gs, i) { gs.forEach(function (g) {
         if (g.spill) return;
         /* 1 cm into the reveal each side and under the head, so its ends bear on the jambs, never flush with them */
+        /* v178 (req 3184): a dressed opening carries its dressing (trim, hood), so Design's panelling.js stops at its outer edge */
+        var dr = dressOf(g, g.s1 - g.s0);
         pops.push({ wall: i, at: (g.s0 + g.s1) / 2, w: Math.max(0.1, g.s1 - g.s0 - 0.02), sill: g.sill > 0.05 ? g.sill + 0.01 : g.sill,
-          h: g.h - g.sill - (g.sill > 0.05 ? 0.02 : 0.01), door: g.sill < 0.05 && !g.niche });
+          h: g.h - g.sill - (g.sill > 0.05 ? 0.02 : 0.01), door: g.sill < 0.05 && !g.niche, trim: dr ? dr.trim : undefined, hood: dr ? dr.hood : undefined });
       }); });
       (M.features || []).forEach(function (ft) {
         if (!ft.at || !ft.w || !/fireplace/.test(ft.kind || '') || !ft.room || (ft.room !== Q.id && slug(ft.room) !== Q.id)) return;
@@ -1839,13 +1867,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
            door, or the first ages P1 and P2), 3 a Tudor head (a later age, P5 and after, or the fourth age on the floors from the fourth up),
            2 a pointed head in a plain ring. Decided once on the opening from the older of its two rooms, so both faces agree;
            a record's own head (round, pointed, square) stands. Under TRIM only; the preview ?dpre= still overrides */
-        if (TRIM && !DPRE && !g.back && !g.op.head && (isDoor(g.op.kind || '') || (isWay(g.op.kind || '') && w <= 3.5))) {
-          var hAge = function (id) { var r_ = (M.rooms || []).filter(function (r) { return slug(r.id) === id; })[0]; return +String(r_ && r_.age || 'P3').replace(/\D/g, '') || 3; };
-          var hn = Math.min.apply(null, (g.op.between || [Q.id]).map(function (b) { return hAge(slug(b)); }));
-          var hcl = g.op.grand || hn <= 2 ? 1 : hn >= 5 || (hn === 4 && Q.floor > 15) ? 3 : 2;
-          g.op.head = hcl === 3 ? 'tudor' : 'pointed'; g.op.hmv = hcl === 1 ? { hood: 0.18, stop: true } : { hood: 0 };
-          window.__headMix = window.__headMix || { 1: 0, 2: 0, 3: 0 }; window.__headMix[hcl]++;
-        }
+        doorHead(g, w);   /* v178: the choice is doorHead's, made before the panelling reads it */
         if (DPRE && !g.back && (isDoor(g.op.kind || '') || (isWay(g.op.kind || '') && w <= 3.5)) && DPRE.head) g.op.head = DPRE.head;   /* req 1996: a preview of door surrounds, ?dpre=A to D, never in a build */
         if (TRIM && !g.back) trimGap(g, sm, w, L, HE);   /* v91 */
         /* v153 (req 2011): how far this face stands from the other place's, where two places' faces are a thin wall apart (the
