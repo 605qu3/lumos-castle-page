@@ -340,6 +340,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
   function toLocal(sx, sy, sz) { return new THREE.Vector3(sx - cx, (sz == null ? z0 : sz) - z0, -(sy - cy)); }
 
   var group = new THREE.Group();
+  var STUBBACK = {};   /* v182 (req 3189, P03): a backed arch's outer mouth, by opening id */
   var EXT = !!(o && o.exterior) || /(^|[?&])exterior=1(&|$)/.test(location.search);   /* req 3189: the outside view */
   var mats = {};
   for (var k in GREY) mats[k] = F.solid(GREY[k]);
@@ -513,7 +514,10 @@ window.CastleShell = { build: function (F, M, placeId, o) {
      masonry where the wall stands and closing the cut where it does not */
   function arcStub(s, Q, w, id, oat, tW) {
     var A = s.arc, c = A.c, ri = A.r_in, ro = A.r_out, b0 = A.bearings[0], b1 = A.bearings[1];
-    var rW = oat && tW ? Math.max(ro + 0.1, Math.hypot(oat[0] - c[0], oat[1] - c[1]) + tW - 0.02) : ro + 0.1;
+    /* v182 (req 3189, P03's after): v180's rW (each tread's wall slab out to the room's outer face) stood flat facets whose
+       corners came 1 cm proud of the drum, the pale and dark slabs along its foot, a black sill under the arch and a seam in
+       its fill; the stub's back wall is r_out + 0.1 again and the cut is closed by one backing at the call (stubBack) */
+    var rW = ro + 0.1;
     var sweep = ((b1 - b0) % 360 + 360) % 360, n = s.treads || 20, db = sweep / n, rise = s.rise || (s.to - s.from) / n;
     var foot = Math.abs(Q.floor - s.from) <= Math.abs(Q.floor - s.to), dir = foot ? 1 : -1, bA = foot ? b0 : b1;
     var half = (w / 2 + 0.1) / ri * 180 / Math.PI, HEAD = 2.0, N = Math.min(10, n);
@@ -1916,7 +1920,21 @@ window.CastleShell = { build: function (F, M, placeId, o) {
         var to = other(g.op, Q.id), via = isWay(g.op.kind) ? viaStair(M, to, Q.id) : null;
         if (via) {
           var sv = (M.stairs || []).filter(function (x) { return slug(x.id) === to; })[0];
-          if (sv && sv.arc) arcStub(sv, Q, w, g.op.id, g.op.at, t);
+          if (sv && sv.arc) {
+            arcStub(sv, Q, w, g.op.id, g.op.at, t);
+            /* v182 (req 3189, P03): the arch's cut runs through the wall's whole depth; one flat backing across it, 10 cm behind
+               the outer face, sill to head, 2 cm into each jamb, closes it from the lawn (a backed arch) and stands behind the
+               stub's own back wall from the room */
+            var tdb = g.op.depth > t + 0.05 ? g.op.depth : t, smb = (g.s0 + g.s1) / 2, wb = g.s1 - g.s0, hb = g.h - g.sill;
+            /* v185 (req 3189, P03: no depth contest at the band): the backing's foot ran 2 cm under the sill, inside the
+               tower's filler band (its top at the sill), 4 cm behind the band's face at the jambs, and from the d-cabin stand
+               it fought the band (the dark block at the left jamb's foot); it now stands on the sill, nothing of it below */
+            var bk = slab(wb + 0.12, hb + 0.02, 0.06, mats.wall, 'wall');
+            var bkp = toLocal(a[0] + ux * smb + nx * (tdb - 0.13), a[1] + uy * smb + ny * (tdb - 0.13), Q.floor);
+            bk.position.set(bkp.x, bkp.y + g.sill + (hb + 0.02) / 2, bkp.z); bk.rotation.y = ang;
+            bk.name = Q.id + '-stub-back-' + g.op.id; bk.userData.owner = Q.id; group.add(bk);
+            STUBBACK[g.op.id] = [a[0] + ux * smb + nx * tdb, a[1] + uy * smb + ny * tdb];   /* the cut's outer mouth, for its hole floor */
+          }
           to = via;
         }
         /* a way above RAISED (the landing bay's mouth at +34.42) is reached on its own floor, its sill */
@@ -3254,7 +3272,32 @@ window.CastleShell = { build: function (F, M, placeId, o) {
            (a mouth into stair-hall, whose floor is the ground floor's) its half is that room's open air, no floor */
         if (h.z0 < lo - 0.05) return;
         if (sg.kind === 'flush' && sg.rooms.some(function (r) { return !sg.zr[r] || Math.abs(sg.zr[r][0] - h.z0) > 0.05; })) return;
-        var fl = slab(h.s1 - h.s0, 0.1, sg.off[1] - sg.off[0], mats.floor, 'floor'), sc = (h.s0 + h.s1) / 2, oc = (sg.off[0] + sg.off[1]) / 2;
+        var sc = (h.s0 + h.s1) / 2, o0 = sg.off[0], o1 = sg.off[1], SB = STUBBACK[h.op];
+        /* v182 (req 3189, P03's black sill): a backed arch's hole floor ran out to the drum's face, its dark end the sill seen
+           from the lawn; it stops under the backing's face, 10 cm in, and the last 9 cm is the wall's stone, 1 cm inside the face.
+           v183 (req 3189, P03's dark blocks): that stone was 10 cm deep, its foot 10 cm under the floor, and the base band under
+           the drum is a faceted skin with no top (its point at the arch's middle on the face, its ends 6 cm inside it), so the
+           stone's front stood up to 4 cm proud of the band, two dark blocks cut into the band's top either side of its lit
+           point. The stone is now a 4 mm cap on the band's top line, from the backing's face to 5 mm past the drum's face: it
+           closes the band's open top under the arch and never reaches below it, so the band runs whole under the sill.
+           v184 (req 3189, P03's plinth feet): from the d-cabin stand, 230 m off and 36 m below, that cap's dark underside showed
+           where it hung past the band (castle-exterior's tower filler, an open 24-sided drum at the tower's r, its faces up to
+           6 cm inside the drum's face here), two dark wedges either side of the band's corner, and the hole floor's end, 4 cm
+           behind the band at its ends, fought it for depth at that range (the jagged dark under the sill at fov 2). The cap is
+           now drawn in plan to the filler's own 24-gon less 4 cm (at 1 cm its edges drew through the band), never past it, from the backing's face, 12 cm deep (covering
+           the hole floor's end), its top 1 mm under the floor, in the filler's tone and shading, so what the band's face does not
+           hide is band-coloured; with no tower at the hole it stops 1 cm inside the room's face.
+           v185 (req 3189, P03: no depth contest at the band): v184's cap and the hole floor's end, 4 cm behind the band's face
+           at the jambs, still fought it from the d-cabin stand (at 241 m a 0.1 near plane resolves about 3.5 cm), the pale slab,
+           its dark wedge and flecks. The cap is gone and the floor's end is 30 cm inside the face, 24 to 30 cm behind the band
+           (at 11 to 16 cm, tried first, it still flecked the band at fov 6; hidden, the flecks went), so below the sill the
+           band alone shows; the backing's foot is on the sill (arcStub's v185) */
+        if (SB) {
+          var px = sg.a[0] + ux * sc, py = sg.a[1] + uy * sc;
+          var d0 = Math.hypot(px + sg.n[0] * o0 - SB[0], py + sg.n[1] * o0 - SB[1]), d1 = Math.hypot(px + sg.n[0] * o1 - SB[0], py + sg.n[1] * o1 - SB[1]);
+          if (d1 <= d0) o1 -= 0.30; else o0 += 0.30;   /* v185: was 0.10, with v182 to v184's cap from there */
+        }
+        var fl = slab(h.s1 - h.s0, 0.1, o1 - o0, mats.floor, 'floor'), oc = (o0 + o1) / 2;
         fl.position.copy(toLocal(sg.a[0] + ux * sc + sg.n[0] * oc, sg.a[1] + uy * sc + sg.n[1] * oc, h.z0 - 0.052));
         fl.rotation.y = Math.atan2(uy, ux); fl.name = sg.owner + '-holefloor-' + h.op; fl.userData.owner = sg.owner; fl.userData.holeFloor = h.op;
         group.add(fl);
