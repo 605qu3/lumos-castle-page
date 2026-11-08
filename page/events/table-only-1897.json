@@ -1,0 +1,185 @@
+{
+ "chain": "table-only-1897",
+ "about": "The table-only places of 1897, Magic's req 3262: the oriel bay's lamp, the wind-dial room (hand, tally, whistle), the watch bartizan's morris pebbles and the newspaper room's old volumes. Left as the table has them: the oriel's Highlands, the harps and the Express (castle-wide-1027.md 5, 12, 8, unchanged), and req 81's two holds in the Muggle Studies room (Mr Weasley's note held for the books' years; the lives shelf only for a Frog card that exists in the visited year), which add no cue here. The place names `newspaper room` is provisional until its page names it.",
+ "first_visit": [],
+ "room": [],
+ "records": [
+  {
+   "id": "table-only-1897.oriel-lamp",
+   "tier": "fixed",
+   "source": "device",
+   "leans": [],
+   "weight": 1,
+   "moment": "arrive",
+   "when": [
+    "place = oriel bay",
+    "era = 1890s",
+    "time = evening"
+   ],
+   "show": [
+    "the bay's lamp lit, as the castle's are at dusk, though no one is to be seen who came in by the panel"
+   ],
+   "starts": [],
+   "canon": "Magic's req 3262 (docs/magic/rooms.md, The table-only places, 1897, read in the canon tool 8 November 2026): castle-wide-1027.md 9, the lamp at dusk; the one small sign that someone else knows the bay; Ours; the bay's panel opens from either side"
+  },
+  {
+   "id": "table-only-1897.dial-wind",
+   "tier": "fixed",
+   "source": "device",
+   "leans": [],
+   "weight": 1,
+   "moment": "wait 20-90 s",
+   "when": [
+    "place = wind dial room",
+    "era = 1890s",
+    "windy = yes"
+   ],
+   "show": [
+    "the painted dial's hand, turned by the rod from the vane above, swings slowly round and settles on a new quarter"
+   ],
+   "starts": [],
+   "canon": "Magic's req 3262 (docs/magic/rooms.md, The table-only places, 1897, read in the canon tool 8 November 2026): a plain vane, no spell (GoF 7 L23484, the books' vanes are Muggle-looking things); Events' wind is a strength only, so the hand wanders with it until a quarter is given; Ours"
+  },
+  {
+   "id": "table-only-1897.dial-calm",
+   "tier": "fixed",
+   "source": "device",
+   "leans": [],
+   "weight": 1,
+   "moment": "wait 20-90 s",
+   "when": [
+    "place = wind dial room",
+    "era = 1890s",
+    "windy = no"
+   ],
+   "show": [
+    "the painted dial's hand nudged a hair one way and back by some small air, and then still"
+   ],
+   "starts": [],
+   "canon": "Magic's req 3262 (docs/magic/rooms.md, The table-only places, 1897, read in the canon tool 8 November 2026): the hand rests on a still day and wanders a little with the strength; a plain vane"
+  },
+  {
+   "id": "table-only-1897.dial-tally",
+   "tier": "fixed",
+   "source": "device",
+   "leans": [],
+   "weight": 1,
+   "moment": "arrive",
+   "when": [
+    "place = wind dial room",
+    "era = 1890s",
+    "time = morning",
+    "weather != rain",
+    "ground = wet"
+   ],
+   "show": [
+    "one more chalk stroke on the slate's rain tally than yesterday, the chalk on its ledge a little shorter, and no one here"
+   ],
+   "starts": [],
+   "canon": "Magic's req 3262 (docs/magic/rooms.md, The table-only places, 1897, read in the canon tool 8 November 2026): after each wet day, in the morning; a small charm or a keeper's habit, never said which; Ours; the page has no day-before clock, so a wet morning stands for it"
+  },
+  {
+   "id": "table-only-1897.dial-whistle",
+   "tier": "fixed",
+   "source": "device",
+   "leans": [],
+   "weight": 1,
+   "moment": "wait 15-60 s",
+   "when": [
+    "place = wind dial room",
+    "era = 1890s",
+    "windy = yes"
+   ],
+   "show": [
+    "a thin whistle through the two loops on the wind, no note, and gone as the gust drops"
+   ],
+   "starts": [],
+   "canon": "Magic's req 3262 (docs/magic/rooms.md, The table-only places, 1897, read in the canon tool 8 November 2026): castle-wide-1027.md 12's physics; the loops have no glass; a strong wind only, still on a calm day; the harps are the room above's"
+  },
+  {
+   "id": "table-only-1897.morris",
+   "tier": "fixed",
+   "source": "device",
+   "leans": [],
+   "weight": 1,
+   "moment": "arrive",
+   "when": [
+    "place = watch bartizan",
+    "era = 1890s"
+   ],
+   "show": [
+    "the nine men's morris board cut in the seat, a few pebbles left in its points as if a game had stopped, not quite where they lay last time"
+   ],
+   "starts": [],
+   "canon": "Magic's req 3262 (docs/magic/rooms.md, The table-only places, 1897, read in the canon tool 8 November 2026): the morris board, always; Ours, and no game is offered"
+  },
+  {
+   "id": "table-only-1897.morris-lay-1",
+   "tier": "small",
+   "source": "device",
+   "leans": [],
+   "weight": 1,
+   "moment": "arrive",
+   "when": [
+    "place = watch bartizan",
+    "era = 1890s"
+   ],
+   "show": [
+    "this time two pebbles lie near the middle of the board, side by side"
+   ],
+   "starts": [],
+   "canon": "Magic's req 3262 (docs/magic/rooms.md, The table-only places, 1897, read in the canon tool 8 November 2026): the pebbles lie a little differently each visit: three layings, the small tier's one-a-visit with no repeat of the last; Ours"
+  },
+  {
+   "id": "table-only-1897.morris-lay-2",
+   "tier": "small",
+   "source": "device",
+   "leans": [],
+   "weight": 1,
+   "moment": "arrive",
+   "when": [
+    "place = watch bartizan",
+    "era = 1890s"
+   ],
+   "show": [
+    "this time one pebble is pushed out to a corner of the board and the rest are scattered"
+   ],
+   "starts": [],
+   "canon": "Magic's req 3262 (docs/magic/rooms.md, The table-only places, 1897, read in the canon tool 8 November 2026): the pebbles lie a little differently each visit: three layings, the small tier's one-a-visit with no repeat of the last; Ours"
+  },
+  {
+   "id": "table-only-1897.morris-lay-3",
+   "tier": "small",
+   "source": "device",
+   "leans": [],
+   "weight": 1,
+   "moment": "arrive",
+   "when": [
+    "place = watch bartizan",
+    "era = 1890s"
+   ],
+   "show": [
+    "this time three pebbles lie in a row along one side of the board"
+   ],
+   "starts": [],
+   "canon": "Magic's req 3262 (docs/magic/rooms.md, The table-only places, 1897, read in the canon tool 8 November 2026): the pebbles lie a little differently each visit: three layings, the small tier's one-a-visit with no repeat of the last; Ours"
+  },
+  {
+   "id": "table-only-1897.old-volumes",
+   "tier": "fixed",
+   "source": "device",
+   "leans": [],
+   "weight": 1,
+   "moment": "arrive",
+   "when": [
+    "place = newspaper room",
+    "era = 1890s"
+   ],
+   "show": [
+    "bound back issues of the Prophet on the shelves, the old ones yellowed, the photographs in them still moving in their short loops"
+   ],
+   "starts": [],
+   "canon": "Magic's req 3262 (docs/magic/rooms.md, The table-only places, 1897, read in the canon tool 8 November 2026): HBP 25 L63954 and L63952 (a moving photograph yellowed with age on very old newsprint, the object only); 1897 issues and older only"
+  }
+ ]
+}

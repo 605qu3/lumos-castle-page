@@ -1,0 +1,124 @@
+{
+ "chain": "balconies-1897",
+ "about": "The two floor-1 balconies of 1897 (entrance-hall-balcony, courtyard-balcony), Magic's req 3259: Peeves along the hall rail, the Christmas holly, the courtyard lip's drip and the wet break. The hall balcony's meals are the sound schedule's hall bed and no cue here. The place names `entrance hall balcony` and `courtyard balcony` are provisional until the pages name them.",
+ "first_visit": [],
+ "room": [],
+ "records": [
+  {
+   "id": "balconies-1897.peeves-rail",
+   "tier": "fixed",
+   "source": "device",
+   "leans": [],
+   "weight": 1,
+   "moment": "wait 120-600 s",
+   "when": [
+    "place = entrance hall balcony",
+    "era = 1890s"
+   ],
+   "show": [
+    "Peeves comes lying on his back along the rail, slides its whole length with his hands behind his head, and is gone at the far end with a rattle; nothing falls from him"
+   ],
+   "starts": [],
+   "canon": "Magic's req 3259 (docs/magic/rooms.md, The two floor-1 balconies, 1897, read in the canon tool 8 November 2026): OotP 12 L40898 (Peeves down the banister on his back, an everyday Peeves); rare by the long wait; drops nothing; the hall's Peeves's ball is separate and unchanged"
+  },
+  {
+   "id": "balconies-1897.holly",
+   "tier": "fixed",
+   "source": "device",
+   "leans": [],
+   "weight": 1,
+   "moment": "arrive",
+   "when": [
+    "place = entrance hall balcony",
+    "era = 1890s",
+    "date >= 12-14",
+    "date <= 12-31"
+   ],
+   "show": [
+    "holly and tinsel twisted round the rail, as round the stair's banisters"
+   ],
+   "starts": [],
+   "canon": "Magic's req 3259 (docs/magic/rooms.md, The two floor-1 balconies, 1897, read in the canon tool 8 November 2026): HBP 15 L59878 (garlands of holly and tinsel twisted around the banisters, the usual Christmas), 14 to 31 December with the hall's needles; the rail is Ours to carry it"
+  },
+  {
+   "id": "balconies-1897.drip",
+   "tier": "fixed",
+   "source": "device",
+   "leans": [],
+   "weight": 1,
+   "moment": "arrive",
+   "when": [
+    "place = courtyard balcony",
+    "era = 1890s",
+    "weather = rain"
+   ],
+   "show": [
+    "the balcony's lip dripping heavily onto the flags below, a line of drops and a dark wet stripe under it, the corner behind it in deep shadow and nearly dry"
+   ],
+   "starts": [],
+   "canon": "Magic's req 3259 (docs/magic/rooms.md, The two floor-1 balconies, 1897, read in the canon tool 8 November 2026): OotP 12 L40530 (the balcony heavily dripping on a wet day); drizzle and rain both read as rain here"
+  },
+  {
+   "id": "balconies-1897.drip-slows",
+   "tier": "fixed",
+   "source": "device",
+   "leans": [],
+   "weight": 1,
+   "moment": "arrive",
+   "when": [
+    "place = courtyard balcony",
+    "era = 1890s",
+    "weather != rain",
+    "ground = wet"
+   ],
+   "show": [
+    "the last drops falling from the balcony's lip, slower and slower, a dark wet stripe still under it, and then none"
+   ],
+   "starts": [],
+   "canon": "Magic's req 3259 (docs/magic/rooms.md, The two floor-1 balconies, 1897, read in the canon tool 8 November 2026): OotP 12 L40530; the drip slows and stops an hour after the rain: the page has the ground wet after rain and no clock for the hour, so the wet ground stands for it"
+  },
+  {
+   "id": "balconies-1897.pooling",
+   "tier": "fixed",
+   "source": "device",
+   "leans": [],
+   "weight": 1,
+   "moment": "arrive",
+   "when": [
+    "place = courtyard balcony",
+    "era = 1890s",
+    "weather = rain"
+   ],
+   "show": [
+    "from the balcony's own door, its floor wet and pooling to the lip, the drops going over the edge, the courtyard grey below"
+   ],
+   "starts": [],
+   "canon": "Magic's req 3259 (docs/magic/rooms.md, The two floor-1 balconies, 1897, read in the canon tool 8 November 2026): the on-the-balcony row: Ours; the pooling floor is Interiors' to draw"
+  },
+  {
+   "id": "balconies-1897.wet-break",
+   "tier": "fixed",
+   "source": "device",
+   "leans": [],
+   "weight": 1,
+   "moment": "clock 11:00",
+   "when": [
+    "place = courtyard balcony",
+    "era = 1890s",
+    "weather = rain",
+    "weekday != saturday",
+    "weekday != sunday",
+    "occasion != christmas",
+    "occasion != christmas day",
+    "occasion != easter",
+    "occasion != start of term",
+    "occasion != leaving feast"
+   ],
+   "show": [
+    "from the yard below, talk from huddles round its edges, blurred in the drizzle, nobody to be named; the corner under the balcony the one place to stand out of it"
+   ],
+   "starts": [],
+   "canon": "Magic's req 3259 (docs/magic/rooms.md, The two floor-1 balconies, 1897, read in the canon tool 8 November 2026): OotP 12 L40530 (huddled talk around the edges of the yard, blurred in the fine drizzle); the mid-morning break of the staff room (req 1354), heard and never seen"
+  }
+ ]
+}
