@@ -33,7 +33,7 @@
 (function () {
   'use strict';
 
-  var SPRING_MIN = 2.0, RISE_MAX = 0.45, AISLE_MAX = 6.0, BEAM_STEP = 2.4, PIER_R = 0.45, SEG = 16;
+  var SPRING_MIN = 2.0, RISE_MAX = 0.45, AISLE_MAX = 6.0, BEAM_STEP = 2.4, PIER_R = 0.45, SEG = 16, BURY = 0.03;
 
   /* an arch's height over its springing at s metres from its middle: a segment of a circle through the springing
      at +-a and the crown at rise r (a half round where r = a) */
@@ -77,6 +77,15 @@
     var a = (alongX ? B.z1 - B.z0 : B.x1 - B.x0) / 2, H = heights(Q, a), mid = alongX ? (B.z0 + B.z1) / 2 : (B.x0 + B.x1) / 2;
     var m = field(THREE, B.x0, B.x1, B.z0, B.z1, B.y + H.springs, function (x, z) {
       return arch(a, H.crown - H.springs, alongX ? z - mid : x - mid); }, mats.vault, 24);
+    /* req 3186: a half round meets the wall at a tangent, flush with its face, so the two fight in small teeth along
+       the springing; the edge row goes BURY into the wall, so the first facet crosses the face at an angle and the
+       foot hides behind it (the crown and every other point stay) */
+    var p = m.geometry.attributes.position;
+    for (var i = 0; i < p.count; i++) {
+      var s = alongX ? p.getZ(i) - mid : p.getX(i) - mid;
+      if (Math.abs(Math.abs(s) - a) < 1e-4) { if (alongX) p.setZ(i, p.getZ(i) + Math.sign(s) * BURY); else p.setX(i, p.getX(i) + Math.sign(s) * BURY); }
+    }
+    p.needsUpdate = true; m.geometry.computeVertexNormals();
     m.name = Q.id + '-barrel'; G.add(m);
     return { group: G, flat: false, springs: H.springs, crown: H.crown };
   }
@@ -134,7 +143,7 @@
      material and a swap is one assignment. In an awake place one or two of its faces (fixed by the place) doze */
   var FACES = { awake: 'corbels-faces.png', dozing: 'corbels-faces-dozing.png', sleeping: 'corbels-faces-sleeping.png',
     yawning: 'corbels-faces-yawning.png' };   /* the yawn (req 1313): Godric's candidate 1 on req 1336, 28 October 2026, 12.15 am */
-  var FACE_TILT = 0.35, FACE_ASPECT = 0.351 / 0.393, facesBase = '../assets/layers/', faceMats = {}, faceSets = {}, T3 = null;
+  var FACE_TILT = 0.08, FACE_ASPECT = 0.351 / 0.393, facesBase = '../assets/layers/', faceMats = {}, faceSets = {}, faceTint = {}, T3 = null;
   function hash(s) { var h = 2166136261; for (var i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
   /* v? (Architect, 1 November 2026, Godric on the hospital wing: "the corbel faces are still the wrong colour"): the atlases are drawn
      in copper pink (mean 173, 133, 123), the walls are stone; once loaded each atlas is turned to its light-and-shade alone, lifted a
@@ -146,22 +155,39 @@
     var x = c.getContext('2d'); x.drawImage(im, 0, 0);
     var d = x.getImageData(0, 0, c.width, c.height), p = d.data;
     for (var i = 0; i < p.length; i += 4) { var l = Math.min(255, (0.3 * p[i] + 0.59 * p[i + 1] + 0.11 * p[i + 2]) * 1.4); p[i] = p[i + 1] = p[i + 2] = l; }
+    /* v? (req 3205 E, 7 November 2026): the art is inked round its cut edge, a dark band 5 to 8 px wide inside the alpha, its faint trace to 13
+       (lum 31 against the stone's 170), which read as a dotted outline round every face. Each texel's distance to the
+       cut (two chamfer passes); within EDGE px it is cut too, and every cut texel takes the stone's mean tone from just
+       inside the new edge, so the mipmaps blend stone into the rim, never the black of the empty texels */
+    var W = c.width, H = c.height, n = W * H, D = new Float32Array(n), EDGE = 14, big = 1e6, j, s = 0, sn = 0;
+    for (j = 0; j < n; j++) D[j] = p[j * 4 + 3] < 128 ? 0 : big;
+    for (var y = 0; y < H; y++) for (var xx = 0; xx < W; xx++) { j = y * W + xx; if (!D[j]) continue;
+      if (xx) D[j] = Math.min(D[j], D[j - 1] + 1); if (y) D[j] = Math.min(D[j], D[j - W] + 1);
+      if (xx && y) D[j] = Math.min(D[j], D[j - W - 1] + 1.414); if (xx < W - 1 && y) D[j] = Math.min(D[j], D[j - W + 1] + 1.414); }
+    for (y = H - 1; y >= 0; y--) for (xx = W - 1; xx >= 0; xx--) { j = y * W + xx; if (!D[j]) continue;
+      if (xx < W - 1) D[j] = Math.min(D[j], D[j + 1] + 1); if (y < H - 1) D[j] = Math.min(D[j], D[j + W] + 1);
+      if (xx < W - 1 && y < H - 1) D[j] = Math.min(D[j], D[j + W + 1] + 1.414); if (xx && y < H - 1) D[j] = Math.min(D[j], D[j + W - 1] + 1.414); }
+    for (j = 0; j < n; j++) if (D[j] > EDGE && D[j] <= EDGE + 6) { s += p[j * 4]; sn++; }
+    var fill = sn ? s / sn : 200;
+    for (j = 0; j < n; j++) if (D[j] <= EDGE) { var q = j * 4; p[q] = p[q + 1] = p[q + 2] = fill; }
+    for (j = 3; j < p.length; j += 4) p[j] = 255;   /* then opaque throughout: the face is a whole stone panel, its cut filled with the stone's tone, so no alpha-test edge steps into a dashed line (Fawkes's blind look, 8.50 pm) */
     x.putImageData(d, 0, 0); tex.image = c; tex.needsUpdate = true; return tex;
   }
   var STONE_FACE = 0xe3d8c4;
-  function faceMat(THREE, state) {
+  function faceMat(THREE, state, tint) {
     T3 = THREE;
-    if (!faceMats[state]) {
+    var key = state + (tint != null ? ':' + tint : '');
+    if (!faceMats[key]) {
       var t = new THREE.TextureLoader().load(facesBase + FACES[state], stoneTexture);
       if (THREE.SRGBColorSpace) t.colorSpace = THREE.SRGBColorSpace; else if (THREE.sRGBEncoding) t.encoding = THREE.sRGBEncoding;
-      faceMats[state] = new THREE.MeshLambertMaterial({ map: t, color: STONE_FACE, alphaTest: 0.5 });
+      faceMats[key] = new THREE.MeshLambertMaterial({ map: t, color: tint != null ? tint : STONE_FACE, alphaTest: 0.5 });
     }
-    return faceMats[state];
+    return faceMats[key];
   }
-  function face(THREE, id, k, h) {
-    var g = new THREE.PlaneGeometry(h * FACE_ASPECT, h), uv = g.attributes.uv, cell = (hash(id) + k) % 6;
+  function face(THREE, id, k, h, w) {
+    var g = new THREE.PlaneGeometry(w || h * FACE_ASPECT, h), uv = g.attributes.uv, cell = (hash(id) + k) % 6;
     for (var i = 0; i < uv.count; i++) uv.setX(i, (cell + uv.getX(i)) / 6);
-    var m = new THREE.Mesh(g, faceMat(THREE, 'awake')); m.name = id + '-corbel-face-' + k;
+    var m = new THREE.Mesh(g, faceMat(THREE, 'awake', faceTint[id])); m.name = id + '-corbel-face-' + k;
     (faceSets[id] = faceSets[id] || []).push(m);
     return m;
   }
@@ -180,7 +206,7 @@
     var F = faceSets[id] || [], n = F.length, h = hash(id), doze = n ? [h % n] : [];
     if (!FACES[state] || !n) return 0;
     if (n > 2 && (h >>> 8) % 2) doze.push((doze[0] + 1 + (h >>> 9) % (n - 1)) % n);
-    F.forEach(function (m, k) { m.material = faceMat(T3, state === 'awake' && doze.indexOf(k) >= 0 ? 'dozing' : state); });
+    F.forEach(function (m, k) { m.material = faceMat(T3, state === 'awake' && doze.indexOf(k) >= 0 ? 'dozing' : state, faceTint[id]); });
     return n;
   }
 
@@ -222,20 +248,32 @@
     var span = alongX ? B.z1 - B.z0 : B.x1 - B.x0, top = B.y + Q.ceiling - Q.floor, n = Q.beamsAt ? Q.beamsAt.length : Math.max(1, Math.round(L / BEAM_STEP));
     var bw = 0.28, bd = 0.36, cl = 0.42, ch = 0.42;
     faceSets[Q.id] = [];
+    /* req 3205: the face wears the corbel block's own stone, not the cream 0xe3d8c4 (Godric, 6.05 pm, 7 November 2026) */
+    if (mats.stone && mats.stone.color) { var hsl = { h: 0, s: 0, l: 0 }; mats.stone.color.getHSL(hsl); faceTint[Q.id] = new THREE.Color().setHSL(hsl.h, hsl.s, 0.70).getHex(); }   /* the block's hue, lightened: its own colour is the dark half of the dressed stone */
+    /* the stone behind the face takes the face's own tint, so a clear edge of the carving shows lit stone, never the block's shadowed front */
+    var backing = faceTint[Q.id] != null ? new THREE.MeshLambertMaterial({ color: new THREE.Color(faceTint[Q.id]).multiplyScalar(0.9) }) : mats.stone;
     for (var i = 0; i < n; i++) {
       var t = Q.beamsAt ? Q.beamsAt[i] : (alongX ? B.x0 : B.z0) + (i + 0.5) * L / n, mid = alongX ? (B.z0 + B.z1) / 2 : (B.x0 + B.x1) / 2;
       var b = new THREE.Mesh(alongX ? new THREE.BoxGeometry(bw, bd, span) : new THREE.BoxGeometry(span, bd, bw), mats.beam);
       b.position.set(alongX ? t : mid, top - bd / 2, alongX ? mid : t); b.name = Q.id + '-beam-' + i; b.userData.beam = i; b.userData.axis = alongX ? 'x' : 'z'; G.add(b);
       [-1, 1].forEach(function (s) {   /* a corbel each end, out from the wall under the beam */
-        var c = new THREE.Mesh(alongX ? new THREE.BoxGeometry(bw + 0.08, ch, cl) : new THREE.BoxGeometry(cl, ch, bw + 0.08), mats.stone);
+        var c = new THREE.Mesh(alongX ? new THREE.BoxGeometry(bw + 0.08, ch, cl) : new THREE.BoxGeometry(cl, ch, bw + 0.08), mats.corbel || mats.stone);   /* req 3175: the shell's self-lit variant, so the underside is not black */
         var e = mid + s * (span / 2 - cl / 2);
         c.position.set(alongX ? t : e, top - bd - ch / 2, alongX ? e : t); c.name = Q.id + '-corbel-' + i + (s < 0 ? 'a' : 'b'); c.userData.beam = i; c.userData.end = s; c.userData.corbel = true; G.add(c);
         /* the head bows to the floor below, FACE_TILT, its chin 1 cm proud of its corbel's face to the room (Design's look at the
            Architect's corridor shot, 20 October 2026: square to the room, a face under the beams read edge-on from below) */
-        var fh = ch - 0.02, f = face(THREE, Q.id, 2 * i + (s < 0 ? 0 : 1), fh), o = e - s * (cl / 2 + 0.01 + fh / 2 * Math.sin(FACE_TILT));
+        var fh = ch, fw = bw + 0.08, f = face(THREE, Q.id, 2 * i + (s < 0 ? 0 : 1), fh, fw), o = e - s * (cl / 2 + 0.01 + fh / 2 * Math.sin(FACE_TILT));
         f.position.set(alongX ? t : o, top - bd - ch / 2, alongX ? o : t); f.rotation.order = 'YXZ'; f.rotation.x = FACE_TILT;
         f.rotation.y = alongX ? (s < 0 ? 0 : Math.PI) : -s * Math.PI / 2; f.userData.beam = i; f.userData.end = s; G.add(f);
-        var w = wedge(THREE, fh * FACE_ASPECT, fh, FACE_TILT, mats.stone); w.position.copy(f.position); w.rotation.copy(f.rotation); w.userData.beam = i; w.userData.end = s; G.add(w);
+        /* req 3205: the wedge 0.7 mm proud of the block each side (1.004 of its width); at 0.99 a 1.8 mm strip of the block's shadowed front showed past it as a dark hairline on the oblique */
+        var w = wedge(THREE, fw / 0.96 * 1.004, fh, FACE_TILT, [mats.stone, backing]); w.position.copy(f.position); w.rotation.copy(f.rotation); w.userData.beam = i; w.userData.end = s; G.add(w);
+        /* req 3205: a stone sill under the chin closes the 1 cm gap between the face and the block, which from below showed the
+           wedge's lit front as a one-pixel strip, a sawtooth along the block's bottom front edge. Its underside falls from the chin
+           back to 0.8 mm under the block's underside (tilted the other way from the face), so no sliver of the block's shadowed front shows under it */
+        var sg = new THREE.BoxGeometry(fw * 1.004, 0.004, 0.0105); sg.translate(0, 0.002, -0.00525);
+        var sill = new THREE.Mesh(sg, mats.stone); sill.rotation.order = 'YXZ'; sill.rotation.y = f.rotation.y; sill.rotation.x = -2 * FACE_TILT;
+        sill.position.set(0, -fh / 2, 0).applyQuaternion(f.quaternion).add(f.position);   /* the chin's edge */
+        sill.userData.beam = i; sill.userData.end = s; G.add(sill);
       });
     }
     corbels(Q.id, 'awake');
