@@ -4,10 +4,10 @@
 window.CASTLE_ROOM_TAGS = window.CASTLE_ROOM_TAGS || {};
 window.CASTLE_ROOM_TAGS["1"] = {
  "_meta": {
-  "written": "30 October 2026, 20:49 (Design, make-room-tags.py), req 1598, req 1650",
+  "written": "08 November 2026, 12:18 (Design, make-room-tags.py), req 1598, req 1650",
   "floor": "1",
-  "model": 256,
-  "floor_version": 6,
+  "model": 305,
+  "floor_version": 10,
   "rule": "A tag is a check, not a tone: the shell sets no wall lighter to meet a brightness floor (a lifted wall turns to paint, design-bright-rooms-1021); a room under its floor gets one more lamp. Nothing glows. Fire light waits on its own key: a hearth is listed, never counted as a light.",
   "light": {
    "day": "the room has at least one window-family opening in the model (the day driver reaches it)",
@@ -437,23 +437,6 @@ window.CASTLE_ROOM_TAGS["1"] = {
    "surface": "oak",
    "acoustic": "dry"
   },
-  "drum-way-1": {
-   "use": "passage",
-   "age": "P3",
-   "area": 4,
-   "h": 2.6,
-   "light": {
-    "day": false,
-    "windows": 0,
-    "lamp": "lantern",
-    "lamps": 1,
-    "day_floor": 0.3,
-    "night_floor": 0.14,
-    "read": false
-   },
-   "surface": "flagstone",
-   "acoustic": "close"
-  },
   "lake-corridor-1-east": {
    "use": "passage",
    "age": "P6",
@@ -720,13 +703,13 @@ window.CASTLE_ROOM_TAGS["1"] = {
   "exam-papers-archive": {
    "use": "store",
    "age": "P3",
-   "area": 267,
+   "area": 244,
    "h": 4.5,
    "light": {
     "day": false,
     "windows": 0,
     "lamp": "torch",
-    "lamps": 14,
+    "lamps": 13,
     "day_floor": 0.3,
     "night_floor": 0.14,
     "read": false
@@ -737,13 +720,13 @@ window.CASTLE_ROOM_TAGS["1"] = {
   "west-dispensary": {
    "use": "workroom",
    "age": "P3",
-   "area": 197,
+   "area": 173,
    "h": 4.5,
    "light": {
     "day": false,
     "windows": 0,
     "lamp": "torch",
-    "lamps": 10,
+    "lamps": 9,
     "day_floor": 0.3,
     "night_floor": 0.14,
     "read": false
@@ -1411,8 +1394,8 @@ window.CASTLE_ROOM_TAGS["1"] = {
     "night_floor": 0.14,
     "read": false
    },
-   "surface": "flagstone",
-   "acoustic": "vaulted"
+   "surface": "oak",
+   "acoustic": "dry"
   },
   "west-pole-shaft-1": {
    "use": "passage",
@@ -1428,8 +1411,8 @@ window.CASTLE_ROOM_TAGS["1"] = {
     "night_floor": 0.14,
     "read": false
    },
-   "surface": "flagstone",
-   "acoustic": "passage"
+   "surface": "oak",
+   "acoustic": "dry"
   },
   "west-dumbwaiter-shaft-1": {
    "use": "passage",
@@ -1445,8 +1428,8 @@ window.CASTLE_ROOM_TAGS["1"] = {
     "night_floor": 0.14,
     "read": false
    },
-   "surface": "flagstone",
-   "acoustic": "passage"
+   "surface": "oak",
+   "acoustic": "dry"
   },
   "loop-gallery-stair-1": {
    "use": "passage",
@@ -1481,6 +1464,95 @@ window.CASTLE_ROOM_TAGS["1"] = {
    },
    "surface": "flagstone",
    "acoustic": "passage"
+  },
+  "drum-bend-1-west": {
+   "use": "passage",
+   "age": "P3",
+   "area": 19,
+   "h": 4.5,
+   "light": {
+    "day": false,
+    "windows": 0,
+    "lamp": "torch",
+    "lamps": 1,
+    "day_floor": 0.3,
+    "night_floor": 0.14,
+    "read": false
+   },
+   "surface": "flagstone",
+   "acoustic": "passage"
+  },
+  "drum-bend-1": {
+   "use": "passage",
+   "age": "P3",
+   "area": 40,
+   "h": 4.5,
+   "light": {
+    "day": false,
+    "windows": 0,
+    "lamp": "torch",
+    "lamps": 2,
+    "day_floor": 0.3,
+    "night_floor": 0.14,
+    "read": false
+   },
+   "surface": "flagstone",
+   "acoustic": "passage"
+  },
+  "drum-bend-1-east": {
+   "use": "passage",
+   "age": "P3",
+   "area": 19,
+   "h": 4.5,
+   "light": {
+    "day": false,
+    "windows": 0,
+    "lamp": "torch",
+    "lamps": 1,
+    "day_floor": 0.3,
+    "night_floor": 0.14,
+    "read": false
+   },
+   "surface": "flagstone",
+   "acoustic": "passage"
+  },
+  "entrance-hall-balcony": {
+   "use": "gallery",
+   "age": "P2",
+   "area": 24,
+   "h": 4.5,
+   "light": {
+    "day": true,
+    "windows": 0,
+    "lamp": "torch",
+    "lamps": 2,
+    "day_floor": 0.3,
+    "night_floor": 0.14,
+    "read": false
+   },
+   "surface": "flagstone",
+   "acoustic": "echoing",
+   "open_side": "south, onto the Entrance Hall",
+   "acoustic_note": "open onto the hall, so it shares the hall's echo"
+  },
+  "courtyard-balcony": {
+   "use": "gallery",
+   "age": "P3",
+   "area": 25,
+   "h": 4.5,
+   "light": {
+    "day": true,
+    "windows": 0,
+    "lamp": "torch",
+    "lamps": 2,
+    "day_floor": 0.3,
+    "night_floor": 0.14,
+    "read": false
+   },
+   "surface": "flagstone",
+   "acoustic": "stone-room",
+   "open_side": "south-east courtyard face, open air",
+   "acoustic_note": "open air; no class in the catalogue fits, stone-room is the nearest, Events to read"
   }
  },
  "stairs": {
