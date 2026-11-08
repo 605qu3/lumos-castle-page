@@ -31,8 +31,8 @@
     /* 1-THINGS north-stair-foot-1 */
     /* docs/interiors/first-floor-gaps-1028.md (north-stair-foot-1, corridors and passages): bare flags, a worn stone threshold at each door, one unlit torch bracket clear of every opening (stair feet: the treads and rails are the Architects own stair pieces, not placed here; the bracket is the familys one; no placeholders) */
     'north-stair-foot-1': { items: [
-      ['b', 155.6, 64.3, 0, 156.6, 64.52, 0.012, 'stone'], ['b', 158.05, 64.3, 0, 158.95, 64.52, 0.012, 'stone'], ['b', 152.48, 59.45, 0, 152.7, 60.35, 0.012, 'stone'], ['b', 159.72, 59.405, 2.15, 160.02, 59.445, 2.2, 'iron'],
-      ['y', 159.74, 59.425, 0.05, 2.2, 2.32, 'iron']] },
+      ['b', 155.6, 64.3, 0, 156.6, 64.52, 0.012, 'stone'], ['b', 158.05, 64.3, 0, 158.95, 64.52, 0.012, 'stone'], ['b', 152.48, 59.45, 0, 152.7, 60.35, 0.012, 'stone'], ['b', 159.72, 59.505, 2.15, 160.02, 59.545, 2.2, 'iron'],
+      ['y', 159.74, 59.525, 0.05, 2.2, 2.32, 'iron']] },
     /* 1-THINGS end north-stair-foot-1 */
     /* 1-THINGS sw-stair-foot-1 */
     /* docs/interiors/first-floor-gaps-1028.md (sw-stair-foot-1, corridors and passages): bare flags, a worn stone threshold at each door, one unlit torch bracket clear of every opening (stair feet: the treads and rails are the Architects own stair pieces, not placed here; the bracket is the familys one; no placeholders) */
@@ -1597,8 +1597,8 @@
     /* 1-THINGS history-teachers-study */
     /* docs/interiors/first-floor-gaps-1028.md (history-teachers-study, teachers' studies): a writing desk with a windsor chair on a hearth rug, a bookcase and a longcase clock, an oil lamp; the leaf's sweep kept clear */
     'history-teachers-study': { items: [
-      ['t', 128.32, 10.225, 129.02, 11.625, 0.76, 'oak'], ['b', 128.37, 11.175, 0.45, 128.97, 11.575, 0.72, 'dark'], ['b', 128.42, 11.125, 0.76, 128.77, 11.525, 0.78, 'paper'], ['y', 128.67, 10.475, 0.06, 0.76, 0.79, 'brass'],
-      ['y', 128.67, 10.475, 0.04, 0.79, 0.88, 'glass'], ['y', 128.67, 10.475, 0.025, 0.88, 1.06, 'glass'], ['t', 127.66, 10.715, 128.08, 11.135, 0.45, 'wood'], ['b', 127.66, 10.715, 0.45, 127.7, 11.135, 0.9, 'wood'],
+      ['t', 128.32, 10.325, 129.02, 11.725, 0.76, 'oak'], ['b', 128.37, 11.275, 0.45, 128.97, 11.675, 0.72, 'dark'], ['b', 128.42, 11.225, 0.76, 128.77, 11.625, 0.78, 'paper'], ['y', 128.67, 10.575, 0.06, 0.76, 0.79, 'brass'],
+      ['y', 128.67, 10.575, 0.04, 0.79, 0.88, 'glass'], ['y', 128.67, 10.575, 0.025, 0.88, 1.06, 'glass'], ['t', 127.66, 10.715, 128.08, 11.135, 0.45, 'wood'], ['b', 127.66, 10.715, 0.45, 127.7, 11.135, 0.9, 'wood'],
       ['b', 127.12, 9.825, 0, 129.32, 12.025, 0.012, 'scarlet'], ['s', 130.57, 14.6, 130.94, 17.6, [0.1, 0.5, 0.9, 1.3000000000000003, 1.7000000000000002, 2.1], 'oak'], ['b', 130.61, 14.66, 0.11, 130.86, 14.86, 0.41, 'leather'], ['b', 130.61, 14.88, 0.11, 130.86, 15.11, 0.43, 'dark'],
       ['b', 130.61, 15.13, 0.11, 130.86, 15.39, 0.45, 'scarlet'], ['b', 130.61, 15.41, 0.11, 130.86, 15.61, 0.47, 'blue'], ['b', 130.61, 15.63, 0.11, 130.86, 15.86, 0.41, 'green'], ['b', 130.61, 15.88, 0.11, 130.86, 16.14, 0.43, 'leather'],
       ['b', 130.61, 16.16, 0.11, 130.86, 16.36, 0.45, 'dark'], ['b', 130.61, 16.38, 0.11, 130.86, 16.61, 0.47, 'scarlet'], ['b', 130.61, 16.63, 0.11, 130.86, 16.89, 0.41, 'blue'], ['b', 130.61, 16.91, 0.11, 130.86, 17.11, 0.43, 'green'],
@@ -1645,8 +1645,8 @@
     /* 1-THINGS teachers-study-1 */
     /* docs/interiors/first-floor-gaps-1028.md (teachers-study-1, teachers' studies): a writing desk with a windsor chair on a hearth rug, a bookcase and a longcase clock and one portrait, an oil lamp; the leaf's sweep kept clear */
     'teachers-study-1': { items: [
-      ['t', 11.95, 63.8, 12.65, 65.2, 0.76, 'oak'], ['b', 12.0, 64.75, 0.45, 12.6, 65.15, 0.72, 'dark'], ['b', 12.05, 64.7, 0.76, 12.4, 65.1, 0.78, 'paper'], ['y', 12.3, 64.05, 0.06, 0.76, 0.79, 'brass'],
-      ['y', 12.3, 64.05, 0.04, 0.79, 0.88, 'glass'], ['y', 12.3, 64.05, 0.025, 0.88, 1.06, 'glass'], ['t', 11.29, 64.29, 11.71, 64.71, 0.45, 'wood'], ['b', 11.29, 64.29, 0.45, 11.33, 64.71, 0.9, 'wood'],
+      ['t', 11.95, 63.90, 12.65, 65.30, 0.76, 'oak'], ['b', 12.0, 64.85, 0.45, 12.6, 65.25, 0.72, 'dark'], ['b', 12.05, 64.80, 0.76, 12.4, 65.20, 0.78, 'paper'], ['y', 12.3, 64.15, 0.06, 0.76, 0.79, 'brass'],
+      ['y', 12.3, 64.15, 0.04, 0.79, 0.88, 'glass'], ['y', 12.3, 64.15, 0.025, 0.88, 1.06, 'glass'], ['t', 11.29, 64.29, 11.71, 64.71, 0.45, 'wood'], ['b', 11.29, 64.29, 0.45, 11.33, 64.71, 0.9, 'wood'],
       ['b', 10.75, 63.4, 0, 12.95, 65.6, 0.012, 'scarlet'], ['s', 14.2, 66.35, 14.57, 69.35, [0.1, 0.5, 0.9, 1.3000000000000003, 1.7000000000000002, 2.1], 'oak'], ['b', 14.24, 66.41, 0.11, 14.49, 66.61, 0.41, 'leather'], ['b', 14.24, 66.63, 0.11, 14.49, 66.86, 0.43, 'dark'],
       ['b', 14.24, 66.88, 0.11, 14.49, 67.14, 0.45, 'scarlet'], ['b', 14.24, 67.16, 0.11, 14.49, 67.36, 0.47, 'blue'], ['b', 14.24, 67.38, 0.11, 14.49, 67.61, 0.41, 'green'], ['b', 14.24, 67.63, 0.11, 14.49, 67.89, 0.43, 'leather'],
       ['b', 14.24, 67.91, 0.11, 14.49, 68.11, 0.45, 'dark'], ['b', 14.24, 68.13, 0.11, 14.49, 68.36, 0.47, 'scarlet'], ['b', 14.24, 68.38, 0.11, 14.49, 68.64, 0.41, 'blue'], ['b', 14.24, 68.66, 0.11, 14.49, 68.86, 0.43, 'green'],
