@@ -245,8 +245,17 @@
      stretch (no other place beside it over the wall's height, tested at 1 m steps 0.1 m out) gets a plain wall piece from
      the wall's top up to the lowest floor above that covers the stretch (a point 0.1 m inside, 0.1 m outside or mid-wall);
      none above means roof, so no band. Same line and thickness as the wall below. Round places are not banded (the tower
-     drums have their filler). ?bands=1 puts it in (off by default while it is refitted). */
+     drums have their filler). ?bands=1 puts it in (off by default while it is refitted).
+     v5 (7 Nov 11.15 pm): the open gap had shown the rooms' lit floors and wall tops as pale storey lines; the band hid
+     them and the faces read flat, so each band carries a string course at its foot, 0.15 m proud, 0.35 m tall, 1.3 times
+     the wall's tone (bandcourse=, bandcourseh=, bandtint= to try others; bandcourse=0 none). banddebug=1 draws band
+     and course in flat red; bandrecess= sets the band's set-back behind the wall below (0.01). */
   var bandsOn = /(^|[?&])bands=1(&|$)/.test(location.search);   /* off by default from 7 Nov 10.15 pm: req 3215 failed the blind look */
+  var bandRecess = (function () { var m = location.search.match(/[?&]bandrecess=([0-9.]+)/); return m ? +m[1] : 0.01; })();   /* req 3215 v5 trial: how far the band stands behind the wall face below */
+  var bandCourse = (function () { var m = location.search.match(/[?&]bandcourse=([0-9.]+)/); return m ? +m[1] : 0.15; })();   /* req 3215 v5 trial: a string course this many metres proud of the wall below, at each band's foot */
+  var bandTint = (function () { var m = location.search.match(/[?&]bandtint=([0-9.]+)/); return m ? +m[1] : 1.3; })();
+  var bandCourseH = (function () { var m = location.search.match(/[?&]bandcourseh=([0-9.]+)/); return m ? +m[1] : 0.35; })();
+  var bandDebug = /(^|[?&])banddebug=1(&|$)/.test(location.search);   /* req 3215 v5: every band piece flat unlit red, to see where the bands stand */
   function inPoly(pts, x, y) {
     var c = false;
     for (var i = 0, j = pts.length - 1; i < pts.length; j = i++) {
@@ -352,18 +361,25 @@
         runs.forEach(function (R) {
           stretches++;
           var e0 = R.s0 < 0.01 ? t : 0, e1 = R.s1 > L - 0.01 ? t : 0;
-          var A = [a[0] + ux * (R.s0 - e0 * 0) + nx * (R.off - 0.01), a[1] + uy * R.s0 + ny * (R.off - 0.01)], B = [a[0] + ux * (R.s1 + e1) + nx * (R.off - 0.01), a[1] + uy * (R.s1 + e1) + ny * (R.off - 0.01)];
-          later.push({ col: R.col, A: A, B: B, z0: top, z1: R.z1, id: Q.q.id, fl: Q.f, edge: i, len: +(R.s1 - R.s0).toFixed(1), at: [+A[0].toFixed(1), +A[1].toFixed(1)], dbg: R.dbg });
+          var A = [a[0] + ux * (R.s0 - e0 * 0) + nx * (R.off - bandRecess), a[1] + uy * R.s0 + ny * (R.off - bandRecess)], B = [a[0] + ux * (R.s1 + e1) + nx * (R.off - bandRecess), a[1] + uy * (R.s1 + e1) + ny * (R.off - bandRecess)];
+          later.push({ col: R.col, A: A, B: B, ex: nx, ey: ny, z0: top, z1: R.z1, id: Q.q.id, fl: Q.f, edge: i, len: +(R.s1 - R.s0).toFixed(1), at: [+A[0].toFixed(1), +A[1].toFixed(1)], dbg: R.dbg });
         });
       }
     });
     var modal = 0xa39d92, mc = 0; Object.keys(tones).forEach(function (c) { if (tones[c] > mc) { mc = tones[c]; modal = +c; } });
-    later.forEach(function (w) { quad(w.col != null ? w.col : modal, [w.A[0], w.A[1], w.z0], [w.B[0], w.B[1], w.z0], [w.B[0], w.B[1], w.z1], [w.A[0], w.A[1], w.z1]); pieces++; });
+    function paler(h) { var k = bandTint; return (Math.min(255, Math.round((h >> 16 & 255) * k)) << 16) | (Math.min(255, Math.round((h >> 8 & 255) * k)) << 8) | Math.min(255, Math.round((h & 255) * k)); }   /* the course in dressed stone, paler than the wall */
+    later.forEach(function (w) { quad(w.col != null ? w.col : modal, [w.A[0], w.A[1], w.z0], [w.B[0], w.B[1], w.z0], [w.B[0], w.B[1], w.z1], [w.A[0], w.A[1], w.z1]); pieces++;
+      if (bandCourse > 0) { var cc = paler(w.col != null ? w.col : modal), H = Math.min(bandCourseH, (w.z1 - w.z0) / 2), o = bandRecess + bandCourse, ex = w.ex, ey = w.ey,
+          A2 = [w.A[0] + ex * o, w.A[1] + ey * o], B2 = [w.B[0] + ex * o, w.B[1] + ey * o];   /* the course: a front, a lit top and a shaded underside; open ends, bandCourseH tall at most */
+        quad(cc, [A2[0], A2[1], w.z0], [B2[0], B2[1], w.z0], [B2[0], B2[1], w.z0 + H], [A2[0], A2[1], w.z0 + H]);
+        quad(cc, [A2[0], A2[1], w.z0 + H], [B2[0], B2[1], w.z0 + H], [w.B[0], w.B[1], w.z0 + H], [w.A[0], w.A[1], w.z0 + H]);
+        quad(cc, [w.A[0], w.A[1], w.z0], [w.B[0], w.B[1], w.z0], [B2[0], B2[1], w.z0], [A2[0], A2[1], w.z0]); }
+    });
     var G = new THREE.Group(), tris = 0; G.name = 'exterior-bands';
     Object.keys(T).forEach(function (c) {
       var bg = new THREE.BufferGeometry(); bg.setAttribute('position', new THREE.Float32BufferAttribute(T[c], 3));
       bg.computeVertexNormals(); bg.computeBoundingSphere(); tris += T[c].length / 9;
-      G.add(new THREE.Mesh(bg, new THREE.MeshLambertMaterial({ color: +c, side: THREE.DoubleSide })));
+      G.add(new THREE.Mesh(bg, bandDebug ? new THREE.MeshBasicMaterial({ color: 0xff0000, side: THREE.DoubleSide }) : new THREE.MeshLambertMaterial({ color: +c, side: THREE.DoubleSide })));
     });
     var log = later.map(function (w) { return { id: w.id, floor: +w.fl.toFixed(2), edge: w.edge, len: w.len, at: w.at, z0: +w.z0.toFixed(2), z1: +w.z1.toFixed(2), h: +(w.z1 - w.z0).toFixed(2), probe: w.dbg }; });
     return { gaps: Object.keys(gaps).map(function (k) { return gaps[k]; }).sort(function (p1, p2) { return p2.gap - p1.gap; }), log: log, group: G, pieces: pieces, tall: tall, faced: faced, bare: bare, probes: probes, places: P.length, tris: tris };
