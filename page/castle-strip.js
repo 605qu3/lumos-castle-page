@@ -12,15 +12,31 @@
    the taller head), counted in merged so the checker can list them.
    Slice 2 brings the arcs (a round room's wall on its two true radii). */
 (function (root) {
-  var EPS = 0.02, SEG = 10;
+  var EPS = 0.02, SEG = 16;   /* SEG: a head's cut is SEG chords (each half of a pointed head SEG / 2), the one source for this file, the shell's lining and castle-trim's casing rings */
+
+  function fracs(head) {
+    /* where along the hole's width (0 to 1) a head's cut is broken, the interior points only. Spaced by arc angle, not
+       evenly in x: uniform steps left the chord at each springing standing ~3 cm inside the arc (req 3314, a faceted
+       haunch); equal angles give equal chords, a sag of R(1 - cos(half step)): ~2.6 mm at 1.2 m wide, 5 mm at 2.4 m.
+       A pointed head is two arcs of radius w about the far jambs, 60 degrees each (SEG / 2 chords); a round or tudor head is a half ellipse (SEG chords) */
+    var f = [], k, n;
+    if (head === 'pointed') {
+      n = SEG / 2;
+      for (k = 1; k < n; k++) f.push(1 + Math.cos(Math.PI - Math.PI / 3 * k / n));   /* left half, springing to apex: angle 180 deg down to 120 deg about the right jamb */
+      f.push(0.5);
+      for (k = n - 1; k >= 1; k--) f.push(1 - (1 + Math.cos(Math.PI - Math.PI / 3 * k / n)));
+    } else for (k = 1; k < SEG; k++) f.push((1 - Math.cos(Math.PI * k / SEG)) / 2);
+    return f;
+  }
 
   function outline(h, lo) {
     /* the hole's edge from its left foot round the head to its right foot, as [x, y] points */
     var p = [], up = h.head ? Math.min(h.up || (h.s1 - h.s0) / 2, h.z1 - h.z0 - 0.01) : 0, sp = h.z1 - up, w = h.s1 - h.s0, m = (h.s0 + h.s1) / 2;
     p.push([h.s0, lo], [h.s0, sp]);
     if (h.head && up > 0.01) {
-      for (var k = 1; k < SEG; k++) {
-        var f = k / SEG, x = h.s0 + w * f, y;
+      var F = fracs(h.head);
+      for (var k = 0; k < F.length; k++) {
+        var f = F[k], x = h.s0 + w * f, y;
         if (h.head === 'pointed') {   /* two arcs of radius w, centred on the far jambs, meeting at the apex */
           var R = w, cx = f <= 0.5 ? h.s1 : h.s0, dx = x - cx, top = Math.sqrt(Math.max(0, R * R - dx * dx));
           y = sp + top * (up / (Math.sqrt(3) * w / 2));
@@ -62,7 +78,7 @@
       return { s0: Math.max(x0, h.s0), s1: Math.min(x1, h.s1), z0: Math.max(0, h.z0), z1: Math.min(hi, h.z1), head: h.head || null, up: h.up || 0 };
     }).filter(function (h) { return h.s1 - h.s0 > EPS && h.z1 - h.z0 > EPS; }));
     var xs = [x0, x1];
-    U.holes.forEach(function (h) { xs.push(h.s0, h.s1); if (h.head) for (var k = 1; k < SEG; k++) xs.push(h.s0 + (h.s1 - h.s0) * k / SEG); });
+    U.holes.forEach(function (h) { xs.push(h.s0, h.s1); if (h.head) fracs(h.head).forEach(function (f) { xs.push(h.s0 + (h.s1 - h.s0) * f); }); });
     xs = xs.filter(function (x) { return x >= x0 - 1e-6 && x <= x1 + 1e-6; }).sort(function (p, q) { return p - q; }).filter(function (x, k, A) { return k === 0 || x - A[k - 1] > 1e-4; });
     var shapes = [];
     for (var k = 0; k + 1 < xs.length; k++) {
@@ -91,6 +107,6 @@
     return { geos: sh.length ? [new THREE.ExtrudeGeometry(sh, { depth: spec.depth, bevelEnabled: false })] : [], merged: U.merged };
   }
 
-  var api = { build: build, unite: unite, outline: outline, topAt: topAt };
+  var api = { build: build, unite: unite, outline: outline, topAt: topAt, fracs: fracs, SEG: SEG };
   if (typeof module !== 'undefined' && module.exports) module.exports = api; else root.CastleStrip = api;
 })(typeof window !== 'undefined' ? window : this);

@@ -162,24 +162,24 @@
       if (d1 < d0 + 0.03 || d1 < 0.03) return [];
     }
     var out = [], L = (Math.PI - Math.acos(-a / (2 * a))) * 2 * a * 2, g = 0.003 / L, S = 4;
-    /* the wall's cut (castle-strip outline) is a polyline of 10 steps in x, not the true arc: its first chord off each
-       springing stands up to 3 cm inside the arc, so a ring whose inner edge lay 6 mm in from the arc left the wall's
-       face showing between ring and lining (the haunch slivers). A casing ring (d0 < 0) now takes its inner edge 6 mm
+    /* the wall's cut (castle-strip outline) is a polyline, not the true arc (a few mm off at castle-strip's SEG, the one
+       source for its points, CastleStrip.fracs): a ring whose inner edge lay 6 mm in from the arc could leave the wall's
+       face showing between ring and lining (the haunch slivers). A casing ring (d0 < 0) takes its inner edge 6 mm
        inside that polyline, along the same radial as its joints */
-    var cutPts = null;
-    if (kind === 'pointed' && d0 < 0) {
-      cutPts = [];
-      for (var q = 0; q <= 10; q++) {
-        var xq = -a + 2 * a * q / 10, cxq = q <= 5 ? a : -a;
-        cutPts.push([xq, Math.sqrt(Math.max(0, 4 * a * a - (xq - cxq) * (xq - cxq)))]);
-      }
+    var cutPts = null, CS = (typeof window !== 'undefined' && window.CastleStrip) || (typeof globalThis !== 'undefined' && globalThis.CastleStrip) || null;
+    if (kind === 'pointed' && d0 < 0 && CS && CS.fracs) {
+      var FQ = [0].concat(CS.fracs('pointed'), [1]);
+      cutPts = FQ.map(function (f) {
+        var xq = -a + 2 * a * f, cxq = f <= 0.5 ? a : -a;
+        return [xq, Math.sqrt(Math.max(0, 4 * a * a - (xq - cxq) * (xq - cxq)))];
+      });
     }
     function inner(t) {
       var P = prof(kind, a, 0, t);
       if (!cutPts) return prof(kind, a, d0, t);
       var c = t <= 0.5 ? a : -a, nx = P[0] - c, ny = P[1], nl = Math.hypot(nx, ny) || 1, best = Infinity, j;
       nx /= nl; ny /= nl;
-      for (j = 0; j < 10; j++) {   /* where the inward ray P - r n meets chord j: r = -cross(w, e) / cross(n, e) */
+      for (j = 0; j + 1 < cutPts.length; j++) {   /* where the inward ray P - r n meets chord j: r = -cross(w, e) / cross(n, e) */
         var ex = cutPts[j + 1][0] - cutPts[j][0], ey = cutPts[j + 1][1] - cutPts[j][1], den = nx * ey - ny * ex;
         if (Math.abs(den) < 1e-9) continue;
         var wx = cutPts[j][0] - P[0], wy = cutPts[j][1] - P[1], r = -(wx * ey - wy * ex) / den, u = (wx * ny - wy * nx) / den;
