@@ -2522,17 +2522,17 @@ window.SHELL_W5A = {
       ['b', 2.95, 49.95, 2.095, 3.95, 49.99, 2.125, 'wood'], ['b', 3.75, 49.76, 2.095, 3.98, 50.02, 2.16, 'straw']] },
     /* H15, docs/interiors/hidden-ways-batch-3.md (H15. The loft over the gate room); curator-hidden-ways-lists-1016: 1, every place's list as written (16 October 2026, by 1.26 pm); off provisional (req 825) */
     'gate-loft': { items: [
-      ['b', 71.98, 60, -0.01, 72.05, 60.07, 0.4, 'wood'], ['b', 71.98, 60.93, -0.01, 72.05, 61, 0.4, 'wood'], ['b', 73.93, 60, -0.01, 74, 60.07, 0.4, 'wood'],
-      ['b', 73.93, 60.93, -0.01, 74, 61, 0.4, 'wood'], ['b', 72.045, 60.005, 0.28, 73.935, 60.065, 0.36, 'wood'], ['b', 72.045, 60.935, 0.28, 73.935, 60.995, 0.36, 'wood'],
-      ['b', 71.985, 60.065, 0.285, 72.045, 60.935, 0.355, 'wood'], ['b', 73.935, 60.065, 0.285, 73.995, 60.935, 0.355, 'wood'], ['b', 72.04, 60.06, 0.2, 73.94, 60.94, 0.215, 'rope'],
-      ['b', 71.98, 62, -0.01, 72.05, 62.07, 0.4, 'wood'], ['b', 71.98, 62.93, -0.01, 72.05, 63, 0.4, 'wood'], ['b', 73.93, 62, -0.01, 74, 62.07, 0.4, 'wood'],
-      ['b', 73.93, 62.93, -0.01, 74, 63, 0.4, 'wood'], ['b', 72.045, 62.005, 0.28, 73.935, 62.065, 0.36, 'wood'], ['b', 72.045, 62.935, 0.28, 73.935, 62.995, 0.36, 'wood'],
-      ['b', 71.985, 62.065, 0.285, 72.045, 62.935, 0.355, 'wood'], ['b', 73.935, 62.065, 0.285, 73.995, 62.935, 0.355, 'wood'], ['b', 72.04, 62.06, 0.2, 73.94, 62.94, 0.215, 'rope'],
+      ['b', 74.205, 60, -0.01, 74.275, 60.07, 0.4, 'wood'], ['b', 74.205, 60.93, -0.01, 74.275, 61, 0.4, 'wood'], ['b', 76.155, 60, -0.01, 76.225, 60.07, 0.4, 'wood'],
+      ['b', 76.155, 60.93, -0.01, 76.225, 61, 0.4, 'wood'], ['b', 74.27, 60.005, 0.28, 76.16, 60.065, 0.36, 'wood'], ['b', 74.27, 60.935, 0.28, 76.16, 60.995, 0.36, 'wood'],
+      ['b', 74.21, 60.065, 0.285, 74.27, 60.935, 0.355, 'wood'], ['b', 76.16, 60.065, 0.285, 76.22, 60.935, 0.355, 'wood'], ['b', 74.265, 60.06, 0.2, 76.165, 60.94, 0.215, 'rope'],
+      ['b', 74.205, 62, -0.01, 74.275, 62.07, 0.4, 'wood'], ['b', 74.205, 62.93, -0.01, 74.275, 63, 0.4, 'wood'], ['b', 76.155, 62, -0.01, 76.225, 62.07, 0.4, 'wood'],
+      ['b', 76.155, 62.93, -0.01, 76.225, 63, 0.4, 'wood'], ['b', 74.27, 62.005, 0.28, 76.16, 62.065, 0.36, 'wood'], ['b', 74.27, 62.935, 0.28, 76.16, 62.995, 0.36, 'wood'],
+      ['b', 74.21, 62.065, 0.285, 74.27, 62.935, 0.355, 'wood'], ['b', 76.16, 62.065, 0.285, 76.22, 62.935, 0.355, 'wood'], ['b', 74.265, 62.06, 0.2, 76.165, 62.94, 0.215, 'rope'],
       ['b', 75, 58.98, -0.01, 76.2, 59.6, 0.55, 'oak'], ['b', 74.99, 58.985, 0.545, 76.21, 59.61, 0.6, 'oak'], ['b', 81.97, 63, 1.58, 82.02, 67, 1.62, 'iron'],
       ['b', 81.9, 63.24, 1.5, 81.975, 63.26, 1.6, 'iron'], ['b', 81.9, 63.678, 1.5, 81.975, 63.697, 1.6, 'iron'], ['b', 81.9, 64.115, 1.5, 81.975, 64.135, 1.6, 'iron'],
       ['b', 81.9, 64.552, 1.5, 81.975, 64.573, 1.6, 'iron'], ['b', 81.9, 64.99, 1.5, 81.975, 65.01, 1.6, 'iron'], ['b', 81.9, 65.427, 1.5, 81.975, 65.448, 1.6, 'iron'],
       ['b', 81.9, 65.865, 1.5, 81.975, 65.885, 1.6, 'iron'], ['b', 81.9, 66.302, 1.5, 81.975, 66.323, 1.6, 'iron'], ['b', 81.9, 66.74, 1.5, 81.975, 66.76, 1.6, 'iron'],
-      ['y', 72.7, 69.3, 0.05, 0.895, 0.96, 'brick']] },
+      ['y', 75.0, 69.3, 0.05, 0.895, 0.96, 'brick']] },
     /* H46, docs/interiors/hidden-ways-batch-8.md (H46. The glass room in the south-east drum); curator-hidden-ways-lists-1016: 1, every place's list as written (16 October 2026, by 1.26 pm); off provisional (req 825) */
     'glass-room': { c: [160, 0], items: [
       ['t', 159.1, -5.02, 160.9, -4.32, 0.85, 'oak'], ['b', 159.2, -4.72, 0.845, 159.5, -4.52, 0.92, 'wood'], ['b', 159.215, -4.66, 0.915, 159.275, -4.58, 0.925, 'ruby'],
@@ -2629,8 +2629,8 @@ window.SHELL_W5A = {
       ['b', 76.92, 59.025, 1.32, 76.95, 59.05, 1.6, 'iron'], ['b', 77.05, 59.025, 1.28, 77.08, 59.05, 1.6, 'iron'], ['b', 77.18, 59.025, 1.35, 77.21, 59.05, 1.6, 'iron'],
       ['b', 77.31, 59.025, 1.25, 77.34, 59.05, 1.6, 'iron'], ['b', 77.44, 59.025, 1.3, 77.47, 59.05, 1.6, 'iron'], ['b', 74.6, 61.1, -0.01, 75.4, 61.9, 0.08, 'stone'],
       ['y', 75, 61.5, 0.18, 0.075, 0.11, 'iron'], ['y', 75, 61.5, 0.04, 0.105, 0.455, 'iron'], ['y', 75, 61.5, 0.25, 0.45, 0.7, 'iron'], ['y', 75, 61.5, 0.22, 0.69, 0.71, 'soot'],
-      ['b', 71.98, 68.39, 1.88, 72.14, 68.41, 1.92, 'iron'], ['y', 72.1, 68.4, 0.008, 1.795, 1.885, 'iron'], ['y', 72.1, 68.4, 0.08, 1.75, 1.8, 'iron'],
-      ['y', 72.1, 68.4, 0.065, 1.545, 1.755, 'glass'], ['y', 72.1, 68.4, 0.08, 1.5, 1.55, 'iron']] },
+      ['b', 74.205, 68.39, 1.88, 74.365, 68.41, 1.92, 'iron'], ['y', 74.325, 68.4, 0.008, 1.795, 1.885, 'iron'], ['y', 74.325, 68.4, 0.08, 1.75, 1.8, 'iron'],
+      ['y', 74.325, 68.4, 0.065, 1.545, 1.755, 'glass'], ['y', 74.325, 68.4, 0.08, 1.5, 1.55, 'iron']] },
     /* H50, docs/interiors/hidden-ways-batch-9.md (H50. Lost property in the North Tower's drum); curator-batch9-list-1020, 1, 20 October 2026, 2.36 pm, relayed by the orchestrator at 2.49: every item of the Curator's lists (docs/curator/hidden-ways-batch-9.md, H50 Tier 2, 1 to 12), each the form of the batch file's row (req 825) */
     'lost-property': { c: [160, 72], items: [
       ['as', 8, 82, 5.6, 6.02, [0.3, 0.75, 1.2, 1.65, 2.1], 'pine'], ['as', 98, 180, 5.6, 6.02, [0.3, 0.75, 1.2, 1.65, 2.1], 'pine'], ['as', 228, 352, 5.6, 6.02, [0.3, 0.75, 1.2, 1.65, 2.1], 'pine'],
@@ -3817,8 +3817,8 @@ window.SHELL_W5A = {
   /* G-ADDS broom-cupboard-2-middle */
   /* NOW (floor-2-by-purpose-1031.md): wooden-pail-1, scrubbing-brush-1, feather-duster-1; NOT PLACED for want of a clear spot: sweet-tin-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-2.js for collision only */
   add('broom-cupboard-2-middle', [
-    ['y', 80.4, 58.56, 0.15, 0, 0.3, 'wood'], ['y', 80.4, 58.56, 0.155, 0.08, 0.1, 'iron'], ['y', 80.4, 58.56, 0.155, 0.2, 0.22, 'iron'], ['b', 73.3, 58.69, 1.2, 73.5, 58.76, 1.3, 'wood'],
-    ['b', 81.26, 53.84, 1.2, 81.34, 53.89, 1.65, 'straw']]);
+    ['y', 81.3, 54.04, 0.15, 0, 0.3, 'wood'], ['y', 81.3, 54.04, 0.155, 0.08, 0.1, 'iron'], ['y', 81.3, 54.04, 0.155, 0.2, 0.22, 'iron'], ['b', 74.24, 53.9, 1.2, 74.31, 54.1, 1.3, 'wood'],
+    ['b', 79.06, 58.71, 1.2, 79.14, 58.76, 1.65, 'straw']]);
   /* G-ADDS end broom-cupboard-2-middle */
   /* G-ADDS broom-cupboard-2-west */
   /* NOW (floor-2-by-purpose-1031.md): brush-and-pan-1, tin-bucket-1, leather-apron-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-2.js for collision only */
@@ -5411,7 +5411,7 @@ window.SHELL_W5A = {
   /* G-ADDS teachers-study-5-middle */
   /* NOW (floors-3-to-7-by-purpose-1031.md): writing-desk-1, oak-chair-1, hearth-rug-1, oil-lamp-1, silver-teapot-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-5.js for collision only */
   add('teachers-study-5-middle', [
-    ['b', 78.1, 59.27, 0, 79.1, 59.82, 0.78, 'oak'], ['b', 73.95, 68.23, 0, 74.45, 68.73, 0.9, 'oak'], ['b', 76.1, 67.73, 0, 77.5, 68.73, 0.012, 'tartan'], ['y', 79.267, 63.412, 0.06, 0.76, 0.86, 'brass'],
+    ['b', 76.1, 59.27, 0, 77.1, 59.82, 0.78, 'oak'], ['b', 74.27, 64.85, 0, 74.77, 65.35, 0.9, 'oak'], ['b', 80.73, 60.6, 0, 81.73, 62.0, 0.012, 'tartan'], ['y', 79.267, 63.412, 0.06, 0.76, 0.86, 'brass'],
     ['y', 79.267, 63.412, 0.045, 0.86, 1.01, 'glass'], ['b', 79.233, 63.538, 0.76, 79.433, 63.658, 0.94, 'steel']]);
   /* G-ADDS end teachers-study-5-middle */
   /* G-ADDS prefects-common-room */
@@ -5443,7 +5443,7 @@ window.SHELL_W5A = {
   /* G-ADDS broom-cupboard-5-middle */
   /* NOW (floors-3-to-7-by-purpose-1031.md): plank-bench-1, iron-bound-chest-1; NOT PLACED for want of a clear spot: oil-lamp-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-5.js for collision only */
   add('broom-cupboard-5-middle', [
-    ['b', 80.45, 53.87, 0.42, 81.75, 54.25, 0.47, 'pine'], ['b', 80.52, 53.9, 0, 80.58, 54.2, 0.42, 'pine'], ['b', 81.62, 53.9, 0, 81.68, 54.2, 0.42, 'pine'], ['b', 74.05, 53.87, 0, 74.95, 54.37, 0.55, 'iron']]);
+    ['b', 81.5, 53.87, 0.42, 82.8, 54.25, 0.47, 'pine'], ['b', 81.57, 53.9, 0, 81.63, 54.2, 0.42, 'pine'], ['b', 82.67, 53.9, 0, 82.73, 54.2, 0.42, 'pine'], ['b', 76.3, 53.87, 0, 77.2, 54.37, 0.55, 'iron']]);
   /* G-ADDS end broom-cupboard-5-middle */
   /* G-ADDS teachers-study-5-southeast */
   /* NOW (floors-3-to-7-by-purpose-1031.md): writing-desk-1, dip-holder-1, leather-armchair-1, oil-lamp-1, fire-irons-1, bookcase-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-5.js for collision only */
@@ -5746,8 +5746,8 @@ window.SHELL_W5A = {
   /* G-ADDS teachers-study-6-astronomy */
   /* NOW (floors-3-to-7-by-purpose-1031.md): writing-desk-1, dip-holder-1, leather-armchair-1, oil-lamp-1, fire-irons-1, bookcase-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-6.js for collision only */
   add('teachers-study-6-astronomy', [
-    ['b', 72.27, 64.9, 0, 72.82, 65.9, 0.78, 'oak'], ['y', 79.267, 63.412, 0.025, 0.76, 0.96, 'wood'], ['b', 72.27, 59.3, 0, 73.07, 60.1, 0.95, 'leather'], ['y', 79.267, 63.536, 0.06, 0.76, 0.86, 'brass'],
-    ['y', 79.267, 63.536, 0.045, 0.86, 1.01, 'glass'], ['b', 72.27, 68.15, 0, 72.57, 68.45, 0.7, 'iron'], ['b', 72.27, 66.0, 0, 72.57, 67.0, 1.9, 'oak']]);
+    ['b', 74.3, 59.27, 0, 75.3, 59.82, 0.78, 'oak'], ['y', 79.267, 63.412, 0.025, 0.76, 0.96, 'wood'], ['b', 77.6, 67.93, 0, 78.4, 68.73, 0.95, 'leather'], ['y', 79.267, 63.536, 0.06, 0.76, 0.86, 'brass'],
+    ['y', 79.267, 63.536, 0.045, 0.86, 1.01, 'glass'], ['b', 74.27, 66.15, 0, 74.57, 66.45, 0.7, 'iron'], ['b', 74.27, 59.9, 0, 74.57, 60.9, 1.9, 'oak']]);
   /* G-ADDS end teachers-study-6-astronomy */
   /* G-ADDS vectors-study-6 */
   /* NOW (floors-3-to-7-by-purpose-1031.md): writing-desk-1, oak-chair-1, bookcase-1, silver-teapot-1, log-basket-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-6.js for collision only */
@@ -5764,9 +5764,9 @@ window.SHELL_W5A = {
   /* G-ADDS broom-cupboard-6-middle */
   /* NOW (floors-3-to-7-by-purpose-1031.md): hall-chair-1, hearth-rug-1, stool-1, oil-lamp-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-6.js for collision only */
   add('broom-cupboard-6-middle', [
-    ['b', 72.27, 54.25, 0, 72.77, 54.75, 0.95, 'oak'], ['b', 85.83, 54.9, 0, 86.83, 56.3, 0.012, 'tartan'], ['y', 83.6, 54.07, 0.17, 0.43, 0.47, 'pine'], ['b', 83.68, 54.15, 0, 83.72, 54.19, 0.43, 'pine'],
-    ['b', 83.48, 54.15, 0, 83.52, 54.19, 0.43, 'pine'], ['b', 83.68, 53.95, 0, 83.72, 53.99, 0.43, 'pine'], ['b', 83.48, 53.95, 0, 83.52, 53.99, 0.43, 'pine'], ['y', 72.363, 54.343, 0.06, 0.95, 1.05, 'brass'],
-    ['y', 72.363, 54.343, 0.045, 1.05, 1.2, 'glass']]);
+    ['b', 80.4, 53.87, 0, 80.9, 54.37, 0.95, 'oak'], ['b', 84.65, 53.87, 0, 86.05, 54.87, 0.012, 'tartan'], ['y', 77.35, 54.07, 0.17, 0.43, 0.47, 'pine'], ['b', 77.43, 54.15, 0, 77.47, 54.19, 0.43, 'pine'],
+    ['b', 77.23, 54.15, 0, 77.27, 54.19, 0.43, 'pine'], ['b', 77.43, 53.95, 0, 77.47, 53.99, 0.43, 'pine'], ['b', 77.23, 53.95, 0, 77.27, 53.99, 0.43, 'pine'], ['y', 80.493, 53.963, 0.06, 0.95, 1.05, 'brass'],
+    ['y', 80.493, 53.963, 0.045, 1.05, 1.2, 'glass']]);
   /* G-ADDS end broom-cupboard-6-middle */
   /* G-ADDS broom-cupboard-6-west */
   /* NOW (floors-3-to-7-by-purpose-1031.md): book-crate-1, hessian-sack-1, hanging-lantern-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-6.js for collision only */
@@ -6127,9 +6127,9 @@ window.SHELL_W5A = {
   /* G-ADDS broom-cupboard-7-north-east */
   /* NOW (floors-3-to-7-by-purpose-1031.md): hall-chair-1, hearth-rug-1, stool-1, oil-lamp-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-7.js for collision only */
   add('broom-cupboard-7-north-east', [
-    ['b', 81.85, 57.03, 0, 82.35, 57.53, 0.95, 'oak'], ['b', 72.27, 55.3, 0, 73.27, 56.7, 0.012, 'tartan'], ['y', 86.6, 54.07, 0.17, 0.43, 0.47, 'pine'], ['b', 86.68, 54.15, 0, 86.72, 54.19, 0.43, 'pine'],
-    ['b', 86.48, 54.15, 0, 86.52, 54.19, 0.43, 'pine'], ['b', 86.68, 53.95, 0, 86.72, 53.99, 0.43, 'pine'], ['b', 86.48, 53.95, 0, 86.52, 53.99, 0.43, 'pine'], ['y', 81.943, 57.123, 0.06, 0.95, 1.05, 'brass'],
-    ['y', 81.943, 57.123, 0.045, 1.05, 1.2, 'glass']]);
+    ['b', 84.5, 57.03, 0, 85.0, 57.53, 0.95, 'oak'], ['b', 74.25, 56.53, 0, 75.65, 57.53, 0.012, 'tartan'], ['y', 75.75, 54.07, 0.17, 0.43, 0.47, 'pine'], ['b', 75.83, 54.15, 0, 75.87, 54.19, 0.43, 'pine'],
+    ['b', 75.63, 54.15, 0, 75.67, 54.19, 0.43, 'pine'], ['b', 75.83, 53.95, 0, 75.87, 53.99, 0.43, 'pine'], ['b', 75.63, 53.95, 0, 75.67, 53.99, 0.43, 'pine'], ['y', 84.593, 57.123, 0.06, 0.95, 1.05, 'brass'],
+    ['y', 84.593, 57.123, 0.045, 1.05, 1.2, 'glass']]);
   /* G-ADDS end broom-cupboard-7-north-east */
   /* G-ADDS passage-7-stair-hall */
   /* NOW (floors-3-to-7-by-purpose-1031.md): umbrella-1, hearth-rug-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-7.js for collision only */
@@ -6158,8 +6158,8 @@ window.SHELL_W5A = {
   /* G-ADDS teachers-study-7-north */
   /* NOW (floors-3-to-7-by-purpose-1031.md): writing-desk-1, oak-chair-1, hearth-rug-1, oil-lamp-1, silver-teapot-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-7.js for collision only */
   add('teachers-study-7-north', [
-    ['b', 72.27, 64.9, 0, 72.82, 65.9, 0.78, 'oak'], ['b', 72.27, 60.25, 0, 72.77, 60.75, 0.9, 'oak'], ['b', 80.73, 67.3, 0, 81.73, 68.7, 0.012, 'tartan'], ['y', 76.412, 66.267, 0.06, 0.76, 0.86, 'brass'],
-    ['y', 76.412, 66.267, 0.045, 0.86, 1.01, 'glass'], ['b', 76.374, 66.34, 0.76, 76.574, 66.46, 0.94, 'steel']]);
+    ['b', 74.27, 59.3, 0, 74.82, 60.3, 0.78, 'oak'], ['b', 81.23, 68.25, 0, 81.73, 68.75, 0.9, 'oak'], ['b', 77.7, 67.73, 0, 79.1, 68.73, 0.012, 'tartan'], ['y', 77.412, 66.267, 0.06, 0.76, 0.86, 'brass'],
+    ['y', 77.412, 66.267, 0.045, 0.86, 1.01, 'glass'], ['b', 77.374, 66.34, 0.76, 77.574, 66.46, 0.94, 'steel']]);
   /* G-ADDS end teachers-study-7-north */
   /* G-ADDS astronomy-stair-foot-7 */
   /* NOW (floors-3-to-7-by-purpose-1031.md): plank-bench-1, stair-runner-1; NOT PLACED for want of a clear spot: oil-lamp-1; sited by tools/architect-now.py, plain stand-ins; read back from shell-things-7.js for collision only */
@@ -7776,7 +7776,7 @@ window.SHELL_W5A = {
   /* G-HANG teachers-study-5-middle */
   /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
   add('teachers-study-5-middle', [
-    ['b', 81.7, 63.1, 2.8, 81.76, 64.9, 4.2, 'tartan'], ['b', 72.3, 59.24, 1.15, 72.9, 59.3, 1.95, 'gilt'], ['b', 75.425, 59.24, 1.325, 75.775, 59.3, 1.775, 'gilt']]);
+    ['b', 81.7, 63.1, 2.8, 81.76, 64.9, 4.2, 'tartan'], ['b', 74.24, 62.5, 1.15, 74.3, 63.1, 1.95, 'gilt'], ['b', 75.425, 59.24, 1.325, 75.775, 59.3, 1.775, 'gilt']]);
   /* G-HANG end teachers-study-5-middle */
   /* G-HANG teachers-study-5-southeast */
   /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
@@ -7989,7 +7989,7 @@ window.SHELL_W5A = {
   /* G-HANG teachers-study-6-astronomy */
   /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
   add('teachers-study-6-astronomy', [
-    ['b', 76.1, 68.7, 2.8, 77.9, 68.76, 4.2, 'tartan'], ['b', 72.24, 67.4, 1.15, 72.3, 68.0, 1.95, 'gilt'], ['b', 72.625, 68.7, 1.325, 72.975, 68.76, 1.775, 'gilt']]);
+    ['b', 78.1, 68.7, 2.8, 79.9, 68.76, 4.2, 'tartan'], ['b', 76.8, 68.7, 1.15, 77.4, 68.76, 1.95, 'gilt'], ['b', 74.24, 67.225, 1.325, 74.3, 67.575, 1.775, 'gilt']]);
   /* G-HANG end teachers-study-6-astronomy */
   /* G-HANG teachers-study-6-east */
   /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
@@ -8162,7 +8162,7 @@ window.SHELL_W5A = {
   /* G-HANG teachers-study-7-north */
   /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */
   add('teachers-study-7-north', [
-    ['b', 75.9, 68.7, 2.6, 78.1, 68.76, 4.2, 'tartan'], ['b', 72.24, 59.5, 1.15, 72.3, 60.1, 1.95, 'gilt'], ['b', 72.24, 61.125, 1.325, 72.3, 61.475, 1.775, 'gilt']]);
+    ['b', 77.9, 68.7, 2.6, 80.1, 68.76, 4.2, 'tartan'], ['b', 74.24, 65.5, 1.15, 74.3, 66.1, 1.95, 'gilt'], ['b', 74.24, 59.225, 1.325, 74.3, 59.575, 1.775, 'gilt']]);
   /* G-HANG end teachers-study-7-north */
   /* G-HANG teachers-study-7-west */
   /* WALL HANGINGS (wall-hangings-1031.md, req 2252): 1 tapestries, 2 frames, plain placeholders at the stated sizes, tools/architect-now.py --hang */

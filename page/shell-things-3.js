@@ -857,14 +857,14 @@
     /* 3-THINGS cleaning-cupboard-3-lobby */
     /* docs/interiors/upper-floors-gaps-1028.md (cleaning-cupboard-3-lobby, broom and cleaning cupboards): a peg rail with the rake, the mop and the brush and pan, a wooden pail and a tin bucket by them, a worn threshold; the aisle from the door stays clear */
     'cleaning-cupboard-3-lobby': { items: [
-      ['b', 71.49, 61.35, 1.5, 71.57, 71.95, 1.56, 'oak'], ['b', 71.51, 61.65, 0, 71.57, 61.68, 1.75, 'wood'], ['b', 71.5, 61.47, 1.55, 71.57, 61.86, 1.62, 'iron'], ['b', 71.51, 62.2, 0, 71.57, 62.23, 1.6, 'wood'],
-      ['b', 71.45, 62.1, 0, 71.57, 62.33, 0.3, 'rope'], ['b', 71.49, 62.75, 1.0, 71.57, 62.97, 1.5, 'wood'], ['b', 71.47, 62.79, 0.99, 71.57, 62.93, 1.0, 'steel'], ['b', 71.4, 62.75, 0.6, 71.57, 63.05, 0.62, 'tin'],
-      ['y', 71.25, 63.45, 0.15, 0, 0.3, 'wood'], ['y', 71.25, 63.95, 0.16, 0, 0.32, 'tin'], ['b', 69.65, 59.63, 0, 70.55, 59.85, 0.012, 'stone']] },
+      ['b', 73.715, 61.35, 1.5, 73.795, 71.95, 1.56, 'oak'], ['b', 73.735, 61.65, 0, 73.795, 61.68, 1.75, 'wood'], ['b', 73.725, 61.47, 1.55, 73.795, 61.86, 1.62, 'iron'], ['b', 73.735, 62.2, 0, 73.795, 62.23, 1.6, 'wood'],
+      ['b', 73.675, 62.1, 0, 73.795, 62.33, 0.3, 'rope'], ['b', 73.715, 62.75, 1.0, 73.795, 62.97, 1.5, 'wood'], ['b', 73.695, 62.79, 0.99, 73.795, 62.93, 1.0, 'steel'], ['b', 73.625, 62.75, 0.6, 73.795, 63.05, 0.62, 'tin'],
+      ['y', 73.475, 63.45, 0.15, 0, 0.3, 'wood'], ['y', 73.475, 63.95, 0.16, 0, 0.32, 'tin'], ['b', 69.65, 59.63, 0, 70.55, 59.85, 0.012, 'stone']] },
     /* 3-THINGS end cleaning-cupboard-3-lobby */
     /* 3-THINGS broom-cupboard-3-middle */
     /* docs/interiors/upper-floors-gaps-1028.md (broom-cupboard-3-middle, broom and cleaning cupboards): a peg rail with the rake, the mop and the brush and pan, a wooden pail and a tin bucket by them, a worn threshold; the aisle from the door stays clear */
     'broom-cupboard-3-middle': { items: [
-      ['b', 72.35, 53.83, 1.5, 86.45, 53.91, 1.56, 'oak'], ['b', 86.12, 53.83, 0, 86.15, 53.89, 1.75, 'wood'], ['b', 85.94, 53.83, 1.55, 86.33, 53.9, 1.62, 'iron'], ['b', 85.57, 53.83, 0, 85.6, 53.89, 1.6, 'wood'],
+      ['b', 74.3, 53.83, 1.5, 86.45, 53.91, 1.56, 'oak'], ['b', 86.12, 53.83, 0, 86.15, 53.89, 1.75, 'wood'], ['b', 85.94, 53.83, 1.55, 86.33, 53.9, 1.62, 'iron'], ['b', 85.57, 53.83, 0, 85.6, 53.89, 1.6, 'wood'],
       ['b', 85.47, 53.83, 0, 85.7, 53.95, 0.3, 'rope'], ['b', 84.83, 53.83, 1.0, 85.05, 53.91, 1.5, 'wood'], ['b', 84.87, 53.83, 0.99, 85.01, 53.93, 1.0, 'steel'], ['b', 84.75, 53.83, 0.6, 85.05, 54.0, 0.62, 'tin'],
       ['y', 84.35, 54.15, 0.15, 0, 0.3, 'wood'], ['y', 83.85, 54.15, 0.16, 0, 0.32, 'tin'], ['b', 79.1, 57.35, 0, 80.0, 57.57, 0.012, 'stone']] },
     /* 3-THINGS end broom-cupboard-3-middle */
