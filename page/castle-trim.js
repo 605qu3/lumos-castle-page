@@ -155,7 +155,12 @@
   /* v10: a pointed head's ring, n stones each half (a joint at the apex, as a two-centred arch has), from d0 to d1 out of
      the cut, standing P out; 6 mm joints; left out whole where the ceiling or the wall's ends cut it */
   function pring(THREE, kind, a, cy, d0, d1, P, n) {
-    if (CLIP && (cy + rise(kind, a, d1) > CLIP.ymax || -a - d1 < CLIP.x0 || a + d1 > CLIP.x1)) return [];
+    if (CLIP && cy + rise(kind, a, d1) > CLIP.ymax) return [];
+    if (CLIP && (-a - d1 < CLIP.x0 || a + d1 > CLIP.x1)) {
+      /* a wall too short for the full ring (a facet of a round shaft): the ring is cut to the room the wall leaves, as the jambs are by rect(), so both read one width */
+      d1 = Math.min(-CLIP.x0 - a, CLIP.x1 - a);
+      if (d1 < d0 + 0.03 || d1 < 0.03) return [];
+    }
     var out = [], L = (Math.PI - Math.acos(-a / (2 * a))) * 2 * a * 2, g = 0.003 / L, S = 4;
     for (var k = 0; k < 2 * n; k++) {
       var t0 = k / (2 * n) + g, t1 = (k + 1) / (2 * n) - g, sh = new THREE.Shape(), i, p;

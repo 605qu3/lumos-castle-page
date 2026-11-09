@@ -186,7 +186,7 @@ if (!/[?&]faceall=0/.test(location.search) && window.CastleStoneFace) ['founders
 <script src="charms/spells.js?v=41"></script>
 <script src="charms/guide.js?v=6"></script>
 <script src="charms/desks.js?v=2"></script>
-<script src="castle-trim.js?v=10"></script>
+<script src="castle-trim.js?v=11"></script>
 <script src="design/lake-views.js?v=1"></script>
 <script src="castle-walls-v2.js?v=6"></script>
 <script src="castle-strip.js?v=2"></script>
@@ -2875,9 +2875,10 @@ var TROPHY_STAT = null;
     add(g, new THREE.CylinderGeometry(0.012, 0.022, h * 0.6, 8), mat, x, y + 0.03 + h * 0.3, z);
     add(g, new THREE.SphereGeometry(0.018, 10, 8), mat, x, y + 0.03 + h * 0.6 + 0.016, z);
   }
+  var curU = 1.0;
   function fill(g, v, gap, seed, keep) {   /* one shelf's things, u from -0.85 to 0.85, none in the kept stretch */
-    var R = rng(seed), u = -0.82;
-    while (u < 0.8) {
+    var R = rng(seed), u = -0.82 * curU;
+    while (u < (curU < 1 ? 0.62 * curU - 0.1 : 0.8)) {
       var w = 0.16 + R() * 0.14, c = u + w / 2;
       if (!(keep && c > keep[0] - 0.12 && c < keep[1] + 0.12)) {
         var back = R(), m = metals[Math.floor(R() * metals.length)];
@@ -2893,7 +2894,7 @@ var TROPHY_STAT = null;
   /* a case in its frame: the back 1 cm off the wall; base 0 to 0.15 out to 0.66; the glass front at 0.54, between posts */
   function tcase(x, y, ox, oy, name, opt) {
     opt = opt || {};
-    var g = frame(x, y, ox, oy, name), B = 0.01, F = 0.54, U = 1.0, TOP = 2.2;
+    var g = frame(x, y, ox, oy, name), B = 0.01, F = 0.54, U = opt.u || 1.0, TOP = 2.2; curU = U;
     slab(g, -U, 0, B, U, 0.15, B + 0.65, wood);                                  /* the base and its ledge */
     slab(g, -U, 0.15, B, U, TOP, B + 0.03, dark);                                /* the back */
     [-1, 1].forEach(function (s) { slab(g, s * U - (s > 0 ? 0.04 : 0), 0.15, F - 0.02, s * U + (s < 0 ? 0.04 : 0), TOP, F + 0.02, wood); });   /* the front posts */
@@ -2934,9 +2935,9 @@ var TROPHY_STAT = null;
   /* the west wall's three in the pier between windows 1 and 4 */
   [29.75, 34.0, 38.25].forEach(function (y, k) { var wg = tcase(0, y, 1, 0, 'trophy-case-w' + k, { seed: 20 + k, keep: k === 1 ? [1.35, -0.1, 0.1] : null }); if (k === 1) statCases.wizard = wg; });
   /* the end walls: two each side of each door, 1.0 clear of its frame */
-  [3.23, 5.4, 10.6, 12.77].forEach(function (x, k) {
-    tcase(x, 24, 0, 1, 'trophy-case-s' + k, { seed: 30 + k });
-    tcase(x, 44, 0, -1, 'trophy-case-n' + k, { seed: 40 + k });
+  [3.23, 5.4, 10.6, 12.35].forEach(function (x, k) {
+    tcase(k === 3 ? 12.77 : x, 24, 0, 1, 'trophy-case-s' + k, { seed: 30 + k });
+    tcase(x, 44, 0, -1, 'trophy-case-n' + k, { seed: 40 + k, u: k === 3 ? 0.7 : 1.0 });   /* req 2072: the last one narrower, 0.4 clear of the east door frame (x 13.45) */
   });
   /* the corner cabinet: its glass on the diagonal from (15, 44) to (16, 43), the base and cornice triangles */
   var tri = function (h, y0) {
