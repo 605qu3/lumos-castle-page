@@ -123,10 +123,7 @@
     /* 5-THINGS end decoy-cupboard-5 */
     /* 5-THINGS chimney-hide */
     /* docs/interiors/hidden-ways-batch-2.md (H10, chimney-hide): a plank seat on two iron brackets across the north end, a folded moth-eaten blanket and a dry leather bottle on it, a tin candle holder with a stub unlit in a niche in the east wall at 1.4; the floor from the panel to the seat left clear */
-    'chimney-hide': { items: [
-      ['b', 20.6, 10.1, 0.43, 21.8, 10.4, 0.47, 'wood'], ['b', 20.7, 10.1, 0.28, 20.76, 10.34, 0.43, 'iron'], ['b', 21.6, 10.1, 0.28, 21.66, 10.34, 0.43, 'iron'], ['b', 21.4, 10.1, 0.47, 21.8, 10.4, 0.57, 'canvas'],
-      ['y', 21.28, 10.25, 0.06, 0.47, 0.72, 'leather'], ['y', 21.28, 10.25, 0.02, 0.72, 0.76, 'wood'], ['b', 21.72, 9.8, 1.4, 21.8, 10.0, 1.55, 'dark'], ['y', 21.76, 9.9, 0.04, 1.4, 1.46, 'tin'],
-      ['y', 21.76, 9.9, 0.02, 1.46, 1.5, 'tallow']] },
+    /* the seat, brackets, blanket, bottle and tin holder are drawn once, by W5B_THINGS (shell-w5b.js, H10); this copy stood in the same place (the Furnisher, req 3185, 8 November 2026) */
     /* 5-THINGS end chimney-hide */
     /* 5-THINGS east-wing-5 */
     /* docs/interiors/upper-floors-gaps-1028.md (east-wing-5, corridors and passages): bare flags, a worn stone threshold at each door, one unlit torch bracket clear of every opening */
