@@ -168,7 +168,7 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <script src="castle-model-2.js?v=10"></script>
 <script src="castle-model-3.js?v=10"></script>
 <script src="castle-model-4.js?v=9"></script>
-<script src="castle-model-5.js?v=10"></script>
+<script src="castle-model-5.js?v=11"></script>
 <script src="castle-model-6.js?v=8"></script>
 <script src="castle-model-7.js?v=13"></script>
 <!-- /the floor files -->
@@ -193,6 +193,7 @@ if (!/[?&]faceall=0/.test(location.search) && window.CastleStoneFace) ['founders
 <script src="castle-shell.js?v=196"></script>
 <script src="castle-exterior.js?v=29"></script>
 <script src="shell-w5b.js?v=25"></script>
+<script src="shell-bare.js?v=1"></script>
 <script src="depth-ties.js?v=1"></script>
 <script src="corridor/suit.js?v=6"></script>
 <script src="corridor/knight.js?v=2"></script>
@@ -388,6 +389,25 @@ if (!shell) { var later = ((window.CASTLE_MODEL || {}).rooms || []).filter(funct
   kit.helpEl.hidden = false; kit.helpEl.textContent = later ? PLACE + ' stands from the ' + (later.first || 'PS') + ' castle, after the boy\'s year; add &book=' + (later.first || 'PS') + ' to see it'
     : 'No such place in the castle model: ' + PLACE; console.warn(kit.helpEl.textContent); return; }
 scene.add(shell.group);
+/* req 3344 step 0 (Godric's yes, 9 November 2026): the shell-only build. ?bare=1, or this place's floor in
+   page/shell-bare.js, builds the shell and skips the dressing: W5B's and the lead's things are not built, and anything
+   the page adds to the scene after this line (the per-room blocks, ROOM_THINGS, portraits) is hidden, so the gate and
+   the eye see walls, floors, vaults, roofs, openings and stairs only. Nothing is deleted; ?bare=0 dresses it again.
+   The builder's own panelling and door and window surrounds are shell here (castle-shell.js), not yet split off. */
+var BARE = (function () {
+  var q = Q.get('bare'); if (q === '0') return false; if (q !== null) return true;
+  var room = (MODEL && MODEL.rooms || []).filter(function (r) { return r.id === PLACE; })[0];
+  return !!(room && window.SHELL_BARE && SHELL_BARE.floors.indexOf(String(room.level)) >= 0);
+})();
+var BARE_KEEP = new Set();
+var BARE_TICK = 0;
+if (BARE) {
+  scene.traverse(function (o) { BARE_KEEP.add(o); });
+  window.lumosBare = { kept: BARE_KEEP, hidden: [], sweep: function () {
+    var out = [];
+    scene.traverse(function (o) { if (!BARE_KEEP.has(o) && !/-threshold-/.test(o.name || '') && (o.isMesh || o.isSprite || o.isPoints || o.isLine) && !o.isLight) out.push(o); });
+    out.forEach(function (o) { o.visible = false; }); this.hidden = out; return out.length; } };
+}
 document.title = shell.place.name + ', a shell';
 
 /* grey light */
@@ -639,8 +659,8 @@ function limits(s) {
   var L = s.lim || { down: -14, up: 14, turn: 60 }, d = lookOf(s).clone().sub(s.pos), el0 = Math.atan2(d.y, Math.hypot(d.x, d.z));
   return { yaw: L.turn >= 180 ? null : L.turn * D2R, lo: Math.min(0, L.down * D2R - el0), hi: Math.max(0, Math.min(88 * D2R, L.up * D2R) - el0) };
 }
-if (W5B.build) W5B.build({ THREE: THREE, kit: kit, shell: shell, PLACE: PLACE, MODEL: MODEL, BOOK: BOOK, HOUR: HOUR, TORCH: TORCH, CANDLE: CANDLE });   /* W5B's things */
-if (W5B.build && window.SHELL_W5A) W5B.build({ THREE: THREE, kit: kit, shell: shell, PLACE: PLACE, MODEL: MODEL, BOOK: BOOK, HOUR: HOUR, TORCH: TORCH, CANDLE: CANDLE, THINGS: SHELL_W5A.things, MATS: SHELL_W5A.mats });   /* the lead's things (page/shell-w5a.js), W5B's builder (req 828) */
+if (!BARE && W5B.build) W5B.build({ THREE: THREE, kit: kit, shell: shell, PLACE: PLACE, MODEL: MODEL, BOOK: BOOK, HOUR: HOUR, TORCH: TORCH, CANDLE: CANDLE });   /* W5B's things */
+if (!BARE && W5B.build && window.SHELL_W5A) W5B.build({ THREE: THREE, kit: kit, shell: shell, PLACE: PLACE, MODEL: MODEL, BOOK: BOOK, HOUR: HOUR, TORCH: TORCH, CANDLE: CANDLE, THINGS: SHELL_W5A.things, MATS: SHELL_W5A.mats });   /* the lead's things (page/shell-w5a.js), W5B's builder (req 828) */
 var START = shell.stands[0], here = START, hy = 0, hp = 0, hyT = 0, hpT = 0, tween = null, legs = [], lookTmp = new THREE.Vector3();
 /* wave 1's Apparate shots (20 October 2026, the Architect's forty-seventh, Fawkes's yes): a room whose one door leaves
    the start facing a near wall turns it into the room (degrees, as a head turn), only when he comes by no door (?place= alone) */
@@ -10369,6 +10389,7 @@ kit.reveal();
 var clock = new THREE.Clock();
 function frame() {
   var dt = Math.min(0.05, clock.getDelta());
+  if (BARE && (BARE_TICK++ % 30) === 0) lumosBare.sweep();   /* req 3344: the shell-only build hides late dressing too */
   updateCamera(dt);
   updateShakes(dt); updatePear(dt); updateKitchens(dt); if (HIDES.update) HIDES.update(dt);
   if (H71.spell) H71.spell.frame(dt);
