@@ -162,9 +162,35 @@
       if (d1 < d0 + 0.03 || d1 < 0.03) return [];
     }
     var out = [], L = (Math.PI - Math.acos(-a / (2 * a))) * 2 * a * 2, g = 0.003 / L, S = 4;
+    /* the wall's cut (castle-strip outline) is a polyline of 10 steps in x, not the true arc: its first chord off each
+       springing stands up to 3 cm inside the arc, so a ring whose inner edge lay 6 mm in from the arc left the wall's
+       face showing between ring and lining (the haunch slivers). A casing ring (d0 < 0) now takes its inner edge 6 mm
+       inside that polyline, along the same radial as its joints */
+    var cutPts = null;
+    if (kind === 'pointed' && d0 < 0) {
+      cutPts = [];
+      for (var q = 0; q <= 10; q++) {
+        var xq = -a + 2 * a * q / 10, cxq = q <= 5 ? a : -a;
+        cutPts.push([xq, Math.sqrt(Math.max(0, 4 * a * a - (xq - cxq) * (xq - cxq)))]);
+      }
+    }
+    function inner(t) {
+      var P = prof(kind, a, 0, t);
+      if (!cutPts) return prof(kind, a, d0, t);
+      var c = t <= 0.5 ? a : -a, nx = P[0] - c, ny = P[1], nl = Math.hypot(nx, ny) || 1, best = Infinity, j;
+      nx /= nl; ny /= nl;
+      for (j = 0; j < 10; j++) {   /* where the inward ray P - r n meets chord j: r = -cross(w, e) / cross(n, e) */
+        var ex = cutPts[j + 1][0] - cutPts[j][0], ey = cutPts[j + 1][1] - cutPts[j][1], den = nx * ey - ny * ex;
+        if (Math.abs(den) < 1e-9) continue;
+        var wx = cutPts[j][0] - P[0], wy = cutPts[j][1] - P[1], r = -(wx * ey - wy * ex) / den, u = (wx * ny - wy * nx) / den;
+        if (u >= -1e-6 && u <= 1 + 1e-6 && r >= -1e-6 && r < best) best = r;
+      }
+      if (!(best < Infinity)) best = 0;
+      return [P[0] - nx * (best - d0), P[1] - ny * (best - d0)];
+    }
     for (var k = 0; k < 2 * n; k++) {
       var t0 = k / (2 * n) + g, t1 = (k + 1) / (2 * n) - g, sh = new THREE.Shape(), i, p;
-      for (i = 0; i <= S; i++) { p = prof(kind, a, d0, t0 + (t1 - t0) * i / S); i ? sh.lineTo(p[0], cy + p[1]) : sh.moveTo(p[0], cy + p[1]); }
+      for (i = 0; i <= S; i++) { p = inner(t0 + (t1 - t0) * i / S); i ? sh.lineTo(p[0], cy + p[1]) : sh.moveTo(p[0], cy + p[1]); }
       for (i = S; i >= 0; i--) { p = prof(kind, a, d1, t0 + (t1 - t0) * i / S); sh.lineTo(p[0], cy + p[1]); }
       var gg = new THREE.ExtrudeGeometry(sh, { depth: P, bevelEnabled: false, steps: 1 });
       gg.translate(0, 0, -EMBED); out.push(gg);
@@ -227,15 +253,23 @@
          turned with it, and the hood following the head where the age has one (a door's on both faces, a window's
          outside), its ends stopped on blocks at the springing */
       var a = w / 2, PP = M.steps ? 0.06 : P;
-      pair(xi, X, jb, jt, PP, ch);
-      parts.push.apply(parts, pring(THREE, HK, a, yr, -J, bw, PP, w > 1.6 ? 6 : 4));
-      if (imp) pair(xi, X + 0.05, jt, yr - J, P + 0.04, true);
+      /* v13: a door in a short wall (near a wall's end, or a facet of a round shaft) is cased the same both sides: mg is the room
+         the nearer end leaves beside the cut, every pair's outer edge is held to it (cap), so the two jambs and the ring read one
+         width; under 3 cm of room there is no casing on either side, never one jamb */
+      var mg = CLIP ? Math.min(-CLIP.x0 - a, CLIP.x1 - a) : Infinity, bwe = Math.min(bw, mg), thin = bwe < 0.03;
+      function cap(x) { return Math.min(x, a + mg); }
+      if (!thin) {
+        pair(xi, a + bwe, jb, jt, PP, ch);
+        parts.push.apply(parts, pring(THREE, HK, a, yr, -J, bwe, PP, w > 1.6 ? 6 : 4));
+        if (imp) pair(xi, cap(X + 0.05), jt, yr - J, P + 0.04, true);
+      }
       if (M.roll || M.bead) parts.push(pRod(THREE, HK, a, yr, 0.03, PP - E, 0.03));
-      if (M.bead) [-1, 1].forEach(function (sd) { parts.push(rod(THREE, 'y', jb, yr, sd * (xi + 0.03), PP - E, 0.03)); });
-      if (M.stop && jb > ys) pair(xi, X + 0.008, ys, jb, PP + 0.016, false);
-      if (M.hood && (!win || out)) {
+      /* a bead's two rods stand or fall together (rod() drops a rod whose own side has no room) */
+      if (M.bead && !thin && xi + 0.06 <= a + mg) [-1, 1].forEach(function (sd) { parts.push(rod(THREE, 'y', jb, yr, sd * (xi + 0.03), PP - E, 0.03)); });
+      if (!thin && M.stop && jb > ys) pair(xi, cap(X + 0.008), ys, jb, PP + 0.016, false);
+      if (!thin && M.hood && (!win || out)) {
         parts.push.apply(parts, pring(THREE, HK, a, yr, bw, bw + 0.08, PP + 0.05, w > 1.6 ? 6 : 4));
-        pair(X + 0.008, X + 0.1, yr - 0.14, yr - J, PP + 0.07, true);
+        pair(cap(X + 0.008), cap(X + 0.1), yr - 0.14, yr - J, PP + 0.07, true);
       }
       if (win && s.sill > 0.05) {
         if (out) parts.push(prism(THREE, -X - 0.05, X + 0.05, [[-E, y0 - 0.09], [PP + 0.07, y0 - 0.09], [PP + 0.07, y0 - 0.04], [PP + 0.015, ys], [-E, ys]]));
