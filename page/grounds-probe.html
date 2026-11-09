@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Grounds probe</title>
+<style>
+:root{--bg:#14161b;--fg:#e8e6df;--dim:#9a998f;--ok:#7fc58a;--bad:#e08a7a;--pend:#c9b66a;--line:#2b2f38}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.45 -apple-system,system-ui,sans-serif;padding:16px;padding-bottom:60px}
+h1{font-size:19px;margin:0 0 4px}
+h2{font-size:15px;margin:22px 0 6px;color:var(--dim);font-weight:600;letter-spacing:.04em;text-transform:uppercase}
+p{margin:6px 0}
+.dim{color:var(--dim)}
+button{font:inherit;color:var(--fg);background:#2a3140;border:1px solid #44506a;border-radius:8px;padding:12px 16px;margin:4px 6px 4px 0;min-height:44px}
+button:disabled{opacity:.4}
+table{border-collapse:collapse;width:100%}
+td{padding:5px 6px;border-bottom:1px solid var(--line);vertical-align:top;word-break:break-word}
+td:first-child{color:var(--dim);width:42%}
+.ok{color:var(--ok)}.bad{color:var(--bad)}.pend{color:var(--pend)}
+textarea{width:100%;height:220px;background:#0e1014;color:var(--fg);border:1px solid var(--line);border-radius:8px;font:12px/1.35 ui-monospace,Menlo,monospace;padding:8px}
+#stage{position:fixed;inset:0;background:#000;z-index:10;display:none}
+#stage canvas{display:block}
+#hud{position:fixed;left:8px;top:8px;z-index:11;font:13px ui-monospace,Menlo,monospace;background:rgba(0,0,0,.6);padding:4px 8px;border-radius:6px;display:none}
+#bgbox{border:1px solid var(--line);border-radius:8px;padding:10px;margin-top:8px}
+</style>
+</head>
+<body>
+<h1>Grounds probe</h1>
+<p class="dim">A throwaway test page: it measures what this device can hold and draw, so the outside is built to fit it. It loads one script (Three.js r128) and no files, spends nothing and sends nothing; the numbers stay here until you copy them.</p>
+
+<h2>Steps</h2>
+<p>Keep the tablet plugged in, Low Power Mode off, and do the steps in order. Each button waits for the one before.</p>
+<button id="b-mem">1. Memory test</button>
+<button id="b-s1" disabled>2. Scene, pixel ratio 1 (60 s)</button>
+<button id="b-s2" disabled>3. Scene, device pixel ratio (60 s)</button>
+<button id="b-bg" disabled>4. Background test (10 min)</button>
+<div id="bgbox" class="dim" hidden></div>
+
+<h2>Pass marks</h2>
+<table id="verdict"></table>
+<p id="advice"></p>
+
+<h2>Facts</h2>
+<table id="facts"></table>
+
+<h2>The json to send</h2>
+<p class="dim">Copy it whole and send it as it is.</p>
+<button id="b-copy">Copy json</button><button id="b-share">Share</button>
+<textarea id="json" readonly></textarea>
+
+<div id="stage"></div>
+<div id="hud"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(function () {
+'use strict';
+
+/* ---------- small helpers ---------- */
+var QUICK = /[?&]quick\b/.test(location.search);   // for a shortened check of the page itself; never used for the real run
+function $(id) { return document.getElementById(id); }
+function sleep(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
+function raf() { return new Promise(function (r) { requestAnimationFrame(r); }); }
+function mulberry32(a) { return function () { a |= 0; a = a + 0x6D2B79F5 | 0; var t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+function store(k, v) { try { sessionStorage.setItem(k, v); } catch (e) {} }
+function load(k) { try { return sessionStorage.getItem(k); } catch (e) { return null; } }
+function round(x, n) { var m = Math.pow(10, n || 0); return Math.round(x * m) / m; }
+
+var R = {
+  probe: 'grounds-probe', version: 1,
+  when: new Date().toISOString(),
+  facts: {}, idle_raf: null, memory: null,
+  scene_dpr1: null, scene_dpr_device: null,
+  background: { hidden_spans_s: [], longest_hidden_s: 0, returned_alive: null, context_lost: null, page_reloaded: false },
+  notes: []
+};
+
+/* ---------- a reload in the same tab means the tab was discarded ---------- */
+(function () {
+  if (load('gp_boot')) { R.background.page_reloaded = true; R.notes.push('This tab was reloaded: the system discarded the page earlier.'); }
+  store('gp_boot', String(Date.now()));
+  var m = load('gp_mem_progress');
+  if (m && !load('gp_mem_done')) { R.notes.push('An earlier memory test in this tab died after about ' + m + ' MB without a clean stop.'); }
+})();
+
+/* ---------- facts ---------- */
+function gatherFacts() {
+  var f = R.facts, ua = navigator.userAgent;
+  f.user_agent = ua;
+  f.platform = navigator.platform;
+  f.max_touch_points = navigator.maxTouchPoints;
+  var ipad = /iPad/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  f.looks_like_ipad = ipad;
+  var os = ua.match(/OS (\d+[_\d]*) like Mac/) || ua.match(/Version\/(\d+[.\d]*)/);
+  f.os_or_safari_version = os ? os[1].replace(/_/g, '.') : 'unknown';
+  f.device_pixel_ratio = window.devicePixelRatio;
+  f.screen = screen.width + 'x' + screen.height;
+  f.inner = window.innerWidth + 'x' + window.innerHeight;
+  f.hardware_concurrency = navigator.hardwareConcurrency || null;
+  f.device_memory_gb = navigator.deviceMemory || null;
+  f.three_revision = (window.THREE && THREE.REVISION) || 'missing';
+  var c = document.createElement('canvas'), gl = null;
+  try { gl = c.getContext('webgl2'); } catch (e) {}
+  f.webgl2 = !!gl;
+  if (!gl) { try { gl = c.getContext('webgl'); } catch (e) {} }
+  if (!gl) { f.webgl = false; return; }
+  f.webgl = true;
+  f.max_texture_size = gl.getParameter(gl.MAX_TEXTURE_SIZE);
+  f.max_texture_image_units = gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS);
+  f.max_vertex_texture_image_units = gl.getParameter(gl.MAX_VERTEX_TEXTURE_IMAGE_UNITS);
+  f.max_cube_map_size = gl.getParameter(gl.MAX_CUBE_MAP_TEXTURE_SIZE);
+  f.max_varying_vectors = gl.getParameter(gl.MAX_VARYING_VECTORS);
+  f.max_fragment_uniform_vectors = gl.getParameter(gl.MAX_FRAGMENT_UNIFORM_VECTORS);
+  f.astc = !!(gl.getExtension('WEBGL_compressed_texture_astc'));
+  f.etc2 = !!(gl.getExtension('WEBGL_compressed_texture_etc'));
+  f.s3tc = !!(gl.getExtension('WEBGL_compressed_texture_s3tc'));
+  f.anisotropic = !!(gl.getExtension('EXT_texture_filter_anisotropic'));
+  var dbg = gl.getExtension('WEBGL_debug_renderer_info');
+  f.gpu = dbg ? gl.getParameter(dbg.UNMASKED_RENDERER_WEBGL) : 'masked';
+  var lose = gl.getExtension('WEBGL_lose_context');
+  if (lose) lose.loseContext();
+}
+
+/* ---------- idle rAF rate (Low Power Mode caps it at 30) ---------- */
+async function idleRaf() {
+  var ts = [];
+  for (var i = 0; i < 4; i++) await raf();          // let the page settle
+  var t0 = performance.now();
+  while (performance.now() - t0 < 3000) { ts.push(await raf()); }
+  var d = [];
+  for (var j = 1; j < ts.length; j++) d.push(ts[j] - ts[j - 1]);
+  d.sort(function (a, b) { return a - b; });
+  var med = d[Math.floor(d.length / 2)];
+  var hz = 1000 / med;
+  R.idle_raf = { frames: ts.length, median_ms: round(med, 2), rate_hz: round(hz, 1), capped_at_30: hz < 36 };
+}
+
+/* ---------- texture memory: 16 MB textures one at a time ---------- */
+async function memoryTest() {
+  var N = 2048, MB = 16, LIMIT = QUICK ? 64 : 512;
+  var c = document.createElement('canvas'); c.width = c.height = 16;
+  var gl = c.getContext('webgl2') || c.getContext('webgl');
+  if (!gl) { R.memory = { error: 'no webgl' }; return; }
+  var lost = false;
+  c.addEventListener('webglcontextlost', function (e) { lost = true; e.preventDefault(); });
+  var vs = 'attribute vec2 p;varying vec2 uv;void main(){uv=p*.5+.5;gl_Position=vec4(p,0.,1.);}';
+  var fs = 'precision mediump float;uniform sampler2D t;varying vec2 uv;void main(){gl_FragColor=texture2D(t,uv);}';
+  function sh(type, src) { var s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s); return s; }
+  var pr = gl.createProgram();
+  gl.attachShader(pr, sh(gl.VERTEX_SHADER, vs)); gl.attachShader(pr, sh(gl.FRAGMENT_SHADER, fs));
+  gl.bindAttribLocation(pr, 0, 'p'); gl.linkProgram(pr); gl.useProgram(pr);
+  var vb = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, vb);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
+  gl.enableVertexAttribArray(0); gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
+  var data = new Uint8Array(N * N * 4), rnd = mulberry32(7);
+  for (var i = 0; i < data.length; i += 4) { var v = (rnd() * 4294967296) >>> 0; data[i] = v; data[i + 1] = v >>> 8; data[i + 2] = v >>> 16; data[i + 3] = 255; }
+  var count = 0, why = 'reached ' + LIMIT + ' MB without a loss', px = new Uint8Array(4);
+  store('gp_mem_done', '');
+  try { sessionStorage.removeItem('gp_mem_done'); } catch (e) {}
+  while (count * MB < LIMIT) {
+    var tex = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_2D, tex);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, N, N, 0, gl.RGBA, gl.UNSIGNED_BYTE, data);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+    gl.drawArrays(gl.TRIANGLES, 0, 3);              // touch it so it is resident
+    gl.readPixels(0, 0, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, px);
+    var err = gl.getError();
+    await sleep(0);
+    if (lost || gl.isContextLost()) { why = 'context lost after ' + count * MB + ' MB held'; break; }
+    if (err === gl.OUT_OF_MEMORY) { why = 'out of memory after ' + count * MB + ' MB held'; break; }
+    count++;
+    store('gp_mem_progress', String(count * MB));
+    $('b-mem').textContent = '1. Memory test: ' + count * MB + ' MB';
+  }
+  var held = count * MB;
+  R.memory = { texture_mb_each: MB, textures_held: count, mb_held: held, stopped_because: why, context_lost: lost || gl.isContextLost() };
+  store('gp_mem_done', '1');
+  var lc = gl.getExtension('WEBGL_lose_context'); if (lc && !lost) lc.loseContext();
+}
+
+/* ---------- the scripted scene ---------- */
+var scene = null;
+function noiseTex(size, seed, base, vary) {
+  // soft layered value noise on a canvas; four of these are the splat ground's layers
+  var c = document.createElement('canvas'); c.width = c.height = size;
+  var x = c.getContext('2d'), img = x.createImageData(size, size), rnd = mulberry32(seed);
+  var g = 16, grid = []; for (var i = 0; i < g * g; i++) grid.push(rnd());
+  function vn(u, v, f) {
+    var gx = (u * f) % g, gy = (v * f) % g, x0 = Math.floor(gx), y0 = Math.floor(gy), fx = gx - x0, fy = gy - y0;
+    function h(a, b) { return grid[((b % g) * g + (a % g))]; }
+    var a = h(x0, y0), b = h(x0 + 1, y0), cc = h(x0, y0 + 1), d = h(x0 + 1, y0 + 1);
+    fx = fx * fx * (3 - 2 * fx); fy = fy * fy * (3 - 2 * fy);
+    return (a * (1 - fx) + b * fx) * (1 - fy) + (cc * (1 - fx) + d * fx) * fy;
+  }
+  for (var py = 0; py < size; py++) for (var px = 0; px < size; px++) {
+    var u = px / size, v = py / size, n = vn(u, v, 1) * .5 + vn(u, v, 2) * .3 + vn(u, v, 4) * .2, o = (py * size + px) * 4;
+    img.data[o] = base[0] + vary[0] * (n - .5); img.data[o + 1] = base[1] + vary[1] * (n - .5); img.data[o + 2] = base[2] + vary[2] * (n - .5); img.data[o + 3] = 255;
+  }
+  x.putImageData(img, 0, 0);
+  var t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.anisotropy = 4;
+  return t;
+}
+function cardTex(kind) {
+  // alpha-cut grass tuft (kind 0) or tree silhouette (kind 1), drawn on a canvas
+  var s = 256, c = document.createElement('canvas'); c.width = c.height = s;
+  var x = c.getContext('2d'), rnd = mulberry32(kind ? 11 : 5);
+  x.clearRect(0, 0, s, s);
+  if (!kind) {
+    for (var i = 0; i < 26; i++) {
+      var bx = 20 + rnd() * 216, lean = (rnd() - .5) * 90, h = 120 + rnd() * 130;
+      x.strokeStyle = 'rgb(' + (60 + rnd() * 50 | 0) + ',' + (95 + rnd() * 60 | 0) + ',' + (40 + rnd() * 30 | 0) + ')';
+      x.lineWidth = 3 + rnd() * 4; x.beginPath(); x.moveTo(bx, s); x.quadraticCurveTo(bx + lean * .3, s - h * .5, bx + lean, s - h); x.stroke();
+    }
+  } else {
+    x.fillStyle = '#4a3a2a'; x.fillRect(s / 2 - 8, s * .5, 16, s * .5);
+    for (var j = 0; j < 22; j++) {
+      x.fillStyle = 'rgb(' + (30 + rnd() * 30 | 0) + ',' + (70 + rnd() * 40 | 0) + ',' + (35 + rnd() * 25 | 0) + ')';
+      x.beginPath(); x.arc(s / 2 + (rnd() - .5) * 150, s * .38 + (rnd() - .5) * 150, 28 + rnd() * 30, 0, 7); x.fill();
+    }
+  }
+  var t = new THREE.CanvasTexture(c); t.anisotropy = 4; return t;
+}
+function skyCube() {
+  var faces = [], size = 256, tops = ['#6d94c8', '#6d94c8', '#9db9de', '#9a8f74', '#7aa0d0', '#7aa0d0'];
+  for (var i = 0; i < 6; i++) {
+    var c = document.createElement('canvas'); c.width = c.height = size;
+    var x = c.getContext('2d'), g = x.createLinearGradient(0, 0, 0, size);
+    if (i === 2) { g.addColorStop(0, tops[i]); g.addColorStop(1, '#bcd0ea'); }
+    else if (i === 3) { g.addColorStop(0, '#6a6a55'); g.addColorStop(1, '#55583f'); }
+    else { g.addColorStop(0, tops[i]); g.addColorStop(1, '#d6dfe8'); }
+    x.fillStyle = g; x.fillRect(0, 0, size, size);
+    faces.push(c);
+  }
+  var t = new THREE.CubeTexture(faces); t.needsUpdate = true; return t;
+}
+
+function buildScene() {
+  var rnd = mulberry32(3307);
+  var stage = $('stage');
+  var renderer = new THREE.WebGLRenderer({ antialias: false, powerPreference: 'high-performance' });
+  renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFShadowMap;
+  stage.appendChild(renderer.domElement);
+  var sc = new THREE.Scene(), cube = skyCube();
+  sc.background = cube;
+  sc.fog = new THREE.Fog(0xcfd9e6, 80, 260);
+  var camera = new THREE.PerspectiveCamera(60, 1, .1, 400);
+
+  sc.add(new THREE.HemisphereLight(0xbcd0ea, 0x55583f, .75));
+  var sun = new THREE.DirectionalLight(0xfff0d8, .9);
+  sun.castShadow = true; sun.shadow.mapSize.set(2048, 2048);
+  var sc2 = sun.shadow.camera; sc2.left = sc2.bottom = -45; sc2.right = sc2.top = 45; sc2.near = 1; sc2.far = 160;
+  sun.shadow.bias = -.0004;
+  sc.add(sun); sc.add(sun.target);
+
+  // ground: 100 x 100 cells of 2 m over 200 x 200 m, four layers mixed by a splat map (RGBA weights, one texel per cell)
+  var sw = new Uint8Array(100 * 100 * 4);
+  for (var i = 0; i < 100 * 100; i++) {
+    var cx = i % 100, cy = (i / 100) | 0;
+    var w = [Math.sin(cx * .11) * Math.cos(cy * .07) + rnd() * .6, Math.sin(cx * .05 + 2) * Math.sin(cy * .09) + rnd() * .6,
+             Math.cos(cx * .08 + 1) * Math.cos(cy * .05 + 3) + rnd() * .6, rnd()];
+    var sum = 0; for (var k = 0; k < 4; k++) { w[k] = Math.max(.05, w[k] + .6); sum += w[k]; }
+    for (var m = 0; m < 4; m++) sw[i * 4 + m] = Math.round(255 * w[m] / sum);
+  }
+  var splat = new THREE.DataTexture(sw, 100, 100, THREE.RGBAFormat); splat.magFilter = THREE.LinearFilter; splat.minFilter = THREE.LinearFilter; splat.needsUpdate = true;
+  var layers = [noiseTex(512, 1, [88, 110, 60], [50, 50, 30]), noiseTex(512, 2, [120, 100, 70], [60, 50, 40]),
+                noiseTex(512, 3, [105, 105, 98], [70, 70, 70]), noiseTex(512, 4, [70, 85, 50], [40, 50, 30])];
+  var gm = new THREE.MeshLambertMaterial({ map: splat });
+  gm.onBeforeCompile = function (s) {
+    s.uniforms.l0 = { value: layers[0] }; s.uniforms.l1 = { value: layers[1] }; s.uniforms.l2 = { value: layers[2] }; s.uniforms.l3 = { value: layers[3] };
+    s.fragmentShader = 'uniform sampler2D l0,l1,l2,l3;\n' + s.fragmentShader.replace('#include <map_fragment>',
+      'vec4 sw = texture2D(map, vUv); vec2 tv = vUv * 60.0;' +
+      'vec3 gc = texture2D(l0, tv).rgb * sw.r + texture2D(l1, tv * 1.3).rgb * sw.g + texture2D(l2, tv * .9).rgb * sw.b + texture2D(l3, tv * 1.7).rgb * sw.a;' +
+      'diffuseColor.rgb *= gc / max(dot(sw, vec4(1.0)), .001);');
+  };
+  var ground = new THREE.Mesh(new THREE.PlaneGeometry(200, 200, 1, 1), gm);
+  ground.rotation.x = -Math.PI / 2; ground.receiveShadow = true; sc.add(ground);
+
+  // 20,000 instanced alpha-tested cards at knee height (0.5 m), random yaw, one draw call
+  var gt = cardTex(0), N = 20000;
+  var gmat = new THREE.MeshLambertMaterial({ map: gt, alphaTest: .5, side: THREE.DoubleSide });
+  var gdep = new THREE.MeshDepthMaterial({ depthPacking: THREE.RGBADepthPacking, map: gt, alphaTest: .5 });
+  var cards = new THREE.InstancedMesh(new THREE.PlaneGeometry(.5, .5).translate(0, .25, 0), gmat, N);
+  cards.customDepthMaterial = gdep; cards.castShadow = true; cards.receiveShadow = true; cards.frustumCulled = false;
+  var o = new THREE.Object3D();
+  for (var n = 0; n < N; n++) {
+    o.position.set((rnd() - .5) * 198, 0, (rnd() - .5) * 198); o.rotation.set(0, rnd() * 6.283, 0);
+    var sc1 = .7 + rnd() * .7; o.scale.set(sc1, sc1, sc1); o.updateMatrix(); cards.setMatrixAt(n, o.matrix);
+  }
+  sc.add(cards);
+
+  // 400 impostor cards (6 x 8 m trees) that turn to face the camera
+  var tt = cardTex(1), TN = 400, tpos = [];
+  var tmat = new THREE.MeshLambertMaterial({ map: tt, alphaTest: .5, side: THREE.DoubleSide, envMap: cube, reflectivity: .05 });
+  var tdep = new THREE.MeshDepthMaterial({ depthPacking: THREE.RGBADepthPacking, map: tt, alphaTest: .5 });
+  var trees = new THREE.InstancedMesh(new THREE.PlaneGeometry(6, 8).translate(0, 4, 0), tmat, TN);
+  trees.customDepthMaterial = tdep; trees.castShadow = true; trees.receiveShadow = true; trees.frustumCulled = false;
+  for (var q = 0; q < TN; q++) tpos.push([(rnd() - .5) * 196, (rnd() - .5) * 196, .8 + rnd() * .5]);
+  sc.add(trees);
+
+  function faceTrees(cam) {
+    for (var t = 0; t < TN; t++) {
+      var p = tpos[t]; o.position.set(p[0], 0, p[1]);
+      o.rotation.set(0, Math.atan2(cam.position.x - p[0], cam.position.z - p[1]), 0);
+      o.scale.set(p[2], p[2], p[2]); o.updateMatrix(); trees.setMatrixAt(t, o.matrix);
+    }
+    trees.instanceMatrix.needsUpdate = true;
+  }
+
+  function size(dpr) {
+    renderer.setPixelRatio(dpr);
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix();
+  }
+  // the scripted walk: a wandering path inside the field, eye at 1.6 m, looking along the way with a slow sway
+  function pose(t) {
+    function at(u) { return [Math.sin(u * .1) * 70 + Math.sin(u * .037) * 15, Math.sin(u * .07 + 1) * 70]; }
+    var a = at(t), b = at(t + .6);
+    camera.position.set(a[0], 1.6, a[1]);
+    camera.lookAt(b[0] + Math.sin(t * .3) * 6, 1.3, b[1] + Math.cos(t * .21) * 6);
+    sun.position.set(a[0] + 40, 70, a[1] + 25); sun.target.position.set(a[0], 0, a[1]);
+    sun.target.updateMatrixWorld();
+    faceTrees(camera);
+  }
+  return { renderer: renderer, scene: sc, camera: camera, size: size, pose: pose, cube: cube };
+}
+
+function pct(a, p) { return a[Math.min(a.length - 1, Math.floor(a.length * p))]; }
+
+async function runScene(label, dpr) {
+  var hud = $('hud'), stage = $('stage');
+  if (!scene) scene = buildScene();
+  stage.style.display = 'block'; hud.style.display = 'block';
+  scene.size(dpr);
+  var ctxLost = false;
+  scene.renderer.domElement.addEventListener('webglcontextlost', function () { ctxLost = true; });
+  var DUR = QUICK ? 4000 : 60000, buckets = [], dts = [], last = 0, t0 = 0, aborted = '';
+  for (var w = 0; w < 5; w++) { scene.pose(w * .1); scene.renderer.render(scene.scene, scene.camera); await raf(); }   // warm up shaders and shadow map
+  await new Promise(function (resolve) {
+    function frame(now) {
+      if (document.hidden) { aborted = 'the page was hidden during the run'; return resolve(); }
+      if (ctxLost) { aborted = 'context lost'; return resolve(); }
+      if (!t0) { t0 = now; last = now; }
+      var el = now - t0;
+      if (last !== now) dts.push(now - last);
+      last = now;
+      var bi = Math.floor(el / 1000); buckets[bi] = (buckets[bi] || 0) + 1;
+      if (el >= DUR) return resolve();
+      scene.pose(el / 1000);
+      scene.renderer.render(scene.scene, scene.camera);
+      hud.textContent = label + '  ' + Math.round(el / 1000) + ' s  ' + (buckets[bi - 1] || '-') + ' fps';
+      requestAnimationFrame(frame);
+    }
+    requestAnimationFrame(frame);
+  });
+  var info = scene.renderer.info.render;
+  var res = { label: label, pixel_ratio: dpr, canvas: scene.renderer.domElement.width + 'x' + scene.renderer.domElement.height, aborted: aborted || null };
+  var full = Array.from({ length: QUICK ? 3 : 60 }, function (_, i) { return buckets[i] || 0; });   // whole seconds only
+  var ds = dts.slice().sort(function (a, b) { return a - b; });
+  res.seconds_measured = full.length;
+  res.fps_by_second = full;
+  res.fps_median = full.length ? full.slice().sort(function (a, b) { return a - b; })[Math.floor(full.length / 2)] : null;
+  res.fps_min = full.length ? Math.min.apply(null, full) : null;
+  res.frame_ms_p50 = ds.length ? round(pct(ds, .5), 1) : null;
+  res.frame_ms_p95 = ds.length ? round(pct(ds, .95), 1) : null;
+  res.frame_ms_p99 = ds.length ? round(pct(ds, .99), 1) : null;
+  res.seconds_at_50_or_more = full.filter(function (b) { return b >= 50; }).length;
+  res.seconds_at_30_or_more = full.filter(function (b) { return b >= 30; }).length;
+  res.draw_calls_per_frame = info.calls; res.triangles_per_frame = info.triangles;
+  res.context_lost = ctxLost;
+  stage.style.display = 'none'; hud.style.display = 'none';
+  return res;
+}
+
+/* ---------- the background test ---------- */
+var hiddenAt = 0, bgArmed = false;
+document.addEventListener('visibilitychange', async function () {
+  if (document.hidden) { hiddenAt = Date.now(); return; }
+  if (!hiddenAt) return;
+  var span = (Date.now() - hiddenAt) / 1000; hiddenAt = 0;
+  var b = R.background; b.hidden_spans_s.push(round(span, 0));
+  if (span > b.longest_hidden_s) b.longest_hidden_s = round(span, 0);
+  // alive means: the render loop runs again, no context lost, and the page was not reloaded
+  var frames = 0, t0 = performance.now(), lost = false;
+  try { if (scene) lost = scene.renderer.getContext().isContextLost(); } catch (e) {}
+  while (performance.now() - t0 < 1500) { await raf(); frames++; }
+  b.returned_alive = frames > 5 && !lost; b.context_lost = lost;
+  if (bgArmed) { $('bgbox').innerHTML = 'Hidden ' + round(span, 0) + ' s. Alive on return: ' + (b.returned_alive ? '<span class="ok">yes</span>' : '<span class="bad">no</span>') + (span < 600 ? ' (under 10 minutes, so it does not count: do it again for the full ten)' : ''); }
+  render();
+});
+
+/* ---------- the pass marks and the page ---------- */
+function mark(state, text) { return '<span class="' + state + '">' + text + '</span>'; }
+function verdict() {
+  var f = R.facts, rows = [], all = [];
+  function row(name, state, detail) { rows.push('<tr><td>' + name + '</td><td>' + mark(state, state === 'ok' ? 'pass' : state === 'bad' ? 'miss' : 'not measured') + ' <span class="dim">' + detail + '</span></td></tr>'); all.push(state); }
+  row('WebGL2', f.webgl2 ? 'ok' : 'bad', f.webgl2 ? 'yes' : 'no');
+  var su = f.max_texture_image_units;
+  row('16 or more fragment samplers', su == null ? 'pend' : su >= 16 ? 'ok' : 'bad', su == null ? '' : su + ' found');
+  var m = R.memory;
+  row('256 MB or more of textures held', !m ? 'pend' : m.mb_held >= 256 ? 'ok' : 'bad', m ? m.mb_held + ' MB: ' + m.stopped_because : '');
+  var lp = R.idle_raf;
+  row('Not in Low Power Mode', !lp ? 'pend' : lp.capped_at_30 ? 'bad' : 'ok', lp ? lp.rate_hz + ' Hz on an empty scene' : '');
+  var a = R.scene_dpr1;
+  row('Scene at pixel ratio 1: 50 fps or more for 54 of 60 s', !a || a.aborted ? 'pend' : a.seconds_at_50_or_more >= 54 ? 'ok' : 'bad', a ? (a.aborted ? 'run stopped: ' + a.aborted : a.seconds_at_50_or_more + ' s at 50+, median ' + a.fps_median + ' fps') : '');
+  var d = R.scene_dpr_device;
+  row('Scene at device pixel ratio ' + (window.devicePixelRatio) + ': 30 fps or more for 54 of 60 s', !d || d.aborted ? 'pend' : d.seconds_at_30_or_more >= 54 ? 'ok' : 'bad', d ? (d.aborted ? 'run stopped: ' + d.aborted : d.seconds_at_30_or_more + ' s at 30+, median ' + d.fps_median + ' fps') : '');
+  var bg = R.background;
+  var bgs = bg.longest_hidden_s < 600 ? 'pend' : (bg.returned_alive && !bg.page_reloaded) ? 'ok' : 'bad';
+  row('Alive after 10 minutes in the background', bgs, bg.page_reloaded ? 'the tab was reloaded' : 'longest hidden ' + bg.longest_hidden_s + ' s');
+  $('verdict').innerHTML = rows.join('');
+  var adv = $('advice');
+  if (all.indexOf('bad') >= 0) { adv.innerHTML = mark('bad', 'A mark is missed.') + ' The recommendation on the card is option 2 (stands and plates).'; R.recommendation = 'option 2'; }
+  else if (all.indexOf('pend') >= 0) { adv.innerHTML = mark('pend', 'Not finished.') + ' Do the steps still waiting.'; R.recommendation = 'pending'; }
+  else { adv.innerHTML = mark('ok', 'Every mark passes.') + ' The walk stays option 1.'; R.recommendation = 'option 1'; }
+}
+function render() {
+  var f = R.facts, rows = [];
+  function add(k, v) { rows.push('<tr><td>' + k + '</td><td>' + String(v).replace(/</g, '&lt;') + '</td></tr>'); }
+  add('Device', (f.looks_like_ipad ? 'iPad ' : '') + f.platform + ', ' + f.os_or_safari_version);
+  add('Browser string', f.user_agent);
+  add('WebGL2', f.webgl2 ? 'yes' : 'no');
+  add('Max texture size', f.max_texture_size);
+  add('Fragment samplers', f.max_texture_image_units);
+  add('Vertex samplers', f.max_vertex_texture_image_units);
+  add('ASTC textures', f.astc ? 'yes' : 'no');
+  add('Pixel ratio', f.device_pixel_ratio + ' (screen ' + f.screen + ', window ' + f.inner + ')');
+  add('GPU', f.gpu);
+  if (R.idle_raf) add('Empty-scene frame rate', R.idle_raf.rate_hz + ' Hz');
+  if (R.memory) add('Texture memory held', R.memory.mb_held + ' MB (' + R.memory.stopped_because + ')');
+  [R.scene_dpr1, R.scene_dpr_device].forEach(function (s) { if (s) add(s.label, s.aborted ? 'stopped: ' + s.aborted : 'median ' + s.fps_median + ' fps, min ' + s.fps_min + ', 95th percentile frame ' + s.frame_ms_p95 + ' ms, ' + s.draw_calls_per_frame + ' draws, ' + s.triangles_per_frame + ' triangles'); });
+  R.notes.forEach(function (n) { add('Note', n); });
+  $('facts').innerHTML = rows.join('');
+  verdict();
+  $('json').value = JSON.stringify(R, null, 1);
+}
+
+function busy(on) { ['b-mem', 'b-s1', 'b-s2', 'b-bg'].forEach(function (i) { $(i).disabled = on || $(i).dataset.locked === '1'; }); }
+function unlock(id) { $(id).dataset.locked = ''; $(id).disabled = false; }
+['b-s1', 'b-s2', 'b-bg'].forEach(function (i) { $(i).dataset.locked = '1'; });
+
+$('b-mem').onclick = async function () {
+  busy(true); await memoryTest(); render();
+  $('b-mem').textContent = '1. Memory test: done (' + (R.memory.mb_held || 0) + ' MB)';
+  unlock('b-s1'); busy(false);
+};
+$('b-s1').onclick = async function () {
+  busy(true); R.scene_dpr1 = await runScene('Scene at pixel ratio 1', 1); render();
+  unlock('b-s2'); busy(false);
+};
+$('b-s2').onclick = async function () {
+  busy(true); R.scene_dpr_device = await runScene('Scene at device pixel ratio ' + window.devicePixelRatio, window.devicePixelRatio); render();
+  unlock('b-bg'); busy(false);
+};
+$('b-bg').onclick = function () {
+  bgArmed = true;
+  var bx = $('bgbox'); bx.hidden = false;
+  bx.innerHTML = 'Switch to another app now, leave this page in the background for <b>ten minutes</b> (set a timer), then come back to this tab and wait a few seconds. This box then says whether the page is alive.';
+};
+$('b-copy').onclick = function () {
+  var ta = $('json'); ta.select();
+  var done = function () { $('b-copy').textContent = 'Copied'; setTimeout(function () { $('b-copy').textContent = 'Copy json'; }, 1500); };
+  if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(ta.value).then(done, function () { document.execCommand('copy'); done(); });
+  else { document.execCommand('copy'); done(); }
+};
+$('b-share').onclick = function () {
+  if (navigator.share) navigator.share({ title: 'Grounds probe', text: $('json').value }).catch(function () {});
+  else $('b-copy').click();
+};
+window.addEventListener('error', function (e) { R.notes.push('Error: ' + e.message); try { render(); } catch (x) {} });
+
+gatherFacts(); render();
+idleRaf().then(render);
+})();
+</script>
+</body>
+</html>
