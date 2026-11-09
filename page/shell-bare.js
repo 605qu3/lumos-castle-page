@@ -7,6 +7,7 @@
    clean: floors whose shell count is zero in the gate (tools/shell-gate.py); a floor moves from floors to clean only when
    its count is zero and Fawkes says so, then its dressing goes back on and is re-placed against the new walls. */
 window.SHELL_BARE = {
+  all: true,   /* every place, a mass's slug (entrance-hall, stair-hall) as well as a room; &clean tool loads excepted (shell.html) */
   floors: ['B', 'G', '1', '2', '3', '4', '5', '6', '7', 'T', 'tower', 'tower-1', 'tower-2', 'tower-3', 'tower-4', 'tower-5', 'tower-6'],
   clean: []
 };

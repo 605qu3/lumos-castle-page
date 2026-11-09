@@ -193,7 +193,7 @@ if (!/[?&]faceall=0/.test(location.search) && window.CastleStoneFace) ['founders
 <script src="castle-shell.js?v=196"></script>
 <script src="castle-exterior.js?v=29"></script>
 <script src="shell-w5b.js?v=25"></script>
-<script src="shell-bare.js?v=2"></script>
+<script src="shell-bare.js?v=3"></script>
 <script src="depth-ties.js?v=1"></script>
 <script src="corridor/suit.js?v=6"></script>
 <script src="corridor/knight.js?v=2"></script>
@@ -396,8 +396,15 @@ scene.add(shell.group);
    The builder's own panelling and door and window surrounds are shell here (castle-shell.js), not yet split off. */
 var BARE = (function () {
   var q = Q.get('bare'); if (q === '0') return false; if (q !== null) return true;
+  /* req 3355 (Godric, 6.02 pm, 9 November 2026: "Dressing off is universal"): every place bare, a mass's slug too, but
+     the measuring tools' &clean loads (seams, inspect, clash runs) keep their dressing, so their baselines still count
+     it; the shell gate's Part B passes bare=1 itself. A floor in SHELL_BARE.clean is dressed again. */
+  if (Q.has('clean')) return false;
+  var SB = window.SHELL_BARE || {};
   var room = (MODEL && MODEL.rooms || []).filter(function (r) { return r.id === PLACE; })[0];
-  return !!(room && window.SHELL_BARE && SHELL_BARE.floors.indexOf(String(room.level)) >= 0);
+  var lvl = room ? String(room.level) : null;
+  if (lvl && (SB.clean || []).indexOf(lvl) >= 0) return false;
+  return !!SB.all || !!(lvl && (SB.floors || []).indexOf(lvl) >= 0);
 })();
 var BARE_KEEP = new Set();
 var BARE_TICK = 0;
