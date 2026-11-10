@@ -4030,4 +4030,6 @@ function farView(F, M, toLocal, panes, paneMat, shaft) {
   requestAnimationFrame(function () { draw(mode); });
   return { scene: scene, cube: rt, glass: glass, night: draw };
 }
+/* v197 (req 3344/3397, the envelope's page adapter): findPlace out, so CastleEnvelope.declare reads the places the builder builds */
+window.CastleShell.findPlace = findPlace;
 })();

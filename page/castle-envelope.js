@@ -8,17 +8,31 @@
    CastleEnvelope.declare(places) -> { pieces, roofs, soffits, totals: { air, shared, sharedOwned, roof, soffit } }
    places: [{ id, poly: [[x, y], ...] (either winding), floor, ceiling, wall }] */
 (function (W) {
-  var STEP = 0.25, CELL = 0.125, LIFT = 1.5;
+  var STEP = 0.25, CELL = 0.1, LIFT0 = 1.5, GRID = 4;
   function area(p) { var s = 0; for (var i = 0; i < p.length; i++) { var a = p[i], b = p[(i + 1) % p.length]; s += a[0] * b[1] - b[0] * a[1]; } return s / 2; }
   function inside(p, x, y) { var c = false; for (var i = 0, j = p.length - 1; i < p.length; j = i++) { var a = p[i], b = p[j];
     if ((a[1] > y) !== (b[1] > y) && x < (b[0] - a[0]) * (y - a[1]) / (b[1] - a[1]) + a[0]) c = !c; } return c; }
   function box(p) { var b = [1e9, 1e9, -1e9, -1e9]; p.forEach(function (q) { b[0] = Math.min(b[0], q[0]); b[1] = Math.min(b[1], q[1]); b[2] = Math.max(b[2], q[0]); b[3] = Math.max(b[3], q[1]); }); return b; }
   function overlaps(a0, a1, b0, b1) { return Math.min(a1, b1) - Math.max(a0, b0) > 0.01; }
-  function declare(places) {
+  function declare(places, opts) {
+    var LIFT = (opts && opts.lift) || LIFT0;
     var P = places.map(function (q) { var poly = area(q.poly) < 0 ? q.poly.slice().reverse() : q.poly; return { id: q.id, poly: poly, floor: q.floor, ceiling: q.ceiling, wall: q.wall || 0.8, bb: box(poly) }; });
-    function at(x, y, z0, z1, not) { for (var k = 0; k < P.length; k++) { var q = P[k]; if (q === not || !overlaps(z0, z1, q.floor, q.ceiling)) continue;
+    /* a bucket grid (GRID m) over the places' boxes, so the probe asks only the places near it (834 rooms in the castle) */
+    var G = {}; P.forEach(function (q) { var w = q.wall; for (var gx = Math.floor((q.bb[0] - w) / GRID); gx <= Math.floor((q.bb[2] + w) / GRID); gx++) for (var gy = Math.floor((q.bb[1] - w) / GRID); gy <= Math.floor((q.bb[3] + w) / GRID); gy++) (G[gx + ',' + gy] = G[gx + ',' + gy] || []).push(q); });
+    /* the vertical test's cover: a place's plan dilated by its wall (walls stand outside the plan at t, castle-shell.js
+       'outward'), as the edge probe already reaches wall + 0.5 out (revised 9.35 pm, the fixtures' expectations first) */
+    function near(q, x, y) { if (x < q.bb[0] - q.wall || x > q.bb[2] + q.wall || y < q.bb[1] - q.wall || y > q.bb[3] + q.wall) return false;
+      if (inside(q.poly, x, y)) return true; var p = q.poly, t = q.wall;   /* each side's wall band, out t, on t past each end (the builder's corner blocks, castle-shell.js ext) */
+      for (var i = 0, j = p.length - 1; i < p.length; j = i++) { var ax = p[j][0], ay = p[j][1], ex = p[i][0] - ax, ey = p[i][1] - ay, l = Math.hypot(ex, ey); if (l < 1e-9) continue;
+        var u = ((x - ax) * ex + (y - ay) * ey) / l, v = ((x - ax) * ey - (y - ay) * ex) / l; if (u >= -t && u <= l + t && v >= 0 && v <= t) return true; }
+      return false; }
+    function cover(x, y, z0, z1, not) { var C = G[Math.floor(x / GRID) + ',' + Math.floor(y / GRID)] || []; for (var k = 0; k < C.length; k++) { var q = C[k];
+      if (q !== not && overlaps(z0, z1, q.floor, q.ceiling) && near(q, x, y)) return q; } return null; }
+    var SOL = (opts && opts.solids) || [];   /* the model's masses and towers: [{ poly, z0, z1 }], inside the building with no room */
+    function solid(x, y, z0, z1) { for (var k = 0; k < SOL.length; k++) { var o = SOL[k]; if (overlaps(z0, z1, o.z0, o.z1) && inside(o.poly, x, y)) return true; } return false; }
+    function at(x, y, z0, z1, not) { var C = G[Math.floor(x / GRID) + ',' + Math.floor(y / GRID)] || []; for (var k = 0; k < C.length; k++) { var q = C[k]; if (q === not || !overlaps(z0, z1, q.floor, q.ceiling)) continue;
       if (x < q.bb[0] || x > q.bb[2] || y < q.bb[1] || y > q.bb[3]) continue; if (inside(q.poly, x, y)) return q; } return null; }
-    var pieces = [], roofs = [], soffits = [], T = { air: 0, shared: 0, sharedOwned: 0, roof: 0, soffit: 0 };
+    var pieces = [], roofs = [], soffits = [], T = { air: 0, shared: 0, sharedOwned: 0, roof: 0, soffit: 0, roofDeep: 0, soffitDeep: 0, roofSolid: 0, soffitSolid: 0 };
     P.forEach(function (q) {
       var n = q.poly.length;
       for (var i = 0; i < n; i++) {
@@ -32,18 +46,21 @@
           pieces.push(pc); if (other) { T.shared += pc.len; if (pc.owner === q.id) T.sharedOwned += pc.len; } else T.air += pc.len;
         }
       }
-      /* roof and soffit: the plan's area less the sampled part a place above or below covers */
-      var full = Math.abs(area(q.poly)), up = 0, dn = 0, bb = q.bb, c2 = CELL * CELL;
-      for (var x = bb[0] + CELL / 2; x < bb[2]; x += CELL) for (var y = bb[1] + CELL / 2; y < bb[3]; y += CELL) {
+      /* roof and soffit, by cell: covered (a place within LIFT, plan and wall), deep (a place further off, the void between
+         is the model's to explain), solid (inside a mass or tower with no room), else open air: only open air is roof or soffit */
+      var r = { air: 0, deep: 0, solid: 0 }, f = { air: 0, deep: 0, solid: 0 }, bb = q.bb, c2 = CELL * CELL, ground = q.floor <= 0.01;
+      /* nothing within reach of the plan (no other place's plan and wall over its box, no solid): its area exactly, not sampled */
+      var lone = !SOL.length && !P.some(function (o) { return o !== q && o.bb[0] - o.wall < bb[2] && o.bb[2] + o.wall > bb[0] && o.bb[1] - o.wall < bb[3] && o.bb[3] + o.wall > bb[1]; });
+      if (lone) { r.air = Math.abs(area(q.poly)); if (!ground) f.air = r.air; }
+      else for (var x = bb[0] + CELL / 2; x < bb[2]; x += CELL) for (var y = bb[1] + CELL / 2; y < bb[3]; y += CELL) {
         if (!inside(q.poly, x, y)) continue;
-        if (at(x, y, q.ceiling + 0.01, q.ceiling + LIFT, q)) up += c2;
-        if (at(x, y, q.floor - LIFT, q.floor - 0.01, q)) dn += c2;
+        if (!cover(x, y, q.ceiling + 0.01, q.ceiling + LIFT, q)) r[cover(x, y, q.ceiling + LIFT, 1e9, q) ? 'deep' : solid(x, y, q.ceiling + 0.01, q.ceiling + LIFT) ? 'solid' : 'air'] += c2;
+        if (!ground && !cover(x, y, q.floor - LIFT, q.floor - 0.01, q)) f[cover(x, y, -1e9, q.floor - LIFT, q) ? 'deep' : solid(x, y, q.floor - LIFT, q.floor - 0.01) ? 'solid' : 'air'] += c2;
       }
-      var roof = Math.max(0, full - up), sof = q.floor > 0.01 || dn > 0 || q.soffit ? Math.max(0, full - dn) : 0;
-      if (q.floor <= 0.01) sof = 0;   /* a place on the ground has no soffit */
-      roofs.push({ place: q.id, z: q.ceiling, area: roof }); soffits.push({ place: q.id, z: q.floor, area: sof }); T.roof += roof; T.soffit += sof;
+      roofs.push({ place: q.id, z: q.ceiling, area: r.air, deep: r.deep, solid: r.solid }); soffits.push({ place: q.id, z: q.floor, area: f.air, deep: f.deep, solid: f.solid });
+      T.roof += r.air; T.soffit += f.air; T.roofDeep += r.deep; T.soffitDeep += f.deep; T.roofSolid += r.solid; T.soffitSolid += f.solid;
     });
     return { pieces: pieces, roofs: roofs, soffits: soffits, totals: T };
   }
-  W.CastleEnvelope = { declare: declare, STEP: STEP, CELL: CELL, LIFT: LIFT };
+  W.CastleEnvelope = { declare: declare, STEP: STEP, CELL: CELL, LIFT: LIFT0 };
 })(typeof window !== 'undefined' ? window : this);
