@@ -1553,8 +1553,8 @@ window.CastleShell = { build: function (F, M, placeId, o) {
       var gent = function (k) { var u = dOf(e.i), v = dOf(k), lu = lOf(e.i), lv = lOf(k);
         return lu > 1e-6 && lv > 1e-6 && (u[0] * v[0] + u[1] * v[1]) / (lu * lv) > Math.cos(Math.PI / 6); };
       var nkN = (e.i + 1) % E.length, pkN = (e.i - 1 + E.length) % E.length, LeN = lOf(e.i);
-      if (ns1 > LeN + 0.02 && gent(nkN)) { gaps[nkN].push({ s0: 0, s1: Math.min(lOf(nkN), ns1 - LeN), sill: nsill, h: nh, op: ft, spill: true }); ng.wide = [ns0, ns1]; ng.s1 = LeN; }
-      if (ns0 < -0.02 && gent(pkN)) { gaps[pkN].push({ s0: Math.max(0, lOf(pkN) + ns0), s1: lOf(pkN), sill: nsill, h: nh, op: ft, spill: true }); ng.wide = [ns0, ns1]; ng.s0 = 0; }
+      if (ns1 > LeN + 0.02 && gent(nkN)) { gaps[nkN].push({ s0: 0, s1: Math.min(lOf(nkN), ns1 - LeN), sill: nsill, h: nh, op: ft, spill: true, nicheSpill: true }); ng.wide = [ns0, ns1]; ng.s1 = LeN; }
+      if (ns0 < -0.02 && gent(pkN)) { gaps[pkN].push({ s0: Math.max(0, lOf(pkN) + ns0), s1: lOf(pkN), sill: nsill, h: nh, op: ft, spill: true, nicheSpill: true }); ng.wide = [ns0, ns1]; ng.s0 = 0; }
     });
     /* v78 (the Architect's 159th; Godric's 11.15 pm, 23 October 2026, Filch's office: "the corbel is in front of the
        door"): a beam's corbels hang from 0.78 under the ceiling, so in a low room one landing over an opening stood
@@ -2156,7 +2156,10 @@ window.CastleShell = { build: function (F, M, placeId, o) {
           var tn = gapQs.length > 1 ? halfGap(Q, a, ux, uy, nx, ny, g.s0, g.s1, t) : t;
           var dp = Math.min(g.op.depth, tn - 0.05), back = slab(w, hh, tn - dp, mats.wall, 'wall');
           var bp = toLocal(a[0] + ux * sm + nx * (dp + (tn - dp) / 2), a[1] + uy * sm + ny * (dp + (tn - dp) / 2), Q.floor);
-          back.position.set(bp.x, bp.y + g.sill + hh / 2, bp.z); back.rotation.y = ang; back.name = Q.id + '-niche-' + g.op.id; group.add(back);
+          /* v210 (req 3481, Fawkes's 1 on req 3535): under ?walls=v2 the strip pass cuts the niche and draws its back to
+             the band's far face (wallsV2); this depth is its own, so the head and floor here meet that back */
+          g.dp = dp;
+          back.position.set(bp.x, bp.y + g.sill + hh / 2, bp.z); back.rotation.y = ang; back.name = Q.id + '-niche-' + g.op.id; if (!WALLS2) group.add(back);
           /* v30 (one owner per face): the head bears 2 cm into the wall over it and either side, its face 2 mm back of the
              wall's, so no face of it lies in a plane of the pieces round it (the hourglass niches' crowns and springings) */
           /* v51 (req 850, the linen room's lamp niche): its face 5 mm back, past the seams test's 4 mm plane, and 2 cm into the niche's back, so neither face lies in a plane of the wall's (4 fights in a niche with a sill) */
@@ -3528,7 +3531,20 @@ window.CastleShell = { build: function (F, M, placeId, o) {
         var L = Math.hypot(ed.b[0] - ed.a[0], ed.b[1] - ed.a[1]); if (L < 1e-6) return;
         var fu = [(ed.b[0] - ed.a[0]) / L, (ed.b[1] - ed.a[1]) / L], fn = [fu[1], -fu[0]];
         (w.gaps[i] || []).forEach(function (g) {
-          if (g.hidden || g.niche || g.recess) return;
+          if (g.hidden || g.recess) return;
+          /* v210 (req 3481, Fawkes's 1 on req 3535): a niche cuts its own room's strip, swept only its depth, square headed
+             (v1's head piece draws the arch), its back drawn after the strip (v1 cut it; v2 left the hourglasses walled in) */
+          /* v217 (req 3344, carrying v216 to v2): a niche wider than its side on a curve is swept once, whole and straight on
+             its own side's line over its full width (g.wide), from 5 cm inside the face so the neighbours' bent faces lie
+             behind the start; the pieces v216 spilled onto the next sides are that sweep's, never openings through the wall */
+          if (g.nicheSpill) return;
+          if (g.niche) {
+            var gs0 = g.wide ? g.wide[0] : g.s0, gs1 = g.wide ? g.wide[1] : g.s1, gin = g.wide ? 0.05 : 0.02;
+            var na = [ed.a[0] + fu[0] * gs0, ed.a[1] + fu[1] * gs0], nb = [ed.a[0] + fu[0] * gs1, ed.a[1] + fu[1] * gs1], ND = (g.dp || g.op.depth) + 0.02;
+            OPS.push({ rooms: [r], q: [[na[0] - fn[0] * gin, na[1] - fn[1] * gin], [nb[0] - fn[0] * gin, nb[1] - fn[1] * gin], [nb[0] + fn[0] * ND, nb[1] + fn[1] * ND], [na[0] + fn[0] * ND, na[1] + fn[1] * ND]],
+              z0: w.Q.floor + g.sill, z1: w.Q.floor + g.h, head: null, up: 0, id: g.op.id, win: false, niche: { c: [(na[0] + nb[0]) / 2, (na[1] + nb[1]) / 2], n: fn, dp: g.dp || g.op.depth, row: w.row } });
+            return;
+          }
           var far = g.op.between ? other(g.op, r) : null, fq = far && byId[far], pa = [ed.a[0] + fu[0] * g.s0, ed.a[1] + fu[1] * g.s0], pb = [ed.a[0] + fu[0] * g.s1, ed.a[1] + fu[1] * g.s1];
           var mx = (pa[0] + pb[0]) / 2, my = (pa[1] + pb[1]) / 2, D = Math.max(1.25, (g.op.depth || 0) + 0.05);
           if (fq) for (var d = 0.05; d <= 4; d += 0.05) if (inPoly(fq.loops[0], mx + fn[0] * d, my + fn[1] * d)) { D = d + 0.02; break; }
@@ -3609,7 +3625,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
         /* v207 (req 3481 cause B): a window of one room cuts no strip it shares with a roofed room; as v1 it stops blind in
            its own wall (lake-corridor-g-east's two lake windows came out in Hidden Ways' loop gallery) */
         if (O.win && O.rooms.length === 1 && sg.rooms.some(function (x) { return x !== O.rooms[0] && roofed(x); })) { (res.blindWins = res.blindWins || []).push(O.id + '@' + sg.rooms.join('/')); return; }
-        holes.push({ s0: c[0], s1: c[1], z0: O.z0, z1: O.z1, head: O.head, up: O.up, op: O.id, from: O.rooms[0] });
+        holes.push({ s0: c[0], s1: c[1], z0: O.z0, z1: O.z1, head: O.head, up: O.up, op: O.id, from: O.rooms[0], niche: O.niche });
       });
       /* v208 (req 3481, D's slanted case): an opening swept from both its rooms cuts a strip with the sweeps of the room
          whose own face the strip is, where that room swept it; the drum's 16-gon door swept on along the drum side's normal
@@ -3659,6 +3675,20 @@ window.CastleShell = { build: function (F, M, placeId, o) {
          floor runs (each floor stops at its room's line), so a black line showed under the doorway. The hole's
          footprint in the band gets its own floor, 2 mm under the rooms' so the two never fight, 0.1 thick */
       holes.forEach(function (h) {
+        /* v210 (req 3481): a niche's back, from its depth to the band's far face, in its room's stone; no hole floor (v1's
+           niche floor stands in it) */
+        if (h.niche) {
+          var NC = h.niche, oF = (NC.c[0] - sg.a[0]) * sg.n[0] + (NC.c[1] - sg.a[1]) * sg.n[1], sgn = NC.n[0] * sg.n[0] + NC.n[1] * sg.n[1] >= 0 ? 1 : -1;
+          var oB = oF + sgn * NC.dp, oE = sgn > 0 ? sg.off[1] : sg.off[0], bk = (oE - oB) * sgn;
+          if (bk > 0.005) {
+            /* 1 cm into each jamb and the head, its far face 2 mm inside the band's, so it shares no plane with the strip */
+            var scN = (h.s0 + h.s1) / 2, pxN = sg.a[0] + ux * scN, pyN = sg.a[1] + uy * scN, ocN = (oB + oE - sgn * 0.002) / 2;
+            var nbk = slab(h.s1 - h.s0 + 0.02, h.z1 - h.z0 + 0.01, bk - 0.002, NC.row ? wallMat(NC.row, pxN, pyN, (h.z1 - h.z0) / 2) : mats.wall, 'wall');
+            nbk.position.copy(toLocal(pxN + sg.n[0] * ocN, pyN + sg.n[1] * ocN, (h.z0 + h.z1) / 2));
+            nbk.rotation.y = Math.atan2(uy, ux); nbk.name = h.from + '-niche-' + h.op; nbk.userData.owner = h.from; group.add(nbk);
+          }
+          return;
+        }
         /* v205 (req 3481 cause C): on the strip the two rooms share, the higher-sill room's half of the band stands
            solid from the lower sill to its own, in its own stone: the step is in the doorway, the face under its sill kept */
         var zs = SILLS[h.op], ks = zs ? Object.keys(zs) : [];
