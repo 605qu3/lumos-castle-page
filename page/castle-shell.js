@@ -330,6 +330,46 @@ function alongEdge(E, i, p) {
   return Math.max(0, Math.min(L, ((p[0] - a[0]) * dx + (p[1] - a[1]) * dy) / L));
 }
 
+/* v199 (req 3344/3397 step 3, the Architect, 9 November 2026): where the rules above find an opening on no side of this
+   place (one point, no `into`: a floor way is in no wall), a doorway pierces the whole wall between its two rooms, so its
+   face here is found across the wall from the face its other room finds: from that face's foot, square out of the other
+   room, to the first side of this place it meets (within its depth, or 3.5 m with none: the drum doors cross 2.2 to
+   2.9 m). Not from inside this place's own plan: a door in a screen or a flight's side stands in no wall of the room
+   round it. With no other room's face found, a point just off a faceted drum's corner (the sides turning under 30
+   degrees) is cut at that corner, on into the next side. `fb` marks the find: no hold along the side for it, so the
+   two faces stay square across the wall */
+function farFind(M, Q, E, op, p) {
+  if (op.into || inPoly(Q.poly, p[0], p[1])) return null;
+  var reach = op.depth ? op.depth + 0.2 : 3.5, ids = (op.between || []).map(slug).filter(function (x) { return x !== Q.id; });
+  for (var k = 0; k < ids.length; k++) {
+    var O = findPlace(M, ids[k]); if (!O || !O.poly) continue;
+    var EO = edgesOf(O.loops || [O.poly], O.loopH, O.loopT), eo = onEdgeE(EO, p, op.depth ? op.depth + 0.2 : null);
+    if (!eo) continue;
+    var a = EO[eo.i].a, b = EO[eo.i].b, ux = (b[0] - a[0]) / eo.L, uy = (b[1] - a[1]) / eo.L;
+    var f = [a[0] + ux * eo.s, a[1] + uy * eo.s], n = [-uy, ux];
+    if (inPoly(O.poly, f[0] + n[0] * 0.05, f[1] + n[1] * 0.05)) n = [uy, -ux];   /* square out of the other room */
+    var best = null;
+    for (var i = 0; i < E.length; i++) {
+      var A = E[i].a, B = E[i].b, ex = B[0] - A[0], ey = B[1] - A[1], L = Math.hypot(ex, ey); if (L < 1e-6) continue;
+      var den = n[0] * ey - n[1] * ex; if (Math.abs(den) < 1e-9) continue;
+      var t = ((A[0] - f[0]) * ey - (A[1] - f[1]) * ex) / den, u = ((A[0] - f[0]) * n[1] - (A[1] - f[1]) * n[0]) / den;
+      if (t > 0.01 && t <= reach && u >= -0.01 && u <= 1.01 && (!best || t < best.d)) best = { i: i, s: u * L, d: t, L: L, fb: 'far' };
+    }
+    if (best) return best;
+  }
+  if (!op.depth && !/loop|slit|cleft|window/.test(op.kind || '')) return null;
+  var tol = op.depth ? op.depth + 0.2 : 1.2, c = null;
+  for (var j = 0; j < E.length; j++) {
+    var A2 = E[j].a, B2 = E[j].b, dx = B2[0] - A2[0], dy = B2[1] - A2[1], L2 = Math.hypot(dx, dy); if (L2 < 1e-6) continue;
+    var s = Math.max(0, Math.min(L2, ((p[0] - A2[0]) * dx + (p[1] - A2[1]) * dy) / L2)), d = Math.hypot(p[0] - A2[0] - dx / L2 * s, p[1] - A2[1] - dy / L2 * s);
+    if (!c || d < c.d - 1e-6) c = { i: j, s: s, d: d, L: L2, fb: 'corner' };
+  }
+  if (!c || c.d > tol) return null;
+  var nk = c.s >= c.L - 1e-6 ? (c.i + 1) % E.length : (c.i - 1 + E.length) % E.length, U = E[c.i], V = E[nk];
+  var uu = [U.b[0] - U.a[0], U.b[1] - U.a[1]], vv = [V.b[0] - V.a[0], V.b[1] - V.a[1]], lu = Math.hypot(uu[0], uu[1]), lv = Math.hypot(vv[0], vv[1]);
+  return lu > 1e-6 && lv > 1e-6 && (uu[0] * vv[0] + uu[1] * vv[1]) / (lu * lv) > Math.cos(Math.PI / 6) ? c : null;
+}
+
 /* each panelled room's grade on Design's ladder (CastlePanelling.GRADES, 0 plain to 3 rich), one line a room when Godric
    grades them (design-panelling-grades-1021); a room not named takes grade 2, his 1 on design-panelling-staff-1021.
    Graded by rank, his 1 on design-panelling-grades-1021 (21 October 2026, 7.10 am; Design's req 844): the teachers'
@@ -367,6 +407,7 @@ function gapsOf(M, Q, E, H) {
         var rdx = pts[0][0] - Q.round.c[0], rdy = pts[0][1] - Q.round.c[1], rD = Math.hypot(rdx, rdy);
         if (rD > Q.round.r && (!op.depth || rD - Q.round.r <= op.depth + 0.2)) e = onEdgeE(E, [Q.round.c[0] + rdx / rD * Q.round.r, Q.round.c[1] + rdy / rD * Q.round.r]);
       }
+      if (!e && pts.length === 1) e = farFind(M, Q, E, op, pts[0]);   /* v199 */
       if (!e) return;
       var s0, s1;
       /* v75 (ledger 258, the lake rooms' seats): a window in a recess deeper than its wall (`recess`: its own cut, w, h
@@ -392,12 +433,12 @@ function gapsOf(M, Q, E, H) {
         if (s1 - s0 < 0.05) return;
       }
       /* v10: held to its side; on a round wall an opening narrower than the side is moved along to fit it whole */
-      if (Q.area && s1 - s0 <= e.L) { if (s0 < 0) { s1 -= s0; s0 = 0; } if (s1 > e.L) { s0 -= s1 - e.L; s1 = e.L; } }
+      if (Q.area && !e.fb && s1 - s0 <= e.L) { if (s0 < 0) { s1 -= s0; s0 = 0; } if (s1 > e.L) { s0 -= s1 - e.L; s1 = e.L; } }
       /* v15: on a curved face drawn in short sides (the casemate's round the drum), an opening wider than its side is cut
          on into the next side too, where that side turns less than 30 degrees; no second leaf (powder-door, Events 1.44 am) */
       var spill = [];
       /* v84: a shaft's round wall too, for a cleft or window (its sides 1.0; H82's cleft 1.8 across the corner due south was cut on one side only; its doors as before) */
-      if ((!Q.area || (Q.shaft && /cleft|window|slit|loop/.test(op.kind || ''))) && !hid) {
+      if ((!Q.area || e.fb || (Q.shaft && /cleft|window|slit|loop/.test(op.kind || ''))) && !hid) {   /* v199: a far or corner find spills too */
         var dirOf = function (k) { var ed = E[k]; return [ed.b[0] - ed.a[0], ed.b[1] - ed.a[1]]; };
         var gentle = function (k) { var u = dirOf(e.i), v = dirOf(k), lu = Math.hypot(u[0], u[1]), lv = Math.hypot(v[0], v[1]);
           return lu > 1e-6 && lv > 1e-6 && (u[0] * v[0] + u[1] * v[1]) / (lu * lv) > Math.cos(Math.PI / 6); };
