@@ -738,6 +738,7 @@ var TILES = {
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="castle.js?v=12"></script>
+<script src="shell-bare.js?v=3"></script>
 <script src="castle-ear.js?v=1"></script>
 <script src="castle-events.js?v=32"></script>
 <script src="charms/guide.js?v=1"></script>
@@ -8602,6 +8603,42 @@ if (kit.from === 'corridor') {
   kit.reveal();
 }
 
+/* req 3359 (req 3355, Godric, 9 November 2026, 6.02 pm: "Dressing off is universal"): the room shows its shell only,
+   by default, as page/shell.html does (page/shell-bare.js, the Architect's pattern). Shell: the floor, ceiling, wall and
+   its two ends, the floor beyond, the two windows and their sky, the key door and its sill, and the portrait hole with its
+   tunnel, ring, panel and the corridor seen through it. Everything else the page builds (rug, fireplace and fire, furniture,
+   portraits, tapestry, bookcase, torches, candles, people, the cat, the 3D figure) is hidden before each frame is drawn;
+   nothing is deleted and no placement changes. ?bare=0 dresses the room again; the measuring tools' &clean loads keep
+   their dressing, so their baselines still count it; 'common-room' in SHELL_BARE.clean dresses it once Fawkes says so. */
+var BARE = (function () {
+  var q = new URLSearchParams(location.search);
+  if (q.get('bare') === '0') return false; if (q.has('bare')) return true;
+  if (q.has('clean')) return false;
+  var SB = window.SHELL_BARE || {};
+  if ((SB.clean || []).indexOf('common-room') >= 0) return false;
+  return !!SB.all;
+})();
+var BARE_SHELL = { 'floor': 1, 'ceiling': 1, 'wall': 1, 'wall-end-left': 1, 'wall-end-right': 1, 'floor-beyond': 1,
+  'window-left': 1, 'window-right': 1, 'window-left-sky': 1, 'window-right-sky': 1, 'key-door': 1, 'key-door-sill': 1 };
+var BARE_DRESS = /torch|candle|lamp|hourglass(?!-recess)|portrait(?!-hole)|tapestry|painting/;
+var BARE_TICK = 0, BARE_HIDE = [], BARE_SEEN = new WeakSet();
+function bareIsShell(o) {
+  for (var p = o; p && p !== scene; p = p.parent) {
+    if (p.name && BARE_DRESS.test(p.name)) return false;
+    if (p.name && BARE_SHELL[p.name]) return true;
+    if (p === holeFrame) return true;
+  }
+  return false;
+}
+function bareSweep() {
+  if ((BARE_TICK++ % 30) === 0) scene.traverse(function (o) {
+    if (BARE_SEEN.has(o)) return; BARE_SEEN.add(o);
+    if ((o.isMesh || o.isSprite || o.isPoints || o.isLine) && !bareIsShell(o)) BARE_HIDE.push(o);
+  });
+  for (var i = 0; i < BARE_HIDE.length; i++) BARE_HIDE[i].visible = false;
+}
+window.lumosBare = { on: BARE, hidden: BARE_HIDE };
+
 var clock = new THREE.Clock();
 var t = 0;
 /* the Omnioculars' dial (the Corridor's req 158, castle.js v=9): what moves by itself (the fire and its smoke, the cat,
@@ -8655,6 +8692,7 @@ function frame() {
   if (HOURGLASS.on) updateHourglass(dt);
   if (fig3d) fig3d.update(sdt);
   var shook = howlerShake();
+  if (BARE) bareSweep();
   renderer.render(scene, camera);
   if (shook) howlerUnshake();
   kit.stats(dt);
