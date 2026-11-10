@@ -594,6 +594,7 @@
      inboard counts as the floor above; a gap taller than MAXGAP is filled to the floor above only where no real face stands
      anywhere in it; and every built place with no place over some of it gets a lid. Off by default until Fawkes's blind look */
   var bandWide = !/[?&]bandwide=0/.test(location.search);   /* v28 (req 3221 via 3226, the Architect's plan docs/architect/absent-storeys-3221.md): the outside test also looks past the whole wall (t + 0.1, t at most 1.5); round places stay in the match lists (never banded); a gap row says `below` when the ceiling is at or under z 0. ?bandwide=0 is the old check */
+  var e1Diag = /(^|[?&])e1diag=1(&|$)/.test(location.search);   /* v30 (req 3344): each E1 gap's probe profile for the judge, reporting only */
   var bandDebug = /(^|[?&])banddebug=1(&|$)/.test(location.search);   /* req 3215 v5: every band piece flat unlit red, to see where the bands stand */
   function inPoly(pts, x, y) {
     var c = false;
@@ -608,7 +609,7 @@
        slit's mid height through each 1 m step finds any face near the wall plane (a taller wall, a ledge): none, and the
        step is open. The piece is one outer face only, set back 0.01 m from the innermost face found just below the slit (so
        never proud of a ledge), in that face's own material colour; no ends, no overlap into the wall, so no joint marks. */
-    var roundSkipped = 0, roundIds = [], seen = {}, P = [], probes = 0, CELL = 4, grid = {}, gridS = {}, tri9 = [], tcol = [], stamp = [], qn = 0;
+    var roundSkipped = 0, roundIds = [], seen = {}, P = [], probes = 0, CELL = 4, grid = {}, gridS = {}, tri9 = [], tcol = [], tnm = [], stamp = [], qn = 0;
     /* a grid over the baked walls (normals within 60 degrees of level) so a probe tests a few triangles, not the castle */
     scene.updateMatrixWorld(true);
     (function () {
@@ -622,7 +623,7 @@
           va.fromBufferAttribute(P0, ix ? ix.getX(k) : k).applyMatrix4(mw); vb.fromBufferAttribute(P0, ix ? ix.getX(k + 1) : k + 1).applyMatrix4(mw); vc.fromBufferAttribute(P0, ix ? ix.getX(k + 2) : k + 2).applyMatrix4(mw);
           e1.subVectors(vb, va); e2.subVectors(vc, va); nn.crossVectors(e1, e2).normalize();
           var slopedT = Math.abs(nn.y) > 0.5; if (slopedT && !(bandFill && Math.abs(nn.y) < 0.94)) continue;   /* req 3226 r30-h: a sloped cap (30 to 70 degrees off vertical) goes in its own grid, read only by the fill's walled test */
-          var id = tri9.length / 9; tri9.push(va.x, va.y, va.z, vb.x, vb.y, vb.z, vc.x, vc.y, vc.z); tcol.push(col);
+          var id = tri9.length / 9; tri9.push(va.x, va.y, va.z, vb.x, vb.y, vb.z, vc.x, vc.y, vc.z); tcol.push(col); if (e1Diag) tnm.push(String(o.name || '').replace(/-[0-9a-f]{6}\|.*$/, ''));
           var GR = slopedT ? gridS : grid;
           var cx0 = Math.floor(Math.min(va.x, vb.x, vc.x) / CELL), cx1 = Math.floor(Math.max(va.x, vb.x, vc.x) / CELL),
               cz0 = Math.floor(Math.min(va.z, vb.z, vc.z) / CELL), cz1 = Math.floor(Math.max(va.z, vb.z, vc.z) / CELL);
@@ -632,11 +633,11 @@
       });
     })();
     var gridB = grid, S0v = new THREE.Vector3(), S1v = new THREE.Vector3(), dv = new THREE.Vector3();
-    function probe(px, py, nx, ny, z, gsel) {
+    function probe(px, py, nx, ny, z, gsel, front) {
       var grid = gsel || gridB;
       var S0 = TL(px + nx * 3, py + ny * 3, z), S1 = TL(px, py, z); S0v.copy(S0); S1v.copy(S1);
       var len = dv.subVectors(S1v, S0v).length(); dv.multiplyScalar(1 / len); probes++; qn++;
-      var far = len * 4 / 3, best = Infinity, bc = null, ox = S0v.x, oy = S0v.y, oz = S0v.z, dx = dv.x, dy = dv.y, dz = dv.z;
+      var far = len * 4 / 3, best = Infinity, bc = null, bn = null, ox = S0v.x, oy = S0v.y, oz = S0v.z, dx = dv.x, dy = dv.y, dz = dv.z;
       for (var u = 0; u <= far; u += CELL / 2) {
         var cl = grid[Math.floor((ox + dx * u) / CELL) + ',' + Math.floor((oz + dz * u) / CELL)]; if (!cl) continue;
         for (var q = 0; q < cl.length; q++) {
@@ -644,13 +645,13 @@
           var b = id * 9, ax = tri9[b], ay = tri9[b + 1], az = tri9[b + 2];
           var e1x = tri9[b + 3] - ax, e1y = tri9[b + 4] - ay, e1z = tri9[b + 5] - az, e2x = tri9[b + 6] - ax, e2y = tri9[b + 7] - ay, e2z = tri9[b + 8] - az;
           var hx = dy * e2z - dz * e2y, hy = dz * e2x - dx * e2z, hz = dx * e2y - dy * e2x, det = e1x * hx + e1y * hy + e1z * hz;
-          if (Math.abs(det) < 1e-9) continue;
+          if (Math.abs(det) < 1e-9 || (front && det < 0)) continue;
           var f = 1 / det, sx = ox - ax, sy = oy - ay, sz = oz - az, uu = f * (sx * hx + sy * hy + sz * hz); if (uu < 0 || uu > 1) continue;
           var qx = sy * e1z - sz * e1y, qy = sz * e1x - sx * e1z, qz = sx * e1y - sy * e1x, vv = f * (dx * qx + dy * qy + dz * qz); if (vv < 0 || uu + vv > 1) continue;
-          var tt = f * (e2x * qx + e2y * qy + e2z * qz); if (tt >= 0 && tt <= far && tt < best) { best = tt; bc = tcol[id]; }
+          var tt = f * (e2x * qx + e2y * qy + e2z * qz); if (tt >= 0 && tt <= far && tt < best) { best = tt; bc = tcol[id]; bn = e1Diag ? tnm[id] : null; }
         }
       }
-      return best < Infinity ? { off: 3 - best * 3 / len, col: bc } : null;
+      return best < Infinity ? { off: 3 - best * 3 / len, col: bc, nm: bn } : null;
     }
     builtPlaces.forEach(function (q) {
       if (!q.poly || q.poly.length < 3 || q.area || q.ceiling == null) return;
@@ -665,7 +666,7 @@
       P.push({ q: q, poly: ar < 0 ? q.poly.slice().reverse() : q.poly, cw: ar < 0, b: [x0, y0, x1, y1], f: q.floor, c: q.ceiling, round: isRound });
     });
     function covers(R, x, y) { return x >= R.b[0] && x <= R.b[2] && y >= R.b[1] && y <= R.b[3] && inPoly(R.poly, x, y); }
-    var tones = {}, later = [], gaps = {}, MAXGAP = 1.25, STEP = 0.25, wideKills = {};
+    var tones = {}, later = [], gaps = {}, MAXGAP = 1.25, STEP = 0.25, wideKills = {}, slitM = 0, slitIds = {};
     function lum(h) { return ((h >> 16 & 255) * 0.3 + (h >> 8 & 255) * 0.59 + (h & 255) * 0.11) / 255; }
     var T = {}, pieces = 0, stretches = 0, tall = 0, faced = 0, bare = 0, fillTall = 0, fillWalled = 0, fillSloped = 0, fillSolid = 0, lids = [], covered = 0, towerKills = 0, partFaced = 0, decks = 0, extDropped = 0;
     var circRooms = (rooms || []).filter(function (r) { return r && r.shape && r.shape.circle && r.shape.r; });   /* v29 (Amendment 3 correction, round 1 of v2): the 58 rooms with shape.circle that neither M.towers nor roundIds hold (oriel-bay, tally-room and others) */
@@ -707,7 +708,7 @@
             if (walledAny && SOLIDWALL.indexOf(Q.q.id) >= 0) { walledAny = false; fillSolid++; }
             if (walledAny) { z1 = null; fillWalled++; } else fillTall++;
           }
-          if (z1 != null && z1 - top > MAXGAP) { tall++; var hg = probe(px, py, nx, ny, top + 0.35), walled = hg && hg.off > -0.1 && hg.off < t + 0.4; if (!walled) { var gk = Q.q.id + '@' + Q.f.toFixed(2), g = gaps[gk] || (gaps[gk] = { id: Q.q.id, floor: +Q.f.toFixed(2), ceiling: +top.toFixed(2), up: +z1.toFixed(2), gap: +(z1 - top).toFixed(2), metres: 0, below: top <= 0, at: [] }); g.metres += +(L / steps).toFixed(2); if (g.at.length < 6) g.at.push([+px.toFixed(2), +py.toFixed(2)]); g.gap = Math.max(g.gap, +(z1 - top).toFixed(2)); } z1 = null; }   /* req 3344 Part B (the Architect, 9 November 2026): each gap keeps up to six of its probe points (at), for the judge; a mid-gap probe as well changed no gap on floor 1 (the slab-zone cause refuted, shell-gate-3344.md). A slab gap is 0.7 m; a taller gap is absent storeys, the Architect's (req 3191), not a band */
+          if (z1 != null && z1 - top > MAXGAP) { tall++; var hg = probe(px, py, nx, ny, top + 0.35), walled = hg && hg.off > -0.1 && hg.off < t + 0.4, openRun = 0, openMax = 0, frontAt = function (h) { return h && h.off > -0.1; };   /* v32 (round 3's judge: s23, s24, s26 showed a vault or slab seen through where the band counted it as wall; g11, g16 a wall standing proud past the band): a face closes the stretch only when it faces outward, at any depth from the wall's inner plane out to 3 m */ if (!walled) { for (var oh = top + 0.1, ost = Math.max(0.25, (z1 - top) / 200); oh < z1 - 0.05; oh += ost) { var ob = probe(px, py, nx, ny, oh, null, true); if (frontAt(ob) || frontAt(probe(px, py, nx, ny, oh, gridS, true))) openRun = 0; else { openRun += ost; openMax = Math.max(openMax, openRun); } } if (openMax <= MAXGAP) { walled = true; slitM += L / steps; var sk = Q.q.id + '@' + Q.f.toFixed(2); if (!slitIds[sk]) slitIds[sk] = { at: [+px.toFixed(2), +py.toFixed(2)], n: [+nx.toFixed(2), +ny.toFixed(2)], top: +top.toFixed(2), up: +z1.toFixed(2), open: +openMax.toFixed(2) }; } }   /* v31 (req 3344 E1's second cause, the Architect, 9 November 2026): z1 comes from room plans, so a storey above whose plan sits a little in or out of this one was missed and a 0.7 m slab slit read as a 30 m gap (classroom-eleven: the walls of floors 5.2 and 10.4 stand there). The gap is now the open height the built faces leave, a face counting only in the wall's own band (-0.1 to t + 0.4, as the rest of bands()): over MAXGAP it is E1; a shorter one is a slit, counted apart (slits), still left unbanded (z1 is null), a fault of its own */ if (!walled) { var gk = Q.q.id + '@' + Q.f.toFixed(2), g = gaps[gk] || (gaps[gk] = { id: Q.q.id, floor: +Q.f.toFixed(2), ceiling: +top.toFixed(2), up: +z1.toFixed(2), gap: +(z1 - top).toFixed(2), metres: 0, below: top <= 0, at: [] }); g.metres += +(L / steps).toFixed(2); if (g.at.length < 6) g.at.push([+px.toFixed(2), +py.toFixed(2)]); if (e1Diag && g.at.length <= 2) { var dz = [], nb = []; for (var dh = top + 0.15; dh < z1 && dz.length < 160; dh += 0.25) { var db = probe(px, py, nx, ny, dh), ds = probe(px, py, nx, ny, dh, gridS); dz.push([+(dh - top).toFixed(2), db ? +db.off.toFixed(2) : null, ds ? +ds.off.toFixed(2) : null, db ? db.nm : null]); } for (var dr = 0; dr < P.length; dr++) { var RD = P[dr]; if (RD === Q) continue; if (RD.f < z1 - 0.1 && RD.c > top + 0.1 && (covers(RD, ox, oy) || covers(RD, px + nx * (t + 0.3), py + ny * (t + 0.3)))) nb.push(RD.q.id + '@' + RD.f.toFixed(1) + '-' + RD.c.toFixed(1)); } (g.diag || (g.diag = [])).push({ t: t, n: [+nx.toFixed(2), +ny.toFixed(2)], z: dz, nb: nb }); } g.gap = Math.max(g.gap, +(z1 - top).toFixed(2)); } z1 = null; }   /* req 3344 Part B (the Architect, 9 November 2026): each gap keeps up to six of its probe points (at), for the judge; a mid-gap probe as well changed no gap on floor 1 (the slab-zone cause refuted, shell-gate-3344.md). A slab gap is 0.7 m; a taller gap is absent storeys, the Architect's (req 3191), not a band */
           if (z1 != null) {
             var hm = probe(px, py, nx, ny, (top + z1) / 2), hq = probe(px, py, nx, ny, top + Math.min(0.2, (z1 - top) / 2));
             dbg = { hm: hm ? +hm.off.toFixed(2) : null, hq: hq ? +hq.off.toFixed(2) : null };
@@ -814,7 +815,7 @@
     var log = later.map(function (w) { var o = { id: w.id, floor: +w.fl.toFixed(2), edge: w.edge, len: w.len, at: w.at, from: [+w.A[0].toFixed(2), +w.A[1].toFixed(2)], to: [+w.B[0].toFixed(2), +w.B[1].toFixed(2)], z0: +w.z0.toFixed(2), z1: +w.z1.toFixed(2), h: +(w.z1 - w.z0).toFixed(2), probe: w.dbg };
       if (w.g) { o.g1 = w.g.g1; o.gv = w.g.gv; o.upProud = w.g.upProud; } return o; });
     if (/[?&]probehook=1/.test(location.search)) window.__extBandsProbe = { probe: probe, later: later };   /* Amendment 7c: exposes the page's own probe to the step-level dump; nothing else reads it, no output changes */
-    return { gaps: Object.keys(gaps).map(function (k) { return gaps[k]; }).sort(function (p1, p2) { return p2.gap - p1.gap; }), log: log, group: G, pieces: pieces, tall: tall, faced: faced, covered: covered, towerKills: towerKills, partFaced: partFaced, extDropped: extDropped, decks: decks, bare: bare, probes: probes, places: P.length, roundSkipped: roundSkipped, roundIds: roundIds, wideKills: wideKills, tris: tris,
+    return { gaps: Object.keys(gaps).map(function (k) { return gaps[k]; }).sort(function (p1, p2) { return p2.gap - p1.gap; }), slits: { metres: +slitM.toFixed(1), ids: Object.keys(slitIds), at: slitIds }, log: log, group: G, pieces: pieces, tall: tall, faced: faced, covered: covered, towerKills: towerKills, partFaced: partFaced, extDropped: extDropped, decks: decks, bare: bare, probes: probes, places: P.length, roundSkipped: roundSkipped, roundIds: roundIds, wideKills: wideKills, tris: tris,
       fill: bandFill ? { tallFilled: fillTall, tallWalled: fillWalled, solid: fillSolid, lids: lids.map(function (L) { return { id: L.Q.q.id, floor: +L.Q.f.toFixed(2), ceiling: +L.Q.c.toFixed(2), open: L.open, of: L.all }; }) } : null };
   }
 
@@ -864,7 +865,7 @@
     var bandsStep = function () {
       var s0 = performance.now(), bd; try { bd = bands(TL, gb.scene, M.towers, M.rooms); } catch (e) { X.skipped.push('bands: ' + String(e && e.stack || e).slice(0, 300)); return; }
       gb.scene.add(keepShell(bd.group));   /* close=2 runs this step AFTER the massing (Amendment 5), so the massing's casts (the eaves fit, the strip, the raised foot) never read the pieces (in close=1 they did: pair14's dark patch at r90-e shows in c as in a, not red, eye-close-3223/v2/pair14-look.py) and the probe grid below holds the massing's own walls */
-      X.bands = { gaps: bd.gaps, log: bd.log, pieces: bd.pieces, tris: Math.round(bd.tris), tallSkipped: bd.tall, roundSkipped: bd.roundSkipped, roundIds: bd.roundIds, close: closeOn, close2: close2, faced: bd.faced, covered: bd.covered, towerKills: bd.towerKills, partFaced: bd.partFaced, extDropped: bd.extDropped, decks: bd.decks, closeDeck: closeDeckOn, bare: bd.bare, probes: bd.probes, places: bd.places, wideKills: bd.wideKills, fill: bd.fill, ms: Math.round(performance.now() - s0) };
+      X.bands = { gaps: bd.gaps, slits: bd.slits, log: bd.log, pieces: bd.pieces, tris: Math.round(bd.tris), tallSkipped: bd.tall, roundSkipped: bd.roundSkipped, roundIds: bd.roundIds, close: closeOn, close2: close2, faced: bd.faced, covered: bd.covered, towerKills: bd.towerKills, partFaced: bd.partFaced, extDropped: bd.extDropped, decks: bd.decks, closeDeck: closeDeckOn, bare: bd.bare, probes: bd.probes, places: bd.places, wideKills: bd.wideKills, fill: bd.fill, ms: Math.round(performance.now() - s0) };
     };
     var massingStep = function () {
       var s0 = performance.now(), m = massing(TL, gb.scene); gb.scene.add(keepShell(m.group));
