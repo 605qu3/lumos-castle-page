@@ -341,6 +341,94 @@ var PANEL_GRADE = {
   'library': 3, 'library-reading-room': 3, 'library-map-room': 3, 'dumbledores-office': 3
 };
 
+/* v198 (req 3344/3397, the Architect, 9 November 2026): the openings on each edge of a place, moved here unchanged out of
+   buildPlace so the envelope gate reads the cuts the builder makes from the model (openingCuts below), not a second
+   copy of the rules. E the place's edges (edgesOf), H its height over its floor; returns the gaps per edge and the
+   caps buildPlace draws over a shaft's corner sills */
+function gapsOf(M, Q, E, H) {
+    var gaps = E.map(function () { return []; }), caps = [];
+    (M.openings || []).concat(Q.ops || []).forEach(function (op) {
+      if (!matches(M, op, Q.id) || op.hatch || op.state === 'set aside') return;   /* v159 (req 2137): an opening the model sets aside builds no door. v134: a flag in a floor (`hatch`) is in no wall; built below as a hatch */
+      /* a doorway behind a panel or a tapestry reads as wall; v8 (req 520): from the hidden place it opens off (its
+         `inside`, the tapestry stair's well), a way out, its sill there `inside_sill`; v10: from its outer side the
+         wall takes a tap there, unseen (the events' `tap <id>`) */
+      var back = !!op.inside && (op.inside === Q.id || slug(op.inside) === Q.id);
+      var hid = /hidden/.test(op.kind || '') && !back;
+      var gid = op.group || null;
+      var pts = op.span ? op.span.map(function (p) { return toSite(M, gid, p); }) : op.at ? [toSite(M, gid, op.at)] : null;
+      if (!pts) return;
+      /* a doorway with a depth (v6: the Great Hall's doors, a 3 m passage, Godric's Q16) is found from the far face too */
+      var e = onEdgeE(E, pts[0], op.depth ? op.depth + 0.2 : null);
+      /* v68 (the shell grotto's cleft, found by the ninety-seventh, req 908's note): on a round room an opening set on the
+         drum's outer face far out (the cleft 3.0 out of the grotto's wall) lands square on no side from there, so,
+         found on none, it is carried in along its bearing onto the circle and cut where it meets the wall; a cleft takes a
+         pane as a window does, its slit of lake light */
+      if (!e && Q.round && pts.length === 1) {
+        var rdx = pts[0][0] - Q.round.c[0], rdy = pts[0][1] - Q.round.c[1], rD = Math.hypot(rdx, rdy);
+        if (rD > Q.round.r && (!op.depth || rD - Q.round.r <= op.depth + 0.2)) e = onEdgeE(E, [Q.round.c[0] + rdx / rD * Q.round.r, Q.round.c[1] + rdy / rD * Q.round.r]);
+      }
+      if (!e) return;
+      var s0, s1;
+      /* v75 (ledger 258, the lake rooms' seats): a window in a recess deeper than its wall (`recess`: its own cut, w, h
+         and sill, from the floor; `back` the stone the glass stands in at its far end) is cut at the recess's size */
+      var RC = op.recess && !back ? op.recess : null;
+      /* v142 (Godric's 1 on req 1812, req 1807): a window of `lights` with a `reveal` is cut at its embrasure, the lights'
+         width and both splays at the inner face, from the seat to the rere-arch's crown (equilateral, springing
+         reveal.spring), and its lights stand in a screen of stone at the reveal's depth (below, where the gaps are drawn) */
+      var LT = op.lights && op.reveal && op.reveal.spring && !back ? op.reveal : null;
+      var LW = LT ? (op.w || 1) + ((LT.splay || [])[0] || 0) + ((LT.splay || [])[1] || 0) : 0;
+      /* v7: the far end measured along the same edge, so an end on a corner (the first floor's mouth at x 92) is not
+         found on the next wall, its sill and head then running the length of this one */
+      if (pts.length > 1) { var s2 = alongEdge(E, e.i, pts[1]); s0 = Math.min(e.s, s2); s1 = Math.max(e.s, s2); }
+      else { var cw = RC ? RC.w : LT ? LW : (op.splay > (op.w || 1) ? op.splay : op.w) || 1; s0 = e.s - cw / 2; s1 = e.s + cw / 2; }   /* v89: a splayed loop cut at its inside width */
+      /* v137 (req 1701, the Architect's 285th): a span whose first end sits on a corner found the wall square across it
+         (drum-bend-mouth-5-nw at drum-bend-5's south-west corner), a gap of no width whose plane took the way's id, so the
+         mouth's own wall never hung one; such a span is found again from its middle, or is in no wall of this place */
+      if (pts.length > 1 && s1 - s0 < 0.05 && Math.hypot(pts[1][0] - pts[0][0], pts[1][1] - pts[0][1]) > 0.3) {
+        var em = onEdgeE(E, [(pts[0][0] + pts[1][0]) / 2, (pts[0][1] + pts[1][1]) / 2], op.depth ? op.depth + 0.2 : null);
+        if (!em || em.i === e.i) return;
+        var ea = alongEdge(E, em.i, pts[0]), eb = alongEdge(E, em.i, pts[1]);
+        e = em; s0 = Math.min(ea, eb); s1 = Math.max(ea, eb);
+        if (s1 - s0 < 0.05) return;
+      }
+      /* v10: held to its side; on a round wall an opening narrower than the side is moved along to fit it whole */
+      if (Q.area && s1 - s0 <= e.L) { if (s0 < 0) { s1 -= s0; s0 = 0; } if (s1 > e.L) { s0 -= s1 - e.L; s1 = e.L; } }
+      /* v15: on a curved face drawn in short sides (the casemate's round the drum), an opening wider than its side is cut
+         on into the next side too, where that side turns less than 30 degrees; no second leaf (powder-door, Events 1.44 am) */
+      var spill = [];
+      /* v84: a shaft's round wall too, for a cleft or window (its sides 1.0; H82's cleft 1.8 across the corner due south was cut on one side only; its doors as before) */
+      if ((!Q.area || (Q.shaft && /cleft|window|slit|loop/.test(op.kind || ''))) && !hid) {
+        var dirOf = function (k) { var ed = E[k]; return [ed.b[0] - ed.a[0], ed.b[1] - ed.a[1]]; };
+        var gentle = function (k) { var u = dirOf(e.i), v = dirOf(k), lu = Math.hypot(u[0], u[1]), lv = Math.hypot(v[0], v[1]);
+          return lu > 1e-6 && lv > 1e-6 && (u[0] * v[0] + u[1] * v[1]) / (lu * lv) > Math.cos(Math.PI / 6); };
+        var len = function (k) { var d = dirOf(k); return Math.hypot(d[0], d[1]); };
+        var nk = (e.i + 1) % E.length, pk = (e.i - 1 + E.length) % E.length;
+        for (var sk = 0; sk < 3 && len(nk) < 1e-3; sk++) nk = (nk + 1) % E.length;          /* past a repeated corner */
+        for (sk = 0; sk < 3 && len(pk) < 1e-3; sk++) pk = (pk - 1 + E.length) % E.length;
+        if (s1 > e.L + 0.02 && gentle(nk)) spill.push({ k: nk, s0: 0, s1: s1 - e.L });
+        if (s0 < -0.02 && gentle(pk)) { var PL = Math.hypot(dirOf(pk)[0], dirOf(pk)[1]); spill.push({ k: pk, s0: Math.max(0, PL + s0), s1: PL }); }
+      }
+      s0 = Math.max(0, s0); s1 = Math.min(e.L, s1);
+      var sill = (back && op.inside_sill != null ? op.inside_sill : op.sill) || 0;
+      if (op.sills && op.sills[Q.id] != null) sill = op.sills[Q.id];      /* v23: a way's sill at a face whose floor lies lower */
+      if (Q.shaft && op.z != null) sill += op.z - Q.floor;                /* v17: in a stair's well, at its own height */
+      else if (Q.shaft) { var oQ = findPlace(M, other(op, Q.id)); if (oQ) sill += oQ.floor - Q.floor; }   /* v25: with no z, at its other room's floor */
+      if (RC) sill = RC.sill || 0;
+      if (LT && LT.seat != null) sill = LT.seat;
+      var oh = RC ? RC.h : LT ? LT.spring + Math.sqrt(3) / 2 * LW - sill : op.h || 2.2;
+      var h = Q.sky ? oh + sill : Math.min(E[e.i].H != null ? E[e.i].H : H, oh + sill);
+      /* v23: an arch's `soffit` gives its head at each room's face (absolute), under a room's raised head */
+      var sof = op.soffit && !hid ? op.soffit : null, near = sof && sof[Q.id], far = sof && sof[other(op, Q.id)];
+      if (near != null) h = near - Q.floor;
+      gaps[e.i].push({ s0: s0, s1: s1, sill: sill, h: h, op: op, far: op.depth && e.d > 0.5 ? e.d : 0, back: back, hidden: hid,
+        soffit: near != null ? [h, far != null ? far - Q.floor : h] : null, recess: RC, lights: LT });
+      spill.forEach(function (sp) { gaps[sp.k].push({ s0: sp.s0, s1: sp.s1, sill: sill, h: h, op: op, back: back, hidden: false, spill: true }); });
+      /* v84: a shaft's opening over a corner (H82's cleft): a round wall's sides meet at their inner faces, leaving a V
+         outside each corner that the wall's height hides; a sill across the corner shows its top, so a cap over it */
+      if (Q.shaft && sill > 0) spill.forEach(function (sp) { caps.push({ sp: sp, e: e, op: op, sill: sill }); });
+    });
+    return { gaps: gaps, caps: caps };
+}
 window.CastleShell = { build: function (F, M, placeId, o) {
   o = o || {};
   var P = findPlace(M, placeId);
@@ -1360,93 +1448,14 @@ window.CastleShell = { build: function (F, M, placeId, o) {
     }
     var E = edgesOf(Q.loops || [Q.poly], Q.loopH, Q.loopT), trimB = {};   /* v91: the trim's geometries, by material */
     /* the openings on each edge: a gap [s0, s1] up to its head h */
-    var gaps = E.map(function () { return []; });
-    (M.openings || []).concat(Q.ops || []).forEach(function (op) {
-      if (!matches(M, op, Q.id) || op.hatch || op.state === 'set aside') return;   /* v159 (req 2137): an opening the model sets aside builds no door. v134: a flag in a floor (`hatch`) is in no wall; built below as a hatch */
-      /* a doorway behind a panel or a tapestry reads as wall; v8 (req 520): from the hidden place it opens off (its
-         `inside`, the tapestry stair's well), a way out, its sill there `inside_sill`; v10: from its outer side the
-         wall takes a tap there, unseen (the events' `tap <id>`) */
-      var back = !!op.inside && (op.inside === Q.id || slug(op.inside) === Q.id);
-      var hid = /hidden/.test(op.kind || '') && !back;
-      var gid = op.group || null;
-      var pts = op.span ? op.span.map(function (p) { return toSite(M, gid, p); }) : op.at ? [toSite(M, gid, op.at)] : null;
-      if (!pts) return;
-      /* a doorway with a depth (v6: the Great Hall's doors, a 3 m passage, Godric's Q16) is found from the far face too */
-      var e = onEdgeE(E, pts[0], op.depth ? op.depth + 0.2 : null);
-      /* v68 (the shell grotto's cleft, found by the ninety-seventh, req 908's note): on a round room an opening set on the
-         drum's outer face far out (the cleft 3.0 out of the grotto's wall) lands square on no side from there, so,
-         found on none, it is carried in along its bearing onto the circle and cut where it meets the wall; a cleft takes a
-         pane as a window does, its slit of lake light */
-      if (!e && Q.round && pts.length === 1) {
-        var rdx = pts[0][0] - Q.round.c[0], rdy = pts[0][1] - Q.round.c[1], rD = Math.hypot(rdx, rdy);
-        if (rD > Q.round.r && (!op.depth || rD - Q.round.r <= op.depth + 0.2)) e = onEdgeE(E, [Q.round.c[0] + rdx / rD * Q.round.r, Q.round.c[1] + rdy / rD * Q.round.r]);
-      }
-      if (!e) return;
-      var s0, s1;
-      /* v75 (ledger 258, the lake rooms' seats): a window in a recess deeper than its wall (`recess`: its own cut, w, h
-         and sill, from the floor; `back` the stone the glass stands in at its far end) is cut at the recess's size */
-      var RC = op.recess && !back ? op.recess : null;
-      /* v142 (Godric's 1 on req 1812, req 1807): a window of `lights` with a `reveal` is cut at its embrasure, the lights'
-         width and both splays at the inner face, from the seat to the rere-arch's crown (equilateral, springing
-         reveal.spring), and its lights stand in a screen of stone at the reveal's depth (below, where the gaps are drawn) */
-      var LT = op.lights && op.reveal && op.reveal.spring && !back ? op.reveal : null;
-      var LW = LT ? (op.w || 1) + ((LT.splay || [])[0] || 0) + ((LT.splay || [])[1] || 0) : 0;
-      /* v7: the far end measured along the same edge, so an end on a corner (the first floor's mouth at x 92) is not
-         found on the next wall, its sill and head then running the length of this one */
-      if (pts.length > 1) { var s2 = alongEdge(E, e.i, pts[1]); s0 = Math.min(e.s, s2); s1 = Math.max(e.s, s2); }
-      else { var cw = RC ? RC.w : LT ? LW : (op.splay > (op.w || 1) ? op.splay : op.w) || 1; s0 = e.s - cw / 2; s1 = e.s + cw / 2; }   /* v89: a splayed loop cut at its inside width */
-      /* v137 (req 1701, the Architect's 285th): a span whose first end sits on a corner found the wall square across it
-         (drum-bend-mouth-5-nw at drum-bend-5's south-west corner), a gap of no width whose plane took the way's id, so the
-         mouth's own wall never hung one; such a span is found again from its middle, or is in no wall of this place */
-      if (pts.length > 1 && s1 - s0 < 0.05 && Math.hypot(pts[1][0] - pts[0][0], pts[1][1] - pts[0][1]) > 0.3) {
-        var em = onEdgeE(E, [(pts[0][0] + pts[1][0]) / 2, (pts[0][1] + pts[1][1]) / 2], op.depth ? op.depth + 0.2 : null);
-        if (!em || em.i === e.i) return;
-        var ea = alongEdge(E, em.i, pts[0]), eb = alongEdge(E, em.i, pts[1]);
-        e = em; s0 = Math.min(ea, eb); s1 = Math.max(ea, eb);
-        if (s1 - s0 < 0.05) return;
-      }
-      /* v10: held to its side; on a round wall an opening narrower than the side is moved along to fit it whole */
-      if (Q.area && s1 - s0 <= e.L) { if (s0 < 0) { s1 -= s0; s0 = 0; } if (s1 > e.L) { s0 -= s1 - e.L; s1 = e.L; } }
-      /* v15: on a curved face drawn in short sides (the casemate's round the drum), an opening wider than its side is cut
-         on into the next side too, where that side turns less than 30 degrees; no second leaf (powder-door, Events 1.44 am) */
-      var spill = [];
-      /* v84: a shaft's round wall too, for a cleft or window (its sides 1.0; H82's cleft 1.8 across the corner due south was cut on one side only; its doors as before) */
-      if ((!Q.area || (Q.shaft && /cleft|window|slit|loop/.test(op.kind || ''))) && !hid) {
-        var dirOf = function (k) { var ed = E[k]; return [ed.b[0] - ed.a[0], ed.b[1] - ed.a[1]]; };
-        var gentle = function (k) { var u = dirOf(e.i), v = dirOf(k), lu = Math.hypot(u[0], u[1]), lv = Math.hypot(v[0], v[1]);
-          return lu > 1e-6 && lv > 1e-6 && (u[0] * v[0] + u[1] * v[1]) / (lu * lv) > Math.cos(Math.PI / 6); };
-        var len = function (k) { var d = dirOf(k); return Math.hypot(d[0], d[1]); };
-        var nk = (e.i + 1) % E.length, pk = (e.i - 1 + E.length) % E.length;
-        for (var sk = 0; sk < 3 && len(nk) < 1e-3; sk++) nk = (nk + 1) % E.length;          /* past a repeated corner */
-        for (sk = 0; sk < 3 && len(pk) < 1e-3; sk++) pk = (pk - 1 + E.length) % E.length;
-        if (s1 > e.L + 0.02 && gentle(nk)) spill.push({ k: nk, s0: 0, s1: s1 - e.L });
-        if (s0 < -0.02 && gentle(pk)) { var PL = Math.hypot(dirOf(pk)[0], dirOf(pk)[1]); spill.push({ k: pk, s0: Math.max(0, PL + s0), s1: PL }); }
-      }
-      s0 = Math.max(0, s0); s1 = Math.min(e.L, s1);
-      var sill = (back && op.inside_sill != null ? op.inside_sill : op.sill) || 0;
-      if (op.sills && op.sills[Q.id] != null) sill = op.sills[Q.id];      /* v23: a way's sill at a face whose floor lies lower */
-      if (Q.shaft && op.z != null) sill += op.z - Q.floor;                /* v17: in a stair's well, at its own height */
-      else if (Q.shaft) { var oQ = findPlace(M, other(op, Q.id)); if (oQ) sill += oQ.floor - Q.floor; }   /* v25: with no z, at its other room's floor */
-      if (RC) sill = RC.sill || 0;
-      if (LT && LT.seat != null) sill = LT.seat;
-      var oh = RC ? RC.h : LT ? LT.spring + Math.sqrt(3) / 2 * LW - sill : op.h || 2.2;
-      var h = Q.sky ? oh + sill : Math.min(E[e.i].H != null ? E[e.i].H : H, oh + sill);
-      /* v23: an arch's `soffit` gives its head at each room's face (absolute), under a room's raised head */
-      var sof = op.soffit && !hid ? op.soffit : null, near = sof && sof[Q.id], far = sof && sof[other(op, Q.id)];
-      if (near != null) h = near - Q.floor;
-      gaps[e.i].push({ s0: s0, s1: s1, sill: sill, h: h, op: op, far: op.depth && e.d > 0.5 ? e.d : 0, back: back, hidden: hid,
-        soffit: near != null ? [h, far != null ? far - Q.floor : h] : null, recess: RC, lights: LT });
-      spill.forEach(function (sp) { gaps[sp.k].push({ s0: sp.s0, s1: sp.s1, sill: sill, h: h, op: op, back: back, hidden: false, spill: true }); });
-      /* v84: a shaft's opening over a corner (H82's cleft): a round wall's sides meet at their inner faces, leaving a V
-         outside each corner that the wall's height hides; a sill across the corner shows its top, so a cap over it */
-      if (Q.shaft && sill > 0) spill.forEach(function (sp) {
-        var c = sp.k === (e.i + 1) % E.length ? E[e.i].b : E[e.i].a, t = Q.wall || 0.5, z = Q.floor + sill;
-        var nrm = function (k) { var ed = E[k], l = Math.hypot(ed.b[0] - ed.a[0], ed.b[1] - ed.a[1]); return [(ed.b[1] - ed.a[1]) / l, -(ed.b[0] - ed.a[0]) / l]; };
-        var n0 = nrm(e.i), n1 = nrm(sp.k), cg = new THREE.BufferGeometry().setFromPoints([toLocal(c[0], c[1], z),
-          toLocal(c[0] + n0[0] * t, c[1] + n0[1] * t, z), toLocal(c[0] + n1[0] * t, c[1] + n1[1] * t, z)]);
-        cg.computeVertexNormals();
-        var cm = F.register(new THREE.Mesh(cg, mats.wall), LAYER.wall); cm.name = Q.id + '-cap-' + op.id; cm.userData.owner = Q.id; group.add(cm);
-      });
+    var GO = gapsOf(M, Q, E, H), gaps = GO.gaps;   /* v198: the resolver, module level, shared with openingCuts */
+  GO.caps.forEach(function (cp) { var sp = cp.sp, e = cp.e, op = cp.op, sill = cp.sill;
+      var c = sp.k === (e.i + 1) % E.length ? E[e.i].b : E[e.i].a, t = Q.wall || 0.5, z = Q.floor + sill;
+      var nrm = function (k) { var ed = E[k], l = Math.hypot(ed.b[0] - ed.a[0], ed.b[1] - ed.a[1]); return [(ed.b[1] - ed.a[1]) / l, -(ed.b[0] - ed.a[0]) / l]; };
+      var n0 = nrm(e.i), n1 = nrm(sp.k), cg = new THREE.BufferGeometry().setFromPoints([toLocal(c[0], c[1], z),
+        toLocal(c[0] + n0[0] * t, c[1] + n0[1] * t, z), toLocal(c[0] + n1[0] * t, c[1] + n1[1] * t, z)]);
+      cg.computeVertexNormals();
+      var cm = F.register(new THREE.Mesh(cg, mats.wall), LAYER.wall); cm.name = Q.id + '-cap-' + op.id; cm.userData.owner = Q.id; group.add(cm);
     });
     /* a niche in the wall (a feature with a depth: the hourglasses', Godric's 13.1): cut, its back the wall's outer
        part, its head round */
@@ -4032,4 +4041,13 @@ function farView(F, M, toLocal, panes, paneMat, shaft) {
 }
 /* v197 (req 3344/3397, the envelope's page adapter): findPlace out, so CastleEnvelope.declare reads the places the builder builds */
 window.CastleShell.findPlace = findPlace;
+/* v198: openingCuts(M, id) -> the cuts the builder makes in place id's walls, in site coordinates: [{ op, edge, a, b,
+   s0, s1, z0, z1, far }], a and b the edge's ends, s along it from a, z absolute (its floor plus the gap's sill and head) */
+window.CastleShell.openingCuts = function (M, id) {
+  var Q = findPlace(M, id); if (!Q || !Q.poly) return [];
+  var E = edgesOf(Q.loops || [Q.poly], Q.loopH, Q.loopT), H = (Q.ceiling != null ? Q.ceiling : Q.floor + 12) - Q.floor, out = [];
+  gapsOf(M, Q, E, H).gaps.forEach(function (gs, i) { gs.forEach(function (g) {
+    out.push({ op: g.op.id, edge: i, a: E[i].a, b: E[i].b, s0: g.s0, s1: g.s1, z0: Q.floor + g.sill, z1: Q.floor + g.h, far: g.far || 0, spill: !!g.spill }); }); });
+  return out;
+};
 })();
