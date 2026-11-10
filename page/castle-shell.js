@@ -1543,7 +1543,18 @@ window.CastleShell = { build: function (F, M, placeId, o) {
       if (!ft.depth || !ft.at || !ft.room || (ft.room !== Q.id && slug(ft.room) !== Q.id)) return;
       var e = onEdgeE(E, toSite(M, ft.group || null, ft.at));
       if (!e) return;
-      gaps[e.i].push({ s0: e.s - ft.w / 2, s1: e.s + ft.w / 2, sill: ft.sill || 0, h: Math.min(H, (ft.h || 2.2) + (ft.sill || 0)), op: ft, niche: true });
+      var ns0 = e.s - ft.w / 2, ns1 = e.s + ft.w / 2, nsill = ft.sill || 0, nh = Math.min(H, (ft.h || 2.2) + (ft.sill || 0));
+      var ng = { s0: ns0, s1: ns1, sill: nsill, h: nh, op: ft, niche: true };
+      gaps[e.i].push(ng);
+      /* v216 (req 3553's fourth fault: postern-outer-leaf-g, 0.8 wide on the passage's 0.34 m sides): a niche wider than
+         its side on a curve (the next side turning under 30 degrees) leaves the next sides open over its width, as an
+         opening's v15 rest does; its back, head and floor are drawn once, straight, on its own side */
+      var dOf = function (k) { return [E[k].b[0] - E[k].a[0], E[k].b[1] - E[k].a[1]]; }, lOf = function (k) { var d = dOf(k); return Math.hypot(d[0], d[1]); };
+      var gent = function (k) { var u = dOf(e.i), v = dOf(k), lu = lOf(e.i), lv = lOf(k);
+        return lu > 1e-6 && lv > 1e-6 && (u[0] * v[0] + u[1] * v[1]) / (lu * lv) > Math.cos(Math.PI / 6); };
+      var nkN = (e.i + 1) % E.length, pkN = (e.i - 1 + E.length) % E.length, LeN = lOf(e.i);
+      if (ns1 > LeN + 0.02 && gent(nkN)) { gaps[nkN].push({ s0: 0, s1: Math.min(lOf(nkN), ns1 - LeN), sill: nsill, h: nh, op: ft, spill: true }); ng.wide = [ns0, ns1]; ng.s1 = LeN; }
+      if (ns0 < -0.02 && gent(pkN)) { gaps[pkN].push({ s0: Math.max(0, lOf(pkN) + ns0), s1: lOf(pkN), sill: nsill, h: nh, op: ft, spill: true }); ng.wide = [ns0, ns1]; ng.s0 = 0; }
     });
     /* v78 (the Architect's 159th; Godric's 11.15 pm, 23 October 2026, Filch's office: "the corbel is in front of the
        door"): a beam's corbels hang from 0.78 under the ceiling, so in a low room one landing over an opening stood
@@ -1686,6 +1697,8 @@ window.CastleShell = { build: function (F, M, placeId, o) {
        hall's whole north wall, and 40.75 to 46.3 stood open in every walk). Now the edge is given away only where its
        sharers cover all of it, along and up; a partly shared edge is built, each sharer's own stretch left to it (below,
        YL), sharing by span overlap. v2 walls keep their own */
+    var EXTCAP = (/(^|[?&])extcap=(\w+)/.exec(window.location.search || '') || [])[2] || 'on';   /* v216: the corner cap; 0 the before */
+    var EXTCAPPED = window.CASTLE_EXTCAPPED || (window.CASTLE_EXTCAPPED = []);   /* v216: the corners it shortened, for the gate's list */
     var SHCUT = !WALLS2 && /(^|[?&])shared=cut(&|$)/.test(window.location.search || '');   /* opt-in until the gate's marks hold; then the default, ?shared=mid the before */
     function sharersE(ed) {   /* places built before this one with a side on this edge's line over it: their stretch along it and their height, over Q.floor */
       var a = ed.a, b = ed.b, L = Math.hypot(b[0] - a[0], b[1] - a[1]), res = [];
@@ -1766,6 +1779,22 @@ window.CastleShell = { build: function (F, M, placeId, o) {
       var turn = function (e0, e1) { return (e0.b[0] - e0.a[0]) * (e1.b[1] - e1.a[1]) - (e0.b[1] - e0.a[1]) * (e1.b[0] - e1.a[0]); };
       if (ext0 && pL >= 1e-6 && turn(pe, ed) < -1e-9) ext0 = 0;
       if (ext1 && turn(ed, ne) < -1e-9) ext1 = 0;
+      /* v216 (req 3553's fourth fault, the postern passage's door and loop behind a 0.34 m side's end block): a corner
+         block runs on only as far as closes the outer angle, t tan(turn) and 2 cm (t sin(turn) closes it), t the thicker
+         of the two sides; a turn of 45 degrees or more keeps t. On a curve drawn in short sides no side reaches across
+         its neighbour, opening or none. ?extcap=0 the before; ?extcap=none no run-on at a gentle turn (the gate's bad) */
+      if (EXTCAP !== '0') {
+        var tOf = function (k) { var e2 = E[k]; return e2.T || (Q.walls ? ((Array.isArray(Q.walls) ? Q.walls[k] : Q.walls[['south', 'east', 'north', 'west'][k]]) || Q.wall) : Q.wall) || t; };
+        var capOf = function (e0, e1, tt) { var l0 = Math.hypot(e0.b[0] - e0.a[0], e0.b[1] - e0.a[1]), l1 = Math.hypot(e1.b[0] - e1.a[0], e1.b[1] - e1.a[1]);
+          if (l0 < 1e-6 || l1 < 1e-6) return Infinity;
+          var c = ((e0.b[0] - e0.a[0]) * (e1.b[0] - e1.a[0]) + (e0.b[1] - e0.a[1]) * (e1.b[1] - e1.a[1])) / (l0 * l1), s = turn(e0, e1) / (l0 * l1);
+          if (c <= 1e-6 || s <= 0 || s / c >= 1) return Infinity;
+          return EXTCAP === 'none' ? 0 : tt * s / c + 0.02; };
+        var e1Was = ext1, e0Was = ext0;
+        if (ext1) ext1 = Math.min(ext1, capOf(ed, ne, Math.max(t, tOf((i + 1) % E.length))));
+        if (ext0 && pL >= 1e-6) ext0 = Math.min(ext0, capOf(pe, ed, Math.max(t, tOf(pi))));
+        if (ext1 !== e1Was || ext0 !== e0Was) EXTCAPPED.push({ room: Q.id, side: i, ext0: [e0Was, ext0], ext1: [e1Was, ext1] });
+      }
       /* v113 (the 227th, req 1511's floor 1 seams): where a place beside has its own side on this wall's line past the
          corner, its wall carries the face on and the corner block would stand in it (the stair hall's west wall ran 0.8
          into the Entrance Hall's, one face at x 68 over its 9.7, 7.76 m2) */
@@ -2100,6 +2129,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
            else that part of the cut stood open on the dark */
         if (g.spill) { if (!g.back && /window|loop|lancet|oriel|dormer|cleft/.test(g.op.kind || '')) pane(g, '-' + i); return; }
         var sm = (g.s0 + g.s1) / 2, w = g.s1 - g.s0, hh = g.h - g.sill;
+        if (g.wide) { sm = (g.wide[0] + g.wide[1]) / 2; w = g.wide[1] - g.wide[0]; }   /* v216: a niche cut on over a curve's corners, drawn whole */
         var mid = toLocal(a[0] + ux * sm, a[1] + uy * sm, Q.floor);
         var inward = new THREE.Vector3(-nx, 0, ny);                     /* site (-nx, -ny) into the local frame */
         /* v23 (the Found list): an arch's soffit through the wall from its head at this face to its head at the far
