@@ -70,7 +70,8 @@
     return tx;
   }
   function inkMat(k, skin) {   /* figure.js's ink hull: the back faces pushed out along the normal, in the castle's one ink */
-    var m = new THREE.MeshBasicMaterial({ color: INK, side: THREE.BackSide, skinning: !!skin });
+    /* lin(INK): given raw, the ink drew as a mid grey (67,58,49) lighter than the wall it outlines (req 3412, 9 Nov 2026) */
+    var m = new THREE.MeshBasicMaterial({ color: lin(INK), side: THREE.BackSide, skinning: !!skin });
     m.onBeforeCompile = function (sh) { sh.vertexShader = sh.vertexShader.replace('#include <begin_vertex>', 'vec3 transformed = position + normal * ' + k.toFixed(5) + ';'); };
     m.customProgramCacheKey = function () { return 'f3ink' + (skin ? 's' : 'r') + k.toFixed(5); };
     return m;
@@ -122,7 +123,7 @@
     var orig = null; skinned.concat(rigid).some(function (m) { return m.material && m.material.map && (orig = m.material.map); });
     var cape = null, tx = atlas(orig), k = 0.0055 / s, inkS = inkMat(k, true), inkR = inkMat(k, false), calls = 0, openBook = null;
     function dress(m, sk) {
-      m.material = new THREE.MeshToonMaterial({ map: tx, gradientMap: tones(), skinning: sk });
+      m.material = new THREE.MeshToonMaterial({ map: tx, gradientMap: tones(), skinning: sk }); if (window.CastleHatch) CastleHatch.apply(m.material);
       var h = sk ? new THREE.SkinnedMesh(m.geometry, inkS) : new THREE.Mesh(m.geometry, inkR);
       h.frustumCulled = false; m.frustumCulled = false; h.name = m.name + '-ink';
       if (sk) { m.parent.add(h); h.bind(m.skeleton, m.bindMatrix); } else m.add(h);
@@ -261,6 +262,7 @@
     R = ctx;
     if (SHOW_CARD) card = makeCard();
     if (!SHOW_FIG) { info.state = 'card only'; return api; }
+    if (Q.get('f3glb')) { startLib(Q.get('f3glb')); return api; }
     var loader;
     addScript('people/GLTFLoader.js?v=1').then(function () {
       loader = new THREE.GLTFLoader();
@@ -277,6 +279,48 @@
     }).catch(function (e) { info = { state: 'failed', error: String(e && e.message || e) }; console.error('figure3d: ' + info.error); });
     return api;
   }
+
+  /* ---------- a library figure (req 3406, 3412): &f3glb=people/models/lib/girl-17.glb ----------
+     People's MPFB bodies (game_engine rig, clip Walk). The same toon ramp, ink hull and shared hatching as the stand-in, at
+     HEIGHT, on the fire mark's spot 0 (still: turned &f3angle degrees from facing the eye; &f3act=toward walks 3.2 m toward the
+     eye; &f3t=seconds holds the clip there). No sitting clip exists on this rig, so no seated shot. */
+  var lib = null;
+  function startLib(path) {
+    addScript('people/GLTFLoader.js?v=1').then(function () {
+      return new Promise(function (res, rej) { new THREE.GLTFLoader().load(path, res, undefined, rej); });
+    }).then(function (gl) {
+      var body = gl.scene, skinned = [];
+      body.traverse(function (o) { if (o.isSkinnedMesh) skinned.push(o); });
+      var clip = gl.animations.filter(function (a) { return a.name === 'Walk'; })[0] || gl.animations[0];
+      var mixer = new THREE.AnimationMixer(body), act = mixer.clipAction(clip); act.play(); mixer.setTime(HOLD >= 0 ? HOLD : 0); body.updateMatrixWorld(true);
+      /* 4-pre (req 3412, 9 Nov 2026): the ink hull at 5.5 mm drew under 1 px at the hearth, so 13 mm (about 1.5 px there,
+         &f3ink= in metres to try another); an untextured body takes the card's own skin under the room's light, 0x8c6a55 (of three tried, nearest the card in brightness),
+         worked back from the card skin's rendered colour over a white body's (docs/common-room/lib-figure-3406/measure.py) */
+      var box = new THREE.Box3().setFromObject(body), s = HEIGHT / (box.max.y - box.min.y), k = (Q.has('f3ink') ? +Q.get('f3ink') : 0.013) / s;
+      var ink = inkMat(k, true), bare = lin(Q.has('f3tone') ? parseInt(Q.get('f3tone'), 16) : 0x8c6a55);
+      skinned.forEach(function (m) {
+        var old = m.material;
+        m.material = new THREE.MeshToonMaterial({ color: old.map ? 0xffffff : bare, map: old.map || null, gradientMap: tones(), skinning: true });
+        if (window.CastleHatch) CastleHatch.apply(m.material);
+        var h = new THREE.SkinnedMesh(m.geometry, ink); h.frustumCulled = false; m.frustumCulled = false; h.name = m.name + '-ink';
+        m.parent.add(h); h.bind(m.skeleton, m.bindMatrix);
+      });
+      var group = new THREE.Group(); body.scale.setScalar(s); body.position.y = -box.min.y * s; group.add(body); R.scene.add(group);
+      lib = { group: group, mixer: mixer, t: HOLD >= 0 ? HOLD : 0, p0: [R.spots[0].x, R.spots[0].z], yaw: null };
+      libStep(0);
+      ready = true; info = { state: 'ready (library figure)', scale: +s.toFixed(4), glb: path, clip: clip.name, height: HEIGHT };
+    }).catch(function (e) { info = { state: 'failed', error: String(e && e.message || e) }; console.error('figure3d: ' + info.error); });
+  }
+  function libStep(dt) {
+    if (!lib) return;
+    if (HOLD < 0) { lib.t += dt; lib.mixer.update(dt); }
+    var p = lib.p0.slice();
+    if (ACT === 'toward') p[1] += Math.min(3.2, lib.t * 1.0);
+    lib.group.position.set(p[0], 0, p[1]);
+    lib.group.rotation.y = ACT === 'toward' ? 0 : Math.atan2(R.camera.position.x - p[0], R.camera.position.z - p[1]) + ANGLE;
+    lib.group.updateMatrixWorld(true);
+  }
+
   /* the sofa is hers while the mockup runs: a drawn pupil the room's timetable puts on it would sit inside her, so any pool
      card within 1.2 m of her seat is kept hidden (the room's own figures elsewhere are untouched) */
   function clearSofa() {
@@ -284,7 +328,7 @@
     var seat = R.onSofa(0, 0.25);
     for (var c in R.poolCards) { var m = R.poolCards[c]; if (m && m.visible && Math.hypot(m.position.x - seat[0], m.position.z - seat[1]) < 1.2) m.visible = false; }
   }
-  function update(dt) { if (ready && HOLD < 0) step(dt); if (ready) clearSofa(); }
+  function update(dt) { if (lib) { libStep(dt); return; } if (ready && HOLD < 0) step(dt); if (ready) clearSofa(); }
   var api = { start: start, update: update, _fig: function () { return fig; }, _ctx: function () { return R; }, info: function () {
     if (fig) fig.group.updateMatrixWorld(true);
     return Object.assign({ t: +t.toFixed(2), at: fig ? fig.group.position.toArray().map(function (x) { return +x.toFixed(3); }) : null,
