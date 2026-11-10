@@ -63,9 +63,16 @@
           if (q.top) { var ts = [t0, (t0 + t1) / 2, t1].map(function (t) { return q.top(a[0] + dx * t, a[1] + dy * t); });
             if (ts.every(function (v) { return v != null; })) { var zt = q.floor + Math.min.apply(null, ts);
               merged = merged.filter(function (b) { return b.z0 < zt - 0.005; }); merged.forEach(function (b) { b.z1 = Math.min(b.z1, zt); }); } }
+          /* the party wall's band (10 November 2026, the Architect, req 3344 row 3; envelope-3344.md, "The declaration's shared
+             side, design gate"): a shared piece carries [in, out] along its normal, from the piece's line: centred on the shared
+             line or the gap's middle, max(gap, 0.3) thick, the gap here exact (the ray to the neighbour's plan edge), not the
+             probe's 0.05 step. The gate reads it for shared pieces; air keeps the full outward wall */
+          function band(o) { var g = o.d, p = o.q.poly; for (var e = 0, f = p.length - 1; e < p.length; f = e++) { var px = p[f][0], py = p[f][1], sx = p[e][0] - px, sy = p[e][1] - py, den = nx * sy - ny * sx; if (Math.abs(den) < 1e-12) continue;
+              var tt = ((px - mx) * sy - (py - my) * sx) / den, ss = ((px - mx) * ny - (py - my) * nx) / den; if (tt >= -1e-9 && ss >= -1e-9 && ss <= 1 + 1e-9 && tt < g) g = Math.max(0, tt); }
+            var th = Math.max(g, 0.3); return [g / 2 - th / 2, g / 2 + th / 2]; }
           merged.forEach(function (b) { var other = b.o ? b.o.q : null, len = L / m, fr = H > 0 ? (b.z1 - b.z0) / H : 1;
             var pc = { place: q.id, a: [a[0] + dx * t0, a[1] + dy * t0], b: [a[0] + dx * t1, a[1] + dy * t1], n: [nx, ny], z0: b.z0, z1: b.z1, len: len, frac: fr, edge: i, col: j,
-              kind: other ? 'shared' : 'air', other: other ? other.id : null, gap: b.o ? b.o.d : null, owner: other ? (q.id < other.id ? q.id : other.id) : q.id };
+              kind: other ? 'shared' : 'air', other: other ? other.id : null, gap: b.o ? b.o.d : null, band: b.o ? band(b.o) : null, owner: other ? (q.id < other.id ? q.id : other.id) : q.id };
             pieces.push(pc); if (other) { T.shared += len * fr; if (pc.owner === q.id) T.sharedOwned += len * fr; } else T.air += len * fr; });
         }
       }
