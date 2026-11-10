@@ -4180,7 +4180,27 @@ function farView(F, M, toLocal, panes, paneMat, shaft) {
 window.CastleShell.findPlace = findPlace;
 /* v200 (req 3344): a place's walls' tops over its floor, top(x, y) on its plan edge, from the same section its builder
    reads (glasshouses); null where the walls stand to the ceiling */
-window.CastleShell.wallTop = function (M, id) { var Q = findPlace(M, id); return Q && Q.glasshouse && Q.glasshouse.house ? glassSection(Q.glasshouse).top : null; };
+/* v202 (req 3344, 10 November 2026, the Architect; envelope-3344.md, "places under the sky"): a place with no ceiling (the
+   model's open_sky room, the leads, a lantern ring) gives each side's own top from the loopH and sky its builder draws
+   from: the nearest side of any loop, its height a number per loop or one per side; the leads' breast where it has no
+   loopH. top.sky marks the place open above: the envelope gate stands its ceiling on the tallest side and floods it
+   under the lowest */
+function skyTop(Q) {
+  if (!Q || Q.ceiling != null) return null;
+  var L = Q.loops || [Q.poly], H = Q.loopH, br = Q.sky ? Q.sky.breast : null;
+  if (!H && br == null) return null;
+  var hOf = function (li, i) { var h = H ? H[li] : br; return Array.isArray(h) ? h[i] : (h != null ? h : br); };
+  var hs = []; L.forEach(function (lp, li) { lp.forEach(function (_, i) { var h = hOf(li, i); if (h != null) hs.push(h); }); });
+  if (!hs.length) return null;
+  var top = function (x, y) { var best = null, bd = 1e9;
+    L.forEach(function (lp, li) { for (var i = 0; i < lp.length; i++) { var a = lp[i], b = lp[(i + 1) % lp.length], dx = b[0] - a[0], dy = b[1] - a[1], ll = dx * dx + dy * dy;
+      var t = ll ? Math.max(0, Math.min(1, ((x - a[0]) * dx + (y - a[1]) * dy) / ll)) : 0, d = Math.hypot(a[0] + dx * t - x, a[1] + dy * t - y);
+      if (d < bd) { bd = d; best = hOf(li, i); } } });
+    return best; };
+  top.sky = { min: Math.min.apply(null, hs), max: Math.max.apply(null, hs) };
+  return top;
+}
+window.CastleShell.wallTop = function (M, id) { var Q = findPlace(M, id); return Q && Q.glasshouse && Q.glasshouse.house ? glassSection(Q.glasshouse).top : skyTop(Q); };
 /* v198: openingCuts(M, id) -> the cuts the builder makes in place id's walls, in site coordinates: [{ op, edge, a, b,
    s0, s1, z0, z1, far }], a and b the edge's ends, s along it from a, z absolute (its floor plus the gap's sill and head) */
 window.CastleShell.openingCuts = function (M, id) {
