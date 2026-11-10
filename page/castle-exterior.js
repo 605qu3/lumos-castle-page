@@ -114,7 +114,7 @@
      the built shell, not dressing, so each is kept. */
   function keepShell(g) { var B = window.lumosBare; if (B && B.kept && g) g.traverse(function (o) { B.kept.add(o); }); return g; }
   function keepPlaces(out) { (out.places || []).forEach(function (q) { builtPlaces.push(q); }); }
-  var GREYS = { raiseFoot: 0xb8b2a8, filler: 0xb9b2a6, roof: 0x5f6670, parapet: 0x8a857e, ground: 0x7d8a5c, rock: 0x8b8478, water: 0x6f8797, raise: 0xa39d92, stripBand: 0xa39d92, stripTop: 0xa39d92, soffit: 0xd0c9bb, raiseCourse: 0x868077, slit: 0x18181a };   /* raise and raiseCourse are set from the probed wall tone (req 3222) */
+  var GREYS = { raiseFoot: 0xb8b2a8, filler: 0xb9b2a6, roof: 0x5f6670, parapet: 0x8a857e, ground: 0x7d8a5c, rock: 0x8b8478, water: 0x6f8797, deep: 0x2f5a4c, raise: 0xa39d92, stripBand: 0xa39d92, stripTop: 0xa39d92, soffit: 0xd0c9bb, raiseCourse: 0x868077, slit: 0x18181a };   /* raise and raiseCourse are set from the probed wall tone (req 3222) */
   function massing(TL, scene) {
     var T = {}; Object.keys(GREYS).forEach(function (k) { T[k] = []; });
     function tri(k, a, b, c) { [a, b, c].forEach(function (p) { var v = TL(p[0], p[1], p[2]); T[k].push(v.x, v.y, v.z); }); }
@@ -484,6 +484,11 @@
        ends, as bands() does), 0.01 m behind the innermost +y face beside it at the exposed x (plane-b.json), running 0.02 m into the slab at each end;
        the bands in `raise` times 0.80 (?stripk=, the floor groups render 0.78 to 0.83 of the massing at one colour), the top in `raise`. 9.7 clears
        the lancets' top at 8.8 (card 3238, whose faces stay unwalled). On by default since v27, ?strip=0 leaves it out; judged with ?bands=1. */
+    /* v30 (req 3340, the Architect 9 Nov 2026 3.30 am; req 3338): the Entrance Hall's north wall is y 70 to 72 in the model (2 m, the outer front, so the two
+       buttresses' back face at y 72 is flush), but the shell's floor group builds every room's wall at the default 0.8 m, so the view's face stood at
+       y 70.8 below z 10.4 (rays from the north, eye-1110 probe). One box in the wall's tone fills y 70.8 to 72 across the hall's width, 0.02 m inside each
+       side so no face lies in another's plane. ?hallnorth=0 leaves it out. */
+    if (!/[?&]hallnorth=0/.test(location.search)) box('raise', [68.02, 70.78, 91.98, 71.99], -5.18, 10.38);
     if (!/[?&]strip=0/.test(location.search)) {   /* v27 (8 Nov 2026, Fawkes 7.30 am: item 7 v27 PASSED): ON by default, ?strip=0 leaves it out */
       var sk = +((/[?&]stripk=([0-9.]+)/.exec(location.search) || [])[1] || 0.8), tn = GREYS.raise;
       GREYS.stripBand = ((tn >> 16 & 255) * sk << 16) | ((tn >> 8 & 255) * sk << 8) | ((tn & 255) * sk | 0);
@@ -523,6 +528,21 @@
     var sq = [[80 - 800, -800], [80 + 800, -800], [80 + 800, 800], [80 - 800, 800]];
     cap('ground', sq, lake ? [lake.poly] : null, -20); wallRing('rock', sq, LO, -20);
     if (lake) { wallRing('rock', lake.poly, LO, -20); cap('water', lake.poly, null, LO); }
+    /* v31 (req 3265, 3270; Grounds' answer req 3339, docs/grounds/loch-bed-3339.md, 9 Nov 2026): the loch's bed. Under the opaque water cap there was
+       nothing, so a window at -90.65 saw sky. The bed is Grounds' field (docs/grounds/plain-3163vr-field.npy, model level = field - 122, 10 m nodes
+       read bilinear at cell centres, x 10 to 150 east, y -10 to -150), the shelf from the shore to y -50 held at -82.5 as Grounds wrote it (a clamp,
+       not a measured bed), the fall from y -50 on. A cell whose mean is under -88 is the green water volume ('deep'); shallower cells are rock.
+       Skirts on the west, east and south edges run to -120 so nothing opens to sky. ?bed=0 leaves it out. */
+    if (!/[?&]bed=0/.test(location.search)) {
+      var BX = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150], BY = [-10, -20, -30, -40, -50, -60, -70, -80, -90, -100, -110, -120, -130, -140, -150],
+          BZ = [[-82.5,-82.5,-82.5,-82.5,-82.5,-82.5,-82.5,-82.5,-82.5,-82.5,-82.5,-82.5,-82.5,-82.5,-82.5],[-82.5,-82.5,-82.5,-82.5,-82.5,-82.5,-82.5,-82.5,-82.5,-82.5,-82.5,-82.5,-82.5,-82.5,-82.5],[-82.5,-82.5,-82.5,-82.5,-82.5,-82.5,-82.5,-82.5,-82.5,-82.5,-82.5,-82.5,-82.5,-82.5,-82.5],[-82.5,-82.5,-82.5,-82.5,-82.5,-82.5,-82.5,-82.5,-82.5,-82.5,-82.5,-82.5,-82.5,-82.5,-82.5],[-82.5,-82.5,-82.5,-83.4,-84.2,-84.7,-85.5,-85.6,-84.7,-83.6,-82.5,-82.5,-82.5,-82.5,-82.5],[-87.6,-88,-88,-88.6,-90.5,-91.9,-93.4,-93.5,-91.5,-89.4,-88,-87.5,-87.5,-87.1,-88],[-93.2,-92.6,-92.5,-93.9,-96,-98,-99.6,-99.3,-97.2,-95.3,-94.3,-93.9,-93.7,-92.8,-91.6],[-96,-95.5,-95.4,-96.3,-97.9,-99.9,-101.7,-101.4,-99.4,-97.8,-96.9,-96.6,-96.2,-95,-94],[-98.9,-98.5,-98.4,-99,-100.3,-101.9,-103.7,-103.6,-101.8,-100.4,-99.7,-99.4,-98.6,-97.4,-96.6],[-101.8,-101.5,-101.4,-101.8,-102.8,-104.1,-105.8,-105.8,-104.3,-103.1,-102.4,-101.9,-101,-99.8,-99.1],[-104.8,-104.5,-104.3,-104.6,-105.4,-106.5,-107.9,-108.1,-106.9,-105.7,-105,-104.4,-103.3,-102.2,-101.6],[-107.6,-107.4,-107.2,-107.4,-108,-109,-110.1,-110.4,-109.4,-108.4,-107.7,-106.8,-105.6,-104.6,-104.1],[-110.3,-110.1,-110,-110.1,-110.7,-111.4,-112.4,-112.8,-112,-110.9,-110.2,-109.2,-108,-107,-106.5],[-112.9,-112.8,-112.6,-112.8,-113.2,-113.9,-114.7,-115.1,-114.5,-113.5,-112.6,-111.5,-110.3,-109.4,-108.8],[-115.4,-115.3,-115.2,-115.3,-115.7,-116.2,-117,-117.4,-116.9,-116,-115,-113.8,-112.6,-111.7,-111.2]];
+      for (var bi = 0; bi + 1 < BY.length; bi++) for (var bj = 0; bj + 1 < BX.length; bj++) {
+        var za = BZ[bi][bj], zb = BZ[bi][bj + 1], zc = BZ[bi + 1][bj + 1], zd = BZ[bi + 1][bj], kk = (za + zb + zc + zd) / 4 < -88 ? 'deep' : 'rock';
+        tri(kk, [BX[bj], BY[bi], za], [BX[bj + 1], BY[bi], zb], [BX[bj + 1], BY[bi + 1], zc]); tri(kk, [BX[bj], BY[bi], za], [BX[bj + 1], BY[bi + 1], zc], [BX[bj], BY[bi + 1], zd]); }
+      var SK = -120, bl = BY.length - 1, bc = BX.length - 1;
+      for (var bj2 = 0; bj2 < bc; bj2++) { var s1 = BZ[bl][bj2], s2 = BZ[bl][bj2 + 1]; quad('deep', [BX[bj2], BY[bl], s1], [BX[bj2 + 1], BY[bl], s2], [BX[bj2 + 1], BY[bl], SK], [BX[bj2], BY[bl], SK]); }
+      for (var bi2 = 0; bi2 < bl; bi2++) { [[0, BX[0]], [bc, BX[bc]]].forEach(function (e) { var s1 = BZ[bi2][e[0]], s2 = BZ[bi2 + 1][e[0]]; quad('deep', [e[1], BY[bi2], s1], [e[1], BY[bi2 + 1], s2], [e[1], BY[bi2 + 1], SK], [e[1], BY[bi2], SK]); }); }
+    }
     var pl = [-30, -6, 190, 110]; cap('ground', rectPts(pl), null, 0); wallRing('rock', rectPts(pl), LO, 0);
     /* req 3227 (Architect, 7 November 2026): a low place standing beyond the plateau's lake face showed its underside from the
        lake (P36, r240-g: a ray-pick at Exterior's station hits the -5.2 floor's slab at x 129 to 161 out to y -12; the
