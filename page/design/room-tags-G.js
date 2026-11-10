@@ -1,13 +1,13 @@
 /* room-tags-G.js: the light, surface and acoustic tags of floor G's rooms, written by
    assets/design/materials/make-room-tags.py (req 1598). A plain script tag loads it; the shell reads
-   window.CASTLE_ROOM_TAGS.G.rooms[id].light / .surface / .acoustic and .stairs[id]. */
+   window.CASTLE_ROOM_TAGS["G"].rooms[id].light / .surface / .acoustic and .stairs[id]. */
 window.CASTLE_ROOM_TAGS = window.CASTLE_ROOM_TAGS || {};
-window.CASTLE_ROOM_TAGS.G = {
+window.CASTLE_ROOM_TAGS["G"] = {
  "_meta": {
-  "written": "29 October 2026, 21:53 (Design, make-room-tags.py), req 1598",
+  "written": "10 November 2026, 17:36 (Design, make-room-tags.py), req 1598",
   "floor": "G",
-  "model": 244,
-  "floor_version": 9,
+  "model": 321,
+  "floor_version": 16,
   "rule": "A tag is a check, not a tone: the shell sets no wall lighter to meet a brightness floor (a lifted wall turns to paint, design-bright-rooms-1021); a room under its floor gets one more lamp. Nothing glows. Fire light waits on its own key: a hearth is listed, never counted as a light.",
   "light": {
    "day": "the room has at least one window-family opening in the model (the day driver reaches it)",
@@ -235,8 +235,8 @@ window.CASTLE_ROOM_TAGS.G = {
    "area": 48,
    "h": 2.2,
    "light": {
-    "day": false,
-    "windows": 0,
+    "day": true,
+    "windows": 1,
     "lamp": "torch",
     "lamps": 3,
     "day_floor": 0.3,
@@ -837,6 +837,23 @@ window.CASTLE_ROOM_TAGS.G = {
    "surface": "flagstone",
    "acoustic": "glasshouse"
   },
+  "greenhouse-three": {
+   "use": "teaching",
+   "age": "P7",
+   "area": 216,
+   "h": 3.4,
+   "light": {
+    "day": false,
+    "windows": 0,
+    "lamp": "candle",
+    "lamps": 11,
+    "day_floor": 0.3,
+    "night_floor": 0.3,
+    "read": true
+   },
+   "surface": "flagstone",
+   "acoustic": "vaulted"
+  },
   "sw-stair-foot-g": {
    "use": "stair",
    "age": "P3",
@@ -1336,12 +1353,12 @@ window.CASTLE_ROOM_TAGS.G = {
   "hall-slot-cupboard": {
    "use": "store",
    "age": "P2",
-   "area": 7,
+   "area": 5,
    "h": 2.6,
    "light": {
     "day": false,
     "windows": 0,
-    "lamp": "torch",
+    "lamp": "lantern",
     "lamps": 1,
     "day_floor": 0.3,
     "night_floor": 0.14,
@@ -1613,6 +1630,40 @@ window.CASTLE_ROOM_TAGS.G = {
    "light": {
     "day": false,
     "windows": 0,
+    "lamp": "lantern",
+    "lamps": 1,
+    "day_floor": 0.3,
+    "night_floor": 0.14,
+    "read": false
+   },
+   "surface": "flagstone",
+   "acoustic": "close"
+  },
+  "caretakers-press-g": {
+   "use": "store",
+   "age": "P2",
+   "area": 21,
+   "h": 4.5,
+   "light": {
+    "day": false,
+    "windows": 0,
+    "lamp": "torch",
+    "lamps": 2,
+    "day_floor": 0.3,
+    "night_floor": 0.14,
+    "read": false
+   },
+   "surface": "stone",
+   "acoustic": "vaulted"
+  },
+  "postern-passage-g": {
+   "use": "passage",
+   "age": "P4",
+   "area": 2,
+   "h": 2.2,
+   "light": {
+    "day": true,
+    "windows": 1,
     "lamp": "lantern",
     "lamps": 1,
     "day_floor": 0.3,
