@@ -3458,8 +3458,11 @@ window.CastleShell = { build: function (F, M, placeId, o) {
       return loops && { id: Q.id, loops: loops, T: Q.wall || 0.8, z0: Q.floor, z1: Q.ceiling != null ? Q.ceiling : Q.floor + 3 };
     }).filter(Boolean);
     /* a flush line stays open where a way between the two spans it (a corridor cut into named stretches) */
-    var openWhole = function (ra, rb, s0, s1) {
-      return (M.openings || []).some(function (op) { return matches(M, op, ra) && matches(M, op, rb) && isWay(op.kind || '') && (op.w || 0) >= s1 - s0 - 0.15; });
+    /* v204, req 3481 (10 November 2026): and only where the way also reaches the shared top; a mouth lower than the line's
+       ceiling leaves it a flush partition, cut by the mouth's own sweep, so the band over the mouth is drawn */
+    var openWhole = function (ra, rb, s0, s1, seg) {
+      var zr = seg && seg.zr, top = zr && zr[ra] && zr[rb] ? Math.min(zr[ra][1], zr[rb][1]) - zr[ra][0] : -Infinity;
+      return (M.openings || []).some(function (op) { return matches(M, op, ra) && matches(M, op, rb) && isWay(op.kind || '') && (op.w || 0) >= s1 - s0 - 0.15 && (op.sill || 0) + (op.h || 0) >= top - 0.05; });
     };
     var G = CastleWalls.graph(places, { stand: P.id, openWhole: openWhole }), byId = {};
     places.forEach(function (q) { byId[q.id] = q; });
