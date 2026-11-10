@@ -285,6 +285,15 @@
      HEIGHT, on the fire mark's spot 0 (still: turned &f3angle degrees from facing the eye; &f3act=toward walks 3.2 m toward the
      eye; &f3t=seconds holds the clip there). No sitting clip exists on this rig, so no seated shot. */
   var lib = null;
+  function primMat(gl, nm) {
+    var j = gl.parser && gl.parser.json; if (!j || !j.meshes) return '';
+    var mt = /^(.*?)(?:_(\d+))?$/.exec(nm || ''), base = mt[1], i = mt[2] ? +mt[2] : 0;
+    for (var k = 0; k < j.meshes.length; k++) {
+      if ((j.meshes[k].name || '').replace(/\./g, '') !== base) continue;
+      var pr = j.meshes[k].primitives[i]; return pr && j.materials && j.materials[pr.material] ? j.materials[pr.material].name : '';
+    }
+    return '';
+  }
   function startLib(path) {
     addScript('people/GLTFLoader.js?v=1').then(function () {
       return new Promise(function (res, rej) { new THREE.GLTFLoader().load(path, res, undefined, rej); });
@@ -300,7 +309,12 @@
       var ink = inkMat(k, true), bare = lin(Q.has('f3tone') ? parseInt(Q.get('f3tone'), 16) : 0x8c6a55);
       skinned.forEach(function (m) {
         var old = m.material;
-        m.material = new THREE.MeshToonMaterial({ color: old.map ? 0xffffff : bare, map: old.map || null, gradientMap: tones(), skinning: true });
+        /* req 5103 (People): a material that carries vertex colours (People's robe glbs: robe, collar, tie, strip, bronze, one COLOR_0 each) keeps them under the toon
+           material; the bare tone stays on skin and on any mesh without colours. &f3vc=0 turns it off for a before shot */
+        /* the loader shares one material across primitives of equal settings, so every primitive says 'robe3-skin'; the glTF's own
+           material name for this primitive is read from its JSON (mesh name, then _<n> for the nth primitive) */
+        var mn = primMat(gl, m.name), keepVc = !!(old.vertexColors || (m.geometry && m.geometry.attributes.color)) && !old.map && !/skin/i.test(mn || old.name || '') && Q.get('f3vc') !== '0';
+        m.material = new THREE.MeshToonMaterial({ color: (old.map || keepVc) ? 0xffffff : bare, map: old.map || null, vertexColors: keepVc, gradientMap: tones(), skinning: true });
         if (window.CastleHatch) CastleHatch.apply(m.material);
         /* req 3564 (People, Fawkes's ruling of 12.52 pm): a robe's inside, seen through the lifted back hem in a walk, drew as the ink hull's flat black
            flap; its back faces are now the robe's own dark, flat (as the pupil's cape is), nearer than the hull so they win the depth test;
