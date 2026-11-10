@@ -302,6 +302,13 @@
         var old = m.material;
         m.material = new THREE.MeshToonMaterial({ color: old.map ? 0xffffff : bare, map: old.map || null, gradientMap: tones(), skinning: true });
         if (window.CastleHatch) CastleHatch.apply(m.material);
+        /* req 3564 (People, Fawkes's ruling of 12.52 pm): a robe's inside, seen through the lifted back hem in a walk, drew as the ink hull's flat black
+           flap; its back faces are now the robe's own dark, flat (as the pupil's cape is), nearer than the hull so they win the depth test;
+           &f3robeback=0 turns it off for a before shot */
+        if (/robe/i.test(old.name || '') && Q.get('f3robeback') !== '0') {
+          var bk = new THREE.SkinnedMesh(m.geometry, new THREE.MeshBasicMaterial({ color: lin(COL.robe), side: THREE.BackSide, skinning: true })); bk.frustumCulled = false; bk.name = m.name + '-back';
+          m.parent.add(bk); bk.bind(m.skeleton, m.bindMatrix);
+        }
         var h = new THREE.SkinnedMesh(m.geometry, ink); h.frustumCulled = false; m.frustumCulled = false; h.name = m.name + '-ink';
         m.parent.add(h); h.bind(m.skeleton, m.bindMatrix);
       });
