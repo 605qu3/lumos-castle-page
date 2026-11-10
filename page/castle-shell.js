@@ -3569,8 +3569,14 @@ window.CastleShell = { build: function (F, M, placeId, o) {
         /* v207 (req 3481 cause B): a window of one room cuts no strip it shares with a roofed room; as v1 it stops blind in
            its own wall (lake-corridor-g-east's two lake windows came out in Hidden Ways' loop gallery) */
         if (O.win && O.rooms.length === 1 && sg.rooms.some(function (x) { return x !== O.rooms[0] && roofed(x); })) { (res.blindWins = res.blindWins || []).push(O.id + '@' + sg.rooms.join('/')); return; }
-        holes.push({ s0: c[0], s1: c[1], z0: O.z0, z1: O.z1, head: O.head, up: O.up, op: O.id });
+        holes.push({ s0: c[0], s1: c[1], z0: O.z0, z1: O.z1, head: O.head, up: O.up, op: O.id, from: O.rooms[0] });
       });
+      /* v208 (req 3481, D's slanted case): an opening swept from both its rooms cuts a strip with the sweeps of the room
+         whose own face the strip is, where that room swept it; the drum's 16-gon door swept on along the drum side's normal
+         landed up to 0.3 m off its line on the overflow's straight face, and the two cuts' union left a sliver open beside
+         the door (old-trophies-overflow 0.1 m2) */
+      var ownOp = {}; holes.forEach(function (h) { if (sg.rooms.indexOf(h.from) >= 0) ownOp[h.op] = 1; });
+      holes = holes.filter(function (h) { return !ownOp[h.op] || sg.rooms.indexOf(h.from) >= 0; });
       /* the corner block: an exterior face ending at a convex corner whose next face starts exterior too runs on by
          the next one's thickness (drawn once, by the face before it, as v1's v42) */
       /* the corner: at a square-ish convex corner (turn over 45 degrees) the face before draws the block, running on by
