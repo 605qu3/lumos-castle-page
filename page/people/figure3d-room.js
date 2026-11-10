@@ -24,7 +24,7 @@
   'use strict';
   var Q = new URLSearchParams(location.search);
   var ACT = Q.get('f3act') || 'loop', ANGLE = +(Q.get('f3angle') || 0) * Math.PI / 180;
-  var HOLD = Q.has('f3t') ? +Q.get('f3t') : -1, SHOW_CARD = Q.get('f3card') !== '0', SHOW_FIG = Q.get('f3fig') !== '0';
+  var HOLD = Q.has('f3t') ? +Q.get('f3t') : -1, SHOW_CARD = Q.get('f3card') !== '0', SHOW_FIG = Q.get('f3fig') !== '0', HIDE_FIG = Q.get('f3fig') === 'hide';
   var BASE = 'people/models/kaykit-adv/', HEIGHT = 1.60;   /* a seventeen-year-old of middle height (req 3369 follow-up, Fawkes 9 Nov 2026): the card's 1360 px figure at 850 px a metre */
   /* &f3model=pupil (req 3369, Godric, 9 November 2026, 7.28 pm): the same Mage reshaped in Blender to a drawn pupil's
      proportions (tools/figure3d-pupil-blender.py: head 0.36, legs 2.6 times longer, the thigh 2.15 and the shin 3.39 so the knee sits
@@ -306,6 +306,9 @@
         m.parent.add(h); h.bind(m.skeleton, m.bindMatrix);
       });
       var group = new THREE.Group(); body.scale.setScalar(s); body.position.y = -box.min.y * s; group.add(body); R.scene.add(group);
+      /* &f3fig=hide (req 3412, the shot freeze): loaded and placed but not drawn, colour and depth off and its shadow kept,
+         so the background plate for measure.py matches the figure frame in every load and draw but the figure */
+      if (HIDE_FIG) body.traverse(function (o) { if (o.material) { o.material.colorWrite = false; o.material.depthWrite = false; } });
       lib = { group: group, mixer: mixer, t: HOLD >= 0 ? HOLD : 0, p0: [R.spots[0].x, R.spots[0].z], yaw: null };
       libStep(0);
       ready = true; info = { state: 'ready (library figure)', scale: +s.toFixed(4), glb: path, clip: clip.name, height: HEIGHT };
