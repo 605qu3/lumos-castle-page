@@ -1892,6 +1892,9 @@ window.CastleShell = { build: function (F, M, placeId, o) {
             var off = face === 'out' ? t : 0, p = toLocal(a[0] + ux * sE + nx * off, a[1] + uy * sE + ny * off, Q.floor);
             geo.applyMatrix4(new THREE.Matrix4().makeRotationY(ang).setPosition(p.x, p.y, p.z));
             if (WALLS2 && face === 'out') geo.userData.seat = { id: Q.id, op: g.op.id, c: [a[0] + ux * sE, a[1] + uy * sE], u: [ux, uy], n: [nx, ny], d: t, in: 0 };
+            /* req 3314: an 'in' casing stood on the plan line, so a flush strip standing in front of it (the hall's, 0.15 proud)
+               buried a jamb; wallsV2 seats each vertex on the room-side face of the band it stands against */
+            if (WALLS2 && face === 'in') geo.userData.seatIn = { id: Q.id, c: [a[0] + ux * sE, a[1] + uy * sE], u: [ux, uy], n: [nx, ny], fl: Q.floor };
             var mt = trimMat(row, a[0] + ux * sE, a[1] + uy * sE, E1[3]);
             (trimB[mt.uuid] = trimB[mt.uuid] || { mat: mt, geos: [] }).geos.push(geo);
           });
@@ -2019,8 +2022,10 @@ window.CastleShell = { build: function (F, M, placeId, o) {
            classroom's and its corridor's, 0.24); null if there is none or no other place is built */
         var faceGap = null;
         if (TRIM && g.op.between) {
-          var fq = other(g.op, Q.id), fR = out.places.filter(function (R) { return R.id === fq; })[0], fe = fR && fR.poly ? onEdge(fR.poly, [a[0] + ux * sm, a[1] + uy * sm]) : null;
+          var fq = other(g.op, Q.id), fR = out.places.filter(function (R) { return R.id === fq; })[0] || findPlace(M, fq), fe = fR && fR.poly ? onEdge(fR.poly, [a[0] + ux * sm, a[1] + uy * sm]) : null;
           if (fe && fe.d > 0.02) faceGap = fe.d;
+          /* v197 (req 3344 step 2, the Architect, 9 November 2026): out.places holds only the places built so far, so the first room of a pair
+             found no other face and its round-head fill and leaf stood the full 0.8 into the far room (floor 1 wi 86 round heads); the model's place answers now */
         }
         /* v97 (the old cells' gates, Godric's 1 on req 1265): a door or way whose record says `head: "round"` is cut
            square to its crown (h) and its two spandrels filled in stone, as a niche's head is (v51): 2 cm into the
@@ -3349,7 +3354,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
       var s0 = Math.min.apply(null, P2.map(function (p) { return p[0]; })), s1 = Math.max.apply(null, P2.map(function (p) { return p[0]; }));
       return s1 > 0.01 && s0 < len - 0.01 && s1 - s0 > 0.02 ? [s0, s1] : null;
     };
-    var res = out.walls2 = { segments: G.segments.length, drawn: 0, merged: 0, plan: G.plan, rows: [] }, nk = {}, segHoles = [];
+    var res = out.walls2 = { segments: G.segments.length, drawn: 0, merged: 0, plan: G.plan, rows: [] }, nk = {}, segHoles = [], segBands = [];
     res.ops = OPS.map(function (O) { return O.id + '@' + O.rooms.join('/'); });
     G.segments.forEach(function (sg) {
       if (sg.kind === 'open') return;
@@ -3514,6 +3519,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
           var cr = c.position.clone().sub(C); c.position.addScaledVector(nL, -cr.dot(nL));
         });
       });
+      segBands.push({ sg: sg, ux: ux, uy: uy, len: len, lo: lo, top: top });   /* req 3314: every band, for an 'in' casing's seat */
       segHoles.push({ sg: sg, ux: ux, uy: uy, len: len, lo: lo, ops: holes.map(function (h) { return h.op; }), z0s: holes.map(function (h) { return h.z0; }) });
       res.merged += S.merged;
       if (S.merged) res.rows.push({ owner: sg.owner, rooms: sg.rooms, merged: S.merged, ops: holes.map(function (h) { return h.op; }) });
@@ -3613,6 +3619,27 @@ window.CastleShell = { build: function (F, M, placeId, o) {
       var dd = seatMove(S); if (dd != null) { pn.position.x += S.n[0] * dd; pn.position.z -= S.n[1] * dd; }
     });
     W2T.forEach(function (T) { Object.keys(T.trimB).forEach(function (key) { T.trimB[key].geos.forEach(function (geo) {
+      var SI = geo.userData.seatIn;
+      if (SI) {   /* req 3314: per vertex, so a door that straddles two bands (the kitchens door N: 9.85 and 10.0) seats each jamb on its own */
+        var bands = [];
+        segBands.forEach(function (b) {
+          var sg = b.sg; if (sg.rooms.indexOf(SI.id) < 0 || Math.abs(b.ux * SI.u[1] - b.uy * SI.u[0]) > 0.02) return;
+          if (b.lo > SI.fl + 1 || b.top < SI.fl + 1) return;
+          var f = sg.off.map(function (o) { return (sg.a[0] + sg.n[0] * o - SI.c[0]) * SI.n[0] + (sg.a[1] + sg.n[1] * o - SI.c[1]) * SI.n[1]; });
+          var mf = Math.min(f[0], f[1]); if (!(mf < -0.005 && mf > -0.2)) return;
+          var sA = (sg.a[0] - SI.c[0]) * SI.u[0] + (sg.a[1] - SI.c[1]) * SI.u[1], sB = (sg.b[0] - SI.c[0]) * SI.u[0] + (sg.b[1] - SI.c[1]) * SI.u[1];
+          bands.push({ s0: Math.min(sA, sB) - 0.003, s1: Math.max(sA, sB) + 0.003, d: mf });
+        });
+        if (bands.length) {
+          var cL = toLocal(SI.c[0], SI.c[1], SI.fl), ps = geo.attributes.position, moved = 0;
+          for (var vi = 0; vi < ps.count; vi++) {
+            var sv = (ps.getX(vi) - cL.x) * SI.u[0] - (ps.getZ(vi) - cL.z) * SI.u[1], dv = 0;
+            bands.forEach(function (b) { if (sv >= b.s0 && sv <= b.s1 && b.d < dv) dv = b.d; });
+            if (dv) { ps.setX(vi, ps.getX(vi) + SI.n[0] * dv); ps.setZ(vi, ps.getZ(vi) - SI.n[1] * dv); moved++; }
+          }
+          if (moved) { ps.needsUpdate = true; res.seats.push([SI.id, 'in', bands.map(function (b) { return +b.d.toFixed(3); }), moved]); }
+        }
+      }
       var S = geo.userData.seat; if (!S) return;
       var dd = seatMove(S); if (dd != null) geo.translate(S.n[0] * dd, 0, -S.n[1] * dd);
     }); }); });
