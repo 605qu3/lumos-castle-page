@@ -3495,9 +3495,17 @@ window.CastleShell = { build: function (F, M, placeId, o) {
         });
       });
     });
+    /* v205 (req 3481 cause C): each opening's sill by room, so one door with two sills (the hall chamber's, 0.45 over the
+       Great Hall's floor, 0 over the chamber's) keeps the higher room's riser where the strip's cut takes the lower */
+    var SILLS = {};
+    OPS.forEach(function (O) { (SILLS[O.id] = SILLS[O.id] || {})[O.rooms[0]] = O.z0; });
     /* the sweep's footprint in a segment's (s, o) frame, clipped to the solid's band; null where it misses */
     var cross = function (O, sg, ux, uy, len) {
-      var P2 = O.q.map(function (p) { var dx = p[0] - sg.a[0], dy = p[1] - sg.a[1]; return [dx * ux + dy * uy, dx * sg.n[0] + dy * sg.n[1]]; });
+      /* v206 (req 3481 cause D): a sweep running along a strip (within about 25 degrees of its line) passes beside it, not
+         through it; clipped to the band it cut the strip's end (the flush line at drum-bend-mouth-g-nw's jamb) */
+      var qx = O.q[3][0] - O.q[0][0], qy = O.q[3][1] - O.q[0][1], qL = Math.hypot(qx, qy);
+      if (qL > 1e-6 && Math.abs((qx * ux + qy * uy) / qL) > 0.9) return null;
+      var P2 =O.q.map(function (p) { var dx = p[0] - sg.a[0], dy = p[1] - sg.a[1]; return [dx * ux + dy * uy, dx * sg.n[0] + dy * sg.n[1]]; });
       [[sg.off[0] - 0.001, 1], [sg.off[1] + 0.001, -1]].forEach(function (cl) {
         var o = [], k = cl[0], sgn = cl[1], ins = function (p) { return sgn * (p[1] - k) >= 0; };
         P2.forEach(function (c, j) {
@@ -3597,6 +3605,18 @@ window.CastleShell = { build: function (F, M, placeId, o) {
          floor runs (each floor stops at its room's line), so a black line showed under the doorway. The hole's
          footprint in the band gets its own floor, 2 mm under the rooms' so the two never fight, 0.1 thick */
       holes.forEach(function (h) {
+        /* v205 (req 3481 cause C): on the strip the two rooms share, the higher-sill room's half of the band stands
+           solid from the lower sill to its own, in its own stone: the step is in the doorway, the face under its sill kept */
+        var zs = SILLS[h.op], ks = zs ? Object.keys(zs) : [];
+        if (ks.length === 2 && Math.abs(zs[ks[0]] - zs[ks[1]]) > 0.05 && sg.rooms.indexOf(ks[0]) >= 0 && sg.rooms.indexOf(ks[1]) >= 0 && h.s1 - h.s0 >= 0.05) {
+          var hiR = zs[ks[0]] > zs[ks[1]] ? ks[0] : ks[1], zt = zs[hiR], zb = Math.min(zs[ks[0]], zs[ks[1]]);
+          var scR = (h.s0 + h.s1) / 2, pxR = sg.a[0] + ux * scR, pyR = sg.a[1] + uy * scR, a0 = sg.off[0], a1 = sg.off[1], am = (a0 + a1) / 2;
+          var hq = byId[hiR], side1 = !!(hq && inPoly(hq.loops[0], pxR + sg.n[0] * (a1 + 0.05), pyR + sg.n[1] * (a1 + 0.05)));
+          var r0 = side1 ? am : a0, r1 = side1 ? a1 : am, rc = (r0 + r1) / 2, hW = W2[hiR];
+          var rs = slab(h.s1 - h.s0, zt - zb, r1 - r0, hW && hW.row ? wallMat(hW.row, pxR, pyR, (zt - zb) / 2) : mats.wall, 'wall');
+          rs.position.copy(toLocal(pxR + sg.n[0] * rc, pyR + sg.n[1] * rc, (zb + zt) / 2));
+          rs.rotation.y = Math.atan2(uy, ux); rs.name = hiR + '-riser-' + h.op; rs.userData.owner = hiR; group.add(rs);
+        }
         if (h.z0 > lo + 0.05 || h.s1 - h.s0 < 0.05) return;
         /* req 3166 (the cross-floor rows): only the strip a hole stands on, not one above it that its head reaches into;
            and a flush partition's halves lie in its two rooms' plans, so where one of them has no floor at the hole's
