@@ -2666,6 +2666,17 @@ window.CastleShell = { build: function (F, M, placeId, o) {
   /* (only a place whose wall the mouth is in; a way to a place not yet in the model, or not beside it, shows a dark
      recess beyond the mouth for now) */
   var firstWays = out.ways.slice();
+  /* v203 (req 3451's fair before, 10 November 2026, the Architect; envelope-3344.md, "The doubled mark, fair form"):
+     &also=<start>~<id>,<id>;<start>~... builds, in the walk from <start> only, those places here, after the floor and
+     before its ways, the same set another run's walk reached, so two rules are compared over the same places; their own
+     ways are not followed (firstWays is already taken). &alsoafter puts them after the ways instead, to test that the
+     order does not matter. Absent, nothing changes */
+  var ALSO = null, ALSOAFTER = /(^|[?&])alsoafter(&|=|$)/.test(location.search);
+  decodeURIComponent((/(^|[?&])also=([^&]*)/.exec(location.search) || [])[2] || '').split(';').forEach(function (e) {
+    var k = e.indexOf('~'); if (k > 0 && e.slice(0, k) === P.id) ALSO = e.slice(k + 1); });
+  function buildAlso() { if (ALSO) ALSO.split(',').forEach(function (id) {
+    if (!id || out.places.some(function (q) { return q.id === id; })) return; var Q = findPlace(M, id); if (Q && !(Q.rec && Q.rec.page)) { out.places.push(Q); buildPlace(Q); } }); }
+  if (!ALSOAFTER) buildAlso();
   firstWays.forEach(function (w) {
     if (out.places.some(function (q) { return q.id === w.to; })) return;
     /* a way out of a hidden place (v8): its far side is its own shell, a tap away, never built here, since the two
@@ -2695,6 +2706,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
     rec.rotation.y = Math.atan2(w.inward.x, w.inward.z); rec.material.side = THREE.BackSide; rec.name = 'beyond-' + w.id;
     group.add(rec);
   });
+  if (ALSOAFTER) buildAlso();
   /* req 3189 (Exterior's E2, P13): the outside view leaves out a room with its own page (castle-exterior.js), so the stair
      hall's mouth onto the Fat Lady's corridor (corridor-mouth, x 68, +34.42 to +40.9) opened onto air, an arched window
      against the block's edge from the south-west. Under the outside view only (o.exterior, or the address's exterior=1 for
