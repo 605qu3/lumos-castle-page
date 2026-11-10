@@ -17,7 +17,7 @@
    from the first year; a later first marks only what opens with a book or would give one away. A room's "alias" is
    an old id that still opens it; "shell": "never" keeps a room model data only, never built or walked. */
 window.CASTLE_MODEL = {
-  "version": 317,
+  "version": 318,
   "units": "metres",
   "site": {
     "block": [0, 0, 160, 72], "front": "north", "lake": "south", "state": "designed",
@@ -385,6 +385,9 @@ window.CASTLE_MODEL = {
     {"id": "entrance-buttress-e-1", "kind": "buttress", "age": "P2", "poly": [[90.0, 72], [91.5, 72], [91.5, 74.0], [90.0, 74.0]], "base": -1.5, "top": 6.0, "state": "proposed", "about": "req 3285, Godric's 1 on card 3276 and Exterior's yes on req 3338 (9 November 2026): the Entrance Hall's east north-front buttress for its rib vault (req 3245, spec docs/architect/entrance-hall-structure-3245-spec.md option 1), x 90.0 to 91.5, 1.5 wide, stepped back twice: tier 1 of 3, y 72 to 74.0, from -1.5 to 6.0. The Astronomy Tower's drum between the two is the great buttress. Drawn as a plain prism (castle-exterior.js and castle-shell.js read the works list); the weatherings between the tiers are not drawn."},
     {"id": "entrance-buttress-e-2", "kind": "buttress", "age": "P2", "poly": [[90.0, 72], [91.5, 72], [91.5, 73.3], [90.0, 73.3]], "base": 6.0, "top": 9.0, "state": "proposed", "about": "req 3285, Godric's 1 on card 3276 and Exterior's yes on req 3338 (9 November 2026): the Entrance Hall's east north-front buttress for its rib vault (req 3245, spec docs/architect/entrance-hall-structure-3245-spec.md option 1), x 90.0 to 91.5, 1.5 wide, stepped back twice: tier 2 of 3, y 72 to 73.3, from 6.0 to 9.0. The Astronomy Tower's drum between the two is the great buttress. Drawn as a plain prism (castle-exterior.js and castle-shell.js read the works list); the weatherings between the tiers are not drawn."},
     {"id": "entrance-buttress-e-3", "kind": "buttress", "age": "P2", "poly": [[90.0, 72], [91.5, 72], [91.5, 72.6], [90.0, 72.6]], "base": 9.0, "top": 11.5, "state": "proposed", "about": "req 3285, Godric's 1 on card 3276 and Exterior's yes on req 3338 (9 November 2026): the Entrance Hall's east north-front buttress for its rib vault (req 3245, spec docs/architect/entrance-hall-structure-3245-spec.md option 1), x 90.0 to 91.5, 1.5 wide, stepped back twice: tier 3 of 3, y 72 to 72.6, from 9.0 to 11.5. The Astronomy Tower's drum between the two is the great buttress. Drawn as a plain prism (castle-exterior.js and castle-shell.js read the works list); the weatherings between the tiers are not drawn."}
+  ],
+  "fills": [
+    {"id": "fill-g-postern-wedge", "level": "G", "tower": "North Tower", "poly": [[156.115, 65.485], [156.245, 65.485], [156.537, 65.325], [156.785, 65.202], [157.122, 65.052], [157.38, 64.951], [157.817, 64.804], [158.185, 64.702], [158.185, 64.52], [156.513, 64.52], [156.115, 65.348]], "from": 0.0, "to": 5.2, "cleared": {"G-P13": "req 3594"}, "why": "req 3572", "about": "req 3572 step 2 (Godric's 1.51 pm, 10 November 2026: the gaps between the drums and the castle cleanly enclosed): the postern wedge, 0.4 m2 of shut-in air 0.6 to 0.8 m wide between postern-lobby-g, north-stair-foot-g and the North Tower's drum, now solid masonry from the ground floor to the first. Boxed by the rays (docs/architect/drum-gaps-3572-rays.json), claim D's leftover released by Hidden Ways on req 3594. Made by tools/architect-fills.py, kept 2 cm off every room, drum and shaft"}
   ],
   "courts": [
     { "id": "west courtyard", "rect": [16, 18, 68, 50], "state": "designed" },

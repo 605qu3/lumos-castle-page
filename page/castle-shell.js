@@ -3942,6 +3942,36 @@ window.CastleShell = { build: function (F, M, placeId, o) {
     if (!rk) return;
     o.userData.rank = rk; o.onBeforeRender = rankOn; o.onAfterRender = rankOff;
   });
+  /* v210 (req 3572 step 2, Godric's 1.51 pm, 10 November 2026: the gaps between the drums and the castle cleanly
+     enclosed; Fawkes's yes on req 3587): the model's fills, the shut-in wedges between a drum and its range, each one
+     plain masonry, a prism in the wall's stone from its from to its to, drawn after everything else and touching no wall
+     builder. A fill is drawn where a place built here stands on its storey within 3 m of it. ?fills=0 leaves them out.
+     out.fills names those drawn */
+  out.fills = [];
+  if (!/(^|[?&])fills=0(&|$)/.test(location.search)) (M.fills || []).forEach(function (fl) {
+    if (!fl.poly || fl.poly.length < 3) return;
+    var xs = fl.poly.map(function (p) { return p[0]; }), ys = fl.poly.map(function (p) { return p[1]; });
+    var bx = [Math.min.apply(null, xs) - 3, Math.min.apply(null, ys) - 3, Math.max.apply(null, xs) + 3, Math.max.apply(null, ys) + 3];
+    var near = out.places.some(function (q) {
+      if (!q.poly || q.floor == null || q.floor < fl.from - 0.01 || q.floor >= fl.to - 0.01) return false;
+      return q.poly.some(function (p) { return p[0] >= bx[0] && p[0] <= bx[2] && p[1] >= bx[1] && p[1] <= bx[3]; });
+    });
+    if (!near) return;
+    var pts = fl.poly.slice(), area = 0;
+    pts.forEach(function (p, i) { var q = pts[(i + 1) % pts.length]; area += p[0] * q[1] - q[0] * p[1]; });
+    if (area < 0) pts.reverse();                                   /* counter-clockwise in plan */
+    var tri = THREE.ShapeUtils.triangulateShape(pts.map(function (p) { return new THREE.Vector2(p[0], p[1]); }), []), v = [];
+    tri.forEach(function (t) {
+      v.push(toLocal(pts[t[0]][0], pts[t[0]][1], fl.to), toLocal(pts[t[1]][0], pts[t[1]][1], fl.to), toLocal(pts[t[2]][0], pts[t[2]][1], fl.to));
+      v.push(toLocal(pts[t[0]][0], pts[t[0]][1], fl.from), toLocal(pts[t[2]][0], pts[t[2]][1], fl.from), toLocal(pts[t[1]][0], pts[t[1]][1], fl.from));
+    });
+    pts.forEach(function (a, i) { var b = pts[(i + 1) % pts.length];
+      var a0 = toLocal(a[0], a[1], fl.from), b0 = toLocal(b[0], b[1], fl.from), a1 = toLocal(a[0], a[1], fl.to), b1 = toLocal(b[0], b[1], fl.to);
+      v.push(a0, b0, b1, a0, b1, a1); });
+    var g = new THREE.BufferGeometry().setFromPoints(v); g.computeVertexNormals();
+    var mesh = F.register(new THREE.Mesh(g, mats.wall), LAYER.wall); mesh.name = /^fill-/.test(fl.id) ? fl.id : 'fill-' + fl.id; group.add(mesh);
+    out.fills.push(fl.id);
+  });
   if (out.panes.length && F.renderer && o.far) out.far = farView(F, M, toLocal, out.panes, mats.pane, P.shaft);
   return out;
 } };
