@@ -16,7 +16,7 @@
   function overlaps(a0, a1, b0, b1) { return Math.min(a1, b1) - Math.max(a0, b0) > 0.01; }
   function declare(places, opts) {
     var LIFT = (opts && opts.lift) || LIFT0;
-    var P = places.map(function (q) { var poly = area(q.poly) < 0 ? q.poly.slice().reverse() : q.poly; return { id: q.id, poly: poly, floor: q.floor, ceiling: q.ceiling, wall: q.wall || 0.8, bb: box(poly) }; });
+    var P = places.map(function (q) { var poly = area(q.poly) < 0 ? q.poly.slice().reverse() : q.poly; return { id: q.id, poly: poly, floor: q.floor, ceiling: q.ceiling, wall: q.wall || 0.8, top: q.top || null, bb: box(poly) }; });
     /* a bucket grid (GRID m) over the places' boxes, so the probe asks only the places near it (834 rooms in the castle) */
     var G = {}; P.forEach(function (q) { var w = q.wall; for (var gx = Math.floor((q.bb[0] - w) / GRID); gx <= Math.floor((q.bb[2] + w) / GRID); gx++) for (var gy = Math.floor((q.bb[1] - w) / GRID); gy <= Math.floor((q.bb[3] + w) / GRID); gy++) (G[gx + ',' + gy] = G[gx + ',' + gy] || []).push(q); });
     /* the vertical test's cover: a place's plan dilated by its wall (walls stand outside the plan at t, castle-shell.js
@@ -57,6 +57,12 @@
             O.forEach(function (o) { if (overlaps(z0, z1, o.q.floor, o.q.ceiling) && (!best || o.d < best.d)) best = o; }); bands.push({ z0: z0, z1: z1, o: best }); }
           bands.forEach(function (b, k) { if (b.o || b.z1 - b.z0 >= LIFT) return; var lo = bands[k - 1], hi = bands[k + 1]; if (lo && lo.o && hi && hi.o) b.o = lo.o; });
           var merged = []; bands.forEach(function (b) { var l = merged[merged.length - 1]; if (l && l.o === b.o) l.z1 = b.z1; else merged.push({ z0: b.z0, z1: b.z1, o: b.o }); });
+          /* v200 (req 3344): a place whose walls stop short of its ceiling (a glasshouse to its eaves, lunettes, gables)
+             gives top(x, y) over its floor; each band ends at the lowest of the piece's two ends and middle, and a band
+             wholly above is roof, not wall (the section's own curve or slope never reads as a gap) */
+          if (q.top) { var ts = [t0, (t0 + t1) / 2, t1].map(function (t) { return q.top(a[0] + dx * t, a[1] + dy * t); });
+            if (ts.every(function (v) { return v != null; })) { var zt = q.floor + Math.min.apply(null, ts);
+              merged = merged.filter(function (b) { return b.z0 < zt - 0.005; }); merged.forEach(function (b) { b.z1 = Math.min(b.z1, zt); }); } }
           merged.forEach(function (b) { var other = b.o ? b.o.q : null, len = L / m, fr = H > 0 ? (b.z1 - b.z0) / H : 1;
             var pc = { place: q.id, a: [a[0] + dx * t0, a[1] + dy * t0], b: [a[0] + dx * t1, a[1] + dy * t1], n: [nx, ny], z0: b.z0, z1: b.z1, len: len, frac: fr, edge: i, col: j,
               kind: other ? 'shared' : 'air', other: other ? other.id : null, gap: b.o ? b.o.d : null, owner: other ? (q.id < other.id ? q.id : other.id) : q.id };

@@ -64,6 +64,33 @@ function toSite(M, gid, p) {
   return [g.x + p[0] * Math.cos(t) - p[1] * Math.sin(t), g.y + p[0] * Math.sin(t) + p[1] * Math.cos(t)];
 }
 
+/* v200 (req 3344, 9 November 2026, the Architect; docs/architect/envelope-3344.md, "The greenhouses' walls to their own
+   section"): a glasshouse's section, once. Both builders take their heights from it, and its top(x, y) is the height
+   over the house's floor that the wall standing on plan edge point (x, y) is built to: eaves on a long wall; over a
+   barrel's end the springing plus the lunette's half-round to the crown; a plain house's gable from the eaves at its
+   corners to the ridge at its middle. Null off the house's rect edges. CastleShell.wallTop hands it to the envelope */
+function glassSection(GH) {
+  var h = GH.house, B = GH.building || {}, R = h.rect, X0 = R[0], Y0 = R[1], X1 = R[2], Y1 = R[3], T = 0.05;
+  function edge(x, y) { var d = [Math.abs(y - Y0), Math.abs(y - Y1), Math.abs(x - X0), Math.abs(x - X1)], k = d.indexOf(Math.min.apply(null, d));
+    if (d[k] > T || x < X0 - T || x > X1 + T || y < Y0 - T || y > Y1 + T) return null; return k < 2 ? 'long' : 'gable'; }
+  if (h.nave) {
+    var NV = h.nave, TR = h.transept || null, S = NV.springing, C = NV.crown, NY0 = NV.rect[1], NY1 = NV.rect[3], RR = (NY1 - NY0) / 2,
+        NC = (NY0 + NY1) / 2, TX0 = TR ? TR.rect[0] : null, TX1 = TR ? TR.rect[2] : null, TC = TR ? (TX0 + TX1) / 2 : null;
+    /* the lunette as the builder draws it, LN straight sides on the half-round, so the top is the glass's own edge */
+    var LN = 24, arch = function (u, c) { var d = Math.max(-RR, Math.min(RR, u - c)), a = Math.acos(d / RR), st = Math.PI / LN, i = Math.min(LN - 1, Math.floor(a / st));
+      var x0 = RR * Math.cos(i * st), z0 = RR * Math.sin(i * st), x1 = RR * Math.cos((i + 1) * st), z1 = RR * Math.sin((i + 1) * st);
+      return S + (Math.abs(x1 - x0) < 1e-9 ? Math.max(z0, z1) : z0 + (z1 - z0) * (d - x0) / (x1 - x0)); };
+    return { kind: 'palace', E: h.eaves, S: S, C: C, RR: RR, LN: LN, NY0: NY0, NY1: NY1, NC: NC, TX0: TX0, TX1: TX1, TC: TC,
+      top: function (x, y) { var e = edge(x, y); if (!e) return null;
+        if (e === 'long') return TR && x > TX0 && x < TX1 ? arch(x, TC) : h.eaves;
+        return y > NY0 && y < NY1 ? arch(y, NC) : h.eaves; } };
+  }
+  var E = B.eaves || 3.0, RG = B.ridge || 4.6, YC = (Y0 + Y1) / 2, HW = (Y1 - Y0) / 2;
+  return { kind: 'plain', E: E, ridge: RG, YC: YC,
+    top: function (x, y) { var e = edge(x, y); if (!e) return null;
+      return e === 'long' ? E : E + (RG - E) * Math.max(0, 1 - Math.abs(y - YC) / HW); } };
+}
+
 /* a place by id: a room, or a mass or court by its id made a slug ("stair hall" is stair-hall); its plan as a site
    polygon (counter-clockwise), its floor and ceiling as heights in the castle's frame */
 function findPlace(M, id) {
@@ -946,8 +973,9 @@ window.CastleShell = { build: function (F, M, placeId, o) {
   function buildGlasshouse(Q) {
     var h = Q.glasshouse.house, B = Q.glasshouse.building, FT = h.fittings || {}, n0 = group.children.length;
     var R = h.rect, G = h.grid, f = Q.floor, X0 = R[0], Y0 = R[1], X1 = R[2], Y1 = R[3];
-    var E = h.eaves, RF = h.ridge_and_furrow, NV = h.nave, TR = h.transept, S = NV.springing, C = NV.crown, GF = B.glass_from || 0.8;
-    var PW = 2.44, NY0 = NV.rect[1], NY1 = NV.rect[3], TX0 = TR ? TR.rect[0] : null, TX1 = TR ? TR.rect[2] : null, NC = (NY0 + NY1) / 2, TC = TR ? (TX0 + TX1) / 2 : null, RR = (NY1 - NY0) / 2;
+    var SEC = glassSection(Q.glasshouse);   /* v200: the heights from the house's one section */
+    var E = SEC.E, RF = h.ridge_and_furrow, NV = h.nave, TR = h.transept, S = SEC.S, C = SEC.C, GF = B.glass_from || 0.8;
+    var PW = 2.44, NY0 = SEC.NY0, NY1 = SEC.NY1, TX0 = SEC.TX0, TX1 = SEC.TX1, NC = SEC.NC, TC = SEC.TC, RR = SEC.RR;
     var D = B.door || { w: 1.2, h: 2.2 }, DY = h.door ? h.door[1] : NC;
     var iron = F.solid(0x2a2d2c), brick = F.solid(0x8a4b38), earth = F.solid(0x5a4a3a), slat = F.solid(0x8b6d4c), soil = F.solid(0x3a2e24),
         flag = F.solid(0xb9b2a2), stone = F.solid(0x8e897e), wood = F.solid(0x6b4e33), leaf = F.solid(0x4f6b3c), wattle = F.solid(0x7a6244),
@@ -973,7 +1001,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
     }
     /* a half-round lunette over the springing, centred at (cx, cy) on a face along x (ax 1) or y (ax 0) */
     function lunette(cx, cy, ax) {
-      var c = L(cx, cy, S), n = 24;
+      var c = L(cx, cy, S), n = SEC.LN;
       for (var i = 0; i < n; i++) {
         var a0 = Math.PI * i / n, a1 = Math.PI * (i + 1) / n;
         var p0 = ax ? L(cx + RR * Math.cos(a0), cy, S + RR * Math.sin(a0)) : L(cx, cy + RR * Math.cos(a0), S + RR * Math.sin(a0));
@@ -1123,8 +1151,9 @@ window.CastleShell = { build: function (F, M, placeId, o) {
      over the stokehole's half under the east gable, a dark pit below it (the fire's light is a later piece) */
   function buildPlainGlasshouse(Q) {
     var h = Q.glasshouse.house, B = Q.glasshouse.building, FT = h.fittings || {}, n0 = group.children.length;
-    var R = h.rect, f = Q.floor, X0 = R[0], Y0 = R[1], X1 = R[2], Y1 = R[3], YC = (Y0 + Y1) / 2;
-    var E = B.eaves || 3.0, RG = B.ridge || 4.6, GF = B.glass_from || 0.8, PW = 2.44, D = B.door || { w: 1.2, h: 2.2 }, DY = h.door ? h.door[1] : YC;
+    var SEC = glassSection(Q.glasshouse);   /* v200: the heights from the house's one section */
+    var R = h.rect, f = Q.floor, X0 = R[0], Y0 = R[1], X1 = R[2], Y1 = R[3], YC = SEC.YC;
+    var E = SEC.E, RG = SEC.ridge, GF = B.glass_from || 0.8, PW = 2.44, D = B.door || { w: 1.2, h: 2.2 }, DY = h.door ? h.door[1] : YC;
     var iron = F.solid(0x2a2d2c), brick = F.solid(0x8a4b38), earth = F.solid(0x5a4a3a), slat = F.solid(0x8b6d4c), pit = F.solid(0x15110e), pitwall = F.solid(0x3b2a22);
     if (!mats.pane) mats.pane = new THREE.MeshBasicMaterial({ color: new THREE.Color(tone('sky-day')).convertSRGBToLinear(), side: THREE.DoubleSide });
     function L(x, y, z) { return toLocal(x, y, f + z); }
@@ -4082,6 +4111,9 @@ function farView(F, M, toLocal, panes, paneMat, shaft) {
 }
 /* v197 (req 3344/3397, the envelope's page adapter): findPlace out, so CastleEnvelope.declare reads the places the builder builds */
 window.CastleShell.findPlace = findPlace;
+/* v200 (req 3344): a place's walls' tops over its floor, top(x, y) on its plan edge, from the same section its builder
+   reads (glasshouses); null where the walls stand to the ceiling */
+window.CastleShell.wallTop = function (M, id) { var Q = findPlace(M, id); return Q && Q.glasshouse && Q.glasshouse.house ? glassSection(Q.glasshouse).top : null; };
 /* v198: openingCuts(M, id) -> the cuts the builder makes in place id's walls, in site coordinates: [{ op, edge, a, b,
    s0, s1, z0, z1, far }], a and b the edge's ends, s along it from a, z absolute (its floor plus the gap's sill and head) */
 window.CastleShell.openingCuts = function (M, id) {
