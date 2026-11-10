@@ -107,6 +107,12 @@
 
   /* the massing: triangles per material, every vertex through the main toLocal */
   var builtPlaces = [];
+  /* v30 (req 3344 E1's cause, the Architect, 9 November 2026, 7.55 pm): under ?bare=1 the shell page hides, every 30 frames,
+     whatever joined the scene after its own build (page/shell.html, lumosBare.sweep). The exterior's floors, shafts, bands and
+     massing joined later, so the sweep hid them before bands() made its probe grid: the probe met an almost empty castle (215
+     of 236 E1 gaps found not even their own room's wall 1 m under the ceiling) and the bare view showed no floors. They are
+     the built shell, not dressing, so each is kept. */
+  function keepShell(g) { var B = window.lumosBare; if (B && B.kept && g) g.traverse(function (o) { B.kept.add(o); }); return g; }
   function keepPlaces(out) { (out.places || []).forEach(function (q) { builtPlaces.push(q); }); }
   var GREYS = { raiseFoot: 0xb8b2a8, filler: 0xb9b2a6, roof: 0x5f6670, parapet: 0x8a857e, ground: 0x7d8a5c, rock: 0x8b8478, water: 0x6f8797, raise: 0xa39d92, stripBand: 0xa39d92, stripTop: 0xa39d92, soffit: 0xd0c9bb, raiseCourse: 0x868077, slit: 0x18181a };   /* raise and raiseCourse are set from the probed wall tone (req 3222) */
   function massing(TL, scene) {
@@ -838,7 +844,7 @@
         if (out) {
           placeInto(out, TL);
           rec.built = (out.places || []).length; keepPlaces(out);
-          var bk = bake([out.group], 'exterior-floor-' + rec.z); gb.scene.add(bk.group); rec.meshes = bk.meshes; rec.bins = bk.bins;
+          var bk = bake([out.group], 'exterior-floor-' + rec.z); gb.scene.add(keepShell(bk.group)); rec.meshes = bk.meshes; rec.bins = bk.bins;
         } else X.skipped.push('floor ' + rec.z + ': no seed built');
         rec.ms = Math.round(performance.now() - s0); X.floors.push(rec);
       });
@@ -852,16 +858,16 @@
           if (out && out.place && out.place.shaft) { keepPlaces(out); placeInto(out, TL); gs.push(out.group); X.shafts.built++; }
         } catch (e) { X.skipped.push('shaft ' + st.id + ': ' + String(e && e.message || e).slice(0, 120)); }
       });
-      var bk = bake(gs, 'exterior-shafts'); gb.scene.add(bk.group); X.shafts.meshes = bk.meshes;
+      var bk = bake(gs, 'exterior-shafts'); gb.scene.add(keepShell(bk.group)); X.shafts.meshes = bk.meshes;
       X.shafts.ms = Math.round(performance.now() - s0);
     });
     var bandsStep = function () {
       var s0 = performance.now(), bd; try { bd = bands(TL, gb.scene, M.towers, M.rooms); } catch (e) { X.skipped.push('bands: ' + String(e && e.stack || e).slice(0, 300)); return; }
-      gb.scene.add(bd.group);   /* close=2 runs this step AFTER the massing (Amendment 5), so the massing's casts (the eaves fit, the strip, the raised foot) never read the pieces (in close=1 they did: pair14's dark patch at r90-e shows in c as in a, not red, eye-close-3223/v2/pair14-look.py) and the probe grid below holds the massing's own walls */
+      gb.scene.add(keepShell(bd.group));   /* close=2 runs this step AFTER the massing (Amendment 5), so the massing's casts (the eaves fit, the strip, the raised foot) never read the pieces (in close=1 they did: pair14's dark patch at r90-e shows in c as in a, not red, eye-close-3223/v2/pair14-look.py) and the probe grid below holds the massing's own walls */
       X.bands = { gaps: bd.gaps, log: bd.log, pieces: bd.pieces, tris: Math.round(bd.tris), tallSkipped: bd.tall, roundSkipped: bd.roundSkipped, roundIds: bd.roundIds, close: closeOn, close2: close2, faced: bd.faced, covered: bd.covered, towerKills: bd.towerKills, partFaced: bd.partFaced, extDropped: bd.extDropped, decks: bd.decks, closeDeck: closeDeckOn, bare: bd.bare, probes: bd.probes, places: bd.places, wideKills: bd.wideKills, fill: bd.fill, ms: Math.round(performance.now() - s0) };
     };
     var massingStep = function () {
-      var s0 = performance.now(), m = massing(TL, gb.scene); gb.scene.add(m.group);
+      var s0 = performance.now(), m = massing(TL, gb.scene); gb.scene.add(keepShell(m.group));
       X.massing = { tris: Math.round(m.tris), ms: Math.round(performance.now() - s0) };
     };
     if (close2) { steps.push(massingStep); if (bandsOn || closeOn) steps.push(bandsStep); }   /* Amendment 5 (req 3223): the bands step reads the scene when it runs, so with close=2 it runs after the massing; close=1 and bands=1 keep the old order */
