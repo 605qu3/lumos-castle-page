@@ -294,6 +294,12 @@
     }
     return '';
   }
+  /* req 5121 (People): a glb's morph targets (the falling sleeve) play on the page: the toon, hull and back materials draw morphs, and the -ink and -back
+     copies share the original mesh's weights, so the clip's weights channel moves cloth and hull together. &f3morph=0 is the before */
+  function shareMorph(o, m) {
+    if (Q.get('f3morph') === '0' || !m.morphTargetInfluences) return;
+    o.morphTargetInfluences = m.morphTargetInfluences; o.morphTargetDictionary = m.morphTargetDictionary;
+  }
   function startLib(path) {
     addScript('people/GLTFLoader.js?v=1').then(function () {
       return new Promise(function (res, rej) { new THREE.GLTFLoader().load(path, res, undefined, rej); });
@@ -306,7 +312,7 @@
          &f3ink= in metres to try another); an untextured body takes the card's own skin under the room's light, 0x8c6a55 (of three tried, nearest the card in brightness),
          worked back from the card skin's rendered colour over a white body's (docs/common-room/lib-figure-3406/measure.py) */
       var box = new THREE.Box3().setFromObject(body), s = HEIGHT / (box.max.y - box.min.y), k = (Q.has('f3ink') ? +Q.get('f3ink') : 0.013) / s;
-      var ink = inkMat(k, true), bare = lin(Q.has('f3tone') ? parseInt(Q.get('f3tone'), 16) : 0x8c6a55);
+      var ink = inkMat(k, true); ink.morphTargets = Q.get('f3morph') !== '0'; var bare = lin(Q.has('f3tone') ? parseInt(Q.get('f3tone'), 16) : 0x8c6a55);
       skinned.forEach(function (m) {
         var old = m.material;
         /* req 5103 (People): a material that carries vertex colours (People's robe glbs: robe, collar, tie, strip, bronze, one COLOR_0 each) keeps them under the toon
@@ -314,17 +320,17 @@
         /* the loader shares one material across primitives of equal settings, so every primitive says 'robe3-skin'; the glTF's own
            material name for this primitive is read from its JSON (mesh name, then _<n> for the nth primitive) */
         var mn = primMat(gl, m.name), keepVc = !!(old.vertexColors || (m.geometry && m.geometry.attributes.color)) && !old.map && !/skin/i.test(mn || old.name || '') && Q.get('f3vc') !== '0';
-        m.material = new THREE.MeshToonMaterial({ color: (old.map || keepVc) ? 0xffffff : bare, map: old.map || null, vertexColors: keepVc, gradientMap: tones(), skinning: true });
+        m.material = new THREE.MeshToonMaterial({ color: (old.map || keepVc) ? 0xffffff : bare, map: old.map || null, vertexColors: keepVc, gradientMap: tones(), skinning: true, morphTargets: Q.get('f3morph') !== '0' });
         if (window.CastleHatch) CastleHatch.apply(m.material);
         /* req 3564 (People, Fawkes's ruling of 12.52 pm): a robe's inside, seen through the lifted back hem in a walk, drew as the ink hull's flat black
            flap; its back faces are now the robe's own dark, flat (as the pupil's cape is), nearer than the hull so they win the depth test;
            &f3robeback=0 turns it off for a before shot */
         if (/robe/i.test(old.name || '') && Q.get('f3robeback') !== '0') {
-          var bk = new THREE.SkinnedMesh(m.geometry, new THREE.MeshBasicMaterial({ color: lin(COL.robe), side: THREE.BackSide, skinning: true })); bk.frustumCulled = false; bk.name = m.name + '-back';
-          m.parent.add(bk); bk.bind(m.skeleton, m.bindMatrix);
+          var bk = new THREE.SkinnedMesh(m.geometry, new THREE.MeshBasicMaterial({ color: lin(COL.robe), side: THREE.BackSide, skinning: true, morphTargets: Q.get('f3morph') !== '0' })); bk.frustumCulled = false; bk.name = m.name + '-back';
+          shareMorph(bk, m); m.parent.add(bk); bk.bind(m.skeleton, m.bindMatrix);
         }
         var h = new THREE.SkinnedMesh(m.geometry, ink); h.frustumCulled = false; m.frustumCulled = false; h.name = m.name + '-ink';
-        m.parent.add(h); h.bind(m.skeleton, m.bindMatrix);
+        shareMorph(h, m); m.parent.add(h); h.bind(m.skeleton, m.bindMatrix);
       });
       var group = new THREE.Group(); body.scale.setScalar(s); body.position.y = -box.min.y * s; group.add(body); R.scene.add(group);
       /* &f3fig=hide (req 3412, the shot freeze): loaded and placed but not drawn, colour and depth off and its shadow kept,
