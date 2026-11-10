@@ -1666,10 +1666,59 @@ window.CastleShell = { build: function (F, M, placeId, o) {
     }
     /* a wall already built from the other side (the place one step on shares it) is not built twice; v24: only where
        the two stand at one height (the Charms corridor over the first floor's, the same plan two storeys up, kept its walls) */
-    function sharedE(ed) {
+    function sharedMid(ed) {
       var midE = [(ed.a[0] + ed.b[0]) / 2, (ed.a[1] + ed.b[1]) / 2];
       return Q !== P && Math.hypot(ed.b[0] - ed.a[0], ed.b[1] - ed.a[1]) >= 1e-6 && out.places.some(function (R) { var e = R !== Q && onEdge(R.poly, midE);
         return e && e.d < 0.05 && R.floor < (Q.ceiling == null ? Infinity : Q.ceiling) - 0.05 && (R.ceiling == null ? Infinity : R.ceiling) > Q.floor + 0.05; });
+    }
+    /* v201 (req 3344, 10 November 2026, the Architect; docs/architect/envelope-3344.md, "The per-sharer cut-out"): the
+       midpoint rule above gave a whole edge away on one point and any overlap (the Entrance Hall, 0 to 9.72, took the stair
+       hall's whole north wall, and 40.75 to 46.3 stood open in every walk). Now the edge is given away only where its
+       sharers cover all of it, along and up; a partly shared edge is built, each sharer's own stretch left to it (below,
+       YL), sharing by span overlap. v2 walls keep their own */
+    var SHCUT = !WALLS2 && /(^|[?&])shared=cut(&|$)/.test(window.location.search || '');   /* opt-in until the gate's marks hold; then the default, ?shared=mid the before */
+    function sharersE(ed) {   /* places built before this one with a side on this edge's line over it: their stretch along it and their height, over Q.floor */
+      var a = ed.a, b = ed.b, L = Math.hypot(b[0] - a[0], b[1] - a[1]), res = [];
+      if (Q === P || L < 1e-6) return res;
+      var ux = (b[0] - a[0]) / L, uy = (b[1] - a[1]) / L, nx = uy, ny = -ux, top = (Q.ceiling == null ? Infinity : Q.ceiling) - Q.floor;
+      out.places.forEach(function (R) {
+        if (R === Q || !R.poly) return;
+        var z0 = R.floor - Q.floor, z1 = (R.ceiling == null ? Infinity : R.ceiling) - Q.floor;
+        if (z0 >= top - 0.05 || z1 <= 0.05) return;
+        R.poly.forEach(function (p, k) {
+          var p2 = R.poly[(k + 1) % R.poly.length];
+          if (Math.abs((p[0] - a[0]) * nx + (p[1] - a[1]) * ny) > 0.05 || Math.abs((p2[0] - a[0]) * nx + (p2[1] - a[1]) * ny) > 0.05) return;
+          var sa = (p[0] - a[0]) * ux + (p[1] - a[1]) * uy, sb = (p2[0] - a[0]) * ux + (p2[1] - a[1]) * uy;
+          var r0 = Math.max(0, Math.min(sa, sb)), r1 = Math.min(L, Math.max(sa, sb));
+          if (r1 - r0 >= 0.05) res.push({ id: R.id, s0: r0, s1: r1, z0: z0, z1: z1 });
+        });
+      });
+      return res;
+    }
+    function coversE(ed, sh) {   /* do the sharers' rectangles cover the whole edge, 0 to L along, 0 to its wall's height up? */
+      var L = Math.hypot(ed.b[0] - ed.a[0], ed.b[1] - ed.a[1]), HE = ed.H != null ? ed.H : H;
+      var ss = [0, L], zz = [0, HE];
+      sh.forEach(function (s) { ss.push(s.s0, s.s1); zz.push(Math.max(0, Math.min(HE, s.z0)), Math.max(0, Math.min(HE, s.z1))); });
+      ss.sort(function (x, y) { return x - y; }); zz.sort(function (x, y) { return x - y; });
+      for (var si = 0; si < ss.length - 1; si++) for (var zi = 0; zi < zz.length - 1; zi++) {
+        if (ss[si + 1] - ss[si] < 0.05 || zz[zi + 1] - zz[zi] < 0.05) continue;
+        var cs = (ss[si] + ss[si + 1]) / 2, cz = (zz[zi] + zz[zi + 1]) / 2;
+        if (!sh.some(function (s) { return s.s0 <= cs && s.s1 >= cs && s.z0 <= cz && s.z1 >= cz; })) return false;
+      }
+      return true;
+    }
+    var shMemo = [];
+    function sharedE(ed) {   /* given away whole: the midpoint rule's edges, now only those their sharers cover */
+      if (!sharedMid(ed)) return false;
+      if (!SHCUT) return true;
+      for (var mk = 0; mk < shMemo.length; mk++) if (shMemo[mk].ed === ed) return shMemo[mk].whole;
+      var sh = sharersE(ed), whole = coversE(ed, sh);
+      shMemo.push({ ed: ed, whole: whole, sh: sh });
+      return whole;
+    }
+    function partE(ed) {   /* a partly shared edge's sharers (the midpoint rule gave it away; v201 builds it round them), else [] */
+      if (!sharedE(ed) && SHCUT && sharedMid(ed)) for (var mk = 0; mk < shMemo.length; mk++) if (shMemo[mk].ed === ed) return shMemo[mk].sh;
+      return [];
     }
     if (WALLS2) W2[Q.id] = { Q: Q, E: E, gaps: gaps, row: row, H: H };   /* req 3166: the strips read these once every place is built */
     E.forEach(function (ed, i) {
@@ -1679,6 +1728,10 @@ window.CastleShell = { build: function (F, M, placeId, o) {
       if (own && typeof own === 'object') { if (own.breast != null) HE = own.breast; if (own.merlons != null) MER = own.merlons; }
       if (L < 1e-6) return;
       if (sharedE(ed)) return;
+      /* v201: a partly shared edge leaves each sharer's openings on its stretch to the sharer, which cut and dress them */
+      var SH = partE(ed);
+      if (SH.length) gaps[i] = (gaps[i] || []).filter(function (g) { var gm = (g.s0 + g.s1) / 2;
+        return !SH.some(function (s) { return gm > s.s0 && gm < s.s1 && g.sill < s.z1 - 0.05 && g.h > s.z0 + 0.05; }); });
       var ux = dx / L, uy = dy / L, nx = uy, ny = -ux;                 /* outward, the polygon counter-clockwise */
       /* v124: a poly room's `walls` is a list, side by side from its first corner (down-only-stair-way-1's south side 0.3) */
       var t = ed.T || (Q.walls ? ((Array.isArray(Q.walls) ? Q.walls[i] : Q.walls[['south', 'east', 'north', 'west'][i]]) || Q.wall) : Q.wall);
@@ -1828,8 +1881,13 @@ window.CastleShell = { build: function (F, M, placeId, o) {
           (out.hideLeaves = out.hideLeaves || []).push(Q.id + ' wall ' + i + ' leaves ' + q.id + ' ' + r0.toFixed(2) + '-' + r1.toFixed(2));
         });
       });
+      var shRun = {};
+      run.cutFor = SH.map(function (s) { return s.id; });
       wallRuns.forEach(function (R) {
         if (R.gone || R.owner === Q.id) return;
+        /* v201 (FAIL 1, 12.34 am): a run that left this place's stretch to it (cut out before this place stood: the floor
+           builds longest wall first, so the stair hall stood before the Entrance Hall, and each left 0 to 9.75 to the other) */
+        if ((R.cutFor || []).indexOf(Q.id) >= 0) return;
         if (R.hide !== run.hide && (run.wraps || R.wraps)) return;   /* seams 1107: the notched hide's wall left the stretch (above, or when R was built); the walked wall is skinned over it */
         if (run.wells.indexOf(R.owner) >= 0 || (R.wells || []).indexOf(Q.id) >= 0) return;   /* v128: the well keeps its own */
         var d0 = (R.a[0] - a[0]) * nx + (R.a[1] - a[1]) * ny, d1 = (R.b[0] - a[0]) * nx + (R.b[1] - a[1]) * ny;
@@ -1837,12 +1895,21 @@ window.CastleShell = { build: function (F, M, placeId, o) {
         var sa = (R.a[0] - a[0]) * ux + (R.a[1] - a[1]) * uy, sb = (R.b[0] - a[0]) * ux + (R.b[1] - a[1]) * uy;
         var r0 = Math.max(0, Math.min(sa, sb)), r1 = Math.min(L, Math.max(sa, sb)), y0 = R.z0 - Q.floor, y1 = R.z1 - Q.floor;
         if (r1 - r0 < 0.05 || y0 > HE - 0.05 || y1 < 0.05) return;
+        /* v201: a sharer's own run stands; this wall leaves its stretch and height, never takes it down */
+        if (SH.some(function (s) { return s.id === R.owner; })) { YL.push([r0, r1, y0, y1]); shRun[R.owner] = 1; return; }
         if (R.plain && Math.abs(sb - sa) < L - 0.05 && Math.min(sa, sb) > -0.05 && Math.max(sa, sb) < L + 0.05 && y0 > -0.05 && y1 < HE + 0.05) {
           R.meshes.forEach(function (m) { if (m.parent) m.parent.remove(m); });
           R.gone = true; (out.sharedLines = out.sharedLines || []).push(Q.id + ' keeps ' + R.owner + "'s line");
         } else YL.push([r0, r1, y0, y1]);
         (out.sharedPairs = out.sharedPairs || []).push({ later: Q.id + ' ' + i, L: +L.toFixed(2), earlier: R.owner, RL: +Math.abs(sb - sa).toFixed(2), s: [+sa.toFixed(2), +sb.toFixed(2)], plain: R.plain, gone: R.gone });
       });
+      /* v201: a sharer with no run of its own on this line (drawn another way, or its side given to a third place) keeps its
+         stretch as the midpoint rule trusted it to; each partly shared edge is listed with which sharers stood (out.sharedCut) */
+      if (SH.length) {
+        SH.forEach(function (s) { if (!shRun[s.id]) YL.push([s.s0, s.s1, Math.max(0, s.z0), Math.min(HE, s.z1)]); });
+        (out.sharedCut = out.sharedCut || []).push({ id: Q.id, i: i, L: +L.toFixed(2), H: +HE.toFixed(2),
+          sharers: SH.map(function (s) { return s.id + ' ' + s.s0.toFixed(2) + '-' + s.s1.toFixed(2) + ' z ' + s.z0.toFixed(2) + '-' + (s.z1 === Infinity ? 'open' : s.z1.toFixed(2)) + (shRun[s.id] ? ' run' : ' no run'); }) });
+      }
       if (YL.length) (out.sharedLines = out.sharedLines || []).push(Q.id + ' wall ' + i + ' leaves ' + YL.length + ' stretch(es)');
       wallRuns.push(run);
       function piece(s0, s1, ya, yb, name) {
