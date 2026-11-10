@@ -8701,7 +8701,7 @@ renderer.setAnimationLoop(frame);
 /* the 3D figure mockup (req 3317, page/people/figure3d-room.js), only behind ?figure3d=1; with it off nothing loads */
 var fig3d = null;
 if (/[?&]figure3d=1(&|$)/.test(location.search)) {
-  var f3s = document.createElement('script'); f3s.src = 'people/figure3d-room.js?v=10';
+  var f3s = document.createElement('script'); f3s.src = 'people/figure3d-room.js?v=11';
   f3s.onload = function () { fig3d = window.Figure3D.start({ scene: scene, camera: camera, spots: FIGURE_SPOTS, sofaAt: SOFA_AT, onSofa: onSofa, facers: facers, poolCards: poolCards }); };
   document.body.appendChild(f3s);
 }
