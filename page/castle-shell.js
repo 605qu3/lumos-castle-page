@@ -3455,7 +3455,8 @@ window.CastleShell = { build: function (F, M, placeId, o) {
     ids.forEach(function (id) { if (!pool.some(function (q) { return q.id === id; })) pool.push(W2[id].Q); });
     var places = pool.map(function (Q) {
       var loops = Q.loops || (Q.poly ? [Q.poly] : null);
-      return loops && { id: Q.id, loops: loops, T: Q.wall || 0.8, z0: Q.floor, z1: Q.ceiling != null ? Q.ceiling : Q.floor + 3 };
+      return loops && { id: Q.id, loops: loops, T: Q.wall || 0.8, z0: Q.floor, z1: Q.ceiling != null ? Q.ceiling : Q.floor + 3,
+        open: Q.ceiling == null || !!Q.sky || !!Q.openTop || (M.courts || []).indexOf(Q.rec) >= 0 };   /* v207: open overhead, outside air */
     }).filter(Boolean);
     /* a flush line stays open where a way between the two spans it (a corridor cut into named stretches) */
     /* v204, req 3481 (10 November 2026): and only where the way also reaches the shared top; a mouth lower than the line's
@@ -3476,6 +3477,10 @@ window.CastleShell = { build: function (F, M, placeId, o) {
        room, so the hole comes out on the far side whatever the far wall's angle (a round room's 24 sides beside a
        straight corridor are two exterior strips, neither parallel; plan section 5) */
     var inPoly = function (pts, x, y) { var c = false; for (var k = 0, j = pts.length - 1; k < pts.length; j = k++) { var A = pts[k], B = pts[j]; if ((A[1] > y) !== (B[1] > y) && x < (B[0] - A[0]) * (y - A[1]) / (B[1] - A[1]) + A[0]) c = !c; } return c; };
+    /* v207 (req 3481 cause B): a window to the outside by its kind (window, loop, lancet, slit, vent), never a door, a
+       way, a squint or a cubby; and a place open overhead (a court, the leads, an open drum) is outside air */
+    var winKind = function (k) { k = String(k || ''); return !isDoor(k) && !isWay(k) && /\b(window|loop|lancet|slit|vent)\b/.test(k) && !/squint|cubby|hatch/.test(k); };
+    var roofed = function (id) { var q = byId[id]; return !!q && !q.open; };
     var OPS = [];
     ids.forEach(function (r) {
       var w = W2[r];
@@ -3491,7 +3496,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
           var headed = (hk === 'round' && g.op.head === 'round' || hk === 'pointed' || hk === 'tudor') && !g.back && !g.soffit && (isDoor(g.op.kind) || isWay(g.op.kind) || win_);
           var rr = (g.s1 - g.s0) / 2, up = !headed ? 0 : hk === 'pointed' ? Math.sqrt(3) * rr : hk === 'tudor' ? (window.CastleTrim && CastleTrim.rise ? CastleTrim.rise('tudor', rr, 0) : rr * 0.6) : rr;
           OPS.push({ rooms: far ? [r, far] : [r], q: [[pa[0] - fn[0] * 0.02, pa[1] - fn[1] * 0.02], [pb[0] - fn[0] * 0.02, pb[1] - fn[1] * 0.02], [pb[0] + fn[0] * D, pb[1] + fn[1] * D], [pa[0] + fn[0] * D, pa[1] + fn[1] * D]],
-            z0: w.Q.floor + g.sill, z1: w.Q.floor + g.h, head: headed ? hk : null, up: up, id: g.op.id });
+            z0: w.Q.floor + g.sill, z1: w.Q.floor + g.h, head: headed ? hk : null, up: up, id: g.op.id, win: winKind(g.op.kind) });
         });
       });
     });
@@ -3561,6 +3566,9 @@ window.CastleShell = { build: function (F, M, placeId, o) {
         if (!O.rooms.some(function (r) { return sg.rooms.indexOf(r) >= 0; }) && !(O.rooms.length > 1 && O.z1 > lo + 0.05 && O.z0 < top - 0.05)) return;
         if (O.z1 <= lo + 0.05 || O.z0 >= top - 0.05) return;   /* an opening above or below this strip's height (req 3166) */
         var c = cross(O, sg, ux, uy, len); if (!c) return;
+        /* v207 (req 3481 cause B): a window of one room cuts no strip it shares with a roofed room; as v1 it stops blind in
+           its own wall (lake-corridor-g-east's two lake windows came out in Hidden Ways' loop gallery) */
+        if (O.win && O.rooms.length === 1 && sg.rooms.some(function (x) { return x !== O.rooms[0] && roofed(x); })) { (res.blindWins = res.blindWins || []).push(O.id + '@' + sg.rooms.join('/')); return; }
         holes.push({ s0: c[0], s1: c[1], z0: O.z0, z1: O.z1, head: O.head, up: O.up, op: O.id });
       });
       /* the corner block: an exterior face ending at a convex corner whose next face starts exterior too runs on by
