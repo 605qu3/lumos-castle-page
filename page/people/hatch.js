@@ -23,9 +23,9 @@
      &hatchw=peak width px (1.6), &hatchp=minimum on-screen spacing px (5), &hatchk=half-lambert value where lines
      begin (0.45). */
   var M = Q.get('hatchm') || '', SP = +(Q.get('hatchs') || 0.012), RR = +(Q.get('hatchr') || 0.36),
-      WP = +(Q.get('hatchw') || 1.6), PX = +(Q.get('hatchp') || 5), K0 = +(Q.get('hatchk') || 0.45);
+      WP = +(Q.get('hatchw') || 1.6), PX = +(Q.get('hatchp') || 5), K0Q = Q.get('hatchk');
   var TAM = '{ float hl = dot(normalize(normal), directionalLights[0].direction) * 0.5 + 0.5;\n' +
-    '  float dk = clamp((hK0 - hl) / 0.30, 0.0, 1.0);\n' +
+    '  float dk = clamp((hK0 - hl) / hKS, 0.0, 1.0);\n' +
     '  float acr = atan(vHP.x, vHP.z) * hRR, alg = vHP.y;\n' +
     '  float fa = max(fwidth(acr), 1e-6), fl = max(fwidth(alg), 1e-6);\n' +
     '  float x = acr / hSP, i = floor(x), fx = fract(x);\n' +
@@ -47,6 +47,12 @@
   function apply(mat, ink) {
     if (!ON || !mat || mat.userData.hatched) return mat;
     mat.userData.hatched = true;
+    /* 10 Nov 2026 (req 3407, the 65th session): lines begin at the material's own toon step, read from its ramp, so the
+       two cannot drift apart (the first build's fixed 0.45 sat inside the ramp's mid step and drew 70 px on cyl.html):
+       an n-texel ramp's lit step starts at half-lambert 1 - 1/n; lines fade in across the mid step and are full at its
+       dark edge (1 - 2/n). &hatchk overrides the start, the span then 0.30 as before. */
+    var gw = mat.gradientMap && mat.gradientMap.image && mat.gradientMap.image.width;
+    var K0 = K0Q != null ? +K0Q : (gw > 1 ? 1 - 1 / gw : 0.45), KS = K0Q != null || !(gw > 1) ? 0.30 : 1 / gw;
     var prev = mat.onBeforeCompile;
     mat.onBeforeCompile = function (sh, r) {
       if (prev) prev.call(mat, sh, r);
@@ -58,11 +64,11 @@
       sh.uniforms.hInk = { value: ink || [0.10, 0.08, 0.07] };
       sh.uniforms.hL = { value: L }; sh.uniforms.hC = { value: C }; sh.uniforms.hV = { value: V };
       sh.uniforms.hSP = { value: SP }; sh.uniforms.hRR = { value: RR }; sh.uniforms.hWP = { value: WP };
-      sh.uniforms.hPX = { value: PX }; sh.uniforms.hK0 = { value: K0 };
+      sh.uniforms.hPX = { value: PX }; sh.uniforms.hK0 = { value: K0 }; sh.uniforms.hKS = { value: KS };
       sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nvarying vec3 vHP; varying vec3 vHN;')
         .replace('#include <begin_vertex>', '#include <begin_vertex>\nvHP = position; vHN = normal;');
       sh.fragmentShader = sh.fragmentShader.replace('#include <common>',
-        '#include <common>\nvarying vec3 vHP; varying vec3 vHN; uniform float hF, hT, hD, hL, hC, hV, hSP, hRR, hWP, hPX, hK0; uniform vec2 hDir; uniform vec3 hInk;\n' +
+        '#include <common>\nvarying vec3 vHP; varying vec3 vHN; uniform float hF, hT, hD, hL, hC, hV, hSP, hRR, hWP, hPX, hK0, hKS; uniform vec2 hDir; uniform vec3 hInk;\n' +
         'float hHash(float n) { return fract(sin(n * 127.1) * 43758.5453); }')
         .replace('#include <map_fragment>', '#include <map_fragment>\n' +
           'float hAl = dot(diffuseColor.rgb, vec3(0.2126, 0.7152, 0.0722));\n' +
@@ -82,7 +88,7 @@
           '  if (hV > 0.5) gl_FragColor.rgb = vec3(form); }\n') +
           '#include <dithering_fragment>');
     };
-    mat.customProgramCacheKey = function () { return 'hatch' + M + F + T + D + A + L + C + V + SP + RR + WP + PX + K0; };
+    mat.customProgramCacheKey = function () { return 'hatch' + M + F + T + D + A + L + C + V + SP + RR + WP + PX + K0 + KS; };
     mat.needsUpdate = true;
     return mat;
   }
