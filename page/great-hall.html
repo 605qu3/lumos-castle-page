@@ -132,14 +132,41 @@ shot before anything is spent.
 <div id="help">Drag to look around.</div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="castle.js?v=15"></script>
-<script src="castle-model.js?v=594"></script>
-<script src="castle-paint.js?v=84"></script>
-<script src="design/tones.js?v=6"></script>
+<script src="castle-model.js?v=615"></script>
+<!-- the floor files: tools/castle-floor.py writes this block, never by hand -->
+<script src="castle-model-B.js?v=9"></script>
+<script src="castle-model-G.js?v=14"></script>
+<script src="castle-model-1.js?v=12"></script>
+<script src="castle-model-2.js?v=13"></script>
+<script src="castle-model-3.js?v=10"></script>
+<script src="castle-model-4.js?v=9"></script>
+<script src="castle-model-5.js?v=12"></script>
+<script src="castle-model-6.js?v=8"></script>
+<script src="castle-model-7.js?v=14"></script>
+<!-- /the floor files -->
+<script src="castle-paint.js?v=117"></script>
+<script src="design/room-tags-G.js?v=1"></script>
+<script src="design/room-use.js?v=1"></script>
+<script src="design/floor-kit.js?v=1"></script>
+<script src="design/tones.js?v=7"></script>
 <script src="design/stone-face.js?v=1"></script>
-<script src="design/ceilings.js?v=5"></script>
+<script>/* the Architect's 392nd, Godric's 1 on req 2246 (31 October 2026): the stone face on every stone, all floors, not only late-pale; ?faceall=0 lays it back to flat for a comparison */
+if (!/[?&]faceall=0/.test(location.search) && window.CastleStoneFace) ['founders-rubble', 'tudor-pink', 'high-grey', 'houses-sandstone'].forEach(function (s) { CastleStoneFace.FACED[s] = true; });</script>
+<script src="design/ceilings.js?v=14"></script>
 <script src="design/panelling.js?v=2"></script>
-<script src="castle-shell.js?v=179"></script>
-<script src="castle-events.js?v=39"></script>
+<script src="design/ironwork.js?v=2"></script>
+<script src="charms/spells.js?v=41"></script>
+<script src="charms/guide.js?v=6"></script>
+<script src="charms/desks.js?v=2"></script>
+<script src="castle-trim.js?v=14"></script>
+<script src="design/lake-views.js?v=1"></script>
+<script src="castle-walls-v2.js?v=6"></script>
+<script src="castle-strip.js?v=3"></script>
+<script src="castle-shell.js?v=209"></script>
+<script src="castle-exterior.js?v=29"></script>
+<script src="shell-w5b.js?v=25"></script>
+<script src="shell-bare.js?v=3"></script>
+<script src="castle-events.js?v=40"></script>
 <script src="castle-sound.js?v=1"></script>
 <script>
 (function () {
@@ -183,6 +210,31 @@ var shell = window.CastleShell && MODEL ? CastleShell.build(kit, MODEL, PLACE, {
    the materials schedule's tones come with the shell; the sky still shows through all that is not rib */
 if (!shell) { kit.helpEl.textContent = 'The Great Hall is not in the castle model.'; return; }
 scene.add(shell.group);
+/* req 3360 (req 3355, Godric, 9 November 2026, 6.02 pm: "Dressing off is universal"): the hall shows its shell only by
+   default, as page/shell.html does (page/shell-bare.js, the Architect's pattern): what stands in the scene now is the
+   shell (walls, floors, vaults, ceilings, openings, stairs); everything the page adds after this line (tables, benches,
+   fires, candles, diners, portraits, the platform's things) is hidden before each frame is drawn. Nothing is deleted and
+   no placement changes. ?bare=0 dresses the hall again; a &clean load (the measuring tools) keeps its dressing, so
+   their baselines still count it; 'great-hall' or its level in SHELL_BARE.clean dresses it once Fawkes says so. */
+var BARE = (function () {
+  var q = Q.get('bare'); if (q === '0') return false; if (q !== null) return true;
+  if (Q.has('clean')) return false;
+  var SB = window.SHELL_BARE || {};
+  var room = (MODEL && MODEL.rooms || []).filter(function (r) { return r.id === PLACE; })[0];
+  var lvl = room ? String(room.level) : null;
+  if ((SB.clean || []).indexOf(PLACE) >= 0 || (lvl && (SB.clean || []).indexOf(lvl) >= 0)) return false;
+  return !!SB.all || !!(lvl && (SB.floors || []).indexOf(lvl) >= 0);
+})();
+var BARE_KEEP = new Set(), BARE_HIDE = [], BARE_TICK = 0;
+if (BARE) scene.traverse(function (o) { BARE_KEEP.add(o); });
+function bareSweep() {
+  if ((BARE_TICK++ % 10) === 0) scene.traverse(function (o) {
+    if (BARE_KEEP.has(o) || o.isLight) return; BARE_KEEP.add(o);
+    if (o.isMesh || o.isSprite || o.isPoints || o.isLine) BARE_HIDE.push(o);
+  });
+  for (var i = 0; i < BARE_HIDE.length; i++) BARE_HIDE[i].visible = false;
+}
+window.lumosBare = { on: BARE, hidden: BARE_HIDE };
 var P = function (x, y, z) { return shell.toLocal(x, y, (z || 0)); };
 
 /* the clock (docs/room-states.md §1): one runtime, every chain, this room's place */
@@ -1411,6 +1463,7 @@ function frame() {
   fly(T, dt);
   turnDiners();
   redraw += dt; if (redraw > 30) { redraw = 0; draw(); }   /* the clock moves on while he stays: dusk comes, a meal begins */
+  if (BARE) bareSweep();
   renderer.render(scene, camera);
   kit.stats(dt);
 }
