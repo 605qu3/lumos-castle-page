@@ -721,8 +721,18 @@ window.CastleShell = { build: function (F, M, placeId, o) {
     var CSF = window.CastleStoneFace;
     if (!CSF || !kind || !CSF.FACED[st]) return paintMat(hex, two);
     var k = hex + (two ? 'd' : '') + 'f' + kind;
-    if (!paintMats[k]) { paintMats[k] = F.solid(hex); if (two) paintMats[k].side = THREE.DoubleSide; CSF.dress(THREE, paintMats[k], kind); }
+    if (!paintMats[k]) { paintMats[k] = F.solid(hex); if (two) paintMats[k].side = THREE.DoubleSide; CSF.dress(THREE, paintMats[k], kind); paintMats[k].clone = keepFace; }
     return paintMats[k];
+  }
+  /* v209 (req 3472 item 2, Fawkes 7.21 am: the head piece over a cut takes its wall's own stone and joints; the Architect,
+     10 November 2026): three's Material.clone copies userData (faced, so stone-face.js's dress() never runs again) but not
+     onBeforeCompile, so any copy of a dressed stone drew its flat base colour with no courses: the drum doors' heads
+     (the probe: <place>-head-<door>, its program key the default, userData.corbelM in toJSON form, the mark of a copy).
+     A copy of a dressed material now keeps its source's shader and cache key, and passes the rule on to its own copies */
+  function keepFace() {
+    var c = THREE.Material.prototype.clone.call(this);
+    c.onBeforeCompile = this.onBeforeCompile; c.customProgramCacheKey = this.customProgramCacheKey; c.clone = keepFace;
+    return c;
   }
   function ceilMat(row, sx, sy) {
     var c = row.ceiling, st = stoneAt(row, sx, sy);
