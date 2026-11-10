@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Walking bodies: the iPad budget</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #0b0a09; overflow: hidden; font-family: system-ui, sans-serif; color: #eee; }
+  canvas { display: block; width: 100%; height: 100%; }
+  #big { position: fixed; left: 12px; top: 8px; font: 700 64px/1 monospace; text-shadow: 0 2px 6px #000; }
+  #sub { position: fixed; left: 14px; top: 78px; font: 15px/1.4 monospace; background: rgba(0,0,0,0.55); padding: 6px 8px; white-space: pre; }
+  #bar { position: fixed; right: 10px; top: 10px; display: flex; flex-direction: column; gap: 8px; }
+  button { font: 600 17px system-ui; padding: 12px 16px; border-radius: 10px; border: 1px solid #888; background: #222; color: #fff; }
+</style>
+</head>
+<body>
+<!-- Experiment 6 (req 3412, docs/ministry/reviews/2026-11-09-dumbledore-figure-library.md section 5): the iPad budget.
+     1, 4, 8, 16 or 32 walking library bodies (the People lane's experiment 2: MPFB game_engine rig, 53 bones, about 6,000
+     triangles each, clip Walk) on a bare floor, a toon ramp and an ink hull on every one, as the room would draw them.
+     Links: ?n=8 (the count), ?pp=1 (powerPreference high-performance, as the castle does; ?pp=0 the browser default),
+     ?auto=1 (runs 1, 4, 8, 16, 32 for four seconds each and prints the table), ?hull=0 (no ink hull), ?dpr=1 (pixel ratio).
+     Pass mark: 30 fps or better with 8 bodies. -->
+<canvas id="c"></canvas>
+<div id="big">starting</div>
+<div id="sub"></div>
+<div id="bar"><button id="run">Run all five</button><button id="swap"></button></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="people/GLTFLoader.js"></script>
+<script>
+(function () {
+  var Q = new URLSearchParams(location.search);
+  var PP = Q.get('pp') !== '0', HULL = Q.get('hull') !== '0', N0 = +(Q.get('n') || 8), AUTO = Q.get('auto') === '1';
+  var DPR = Q.has('dpr') ? +Q.get('dpr') : Math.min(window.devicePixelRatio || 1, 2);
+  var canvas = document.getElementById('c');
+  var renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, powerPreference: PP ? 'high-performance' : 'default' });
+  renderer.setPixelRatio(DPR);
+  var scene = new THREE.Scene(); scene.background = new THREE.Color(0x2a2622);
+  var camera = new THREE.PerspectiveCamera(38, 1, 0.1, 100);
+  scene.add(new THREE.HemisphereLight(0xfff0d8, 0x40362c, 0.9));
+  var sun = new THREE.DirectionalLight(0xffe2b0, 0.9); sun.position.set(3, 6, 4); scene.add(sun);
+  var floor = new THREE.Mesh(new THREE.PlaneGeometry(40, 40), new THREE.MeshLambertMaterial({ color: 0x5a4a3c })); floor.rotation.x = -Math.PI / 2; scene.add(floor);
+  var ramp = new THREE.DataTexture(new Uint8Array([70, 70, 70, 255, 150, 150, 150, 255, 255, 255, 255, 255]), 3, 1, THREE.RGBAFormat);
+  ramp.minFilter = ramp.magFilter = THREE.NearestFilter; ramp.needsUpdate = true;
+  var files = ['boy-11', 'girl-14', 'girl-17'], buffers = {}, group = new THREE.Group(), mixers = [], tris = 0;
+  scene.add(group);
+  function resize() { var w = innerWidth, h = innerHeight; renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix(); }
+  addEventListener('resize', resize); resize();
+  function fetchAll() {
+    return Promise.all(files.map(function (f) { return fetch('people/models/lib/' + f + '.glb').then(function (r) { return r.arrayBuffer(); }).then(function (b) { buffers[f] = b; }); }));
+  }
+  function build(n) {
+    while (group.children.length) { var o = group.children.pop(); o.traverse(function (x) { if (x.geometry) x.geometry.dispose(); }); }
+    mixers.length = 0; tris = 0;
+    var cols = Math.ceil(Math.sqrt(n * 1.6)), rows = Math.ceil(n / cols), sp = 1.1;
+    var loader = new THREE.GLTFLoader(), done = 0;
+    return new Promise(function (resolve) {
+      for (var i = 0; i < n; i++) (function (i) {
+        loader.parse(buffers[files[i % 3]].slice(0), '', function (g) {
+          var root = g.scene, skinned = [];
+          root.traverse(function (m) { if (m.isSkinnedMesh) skinned.push(m); });
+          skinned.forEach(function (m) {
+            var old = m.material, tx = old.map || null;
+            m.material = new THREE.MeshToonMaterial({ color: tx ? 0xffffff : (old.color || 0xc9a27c), map: tx, gradientMap: ramp, skinning: true });
+            m.frustumCulled = false; tris += m.geometry.index ? m.geometry.index.count / 3 : m.geometry.attributes.position.count / 3;
+            if (HULL) {
+              var hm = new THREE.MeshBasicMaterial({ color: 0x16120e, side: THREE.BackSide, skinning: true });
+              hm.onBeforeCompile = function (sh) { sh.vertexShader = sh.vertexShader.replace('#include <begin_vertex>', '#include <begin_vertex>\ntransformed += normalize(normal) * 0.008;'); };
+              var h = new THREE.SkinnedMesh(m.geometry, hm);
+              h.frustumCulled = false; h.bind(m.skeleton, m.bindMatrix); m.parent.add(h);
+            }
+          });
+          var col = i % cols, row = Math.floor(i / cols);
+          root.position.set((col - (cols - 1) / 2) * sp, 0, -row * sp);
+          group.add(root);
+          var clip = g.animations.filter(function (a) { return a.name === 'Walk'; })[0] || g.animations[0];
+          if (clip) { var mx = new THREE.AnimationMixer(root); var act = mx.clipAction(clip); act.play(); mx.setTime((i * 0.37) % clip.duration); mixers.push(mx); }
+          if (++done === n) { frame(n, rows); resolve(); }
+        });
+      })(i);
+    });
+  }
+  function frame(n, rows) {
+    var depth = Math.max(rows - 1, 0) * 1.1, cols = Math.ceil(Math.sqrt(n * 1.6));
+    var span = Math.max(cols * 1.1, depth * 1.4, 2.2);
+    camera.position.set(0, 1.5 + span * 0.28, 2.0 + span * 1.05); camera.lookAt(0, 0.8, -depth * 0.45);
+  }
+  var clock = new THREE.Clock(), win = [], fpsNow = 0, label = String(N0);
+  var results = [];
+  try { results = JSON.parse(sessionStorage.getItem('budget') || '[]'); } catch (e) {}
+  function loop() {
+    var dt = Math.min(clock.getDelta(), 0.1);
+    mixers.forEach(function (m) { m.update(dt); });
+    renderer.render(scene, camera);
+    var now = performance.now(); win.push(now); while (win.length && now - win[0] > 2000) win.shift();
+    fpsNow = win.length > 1 ? (win.length - 1) * 1000 / (win[win.length - 1] - win[0]) : 0;
+    document.getElementById('big').textContent = fpsNow.toFixed(0) + ' fps';
+    document.getElementById('sub').textContent = label + ' bodies, ' + Math.round(tris / 1000) + 'k tris (hull ' + (HULL ? 'on' : 'off') + '), pixel ratio ' + DPR + ', powerPreference ' + (PP ? 'high-performance' : 'default') + '\n' +
+      renderer.info.render.calls + ' draw calls\n' + results.map(function (r) { return r.pp + ' n=' + r.n + ': ' + r.fps + ' fps (min ' + r.min + ')'; }).join('\n');
+    requestAnimationFrame(loop);
+  }
+  function measure(n, secs) {
+    return build(n).then(function () { label = String(n); return new Promise(function (res) {
+      var t0 = performance.now(), mn = 999, sum = 0, k = 0;
+      var iv = setInterval(function () {
+        if (performance.now() - t0 < 1500) return;
+        sum += fpsNow; k++; mn = Math.min(mn, fpsNow);
+        if (performance.now() - t0 > 1500 + secs * 1000) { clearInterval(iv); res({ pp: PP ? 'high-perf' : 'default', n: n, fps: +(sum / k).toFixed(1), min: +mn.toFixed(1), calls: renderer.info.render.calls, tris: Math.round(tris) }); }
+      }, 500);
+    }); });
+  }
+  function runAll() {
+    var out = [], p = Promise.resolve();
+    [1, 4, 8, 16, 32].forEach(function (n) { p = p.then(function () { return measure(n, 4); }).then(function (r) { out.push(r); results.push({ pp: r.pp, n: r.n, fps: r.fps, min: r.min }); try { sessionStorage.setItem('budget', JSON.stringify(results)); } catch (e) {} }); });
+    return p.then(function () { window.BUDGET = out; return out; });
+  }
+  document.getElementById('run').onclick = function () { runAll(); };
+  document.getElementById('swap').textContent = PP ? 'Reload with default GPU preference' : 'Reload with high-performance';
+  document.getElementById('swap').onclick = function () { var u = new URL(location.href); u.searchParams.set('pp', PP ? '0' : '1'); location.href = u.toString(); };
+  window.budgetRun = runAll; window.budgetOne = measure;
+  fetchAll().then(function () { requestAnimationFrame(loop); return build(N0); }).then(function () { if (AUTO) runAll(); });
+})();
+</script>
+</body>
+</html>
