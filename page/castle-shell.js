@@ -53,24 +53,9 @@ var SLAB = 0.7, WAIST = 0.6, STEP_OFF = 1.2, RAISED = 1.0;   /* a floor's vault,
 var LAYER = { wall: 0, floor: 1, ceiling: 1, door: 2, stair: 3, way: 4 };   /* castle.js's five tints, under Layers */
 
 function slug(s) { return String(s).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''); }
-/* v223 (req 3344 1d, req 5213's card): ?ghd=1|2|3 previews the Great Hall doors' passage at one size, for Godric's eye;
-   nothing changes without the flag. 1 the doors and both mouths at 4.5 under the passage's 4.5; 2 the doors cut at 4.5,
-   their casing in the Entrance Hall's face kept at 5.0, so a pointed band of plain stone stands between; 3 all at 5.0,
-   the passage's ceiling 5.0 (0.2 of floor left under back-stair-lobby-1). Set once per model, idempotent */
-function ghdPatch(M) {
-  var q = /[?&]ghd=([123])/.exec((typeof location !== 'undefined' && location.search) || ''), n = q ? +q[1] : 0;
-  if (!n || !M || M.__ghd === n) return;
-  M.__ghd = n;
-  var hh = n === 3 ? 5.0 : 4.5;
-  (M.openings || []).forEach(function (op) {
-    if (op.id === 'great-hall-doors') { op.h = hh; if (n === 2) { op.frameH = 5.0; op.frameIn = 'entrance-hall'; } }
-    if (op.id === 'great-hall-doors-passage-east' || op.id === 'great-hall-doors-passage-west') {
-      op.h = hh;   /* inside the passage its mouths are the doors' reveal, plain stone to the vault, no casing to cut */
-      op.noTrimIn = ['great-hall-doors-passage'].concat(n === 2 && op.id === 'great-hall-doors-passage-east' ? ['entrance-hall'] : []);
-    }
-  });
-  if (n === 3) (M.rooms || []).forEach(function (r) { if (r.id === 'great-hall-doors-passage') r.ceiling = 5.0; });
-}
+/* v225 (req 5217, Godric's 1, 10 November 2026, 10.31 pm): ?ghd= retired; the Great Hall doors and the passage's two
+   mouths stand 4.5 m in the model (castle-model.js, castle-model-G.js), under the passage's 4.5 barrel, and the
+   mouths carry noTrimIn: plain stone inside the passage, no casing there */
 function levelZ(M, id) {
   for (var i = 0; i < M.levels.length; i++) if (M.levels[i].id === id) return M.levels[i].z;
   return 0;
@@ -524,7 +509,6 @@ function gapsOf(M, Q, E, H) {
 }
 window.CastleShell = { build: function (F, M, placeId, o) {
   o = o || {};
-  ghdPatch(M);   /* v223: ?ghd= (req 5213), no flag no change */
   var P = findPlace(M, placeId);
   if (!P) return null;
   var cx = 0, cy = 0;
@@ -2126,9 +2110,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
           /* v142: outside, a window of `lights` is dressed light by light at the lights' own sill and crown */
           var each = face === 'out' && g.lights ? g.op.lights.map(function (lt) { return [(lt[0] + lt[1]) / 2, lt[1] - lt[0], g.op.h, g.op.sill]; })
             : [[0, face === 'out' ? slot : w, g.h - g.sill, g.sill]];
-          if (face === 'in' && g.op.noTrimIn && g.op.noTrimIn.indexOf(Q.id) >= 0) return;   /* v223 (?ghd=) */
-          /* v223 (?ghd=2): the doors' casing in the Entrance Hall's face at 5.0 over their 4.5 cut */
-          if (face === 'in' && g.op.frameH && g.op.frameIn === Q.id) each = each.map(function (E1) { return [E1[0], E1[1], g.op.frameH - E1[3], E1[3]]; });
+          if (face === 'in' && g.op.noTrimIn && g.op.noTrimIn.indexOf(Q.id) >= 0) return;   /* v225: an opening's noTrimIn rooms take no casing in their face (req 5217) */
           each.forEach(function (E1) {
             var sE = sm + E1[0];
             var geo = CastleTrim.geometry(THREE, { cls: cls, age: age, w: E1[1], h: E1[2], sill: E1[3], face: face, head: g.op.head,
@@ -4440,7 +4422,6 @@ window.CastleShell.wallTop = function (M, id) { var Q = findPlace(M, id); return
 /* v198: openingCuts(M, id) -> the cuts the builder makes in place id's walls, in site coordinates: [{ op, edge, a, b,
    s0, s1, z0, z1, far }], a and b the edge's ends, s along it from a, z absolute (its floor plus the gap's sill and head) */
 window.CastleShell.openingCuts = function (M, id) {
-  ghdPatch(M);
   var Q = findPlace(M, id); if (!Q || !Q.poly) return [];
   var E = edgesOf(Q.loops || [Q.poly], Q.loopH, Q.loopT), H = (Q.ceiling != null ? Q.ceiling : Q.floor + 12) - Q.floor, out = [];
   gapsOf(M, Q, E, H).gaps.forEach(function (gs, i) { gs.forEach(function (g) {

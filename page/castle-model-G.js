@@ -1559,11 +1559,12 @@
     60.5
    ],
    "w": 3.2,
-   "h": 4.0,
+   "h": 4.5,
+   "noTrimIn": ["great-hall-doors-passage"],
    "z": 0.0,
    "state": "proposed",
    "cite": "",
-   "about": "the passage's east end, where great-hall-doors hang",
+   "about": "Godric's 1 on req 5217 (10 November 2026, 10.31 pm): 4.5 m like the doors and the passage, one stone frame, plain stone inside the passage (no casing there); the passage's east end, where great-hall-doors hang",
    "entered_from": "docs/architect/floors/G.json"
   },
   {
@@ -1579,11 +1580,12 @@
     60.5
    ],
    "w": 3.2,
-   "h": 4.0,
+   "h": 4.5,
+   "noTrimIn": ["great-hall-doors-passage"],
    "z": 0.0,
    "state": "proposed",
    "cite": "",
-   "about": "the passage's west end, into the Great Hall",
+   "about": "Godric's 1 on req 5217 (10 November 2026, 10.31 pm): 4.5 m like the doors and the passage, one stone frame, plain stone inside the passage (no casing there); the passage's west end, into the Great Hall",
    "entered_from": "docs/architect/floors/G.json"
   },
   {
