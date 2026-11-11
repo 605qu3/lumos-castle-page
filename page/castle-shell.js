@@ -549,8 +549,13 @@ window.CastleShell = { build: function (F, M, placeId, o) {
      materials.stones the fallback. Provisional until Design's tones are settled; nothing drawn, nothing generated. */
   var PAINT = window.CASTLE_PAINT || null, TONES = window.CASTLE_TONES || null, painted = o.paint || [], TRIM = !!o.trim && !!window.CastleTrim;
   /* req 3166 slice 1 (the wall rebuild, docs/architect/wall-rebuild-1107.md section 8): ?walls=v2 builds each shared
-     wall once from the wall graph (castle-walls-v2.js) with true holes; v1 stays the default until the pass marks hold */
-  var WALLS2 = o.walls === 'v2' && !!window.CastleWalls && !!window.CastleStrip;
+     wall once from the wall graph (castle-walls-v2.js) with true holes; v1 stays the default until the pass marks hold.
+     v218 (req 5173, Godric's 1, 10 November 2026, 7.22 pm): v2 is the default where the start place stands on G (the
+     level by its floor, as tools/envelope-gate.mjs bins it), one floor at a time; &floor=all spans levels and keeps v1, as
+     does every other level; ?walls=v1 is the before on G */
+  var WLV = (M.levels || []).filter(function (l) { return l.z != null; }).sort(function (a, b) { return a.z - b.z; });
+  var WBIN = (WLV.filter(function (l) { return l.z <= P.floor + 0.01; }).pop() || WLV[0] || {}).id;
+  var WALLS2 = (o.walls || (WBIN === 'G' && o.floor !== 'all' ? 'v2' : 'v1')) === 'v2' && !!window.CastleWalls && !!window.CastleStrip;
   var DPRE = (function () {   /* req 1996: door-surround options for Godric's eye, the page's ?dpre=A|B|C|D; the plain build has none */
     var m = /[?&]dpre=([A-D])/.exec(window.location.search || ''); if (!m) return null;
     var rev = { n: 3, bw: 0.12, proj: 0.025, chamfer: true, stop: false, bead: false, hood: 0 };
