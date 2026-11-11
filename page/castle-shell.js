@@ -562,6 +562,18 @@ window.CastleShell = { build: function (F, M, placeId, o) {
     var hood = { n: 3, bw: 0.12, proj: 0.03, chamfer: true, stop: true, bead: false, hood: 0.18 };
     return { A: { mv: rev }, B: { mv: rev, head: 'pointed' }, C: { mv: hood, head: 'pointed' }, D: { mv: rev, head: 'tudor' } }[m[1]];
   })();   /* v91 */
+  /* v219 (req 5176, Godric's note on his 1 for req 5173: stone-cased openings, a plain and a bold option): ?cased=1 casts every
+     door and way of 3.5 m or less in a broad plain chamfered margin of the dressed stone (Coxton Tower, HES LB15774:
+     "ashlar dressings and margins... chamfered margins") and lines a square head's reveal as a headed one is, a hood kept where the door has one (without it the Great Hall doors' head
+     left 0.12 m2 open, the gate's 6.92 against 6.79); ?cased=2 adds
+     the bold: voussoirs and jamb courses in two stones turn about, a hood with carved label stops (Barclay Church, HES
+     LB26720). A preview for Godric's eye, laid over doorHead's mix (never its heads), off in every build */
+  var CASED = (function () {
+    var m = /[?&]cased=([12])/.exec(window.location.search || ''); if (!m) return null;
+    var plain = { bw: 0.22, proj: 0.045, chamfer: true, stop: false, bead: false, roll: false, impost: false, shaft: false };
+    return m[1] === '1' ? { n: 1, mv: plain } : { n: 2, mv: Object.assign({}, plain, { bw: 0.24, proj: 0.05, hood: 0.18, poly: true }) };
+  })();
+  function caseMv(g) { return DPRE ? DPRE.mv : CASED ? Object.assign({}, g.op.hmv || {}, CASED.mv) : g.op.hmv || null; }
   /* v121 (the ground floor's Pass 1 item 2, the Architect's 261st; Design's tags, req 1598): a room Design tags `stone`
      (worn or rough flags: stores, service, shafts, hidden ways; page/design/room-tags-<F>.js) lays the schedule's flags a
      tenth darker; the schedule (castle-paint.js) stays the floor's kind, the tag only its wear */
@@ -707,6 +719,12 @@ window.CastleShell = { build: function (F, M, placeId, o) {
     var st = stoneAt(row, sx, sy, z), ds = o.trim === 2 && DRESSED[st] || null;
     if (ds) return faced(ds, window.CastleStoneFace && CastleStoneFace.kind('ashlar'), tone(ds + '/ashlar', ds, 1.0), true);
     return faced(st, window.CastleStoneFace && CastleStoneFace.kind('ashlar'), tone(st + '/ashlar', st, 1.08), true);
+  }
+  /* v219 (req 5176, ?cased=2): the bold casing's second stone, a red sandstone against the dressing's pale (Barclay's red
+     on cream), the pale where the dressing is already the pink */
+  function trimAltMat(row, sx, sy, z) {
+    var st = row ? stoneAt(row, sx, sy, z) : 'late-pale', ds = DRESSED[st] || st, alt = ds === 'tudor-pink' ? 'late-pale' : 'tudor-pink';
+    return faced(alt, window.CastleStoneFace && CastleStoneFace.kind('ashlar'), alt === 'tudor-pink' ? 0xa65a44 : tone(alt + '/ashlar', alt, 1.0), true);   /* Edinburgh's red, a warm sandstone */
   }
   function floorMat(row, sx, sy, two) {
     var st = stoneAt(row, sx, sy), kind = FLOOR_USE[row.use];
@@ -1646,7 +1664,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
       if (cls === 'loop') return { trim: 0.1, hood: false };   /* castle-trim's loopMould('in') */
       doorHead(g, w);
       var rm = (M.rooms || []).filter(function (r) { return slug(r.id) === Q.id; })[0];
-      var md = window.CastleTrim.mould(rm && rm.age || 'P3', cls, { late: !!(rm && rm.late), grand: !!g.op.grand }), mv = cls === 'door' ? (DPRE ? DPRE.mv : g.op.hmv || null) : null;
+      var md = window.CastleTrim.mould(rm && rm.age || 'P3', cls, { late: !!(rm && rm.late), grand: !!g.op.grand }), mv = cls === 'door' ? caseMv(g) : null;   /* v219: ?cased= too */
       if (mv) for (var mk in mv) md[mk] = mv[mk];
       return { trim: md.bw, hood: cls === 'door' && !!md.hood, lugs: !!md.lugs };   /* v192 (req 3220): a late P6 door's architrave ears (castle-trim.js:57-58; no other age or class has lugs), so panelling.js stops past them */
     }
@@ -2077,7 +2095,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
           each.forEach(function (E1) {
             var sE = sm + E1[0];
             var geo = CastleTrim.geometry(THREE, { cls: cls, age: age, w: E1[1], h: E1[2], sill: E1[3], face: face, head: g.op.head,
-              late: !!(rm && rm.late), grand: !!g.op.grand, mv: cls === 'door' ? (DPRE ? DPRE.mv : g.op.hmv || null) : null,   /* v141: castle-trim v10's P6 from 1700 and P2's grand door */
+              late: !!(rm && rm.late), grand: !!g.op.grand, mv: cls === 'door' ? caseMv(g) : null,   /* v219: ?cased= too; v141: castle-trim v10's P6 from 1700 and P2's grand door */
               lim: { x0: -sE, x1: L - sE, ymax: HE - 0.008 } });
             var off = face === 'out' ? t : 0, p = toLocal(a[0] + ux * sE + nx * off, a[1] + uy * sE + ny * off, Q.floor);
             geo.applyMatrix4(new THREE.Matrix4().makeRotationY(ang).setPosition(p.x, p.y, p.z));
@@ -2087,6 +2105,16 @@ window.CastleShell = { build: function (F, M, placeId, o) {
             if (WALLS2 && face === 'in') geo.userData.seatIn = { id: Q.id, c: [a[0] + ux * sE, a[1] + uy * sE], u: [ux, uy], n: [nx, ny], fl: Q.floor };
             var mt = trimMat(row, a[0] + ux * sE, a[1] + uy * sE, E1[3]);
             (trimB[mt.uuid] = trimB[mt.uuid] || { mat: mt, geos: [] }).geos.push(geo);
+            /* v219 (req 5176, ?cased=2): the second stone's voussoirs and courses, set and seated as the first's */
+            var ga = geo.userData.alt;
+            if (ga) {
+              delete geo.userData.alt;
+              ga.applyMatrix4(new THREE.Matrix4().makeRotationY(ang).setPosition(p.x, p.y, p.z));
+              if (geo.userData.seat) ga.userData.seat = geo.userData.seat;
+              if (geo.userData.seatIn) ga.userData.seatIn = geo.userData.seatIn;
+              var ma = trimAltMat(row, a[0] + ux * sE, a[1] + uy * sE, E1[3]);
+              (trimB[ma.uuid] = trimB[ma.uuid] || { mat: ma, geos: [] }).geos.push(ga);
+            }
           });
         });
       }
@@ -3816,10 +3844,11 @@ window.CastleShell = { build: function (F, M, placeId, o) {
            its head would be redrawn at the clip line; swallowed by a wider, taller hole (library-corridor-mouth, 3 m
            by 3.6 m round a 2.6 m door by kitchens-steps), entrance-hall's strip drew no stone there and its lining stood
            0.15 m into stair-hall, as charms-passage's did into charms-landing-passage-3 */
-        var uH = CastleStrip.unite(spec.holes.map(function (h) { var cut = h.z1 > top - lo + 0.005; return { s0: Math.max(x0L, h.s0), s1: Math.min(x1L, h.s1), z0: Math.max(0, h.z0), z1: Math.min(top - lo, h.z1), head: cut ? null : (h.head || null), up: cut ? 0 : (h.up || 0) }; })
+        var uH = CastleStrip.unite(spec.holes.map(function (h) { var cut = h.z1 > top - lo + 0.005; return { s0: Math.max(x0L, h.s0), s1: Math.min(x1L, h.s1), z0: Math.max(0, h.z0), z1: Math.min(top - lo, h.z1), head: cut ? null : (h.head || null), up: cut ? 0 : (h.up || 0),
+            sq: !!CASED && !cut && !h.niche && !h.head && h.z0 < 0.1 && h.z1 - h.z0 > 1.7 }; })   /* v219 (req 5176, ?cased=): a square-headed door or way's reveal is lined too */
           .filter(function (h) { return h.s1 - h.s0 > 0.02 && h.z1 - h.z0 > 0.02; })).holes;
         uH.forEach(function (h) {
-          if (!h.head || !(h.up > 0.01)) return;
+          if (!h.sq && (!h.head || !(h.up > 0.01))) return;
           if (uH.some(function (o) { return o !== h && o.s0 <= h.s0 + 0.01 && o.s1 >= h.s1 - 0.01 && o.z0 <= h.z1 - h.up + 0.01 &&
             Math.min(CastleStrip.topAt(o, h.s0), CastleStrip.topAt(o, (h.s0 + h.s1) / 2), CastleStrip.topAt(o, h.s1)) >= h.z1 - 0.01; })) return;
           var up = Math.min(h.up, h.z1 - h.z0 - 0.01), sp = h.z1 - up;
@@ -3841,15 +3870,22 @@ window.CastleShell = { build: function (F, M, placeId, o) {
           var nL = C.length - 1;
           if (nL >= 0 && Math.abs(C[nL][0] - h.s1) < 1e-6 && C[nL][1] < sp - 1e-6) { var fR = footAt(h.s1); if (fR >= sp - 0.005) C = C.slice(0, nL); else C[nL] = [h.s1, fR]; }
           if (C.length < 3) return;
-          var dpt = sg.off[1] - sg.off[0], pos = [], uv = [], acc = 0, I = 0.003;
+          var dpt = sg.off[1] - sg.off[0], pos = [], uv = [], pos2 = [], uv2 = [], acc = 0, I = 0.003;
           var off = C.map(function (q, k) {
             var a = C[Math.max(0, k - 1)], b = C[Math.min(C.length - 1, k + 1)], dx = b[0] - a[0], dy = b[1] - a[1], L = Math.hypot(dx, dy) || 1;
             return [q[0] + dy / L * I, q[1] - dx / L * I];   /* into the hole: below the curve run left to right */
           });
           for (var k = 0; k + 1 < off.length; k++) {
             var A = off[k], B = off[k + 1], sl = Math.hypot(B[0] - A[0], B[1] - A[1]);
-            pos.push(A[0], A[1], 0.001, B[0], B[1], 0.001, B[0], B[1], dpt - 0.001, A[0], A[1], 0.001, B[0], B[1], dpt - 0.001, A[0], A[1], dpt - 0.001);
-            uv.push(acc, 0, acc + sl, 0, acc + sl, dpt, acc, 0, acc + sl, dpt, acc, dpt);
+            /* v219 (req 5176, ?cased=2): through the head the lining's voussoirs turn about in two stones, as the face ring's do
+               (castle-trim v11: n a side, mirrored, the springers the first stone); the jambs stay the first */
+            var PZ = pos, UZ = uv;
+            if (CASED && CASED.n === 2 && h.head && A[1] > sp + 0.01 && B[1] > sp + 0.01) {
+              var nV = h.s1 - h.s0 > 1.6 ? 6 : 4, fV = ((A[0] + B[0]) / 2 - h.s0) / (h.s1 - h.s0), iV = Math.min(2 * nV - 1, Math.max(0, Math.floor(fV * 2 * nV)));
+              if ((iV < nV ? iV : 2 * nV - 1 - iV) % 2) { PZ = pos2; UZ = uv2; }
+            }
+            PZ.push(A[0], A[1], 0.001, B[0], B[1], 0.001, B[0], B[1], dpt - 0.001, A[0], A[1], 0.001, B[0], B[1], dpt - 0.001, A[0], A[1], dpt - 0.001);
+            UZ.push(acc, 0, acc + sl, 0, acc + sl, dpt, acc, 0, acc + sl, dpt, acc, dpt);
             acc += sl;
           }
           var lg = new THREE.BufferGeometry();
@@ -3858,6 +3894,14 @@ window.CastleShell = { build: function (F, M, placeId, o) {
           var lm = F.register(new THREE.Mesh(lg, trimMat(oQ.row, sg.a[0] + ux * (h.s0 + h.s1) / 2, sg.a[1] + uy * (h.s0 + h.s1) / 2, lo + sp)), LAYER.wall);
           lm.name = sg.owner + '-head-lining-' + i0 + '-' + (+h.s0.toFixed(2)); lm.userData.owner = sg.owner; lm.userData.lining = 1; lm.userData.rooms = sg.rooms.slice(); lm.userData.wall2 = sg.kind;
           group.add(lm);
+          if (pos2.length) {   /* v219: the second stone's voussoirs of the lining */
+            var lg2 = new THREE.BufferGeometry();
+            lg2.setAttribute('position', new THREE.Float32BufferAttribute(pos2, 3)); lg2.setAttribute('uv', new THREE.Float32BufferAttribute(uv2, 2));
+            lg2.computeVertexNormals(); lg2.applyMatrix4(MX);
+            var lm2 = F.register(new THREE.Mesh(lg2, trimAltMat(oQ.row, sg.a[0] + ux * (h.s0 + h.s1) / 2, sg.a[1] + uy * (h.s0 + h.s1) / 2, lo + sp)), LAYER.wall);
+            lm2.name = lm.name + '-alt'; lm2.userData.owner = sg.owner; lm2.userData.lining = 1; lm2.userData.rooms = sg.rooms.slice(); lm2.userData.wall2 = sg.kind;
+            group.add(lm2);
+          }
         });
       }
     });

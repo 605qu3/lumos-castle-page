@@ -258,9 +258,24 @@
          width; under 3 cm of room there is no casing on either side, never one jamb */
       var mg = CLIP ? Math.min(-CLIP.x0 - a, CLIP.x1 - a) : Infinity, bwe = Math.min(bw, mg), thin = bwe < 0.03;
       function cap(x) { return Math.min(x, a + mg); }
+      /* v11 (req 5176, the bold cased opening, ?cased=2; Barclay Church, Edinburgh, HES LB26720: "polychrome voussoirs",
+         a hood "with carved label stops"): M.poly lays the ring's voussoirs and the jambs' courses in two stones turn
+         about, the second (alt) returned beside the merged geometry as g.userData.alt for the caller's second material.
+         Mirrored stones match (a stone and its fellow across the apex the same), the springers in the first stone, the
+         jamb's top course the second so the turn runs on down; courses about 0.32 m with 6 mm joints */
+      var alt = [];
       if (!thin) {
-        pair(xi, a + bwe, jb, jt, PP, ch);
-        parts.push.apply(parts, pring(THREE, HK, a, yr, -J, bwe, PP, w > 1.6 ? 6 : 4));
+        var nR = w > 1.6 ? 6 : 4;
+        if (M.poly && jt - jb > 0.2) {
+          var nc = Math.max(1, Math.round((jt - jb) / 0.32)), hc = (jt - jb) / nc;
+          for (var c = 0; c < nc; c++) {
+            var cy1 = jt - c * hc, cy0 = cy1 - hc + (c < nc - 1 ? 0.006 : 0), dst = c % 2 === 0 ? alt : parts, keep = parts;
+            parts = dst; pair(xi, a + bwe, cy0, cy1, PP, ch); parts = keep;
+          }
+        } else pair(xi, a + bwe, jb, jt, PP, ch);
+        var rst = pring(THREE, HK, a, yr, -J, bwe, PP, nR);
+        if (M.poly && rst.length === 2 * nR) rst.forEach(function (gq, k) { var ix = k < nR ? k : 2 * nR - 1 - k; (ix % 2 ? alt : parts).push(gq); });
+        else parts.push.apply(parts, rst);
         if (imp) pair(xi, cap(X + 0.05), jt, yr - J, P + 0.04, true);
       }
       if (M.roll || M.bead) parts.push(pRod(THREE, HK, a, yr, 0.03, PP - E, 0.03));
@@ -269,7 +284,16 @@
       if (!thin && M.stop && jb > ys) pair(xi, cap(X + 0.008), ys, jb, PP + 0.016, false);
       if (!thin && M.hood && (!win || out)) {
         parts.push.apply(parts, pring(THREE, HK, a, yr, bw, bw + 0.08, PP + 0.05, w > 1.6 ? 6 : 4));
-        pair(cap(X + 0.008), cap(X + 0.1), yr - 0.14, yr - J, PP + 0.07, true);
+        if (M.poly && cap(X + 0.1) - cap(X + 0.008) > 0.05) {
+          /* v11: the carved label stop: a block under the hood's end, its underside cut back in a slope to the wall, a
+             boss on its face (a stylised carving at greybox scale; Barclay's are angels) */
+          var s0 = cap(X + 0.008), s1 = cap(X + 0.1), sxm = (s0 + s1) / 2;
+          [-1, 1].forEach(function (sd) {
+            var lo = sd > 0 ? s0 : -s1, hi = sd > 0 ? s1 : -s0;
+            parts.push(prism(THREE, lo, hi, [[-E, yr - 0.27], [PP + 0.02, yr - 0.27], [PP + 0.07, yr - 0.12], [PP + 0.07, yr - J], [-E, yr - J]]));
+            var bo = new THREE.IcosahedronGeometry(0.032, 1); bo.translate(sd * sxm, yr - 0.07, PP + 0.075); parts.push(bo);
+          });
+        } else pair(cap(X + 0.008), cap(X + 0.1), yr - 0.14, yr - J, PP + 0.07, true);
       }
       if (win && s.sill > 0.05) {
         if (out) parts.push(prism(THREE, -X - 0.05, X + 0.05, [[-E, y0 - 0.09], [PP + 0.07, y0 - 0.09], [PP + 0.07, y0 - 0.04], [PP + 0.015, ys], [-E, ys]]));
@@ -278,6 +302,7 @@
       CLIP = null;
       var gp = merge(THREE, parts);
       if (s.face === 'in') gp.rotateY(Math.PI);
+      if (alt.filter(Boolean).length) { var ga = merge(THREE, alt); if (s.face === 'in') ga.rotateY(Math.PI); gp.userData.alt = ga; }
       return gp;
     }
     if (RH) {
@@ -352,5 +377,5 @@
     return g;
   }
 
-  window.CastleTrim = { version: 10, tudor: tudor, geometry: geometry, merge: merge, mould: mould, prof: prof, rise: rise };
+  window.CastleTrim = { version: 11, tudor: tudor, geometry: geometry, merge: merge, mould: mould, prof: prof, rise: rise };
 })();
