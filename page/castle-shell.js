@@ -3581,9 +3581,19 @@ window.CastleShell = { build: function (F, M, placeId, o) {
     /* a flush line stays open where a way between the two spans it (a corridor cut into named stretches) */
     /* v204, req 3481 (10 November 2026): and only where the way also reaches the shared top; a mouth lower than the line's
        ceiling leaves it a flush partition, cut by the mouth's own sweep, so the band over the mouth is drawn */
+    /* v229 (req 5219 item 1, docs/handoff/architect.md "Design gate, req 5219 item 1"): the way's head by its own cut, in
+       the castle's frame, against the lower of the two ceilings; v204 set the sill and height (over the opening's own
+       room's floor) against the top over ra's floor, so a way between rooms on two floors read wrong: rose-room-arch
+       (head 34.0 under the way's 34.1) read as reaching it from the rose room's raised floor and its band went unbuilt */
+    var headCache = {}, headOf = function (op) {
+      if (headCache[op.id] != null) return headCache[op.id];
+      var hz = -Infinity;
+      (op.between || []).forEach(function (rid) { try { window.CastleShell.openingCuts(M, slug(rid)).forEach(function (c) { if (c.op === op.id) hz = Math.max(hz, c.z1); }); } catch (e) {} });
+      return (headCache[op.id] = hz);
+    };
     var openWhole = function (ra, rb, s0, s1, seg) {
-      var zr = seg && seg.zr, top = zr && zr[ra] && zr[rb] ? Math.min(zr[ra][1], zr[rb][1]) - zr[ra][0] : -Infinity;
-      return (M.openings || []).some(function (op) { return matches(M, op, ra) && matches(M, op, rb) && isWay(op.kind || '') && (op.w || 0) >= s1 - s0 - 0.15 && (op.sill || 0) + (op.h || 0) >= top - 0.05; });
+      var zr = seg && seg.zr, top = zr && zr[ra] && zr[rb] ? Math.min(zr[ra][1], zr[rb][1]) : -Infinity;
+      return (M.openings || []).some(function (op) { return matches(M, op, ra) && matches(M, op, rb) && isWay(op.kind || '') && (op.w || 0) >= s1 - s0 - 0.15 && headOf(op) >= top - 0.05; });
     };
     var G = CastleWalls.graph(places, { stand: P.id, openWhole: openWhole }), byId = {};
     places.forEach(function (q) { byId[q.id] = q; });
