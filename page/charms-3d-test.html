@@ -163,12 +163,29 @@ modeBtn.addEventListener('click', function () {
   var look = !document.body.classList.contains('look'); document.body.classList.toggle('look', look);
   modeBtn.textContent = look ? 'Looking: drag to turn. Tap for wand.' : 'Wand out. Tap to look around.';
 });
-function drawWand(x, y) {   /* the wand held at the finger's point, tip on the finger, tilted down to the right */
-  ictx.save(); ictx.translate(x, y); ictx.rotate(0.9); ictx.lineCap = 'round';
-  ictx.strokeStyle = '#2a1a10'; ictx.lineWidth = 7; ictx.beginPath(); ictx.moveTo(0, 0); ictx.lineTo(0, 90); ictx.stroke();
-  ictx.strokeStyle = '#8a5a30'; ictx.lineWidth = 4; ictx.beginPath(); ictx.moveTo(0, 0); ictx.lineTo(0, 90); ictx.stroke();
+/* the wand, always in the walker's hand (Godric's "I don't see a wand", 11 November 2026, 2.15 pm): held from the lower
+   right of the screen, pointing at the ring when resting, its tip on the finger while a spell is drawn. */
+function drawWand(tx, ty, lit, rest) {
+  var hx = W * 0.9, hy = H - 70;   /* the hand, low on the right, above the bottom button */
+  var dx = tx - hx, dy = ty - hy, d = Math.hypot(dx, dy) || 1, ux = dx / d, uy = dy / d, nx = -uy, ny = ux;
+  var L = rest ? d * 0.6 : Math.max(d, 120);   /* resting: short of the ring, so the ring stays clear; drawing: tip on the finger */
+  var ex = hx + ux * L, ey = hy + uy * L, gl = Math.min(110, L * 0.32), gx = hx + ux * gl, gy = hy + uy * gl;
+  function taper(x0, y0, w0, x1, y1, w1, col) {
+    ictx.fillStyle = col; ictx.beginPath(); ictx.moveTo(x0 + nx * w0, y0 + ny * w0); ictx.lineTo(x1 + nx * w1, y1 + ny * w1);
+    ictx.lineTo(x1 - nx * w1, y1 - ny * w1); ictx.lineTo(x0 - nx * w0, y0 - ny * w0); ictx.closePath(); ictx.fill();
+  }
+  ictx.save(); ictx.shadowColor = 'rgba(0,0,0,.8)'; ictx.shadowBlur = 10;
+  taper(gx, gy, 6.5, ex, ey, 3, '#3a2414');   /* the shaft, tapering to the tip */
+  taper(hx - ux * 14, hy - uy * 14, 11, gx, gy, 9, '#20140c');   /* the grip */
+  ictx.shadowBlur = 0;
+  taper(gx, gy, 3, ex, ey, 1.2, '#b07c46');   /* light along the shaft */
+  [0.25, 0.55, 0.85].forEach(function (f) { var x = hx + ux * gl * f, y = hy + uy * gl * f; ictx.strokeStyle = '#6e4626'; ictx.lineWidth = 3;
+    ictx.beginPath(); ictx.moveTo(x + nx * 10, y + ny * 10); ictx.lineTo(x - nx * 10, y - ny * 10); ictx.stroke(); });   /* carved rings on the grip */
   ictx.restore();
-  var g = ictx.createRadialGradient(x, y, 0, x, y, 16); g.addColorStop(0, 'rgba(255,250,220,.95)'); g.addColorStop(1, 'rgba(255,220,140,0)'); ictx.fillStyle = g; ictx.beginPath(); ictx.arc(x, y, 16, 0, 7); ictx.fill();
+  var r = lit ? 26 : 16, g = ictx.createRadialGradient(ex, ey, 0, ex, ey, r);
+  g.addColorStop(0, lit ? 'rgba(255,250,220,.95)' : 'rgba(255,240,200,.6)'); g.addColorStop(1, 'rgba(255,220,140,0)');
+  ictx.fillStyle = g; ictx.beginPath(); ictx.arc(ex, ey, r, 0, 7); ictx.fill();
+  return { x: ex, y: ey };
 }
 var last = performance.now(), swing = 0;
 function frame(now) {
@@ -200,8 +217,9 @@ function frame(now) {
   if (pts && pts.length > 1 && al > 0) {
     ictx.lineCap = 'round'; ictx.lineJoin = 'round'; ictx.strokeStyle = 'rgba(255,236,170,' + 0.9 * al + ')'; ictx.lineWidth = 6; ictx.shadowColor = 'rgba(255,200,90,' + al + ')'; ictx.shadowBlur = 12;
     ictx.beginPath(); pts.forEach(function (q, i) { i ? ictx.lineTo(q.x, q.y) : ictx.moveTo(q.x, q.y); }); ictx.stroke(); ictx.shadowBlur = 0;
-    if (stroke) drawWand(pts[pts.length - 1].x, pts[pts.length - 1].y);
   }
+  if (stroke && stroke.length) drawWand(stroke[stroke.length - 1].x, stroke[stroke.length - 1].y, true);
+  else drawWand(W / 2, H / 2, !!th, true);
   requestAnimationFrame(frame);
 }
 /* a hook for a script: cast a drawn stroke given as points, read what the ring is on */
