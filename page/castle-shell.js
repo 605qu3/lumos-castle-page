@@ -3747,28 +3747,37 @@ window.CastleShell = { build: function (F, M, placeId, o) {
          one, else the casing alone (res.reveals lists every one tried: op, room, orders, face). The strip is then built in
          slabs across its depth, the face slab's hole cut n x 0.16 wider on its head's true offset (castle-strip offTop) */
       var RECop = {}, recList = [];
+      if (CASED && CASED.n === 4) {
+        if (sg.rooms.length !== 2) holes.forEach(function (H, k) { var op = OPI[H.op], h = spec.holes[k]; if (op && !H.niche && ringedOp(op, h.s1 - h.s0)) (res.reveals = res.reveals || []).push([H.op, '', 0, 0, +(h.s1 - h.s0).toFixed(2), 'one room', +spec.depth.toFixed(2)]); });
+      }
       if (CASED && CASED.n === 4 && sg.rooms.length === 2) {
         var x0R = -e0, x1R = len + e1;
         spec.holes.forEach(function (h, k) {
           var H = holes[k], op = OPI[H.op]; if (!op || H.niche || RECop[H.op] || !ringedOp(op, h.s1 - h.s0)) return;
-          if (op.noTrimIn && op.noTrimIn.length) return;
-          var btw = (op.between || []).map(slug); if (btw.length !== 2 || btw.some(function (r) { return sg.rooms.indexOf(r) < 0; })) return;
-          if (!(h.head === 'pointed' || h.head === 'round') || Math.abs(h.z0) > 0.05) return;
-          var a = (h.s1 - h.s0) / 2; if (a < 0.2) return;
-          if (Math.abs(h.up - (h.head === 'pointed' ? Math.sqrt(3) * a : a)) > 0.05) return;
-          var R = orderedRoom(btw); if (!R || !W2[R] || !byId[R]) return;
+          var skip = function (w) { (res.reveals = res.reveals || []).push([H.op, '', 0, 0, +(h.s1 - h.s0).toFixed(2), w, +spec.depth.toFixed(2)]); };
+          var btw = (op.between || []).map(slug); if (btw.length !== 2 || btw.some(function (r) { return sg.rooms.indexOf(r) < 0; })) return skip('rooms');
+          if (!(h.head === 'pointed' || h.head === 'round')) return skip('head ' + (h.head || 'square'));
+          if (Math.abs(h.z0) > 0.05) return skip('sill');
+          var a = (h.s1 - h.s0) / 2; if (a < 0.2) return skip('narrow');
+          if (Math.abs(h.up - (h.head === 'pointed' ? Math.sqrt(3) * a : a)) > 0.05) return skip('rise');
+          /* v227: a noTrimIn room stays plain; the orders go on the other room's face (the Great Hall doors' passage, req 5219) */
+          var nti = (op.noTrimIn || []).map(slug), R = nti.length ? btw.filter(function (r) { return nti.indexOf(r) < 0; })[0] : orderedRoom(btw);
+          if (!R || !W2[R] || !byId[R]) return skip('room');
           var sc = (h.s0 + h.s1) / 2, px = sg.a[0] + ux * sc, py = sg.a[1] + uy * sc;
           var at1 = inPoly(byId[R].loops[0], px + sg.n[0] * (sg.off[1] + 0.05), py + sg.n[1] * (sg.off[1] + 0.05));
           var at0 = inPoly(byId[R].loops[0], px + sg.n[0] * (sg.off[0] - 0.05), py + sg.n[1] * (sg.off[0] - 0.05));
-          if (at0 === at1) return;
+          if (at0 === at1) return skip('face');
           var sp = h.z1 - h.up, riseAt = function (dd) { return h.head === 'pointed' ? Math.sqrt(Math.pow(2 * a + dd, 2) - a * a) : a + dd; };
           var fits = function (n) {
             var F = n * RV.OW, X = F + RV.bw + 0.1, top = sp + riseAt(F + RV.bw + 0.08);
-            if (spec.depth < n * RV.DT + 0.12 || h.s0 - X < x0R + 0.02 || h.s1 + X > x1R - 0.02 || top > spec.hi - 0.01) return false;
-            return spec.holes.every(function (o, j) { return j === k || o.z0 > top || o.z1 < h.z0 || o.s1 <= h.s0 - X - 0.05 || o.s0 >= h.s1 + X + 0.05 || (Math.abs(o.s0 - h.s0) < 0.05 && Math.abs(o.s1 - h.s1) < 0.05); });
+            if (spec.depth < n * RV.DT + 0.12) return (why = 'deep ' + spec.depth.toFixed(2), false);
+            if (h.s0 - X < x0R + 0.02 || h.s1 + X > x1R - 0.02) return (why = 'wide', false);
+            if (top > spec.hi - 0.01) return (why = 'high ' + top.toFixed(2) + '>' + spec.hi.toFixed(2), false);
+            return spec.holes.every(function (o, j) { return j === k || o.z0 > top || o.z1 < h.z0 || o.s1 <= h.s0 - X - 0.05 || o.s0 >= h.s1 + X + 0.05 || (Math.abs(o.s0 - h.s0) < 0.05 && Math.abs(o.s1 - h.s1) < 0.05); }) || (why = 'hole', false);
           };
+          var why = '';
           var n = fits(2) ? 2 : fits(1) ? 1 : 0;
-          (res.reveals = res.reveals || []).push([H.op, R, n, at1 ? 1 : 0, +(2 * a).toFixed(2)]);
+          (res.reveals = res.reveals || []).push([H.op, R, n, at1 ? 1 : 0, +(2 * a).toFixed(2), why, +spec.depth.toFixed(2)]);   /* why: the last fit's failure (n < 2) */
           if (!n) return;
           var r = { op: H.op, h: h, R: R, n: n, face1: at1, F: n * RV.OW, D: n * RV.DT, sp: sp, a: a, up: riseAt(n * RV.OW) };
           RECop[H.op] = r; recList.push(r);
