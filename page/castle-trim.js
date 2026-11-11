@@ -233,6 +233,7 @@
     /* v3: every edge that meets the cut, the jambs' feet and tops and the head's top, stand 6 mm into it or clear, so no face of the trim lies in the plane of the wall's own jamb, head
        or sill (the back's 5 mm embed overlapped them: 41 places fought, the all-places run with ?trim=1) */
     if (s.mv) for (var mk in s.mv) M[mk] = s.mv[mk];   /* req 1996 preview: a moulding set by hand */
+    bw = M.bw; P = M.proj; ch = M.chamfer;   /* req 5293: read AFTER the hand-set mould, as the casing's own numbers (a, bw .24, 2 orders) say: bw, P and ch were taken before it, so ?cased=3 drew the P2 door mould's .16 and .04 (about 6 percent narrow against the Blender build) */
     var J = 0.006, wi = w - 2 * J, X = w / 2 + bw, parts = [], lim = s.lim;
     /* the face 'in' is turned half about y after it is built, so its x runs the other way: clip it by the mirror */
     /* v8: 8 mm short of the wall's ends, so a piece cut there never lies in the end's plane (pomfrey-bedroom's widened sill) */
@@ -480,5 +481,5 @@
     return { mass: mass, dress: dress, D: D, F: F, crown: sp + rise(kind, a, F + s.bw + 0.08) };
   }
 
-  window.CastleTrim = { version: 16, tudor: tudor, geometry: geometry, reveal: reveal, portal: portal, merge: merge, mould: mould, prof: prof, rise: rise };
+  window.CastleTrim = { version: 17, tudor: tudor, geometry: geometry, reveal: reveal, portal: portal, merge: merge, mould: mould, prof: prof, rise: rise };
 })();

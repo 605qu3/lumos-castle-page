@@ -607,6 +607,10 @@ window.CastleShell = { build: function (F, M, placeId, o) {
      (res.trial, the export's cross-check); ?arch=trial also leaves them and the porch's mass unbuilt, the glb built in
      Blender standing in their place (page/arch/trial-5270-trial.glb, shell.html) */
   var ARCH = (/[?&]arch=([\w-]+)/.exec(window.location.search || '') || [])[1] || null, TRIO = ['entrance-hall', 'great-hall-doors-passage', 'great-hall'];
+  /* req 5289 (the Blender trial again): ?arch=trial&surr=1 leaves the code's stepped casings of the nine openings in the trio unbuilt, the glb's
+     surrounds (page/arch/trial-5289-surrounds.glb, shell.html) standing in their place. No flag, nothing changes */
+  var SURR = ARCH === 'trial' && /[?&]surr=1/.test(window.location.search || ''),
+    SURR_OPS = ['front-doors', 'great-hall-doors-passage-west', 'kitchens-door', 'dungeon-stair', 'chamber-door', 'hall-chamber-door', 'classrooms-mouth', 'hall-cupboard-door', 'hall-slot-cupboard-door'];
   var GHP = (function () { var q = /[?&]ghp=([012])/.exec(window.location.search || ''); return q ? +q[1] : 1; })();
   function caseMv(g) { return DPRE ? DPRE.mv : CASED ? Object.assign({}, g.op.hmv || {}, CASED.mv) : g.op.hmv || null; }
   /* v121 (the ground floor's Pass 1 item 2, the Architect's 261st; Design's tags, req 1598): a room Design tags `stone`
@@ -2139,7 +2143,8 @@ window.CastleShell = { build: function (F, M, placeId, o) {
           /* v142: outside, a window of `lights` is dressed light by light at the lights' own sill and crown */
           var each = face === 'out' && g.lights ? g.op.lights.map(function (lt) { return [(lt[0] + lt[1]) / 2, lt[1] - lt[0], g.op.h, g.op.sill]; })
             : [[0, face === 'out' ? slot : w, g.h - g.sill, g.sill]];
-          if (face === 'in' && g.op.noTrimIn && g.op.noTrimIn.indexOf(Q.id) >= 0) return;   /* v225: an opening's noTrimIn rooms take no casing in their face (req 5217) */
+          if (SURR && face === 'in' && cls === 'door' && TRIO.indexOf(Q.id) >= 0 && SURR_OPS.indexOf(g.op.id) >= 0) return;   /* req 5289: the glb's */
+          if (face === 'in' && g.op.noTrimIn &&g.op.noTrimIn.indexOf(Q.id) >= 0) return;   /* v225: an opening's noTrimIn rooms take no casing in their face (req 5217) */
           /* v231 (req 5268): the double doors' own opening (great-hall-doors, castle-model.js) stands in the same mouth as the passage's east end; with the porch there its stepped rings drew a second red order inside the porch's arch. The porch is the casing, so the doors' own take none in the Entrance Hall. */
           if (GHP && face === 'in' && g.op.id === 'great-hall-doors') return;
           each.forEach(function (E1) {
@@ -3764,8 +3769,10 @@ window.CastleShell = { build: function (F, M, placeId, o) {
       if (ARCH && sg.rooms.some(function (r) { return TRIO.indexOf(r) >= 0; })) {
         window.__walls2 = res; (res.trial = res.trial || []).push({ kind: sg.kind, owner: sg.owner, rooms: sg.rooms.slice(), a: sg.a, b: sg.b, n: sg.n, off: sg.off, t: sg.t, lo: lo, top: top, e0: e0, e1: e1,
           holes: holes.map(function (h) { return { op: h.op, s0: h.s0, s1: h.s1, z0: h.z0, z1: h.z1, head: h.head, up: h.up, niche: !!h.niche }; }) });
-        if (ARCH === 'trial') return;
       }
+      /* v18 (req 5293): on the Blender trial the wall strips are not drawn (the glb has them), but the hole floors and the
+         leaf, stop and wear reseat below still run for the trio, else the leaf stands 0.25 m deep and the threshold shows */
+      var TRIALSKIP = ARCH === 'trial' && sg.rooms.some(function (r) { return TRIO.indexOf(r) >= 0; });
       /* v226 (req 5219, ?cased=4, the reveal door): a ringed door between this strip's two rooms, pointed or round, from the
          floor, takes its orders on the ordered room's face where the strip has the room: depth for the orders and 0.12 behind,
          the casing's width to the strip's ends and the next hole, the hood's crown under the strip's top; two orders, else
@@ -3835,6 +3842,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
         /* v210 (req 3481): a niche's back, from its depth to the band's far face, in its room's stone; no hole floor (v1's
            niche floor stands in it) */
         if (h.niche) {
+          if (TRIALSKIP) return;
           var NC = h.niche, oF = (NC.c[0] - sg.a[0]) * sg.n[0] + (NC.c[1] - sg.a[1]) * sg.n[1], sgn = NC.n[0] * sg.n[0] + NC.n[1] * sg.n[1] >= 0 ? 1 : -1;
           var oB = oF + sgn * NC.dp, oE = sgn > 0 ? sg.off[1] : sg.off[0], bk = (oE - oB) * sgn;
           if (bk > 0.005) {
@@ -3849,7 +3857,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
         /* v205 (req 3481 cause C): on the strip the two rooms share, the higher-sill room's half of the band stands
            solid from the lower sill to its own, in its own stone: the step is in the doorway, the face under its sill kept */
         var zs = SILLS[h.op], ks = zs ? Object.keys(zs) : [];
-        if (ks.length === 2 && Math.abs(zs[ks[0]] - zs[ks[1]]) > 0.05 && sg.rooms.indexOf(ks[0]) >= 0 && sg.rooms.indexOf(ks[1]) >= 0 && h.s1 - h.s0 >= 0.05) {
+        if (!TRIALSKIP && ks.length === 2 && Math.abs(zs[ks[0]] - zs[ks[1]]) > 0.05 && sg.rooms.indexOf(ks[0]) >= 0 && sg.rooms.indexOf(ks[1]) >= 0 && h.s1 - h.s0 >= 0.05) {
           var hiR = zs[ks[0]] > zs[ks[1]] ? ks[0] : ks[1], zt = zs[hiR], zb = Math.min(zs[ks[0]], zs[ks[1]]);
           var scR = (h.s0 + h.s1) / 2, pxR = sg.a[0] + ux * scR, pyR = sg.a[1] + uy * scR, a0 = sg.off[0], a1 = sg.off[1], am = (a0 + a1) / 2;
           var hq = byId[hiR], side1 = !!(hq && inPoly(hq.loops[0], pxR + sg.n[0] * (a1 + 0.05), pyR + sg.n[1] * (a1 + 0.05)));
@@ -3948,6 +3956,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
           var cr = c.position.clone().sub(C); c.position.addScaledVector(nL, -cr.dot(nL));
         });
       });
+      if (TRIALSKIP) return;
       segBands.push({ sg: sg, ux: ux, uy: uy, len: len, lo: lo, top: top });   /* req 3314: every band, for an 'in' casing's seat */
       segHoles.push({ sg: sg, ux: ux, uy: uy, len: len, lo: lo, ops: holes.map(function (h) { return h.op; }), z0s: holes.map(function (h) { return h.z0; }) });
       res.merged += S.merged;
