@@ -170,17 +170,17 @@
     'p+=vec3(aLean.x*k,0.0,aLean.y*k)*(-uLen*aEnd*2.0); p.y+=uLen*aEnd;' +
     'vA=(1.0-aEnd*0.9)*smoothstep(0.0,0.4,y-aRange.x)*smoothstep(0.0,0.4,aRange.x+hv-y);' +
     'gl_Position=projectionMatrix*viewMatrix*modelMatrix*vec4(p,1.0); }';
-  var SFRAG = 'uniform float uAmount; varying float vA; void main(){ gl_FragColor=vec4(0.8,0.85,0.9,0.85*uAmount*vA); }';
+  var SFRAG = 'uniform float uAmount; varying float vA; void main(){ gl_FragColor=vec4(0.88,0.92,0.96,uAmount*vA); }';
   var FVERT = 'uniform float uTime; uniform float uWind; uniform float uSize; attribute vec2 aRange; attribute vec3 aSeed; attribute vec2 aLean; varying float vA;' +
     'void main(){ vec3 p=position; float hv=aRange.y; float y=aRange.x+mod(p.y-aRange.x-uTime*(0.45+0.35*aSeed.z),hv);' +
     'p.y=y; float sw=sin(uTime*0.9+aSeed.x*30.0)*0.12+uWind*(y-aRange.x)*0.25; p.x+=aLean.x*sw; p.z+=aLean.y*sw;' +
-    'vec4 mv=viewMatrix*modelMatrix*vec4(p,1.0); gl_Position=projectionMatrix*mv; gl_PointSize=uSize*(0.6+0.8*aSeed.y)/max(0.5,-mv.z);' +
-    'vA=smoothstep(0.0,0.4,y-aRange.x)*smoothstep(0.0,0.4,aRange.x+hv-y); }';
+    'vec4 mv=viewMatrix*modelMatrix*vec4(p,1.0); gl_Position=projectionMatrix*mv; gl_PointSize=uSize*(0.6+0.55*aSeed.y)/max(0.5,-mv.z);' +
+    'vA=(1.0-0.4*aSeed.y)*smoothstep(0.0,0.4,y-aRange.x)*smoothstep(0.0,0.4,aRange.x+hv-y); }';
   var FFRAG = 'uniform float uAmount; varying float vA; void main(){ float d=length(gl_PointCoord-0.5); if(d>0.5) discard; gl_FragColor=vec4(0.97,0.98,1.0,uAmount*vA*smoothstep(0.5,0.15,d)); }';
 
   function panes(THREE, windows, o) {
     o = o || {};
-    var density = o.density == null ? 1 : o.density, depth = o.depth || 2.5, N = o.drops || 40;
+    var density = o.density == null ? 1 : o.density, depth = o.depth || 2.5, N = o.drops || 64;
     var group = new THREE.Group(); group.name = 'castle-weather-panes';
     var pp = [], pu = [], ps = [], pi = [], v = 0;
     var sp = [], sr = [], sd = [], sl = [], se = [], fp = [], fr = [], fd = [], fl = [];
@@ -209,7 +209,7 @@
     var pm = new THREE.ShaderMaterial({ vertexShader: PVERT, fragmentShader: PFRAG, transparent: true, depthWrite: false, side: THREE.DoubleSide, fog: false,
       uniforms: { uKind: { value: 0 }, uFrost: { value: 0 }, uTime: { value: 0 }, uAmount: { value: 1 }, uWind: { value: 0 } } });
     var sm = new THREE.ShaderMaterial({ vertexShader: SVERT, fragmentShader: SFRAG, transparent: true, depthWrite: false, fog: false,
-      uniforms: { uTime: { value: 0 }, uWind: { value: 0 }, uSpeed: { value: 9 }, uLen: { value: 0.35 }, uAmount: { value: 1 } } });
+      uniforms: { uTime: { value: 0 }, uWind: { value: 0 }, uSpeed: { value: 9 }, uLen: { value: 0.55 }, uAmount: { value: 1 } } });
     var fm = new THREE.ShaderMaterial({ vertexShader: FVERT, fragmentShader: FFRAG, transparent: true, depthWrite: false, fog: false,
       uniforms: { uTime: { value: 0 }, uWind: { value: 0 }, uSize: { value: 90 }, uAmount: { value: 1 } } });
     var pane = new THREE.Mesh(geo([['position', pp, 3], ['uv', pu, 2], ['aSize', ps, 2]], pi), pm);

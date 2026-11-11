@@ -167,7 +167,7 @@ if (!/[?&]faceall=0/.test(location.search) && window.CastleStoneFace) ['founders
 <script src="shell-w5b.js?v=25"></script>
 <script src="shell-bare.js?v=3"></script>
 <script src="castle-events.js?v=40"></script>
-<script src="castle-weather.js?v=1"></script>
+<script src="castle-weather.js?v=2"></script>
 <script src="castle-sound.js?v=1"></script>
 <script>
 (function () {
@@ -1505,7 +1505,7 @@ renderer.setAnimationLoop(frame);
 if (Q.has('fade')) setTimeout(startFade, 6000);
 
 /* hooks for automated checks; harmless in normal use */
-window.lumosGreybox = { scene: scene, camera: camera, zoom: kit.zoom, tap: tap, goBack: goBack, busy: function () { return !!tween; },
+window.lumosGreybox = { scene: scene, camera: camera, renderer: renderer, zoom: kit.zoom, tap: tap, goBack: goBack, busy: function () { return !!tween; },
   state: function () { return STATE; }, events: events, drivers: drivers, redraw: draw, candles: NC, field: function () { return FIELD_CHECK; }, scorches: function () { return SCORCHES; },
   howler: function () { var n = 0; for (var c in CUES) if (c.indexOf(PSWING) !== 0 && c.indexOf(KNOCK) !== 0) { CUES[c](); n++; } return n; }, heard: function () { return heardLast; },
   panel: function () { return { open: panelOpen, swinging: !!panelSwing, cut: !!PCUT, cues: Object.keys(CUES).filter(function (c) { return c.indexOf(PSWING) === 0 || c.indexOf(KNOCK) === 0; }).length }; },
