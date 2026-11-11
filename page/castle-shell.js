@@ -810,6 +810,8 @@ window.CastleShell = { build: function (F, M, placeId, o) {
   function stairMat(id) {
     var s = PAINT && PAINT.stairs[id];
     if (!s) return null;
+    /* v19 (req 5311, Design; GoF 'magnificent marble staircase'): the marble stairs' treads and risers take Design's marble-pale, as the prefects' bathroom floor does (v150); banisters stay the flat tone */
+    if (s.stone === 'marble' && window.FloorKit && FloorKit.kinds.indexOf('marble-pale') >= 0) return FloorKit.mat(paintMat(0x808080), 'marble-pale', 0.6);
     return paintMat(s.stone === 'marble' ? tone('marble') : tone('flags-' + s.stone, s.stone, 0.86));
   }
   out.paint = { painted: painted, row: function (id) { return rowOf({ id: id, floor: 0 }); } };
