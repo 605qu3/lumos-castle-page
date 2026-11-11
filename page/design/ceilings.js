@@ -10,7 +10,7 @@
        true where the shell's own flat ceiling stays above (beams), false where this group replaces it.
        The vault reads Q.rec.vault where the model gives one (springs and crown over the room's floor, piers as site
        points [x, y]); where it does not, the rule below, provisional until the Architect places them:
-         barrel  along the room's long side; the crown at the ceiling, a half round over the short span where the
+         barrel  along the room's long side (or vault.along 'x' | 'z', req 5216, for a passage between doorways); the crown at the ceiling, a half round over the short span where the
                  height allows, else a segment springing no lower than 2.0 m
          groin   bays on squat round piers: aisles no wider than 6 m, bays about as long as an aisle is wide, the
                  piers where four bays meet, the crown at the ceiling, springing as a barrel's
@@ -73,7 +73,10 @@
   }
 
   function barrel(THREE, Q, B, mats) {
-    var G = new THREE.Group(), alongX = B.x1 - B.x0 >= B.z1 - B.z0;
+    var G = new THREE.Group(), V = Q.rec && Q.rec.vault, alongX = B.x1 - B.x0 >= B.z1 - B.z0;
+    /* req 5216: vault.along 'x' or 'z' (site axes; local x is east, z south) runs the barrel between a passage's doorways
+       instead of along its long side; the springing and crown still come from the model's vault block */
+    if (V && (V.along === 'x' || V.along === 'z')) alongX = V.along === 'x';
     var a = (alongX ? B.z1 - B.z0 : B.x1 - B.x0) / 2, H = heights(Q, a), mid = alongX ? (B.z0 + B.z1) / 2 : (B.x0 + B.x1) / 2;
     var m = field(THREE, B.x0, B.x1, B.z0, B.z1, B.y + H.springs, function (x, z) {
       return arch(a, H.crown - H.springs, alongX ? z - mid : x - mid); }, mats.vault, 24);
