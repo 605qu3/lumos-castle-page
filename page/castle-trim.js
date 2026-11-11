@@ -453,5 +453,32 @@
     return merge(THREE, parts);
   }
 
-  window.CastleTrim = { version: 15, tudor: tudor, geometry: geometry, reveal: reveal, merge: merge, mould: mould, prof: prof, rise: rise };
+  /* v16 (req 5250, the Great Hall doors' card, castle-shell v228 ?ghp=1|2): where the wall is too thin for v15's recess
+     (0.30 at the Great Hall doors), the depth is built in front of it: a mass standing D = n x DT proud of the face, its
+     opening n x OW wider than the door all round, and v15's reveal set in its front so the orders step IN to the door's
+     own width at the wall. s.out null: a portal, the mass following the casing's outline (jambs and arch to F + bw);
+     s.out { hw, top }: the wall thickened, the mass a rectangle hw either side and up to top. Returns { mass, dress }:
+     the mass in the wall's stone (or the dressing's for a portal), the dress v15's casing, hood, orders and shafts.
+     Frame as reveal's, but the face of the wall at z 0 and the front of the mass at z D */
+  function portal(THREE, s) {
+    CLIP = null;
+    var a = s.a, n = s.n, D = n * s.DT, F = n * s.OW, kind = s.kind, sp = s.sp, y0 = s.sill, N = 24, parts = [];
+    var arc = function (d, t0, t1) { var p = []; for (var i = 0; i <= N; i++) { var q = prof(kind, a, d, t0 + (t1 - t0) * i / N); p.push([q[0], sp + q[1]]); } return p; };
+    var X = s.out ? s.out.hw : a + F + s.bw, inner = arc(F, 0, 1);
+    /* the jambs, floor to springing, either side of the opening */
+    [-1, 1].forEach(function (sd) {
+      var g = rect(THREE, sd > 0 ? a + F : -X, sd > 0 ? X : -(a + F), y0, sp, D + EMBED, false); if (g) parts.push(g);
+    });
+    /* over the springing: the outer line (the arch at F + bw, or the rectangle's top) back over the opening's arch */
+    var pts = s.out ? [[X, sp], [X, s.out.top], [-X, s.out.top], [-X, sp]] : arc(F + s.bw, 1, 0);
+    pts = pts.concat(inner);
+    var sh = new THREE.Shape(); sh.moveTo(pts[0][0], pts[0][1]); for (var i = 1; i < pts.length; i++) sh.lineTo(pts[i][0], pts[i][1]); sh.closePath();
+    var top = new THREE.ExtrudeGeometry(sh, { depth: D + EMBED, bevelEnabled: false, steps: 1 }); top.translate(0, 0, -EMBED); parts.push(top);
+    var mass = merge(THREE, parts);
+    var dress = reveal(THREE, { a: a, sill: y0, sp: sp, kind: kind, n: n, OW: s.OW, DT: s.DT, bw: s.bw, proj: s.proj, nR: s.nR });
+    dress.translate(0, 0, D);
+    return { mass: mass, dress: dress, D: D, F: F, crown: sp + rise(kind, a, F + s.bw + 0.08) };
+  }
+
+  window.CastleTrim = { version: 16, tudor: tudor, geometry: geometry, reveal: reveal, portal: portal, merge: merge, mould: mould, prof: prof, rise: rise };
 })();

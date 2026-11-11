@@ -595,6 +595,12 @@ window.CastleShell = { build: function (F, M, placeId, o) {
     if (m[1] === '4') return { n: 4, mv: Object.assign({}, plain, { bw: 0.24, proj: 0.05, hood: 0.18 }) };
     return m[1] === '1' ? { n: 1, mv: plain } : { n: 2, mv: Object.assign({}, plain, { bw: 0.24, proj: 0.05, hood: 0.18, poly: true }) };
   })();
+  /* v228 (req 5250, the Great Hall doors' card, docs/handoff/architect.md "Design gate, req 5250"): ?ghp=1 a portal, the
+     orders stepping in within a block standing proud of the Entrance Hall face; ?ghp=2 the wall at the doors thickened
+     into the Entrance Hall (0.30 to 0.86 m along 6 m, up to the bay's 7.6 m springing) with the orders set in it. Both at
+     great-hall-doors-passage-east alone, nothing in the passage (its noTrimIn kept); castle-trim v16's portal. Previews
+     for Godric's eye, laid over the default; no flag, no change */
+  var GHP = (function () { var q = /[?&]ghp=([12])/.exec(window.location.search || ''); return q ? +q[1] : 0; })();
   function caseMv(g) { return DPRE ? DPRE.mv : CASED ? Object.assign({}, g.op.hmv || {}, CASED.mv) : g.op.hmv || null; }
   /* v121 (the ground floor's Pass 1 item 2, the Architect's 261st; Design's tags, req 1598): a room Design tags `stone`
      (worn or rough flags: stores, service, shafts, hidden ways; page/design/room-tags-<F>.js) lays the schedule's flags a
@@ -2117,6 +2123,20 @@ window.CastleShell = { build: function (F, M, placeId, o) {
           if (face === 'in' && g.op.noTrimIn && g.op.noTrimIn.indexOf(Q.id) >= 0) return;   /* v225: an opening's noTrimIn rooms take no casing in their face (req 5217) */
           each.forEach(function (E1) {
             var sE = sm + E1[0];
+            if (GHP && face === 'in' && cls === 'door' && g.op.id === 'great-hall-doors-passage-east' && CastleTrim.portal) {   /* v228: ?ghp= */
+              var ga0 = E1[1] / 2, kd = g.op.head || 'pointed', spx = E1[3] + E1[2] - CastleTrim.rise(kd, ga0, 0);
+              var PT = CastleTrim.portal(THREE, { a: ga0, sill: E1[3], sp: spx, kind: kd, n: 2, OW: 0.16, DT: 0.28, bw: 0.24, proj: 0.05,
+                out: GHP === 2 ? { hw: 3.0, top: 7.6 } : null });
+              var pp = toLocal(a[0] + ux * sE, a[1] + uy * sE, Q.floor), MXp = new THREE.Matrix4().makeRotationY(ang).setPosition(pp.x, pp.y, pp.z);
+              var si = WALLS2 ? { id: Q.id, op: g.op.id, c: [a[0] + ux * sE, a[1] + uy * sE], u: [ux, uy], n: [nx, ny], fl: Q.floor } : null;
+              [[PT.mass, GHP === 2 ? wallMat(row, a[0] + ux * sE, a[1] + uy * sE, E1[3]) : trimMat(row, a[0] + ux * sE, a[1] + uy * sE, E1[3])],
+               [PT.dress, trimMat(row, a[0] + ux * sE, a[1] + uy * sE, E1[3])]].forEach(function (pm) {
+                pm[0].rotateY(Math.PI); pm[0].applyMatrix4(MXp); if (si) pm[0].userData.seatIn = si;
+                (trimB[pm[1].uuid] = trimB[pm[1].uuid] || { mat: pm[1], geos: [] }).geos.push(pm[0]);
+              });
+              window.__ghp = { opt: GHP, op: g.op.id, room: Q.id, a: ga0, sp: +spx.toFixed(3), D: PT.D, F: PT.F, crown: +PT.crown.toFixed(2), kind: kd };
+              return;
+            }
             var geo = CastleTrim.geometry(THREE, { cls: cls, age: age, w: E1[1], h: E1[2], sill: E1[3], face: face, head: g.op.head,
               late: !!(rm && rm.late), grand: !!g.op.grand, mv: cls === 'door' ? caseMv(g) : null,   /* v219: ?cased= too; v141: castle-trim v10's P6 from 1700 and P2's grand door */
               lim: { x0: -sE, x1: L - sE, ymax: HE - 0.008 } });
