@@ -1,4 +1,98 @@
 {
-  "about": "The castle's one sound table, read by page/castle-sound.js (board req 518): each entry a cue's opening words, its file under page/sounds/, loop (a room's bed) or once (a heard line), and its level 0 to 1 under the player's caps. Empty until Godric says where the sounds come from (the Great Hall's Sound, for every room, 6); a cue with no entry stays silent and is noted.",
-  "sounds": []
+ "about": "The castle's one sound table, read by page/castle-sound.js (board req 518): each entry a cue's opening words, its file under page/sounds/, loop (a room's bed) or once, its level 0 to 1 under the player's caps, and optional variants (files rotated so a repeat never sounds the same). Pilot set from free libraries (Godric's 1 on req 5322, 11 November 2026); tools/sound-pilot.py builds it; every file has a row in LICENCES.md.",
+ "sounds": [
+  {
+   "cue": "torch flames guttering on their brackets",
+   "file": "pilot/torch-1.mp3",
+   "play": "loop",
+   "level": 0.8,
+   "kind": "fire",
+   "id": "torch",
+   "source": "Wikimedia Commons",
+   "licence": "CC0 or public domain (LICENCES.md)",
+   "variants": [
+    "pilot/torch-1.mp3",
+    "pilot/torch-2.mp3",
+    "pilot/torch-3.mp3"
+   ]
+  },
+  {
+   "cue": "a fire settling in the grate",
+   "file": "pilot/grate-1.mp3",
+   "play": "loop",
+   "level": 0.8,
+   "kind": "fire",
+   "id": "grate",
+   "source": "Wikimedia Commons",
+   "licence": "CC0 or public domain (LICENCES.md)"
+  },
+  {
+   "cue": "old wood creaking",
+   "file": "pilot/creak-1.mp3",
+   "play": "once",
+   "level": 0.8,
+   "kind": "wood",
+   "id": "creak",
+   "source": "Wikimedia Commons",
+   "licence": "CC0 or public domain (LICENCES.md)",
+   "variants": [
+    "pilot/creak-1.mp3",
+    "pilot/creak-2.mp3",
+    "pilot/creak-3.mp3"
+   ]
+  },
+  {
+   "cue": "a heavy door on its hinge",
+   "file": "pilot/door-1.mp3",
+   "play": "once",
+   "level": 0.9,
+   "kind": "wood",
+   "id": "door",
+   "source": "Wikimedia Commons",
+   "licence": "CC0 or public domain (LICENCES.md)",
+   "variants": [
+    "pilot/door-1.mp3",
+    "pilot/door-2.mp3"
+   ]
+  },
+  {
+   "cue": "water dripping into a basin",
+   "file": "pilot/drip-1.mp3",
+   "play": "once",
+   "level": 0.7,
+   "kind": "water",
+   "id": "drip",
+   "source": "Wikimedia Commons",
+   "licence": "CC0 or public domain (LICENCES.md)",
+   "variants": [
+    "pilot/drip-1.mp3",
+    "pilot/drip-2.mp3",
+    "pilot/drip-3.mp3"
+   ]
+  },
+  {
+   "cue": "glass clinking",
+   "file": "pilot/glass-1.mp3",
+   "play": "once",
+   "level": 0.7,
+   "kind": "glass",
+   "id": "glass",
+   "source": "Wikimedia Commons",
+   "licence": "CC0 or public domain (LICENCES.md)"
+  },
+  {
+   "cue": "a broom handle knocking against the wall",
+   "file": "pilot/broom-1.mp3",
+   "play": "once",
+   "level": 0.8,
+   "kind": "wood",
+   "id": "broom",
+   "source": "Wikimedia Commons",
+   "licence": "CC0 or public domain (LICENCES.md)",
+   "variants": [
+    "pilot/broom-1.mp3",
+    "pilot/broom-2.mp3"
+   ]
+  }
+ ]
 }

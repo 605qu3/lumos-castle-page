@@ -51,13 +51,30 @@
     if (LOG && root.console) root.console.log('[sound] ' + s);
   }
   function plain(s) { return String(s || '').toLowerCase().replace(/[‘’]/g, "'").replace(/[“”]/g, '"').replace(/\s+/g, ' ').trim(); }
-  function find(words) {
+  var lastVariant = {}, pinned = {};
+  /* an entry with `variants` plays one of them: a once never the one it played last; a bed keeps the one it first drew */
+  function pick(t, isOnce) {
+    var v = t.variants;
+    if (!v || v.length < 2) return t;
+    var f;
+    if (!isOnce && pinned[t.cue]) f = pinned[t.cue];
+    else {
+      var pool = v.filter(function (x) { return x !== lastVariant[t.cue]; });
+      f = pool[Math.floor(Math.random() * pool.length)];
+      lastVariant[t.cue] = f;
+      if (!isOnce) pinned[t.cue] = f;
+    }
+    var c = {}; Object.keys(t).forEach(function (k) { c[k] = t[k]; });
+    c.file = f;
+    return c;
+  }
+  function find(words, isOnce) {
     var w = plain(words), best = null;
     (table || []).forEach(function (t) {
       var c = plain(t.cue);
       if (c && w.indexOf(c) === 0 && (!best || c.length > plain(best.cue).length)) best = t;
     });
-    return best;
+    return best ? pick(best, !!isOnce) : null;
   }
   function withTable(fn) { if (table) fn(); else tableWait.push(fn); }
 
@@ -117,7 +134,8 @@
   function cap(t) { return t.gain != null ? t.gain : BED_CAP; }   /* a mixed entry carries its band's gain; a plain bed the cap */
   function level(t) { var v = Number(t.level); return isFinite(v) ? Math.max(0, Math.min(1, v)) : 1; }
 
-  function bed(cues) {
+  /* `g`, optional, 0 to 1: this call's own gain under the bed cap, so a room with three beds can sit each lower */
+  function bed(cues, g) {
     withTable(function () {
       var next = [], seen = {};
       (cues || []).forEach(function (c) {
@@ -125,7 +143,12 @@
         if (!t) { say('no sound: ' + c); return; }
         if (t.play === 'once') return;   /* a once sound is a heard line's or a tap's, never a bed's */
         if (seen[t.file]) return;
-        seen[t.file] = true; next.push(t);
+        seen[t.file] = true;
+        if (isFinite(Number(g)) && g !== null && g !== undefined && g !== '') {
+          var u = {}; Object.keys(t).forEach(function (k) { u[k] = t[k]; });
+          u.gain = BED_CAP * Math.max(0, Math.min(1, Number(g))); t = u;
+        }
+        next.push(t);
         say('bed: ' + c + ' -> ' + t.file);
       });
       wanted = next;
@@ -135,7 +158,7 @@
 
   function once(words, gain) {
     withTable(function () {
-      var t = find(words);
+      var t = find(words, true);
       if (!t) { say('no sound: ' + words); return; }
       if (!awake || !ctx) { say('before the first tap, not played: ' + words); return; }
       say('once: ' + words + ' -> ' + t.file);
@@ -162,7 +185,12 @@
       ctx = ctx || new AC();
       master = master || ctx.createGain();
       master.gain.value = muted ? 0 : 1;
-      master.connect(ctx.destination);
+      /* a master limiter: three beds and a once together never clip (threshold -6 dB, hard knee, fast attack) */
+      if (ctx.createDynamicsCompressor) {
+        var lim = ctx.createDynamicsCompressor();
+        lim.threshold.value = -6; lim.knee.value = 0; lim.ratio.value = 20; lim.attack.value = 0.003; lim.release.value = 0.25;
+        master.connect(lim); lim.connect(ctx.destination);
+      } else master.connect(ctx.destination);
       if (ctx.resume) ctx.resume();
       var b = ctx.createBuffer(1, 1, 22050), s = ctx.createBufferSource();
       s.buffer = b; s.connect(ctx.destination); s.start(0);
