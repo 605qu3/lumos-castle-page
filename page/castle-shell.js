@@ -809,6 +809,16 @@ window.CastleShell = { build: function (F, M, placeId, o) {
     return paintMat(s.stone === 'marble' ? tone('marble') : tone('flags-' + s.stone, s.stone, 0.86));
   }
   out.paint = { painted: painted, row: function (id) { return rowOf({ id: id, floor: 0 }); } };
+  /* v237 (req 5270, the Blender trial): a mesh from the Blender glb takes the page's own material call, read from the
+     userData its exporter carried (owner, mat, mx, my, mz): a wall wallMat of its owner's row at its band's middle, as
+     the strips' (line 3946); the porch trimMat at the opening's centre and sill, as the porch's mass (?ghp=1). Then
+     F.register on the wall layer, as every wall of the page */
+  out.archAdopt = function (mesh) {
+    var u = mesh.userData || {}, row = W2[u.owner] ? W2[u.owner].row : rowOf({ id: u.owner, floor: 0 });
+    mesh.material = !row ? mats.wall : u.mat === 'trim' ? trimMat(row, u.mx, u.my, u.mz) : wallMat(row, u.mx, u.my, u.mz);
+    F.register(mesh, LAYER.wall);
+    return mesh;
+  };
 
   function quad(w, h, mat, layer) { return F.register(new THREE.Mesh(new THREE.PlaneGeometry(w, h), mat), LAYER[layer]); }
   function slab(w, h, d, mat, layer) { return F.register(new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat), LAYER[layer]); }
