@@ -585,10 +585,14 @@ window.CastleShell = { build: function (F, M, placeId, o) {
      stands on G (WBIN, as walls=v2), one floor at a time; &floor=all and every other level keep none; ?cased=0 is the
      before on G, ?cased=1 and 2 the options not picked */
   var CASED = (function () {
-    var q = /[?&]cased=([0123])/.exec(window.location.search || ''), m = q ? q : (WBIN === 'G' && o.floor !== 'all' ? [0, '3'] : null);
+    var q = /[?&]cased=([01234])/.exec(window.location.search || ''), m = q ? q : (WBIN === 'G' && o.floor !== 'all' ? [0, '3'] : null);
     if (!m || m[1] === '0') return null;
     var plain = { bw: 0.22, proj: 0.045, chamfer: true, stop: false, bead: false, roll: false, impost: false, shaft: false };
     if (m[1] === '3') return { n: 3, mv: Object.assign({}, plain, { bw: 0.24, proj: 0.05, hood: 0.18, orders: 2 }) };
+    /* v226 (req 5219, the reveal door): ?cased=4 sets the orders IN through the wall where the strip has room (wallsV2,
+       castle-trim v15's reveal), the ordered room's face casing drawn round the recess by the kit; every other ringed face
+       keeps the casing and hood alone, no proud orders */
+    if (m[1] === '4') return { n: 4, mv: Object.assign({}, plain, { bw: 0.24, proj: 0.05, hood: 0.18 }) };
     return m[1] === '1' ? { n: 1, mv: plain } : { n: 2, mv: Object.assign({}, plain, { bw: 0.24, proj: 0.05, hood: 0.18, poly: true }) };
   })();
   function caseMv(g) { return DPRE ? DPRE.mv : CASED ? Object.assign({}, g.op.hmv || {}, CASED.mv) : g.op.hmv || null; }
@@ -2121,7 +2125,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
             if (WALLS2 && face === 'out') geo.userData.seat = { id: Q.id, op: g.op.id, c: [a[0] + ux * sE, a[1] + uy * sE], u: [ux, uy], n: [nx, ny], d: t, in: 0 };
             /* req 3314: an 'in' casing stood on the plan line, so a flush strip standing in front of it (the hall's, 0.15 proud)
                buried a jamb; wallsV2 seats each vertex on the room-side face of the band it stands against */
-            if (WALLS2 && face === 'in') geo.userData.seatIn = { id: Q.id, c: [a[0] + ux * sE, a[1] + uy * sE], u: [ux, uy], n: [nx, ny], fl: Q.floor };
+            if (WALLS2 && face === 'in') geo.userData.seatIn = { id: Q.id, op: g.op.id, c: [a[0] + ux * sE, a[1] + uy * sE], u: [ux, uy], n: [nx, ny], fl: Q.floor };
             var mt = trimMat(row, a[0] + ux * sE, a[1] + uy * sE, E1[3]);
             (trimB[mt.uuid] = trimB[mt.uuid] || { mat: mt, geos: [] }).geos.push(geo);
             /* v219 (req 5176, ?cased=2): the second stone's voussoirs and courses, set and seated as the first's */
@@ -3639,6 +3643,20 @@ window.CastleShell = { build: function (F, M, placeId, o) {
     };
     var res = out.walls2 = { segments: G.segments.length, drawn: 0, merged: 0, plan: G.plan, rows: [] }, nk = {}, segHoles = [], segBands = [];
     res.ops = OPS.map(function (O) { return O.id + '@' + O.rooms.join('/'); });
+    /* v226 (req 5219, ?cased=4): the reveal door's measures (the design gate, docs/handoff/architect.md "Design gate, req
+       5219"): each order 0.16 wide and 0.28 deep, the casing 0.24 and the hood 0.08 round the recess on the face. The
+       ordered face is the more public room's (a corridor, passage, hall, landing, lobby, gallery, stair or mouth), else the
+       larger room's, as the approach to a real doorway is dressed and its rear-arch plain; one rule both rooms read alike */
+    var RV = { OW: 0.16, DT: 0.28, bw: 0.24, proj: 0.05 }, OPI = {}, PUB = /corridor|passage|hall|landing|lobby|gallery|vestibule|cloister|entrance|stair|court|mouth/;
+    (M.openings || []).forEach(function (op) { OPI[op.id] = op; });
+    var ringedOp = function (op, w) { var k = op.kind || ''; return !/hidden|window|loop|slit|squint|grating|cleft|lancet|oriel|dormer/.test(k) && (isDoor(k) || (isWay(k) && w <= 3.5)); };
+    var areaOf = function (pts) { var A = 0; for (var i = 0, j = pts.length - 1; i < pts.length; j = i++) A += (pts[j][0] + pts[i][0]) * (pts[j][1] - pts[i][1]); return Math.abs(A / 2); };
+    var orderedRoom = function (rs) {
+      var pb = rs.map(function (r) { return PUB.test(r) ? 1 : 0; });
+      if (pb[0] !== pb[1]) return pb[0] ? rs[0] : rs[1];
+      var ar = rs.map(function (r) { return byId[r] ? areaOf(byId[r].loops[0]) : 0; });
+      return ar[0] >= ar[1] ? rs[0] : rs[1];
+    };
     G.segments.forEach(function (sg) {
       if (sg.kind === 'open') return;
       var built = sg.rooms.filter(function (r) { return W2[r]; });
@@ -3723,7 +3741,59 @@ window.CastleShell = { build: function (F, M, placeId, o) {
       e1 = runOn(e1, len, 1); e0 = runOn(e0, 0, -1);
       var spec = { len: len, hi: top - lo, depth: sg.off[1] - sg.off[0], e0: e0, e1: e1,
         holes: holes.map(function (h) { return { s0: h.s0, s1: h.s1, z0: h.z0 - lo, z1: h.z1 - lo, head: h.head, up: h.up }; }) };
-      var S = CastleStrip.build(THREE, spec);
+      /* v226 (req 5219, ?cased=4, the reveal door): a ringed door between this strip's two rooms, pointed or round, from the
+         floor, takes its orders on the ordered room's face where the strip has the room: depth for the orders and 0.12 behind,
+         the casing's width to the strip's ends and the next hole, the hood's crown under the strip's top; two orders, else
+         one, else the casing alone (res.reveals lists every one tried: op, room, orders, face). The strip is then built in
+         slabs across its depth, the face slab's hole cut n x 0.16 wider on its head's true offset (castle-strip offTop) */
+      var RECop = {}, recList = [];
+      if (CASED && CASED.n === 4 && sg.rooms.length === 2) {
+        var x0R = -e0, x1R = len + e1;
+        spec.holes.forEach(function (h, k) {
+          var H = holes[k], op = OPI[H.op]; if (!op || H.niche || RECop[H.op] || !ringedOp(op, h.s1 - h.s0)) return;
+          if (op.noTrimIn && op.noTrimIn.length) return;
+          var btw = (op.between || []).map(slug); if (btw.length !== 2 || btw.some(function (r) { return sg.rooms.indexOf(r) < 0; })) return;
+          if (!(h.head === 'pointed' || h.head === 'round') || Math.abs(h.z0) > 0.05) return;
+          var a = (h.s1 - h.s0) / 2; if (a < 0.2) return;
+          if (Math.abs(h.up - (h.head === 'pointed' ? Math.sqrt(3) * a : a)) > 0.05) return;
+          var R = orderedRoom(btw); if (!R || !W2[R] || !byId[R]) return;
+          var sc = (h.s0 + h.s1) / 2, px = sg.a[0] + ux * sc, py = sg.a[1] + uy * sc;
+          var at1 = inPoly(byId[R].loops[0], px + sg.n[0] * (sg.off[1] + 0.05), py + sg.n[1] * (sg.off[1] + 0.05));
+          var at0 = inPoly(byId[R].loops[0], px + sg.n[0] * (sg.off[0] - 0.05), py + sg.n[1] * (sg.off[0] - 0.05));
+          if (at0 === at1) return;
+          var sp = h.z1 - h.up, riseAt = function (dd) { return h.head === 'pointed' ? Math.sqrt(Math.pow(2 * a + dd, 2) - a * a) : a + dd; };
+          var fits = function (n) {
+            var F = n * RV.OW, X = F + RV.bw + 0.1, top = sp + riseAt(F + RV.bw + 0.08);
+            if (spec.depth < n * RV.DT + 0.12 || h.s0 - X < x0R + 0.02 || h.s1 + X > x1R - 0.02 || top > spec.hi - 0.01) return false;
+            return spec.holes.every(function (o, j) { return j === k || o.z0 > top || o.z1 < h.z0 || o.s1 <= h.s0 - X - 0.05 || o.s0 >= h.s1 + X + 0.05 || (Math.abs(o.s0 - h.s0) < 0.05 && Math.abs(o.s1 - h.s1) < 0.05); });
+          };
+          var n = fits(2) ? 2 : fits(1) ? 1 : 0;
+          (res.reveals = res.reveals || []).push([H.op, R, n, at1 ? 1 : 0, +(2 * a).toFixed(2)]);
+          if (!n) return;
+          var r = { op: H.op, h: h, R: R, n: n, face1: at1, F: n * RV.OW, D: n * RV.DT, sp: sp, a: a, up: riseAt(n * RV.OW) };
+          RECop[H.op] = r; recList.push(r);
+        });
+      }
+      var S;
+      if (recList.length) {
+        var zs = [0, spec.depth];
+        recList.forEach(function (r) { zs.push(r.face1 ? spec.depth - r.D : r.D); });
+        zs = zs.sort(function (p, q) { return p - q; }).filter(function (z, i, A) { return i === 0 || z - A[i - 1] > 1e-4; });
+        S = { geos: [], merged: 0 };
+        for (var zi = 0; zi + 1 < zs.length; zi++) {
+          var za = zs[zi], zb = zs[zi + 1], zm = (za + zb) / 2, wid = false;
+          var shs = spec.holes.map(function (h, k) {
+            var r = RECop[holes[k].op];
+            if (!r || !(r.face1 ? zm > spec.depth - r.D : zm < r.D)) return h;
+            wid = true;
+            return Object.assign({}, h, { s0: h.s0 - r.F, s1: h.s1 + r.F, z1: r.sp + r.up, up: r.up, d: r.F, sp: r.sp });
+          });
+          /* each slab 1 mm into the next, so no two caps share a plane */
+          var SL = CastleStrip.build(THREE, Object.assign({}, spec, { depth: zb - za + (zi + 2 < zs.length ? 0.001 : 0), holes: shs }));
+          SL.geos.forEach(function (g) { g.translate(0, 0, za); S.geos.push(g); });
+          if (!wid) S.merged = SL.merged;
+        }
+      } else S = CastleStrip.build(THREE, spec);
       /* req 3166 (oriel dots 4 and 9): a hole cut down to a floor goes through the strip's whole depth, where no room's
          floor runs (each floor stops at its room's line), so a black line showed under the doorway. The hole's
          footprint in the band gets its own floor, 2 mm under the rooms' so the two never fight, 0.1 thick */
@@ -3826,6 +3896,13 @@ window.CastleShell = { build: function (F, M, placeId, o) {
         var lb = lf.geometry.boundingBox, lwid = lb.max.x - lb.min.x, rel = lf.position.clone().sub(C);
         var d = rel.dot(nL), da = Math.abs(h.s1 - h.s0 - lwid - 0.02) < 0.05 ? rel.dot(along) : 0;
         if (Math.abs(da) < 0.02) da = 0;
+        var RR = RECop[h.op];
+        if (RR) {   /* v226 (req 5219): the leaf shuts in its rebate, just behind the innermost order */
+          var zt = RR.face1 ? sg.off[1] - RR.D - 0.07 : sg.off[0] + RR.D + 0.07;
+          var mvR = nL.clone().multiplyScalar(zt - oc - d).addScaledVector(along, -da);
+          lf.position.add(mvR); stops.forEach(function (c) { c.position.add(mvR); });
+          return;
+        }
         if (Math.abs(d) + 0.06 <= bh + 0.005 && !da) return;
         var mv = nL.clone().multiplyScalar(-d).addScaledVector(along, -da);
         lf.position.add(mv);
@@ -3854,6 +3931,27 @@ window.CastleShell = { build: function (F, M, placeId, o) {
         m.userData.owner = sg.owner; m.userData.rooms = sg.rooms.slice(); m.userData.wall2 = sg.kind; m.userData.holes = spec.holes.map(function (h, k) { return [holes[k].op, +h.s0.toFixed(2), +h.s1.toFixed(2), +h.z0.toFixed(2), +h.z1.toFixed(2)]; }); m.userData.len = +len.toFixed(2);
         group.add(m); res.drawn++;
       });
+      /* v226 (req 5219): the reveal kit in the recess, its floor, and the ordered room's own face casing for this door taken
+         off (the kit draws the casing round the recess) */
+      recList.forEach(function (r) {
+        var g = CastleTrim.reveal(THREE, { a: r.a, sill: r.h.z0, sp: r.sp, kind: r.h.head, n: r.n, OW: RV.OW, DT: RV.DT, bw: RV.bw, proj: RV.proj });
+        var sc = (r.h.s0 + r.h.s1) / 2;
+        if (!r.face1) g.rotateY(Math.PI);
+        g.translate(sc, 0, r.face1 ? spec.depth : 0);
+        g.applyMatrix4(MX);
+        var rmx = F.register(new THREE.Mesh(g, trimMat(W2[r.R].row, sg.a[0] + ux * sc, sg.a[1] + uy * sc, lo + r.sp)), LAYER.wall);
+        rmx.name = r.R + '-reveal-' + r.op; rmx.userData.owner = r.R; rmx.userData.reveal = r.op; rmx.userData.rooms = sg.rooms.slice(); rmx.userData.wall2 = sg.kind;
+        group.add(rmx);
+        var q0 = r.face1 ? sg.off[1] - r.D : sg.off[0], qc = q0 + r.D / 2;
+        var rfl = slab(r.h.s1 - r.h.s0 + 2 * r.F, 0.1, r.D, mats.floor, 'floor');
+        rfl.position.copy(toLocal(sg.a[0] + ux * sc + sg.n[0] * qc, sg.a[1] + uy * sc + sg.n[1] * qc, lo + r.h.z0 - 0.054));
+        rfl.rotation.y = Math.atan2(uy, ux); rfl.name = r.R + '-revealfloor-' + r.op; rfl.userData.owner = r.R; rfl.userData.holeFloor = r.op;
+        group.add(rfl);
+        W2T.forEach(function (T) {
+          if (T.id !== r.R) return;
+          Object.keys(T.trimB).forEach(function (key) { T.trimB[key].geos = T.trimB[key].geos.filter(function (gq) { var si = gq.userData.seatIn; return !(si && si.op === r.op); }); });
+        });
+      });
       /* req 3166 (oriel dot 12, 7 November 2026, 5.13 pm): v1 dressed a headed opening's intrados with the casing stone
          (the -round-head- fill's sides, trimMat), but v2's strip is one extrusion in the wall's stone, so mouth 5-ne's
          pointed head showed plain rubble round its curve. Each head of the united holes gets a lining 3 mm inside the
@@ -3864,7 +3962,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
            its head would be redrawn at the clip line; swallowed by a wider, taller hole (library-corridor-mouth, 3 m
            by 3.6 m round a 2.6 m door by kitchens-steps), entrance-hall's strip drew no stone there and its lining stood
            0.15 m into stair-hall, as charms-passage's did into charms-landing-passage-3 */
-        var uH = CastleStrip.unite(spec.holes.map(function (h) { var cut = h.z1 > top - lo + 0.005; return { s0: Math.max(x0L, h.s0), s1: Math.min(x1L, h.s1), z0: Math.max(0, h.z0), z1: Math.min(top - lo, h.z1), head: cut ? null : (h.head || null), up: cut ? 0 : (h.up || 0),
+        var uH = CastleStrip.unite(spec.holes.map(function (h, kq) { var cut = h.z1 > top - lo + 0.005, rq = RECop[holes[kq].op]; return { rz: rq ? (rq.face1 ? [0.001, sg.off[1] - sg.off[0] - rq.D] : [rq.D, sg.off[1] - sg.off[0] - 0.001]) : null, s0: Math.max(x0L, h.s0), s1: Math.min(x1L, h.s1), z0: Math.max(0, h.z0), z1: Math.min(top - lo, h.z1), head: cut ? null : (h.head || null), up: cut ? 0 : (h.up || 0),
             sq: !!CASED && !cut && !h.niche && !h.head && h.z0 < 0.1 && h.z1 - h.z0 > 1.7 }; })   /* v219 (req 5176, ?cased=): a square-headed door or way's reveal is lined too */
           .filter(function (h) { return h.s1 - h.s0 > 0.02 && h.z1 - h.z0 > 0.02; })).holes;
         uH.forEach(function (h) {
@@ -3904,7 +4002,8 @@ window.CastleShell = { build: function (F, M, placeId, o) {
               var nV = h.s1 - h.s0 > 1.6 ? 6 : 4, fV = ((A[0] + B[0]) / 2 - h.s0) / (h.s1 - h.s0), iV = Math.min(2 * nV - 1, Math.max(0, Math.floor(fV * 2 * nV)));
               if ((iV < nV ? iV : 2 * nV - 1 - iV) % 2) { PZ = pos2; UZ = uv2; }
             }
-            PZ.push(A[0], A[1], 0.001, B[0], B[1], 0.001, B[0], B[1], dpt - 0.001, A[0], A[1], 0.001, B[0], B[1], dpt - 0.001, A[0], A[1], dpt - 0.001);
+            var zA = h.rz ? h.rz[0] : 0.001, zB = h.rz ? h.rz[1] : dpt - 0.001;   /* v226: a recessed door's lining only behind its orders */
+            PZ.push(A[0], A[1], zA, B[0], B[1], zA, B[0], B[1], zB, A[0], A[1], zA, B[0], B[1], zB, A[0], A[1], zB);
             UZ.push(acc, 0, acc + sl, 0, acc + sl, dpt, acc, 0, acc + sl, dpt, acc, dpt);
             acc += sl;
           }

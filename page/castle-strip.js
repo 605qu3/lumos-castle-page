@@ -37,6 +37,8 @@
       var F = fracs(h.head);
       for (var k = 0; k < F.length; k++) {
         var f = F[k], x = h.s0 + w * f, y;
+        y = h.d ? offTop(h, x) : null;
+        if (y != null) { p.push([x, y]); continue; }
         if (h.head === 'pointed') {   /* two arcs of radius w, centred on the far jambs, meeting at the apex */
           var R = w, cx = f <= 0.5 ? h.s1 : h.s0, dx = x - cx, top = Math.sqrt(Math.max(0, R * R - dx * dx));
           y = sp + top * (up / (Math.sqrt(3) * w / 2));
@@ -46,6 +48,18 @@
     }
     p.push([h.s1, sp], [h.s1, lo]);
     return p;
+  }
+
+  /* req 5219 (castle-shell v226, ?cased=4, the reveal door): a hole cut d wider all round its base opening on the true
+     offset of its head, the curve castle-trim's prof() draws at d (a pointed head's two arcs of radius 2a + d about the
+     base's far jambs, a round head's circle of a + d), so the orders set in the recess meet the cut; h.d is the offset,
+     s0, s1 and z1 the widened hole's, h.sp its springing; null where the hole has no d */
+  function offTop(h, x) {
+    var d = h.d, a = (h.s1 - h.s0) / 2 - d, m = (h.s0 + h.s1) / 2, sp = h.sp, dx;
+    if (!(a > 0.01) || sp == null) return null;
+    if (h.head === 'pointed') { var cx = x <= m ? m + a : m - a, R = 2 * a + d; dx = x - cx; return sp + Math.sqrt(Math.max(0, R * R - dx * dx)); }
+    if (h.head === 'round') { var r = a + d; dx = x - m; return sp + Math.sqrt(Math.max(0, r * r - dx * dx)); }
+    return null;
   }
 
   function unite(holes) {
@@ -67,6 +81,7 @@
     /* the hole's top over x: flat to the springing, then the head */
     var up = h.head ? Math.min(h.up || (h.s1 - h.s0) / 2, h.z1 - h.z0 - 0.01) : 0, sp = h.z1 - up, w = h.s1 - h.s0, m = (h.s0 + h.s1) / 2;
     if (!h.head || up <= 0.01) return h.z1;
+    if (h.d) { var yo = offTop(h, x); if (yo != null) return yo; }
     if (h.head === 'pointed') { var cx = x <= m ? h.s1 : h.s0, dx = x - cx; return sp + Math.sqrt(Math.max(0, w * w - dx * dx)) * (up / (Math.sqrt(3) * w / 2)); }
     var d = (x - m) / (w / 2); return sp + up * Math.sqrt(Math.max(0, 1 - d * d));
   }
@@ -75,7 +90,7 @@
     /* columns: the strip is cut at every hole's jambs and along each head's curve; in each column the solid is what
        the holes over it leave, so a hole may run to the strip's end (a door on a round room's corner) or to its top */
     var x0 = -(spec.e0 || 0), x1 = spec.len + (spec.e1 || 0), hi = spec.hi, U = unite((spec.holes || []).map(function (h) {
-      return { s0: Math.max(x0, h.s0), s1: Math.min(x1, h.s1), z0: Math.max(0, h.z0), z1: Math.min(hi, h.z1), head: h.head || null, up: h.up || 0 };
+      return { s0: Math.max(x0, h.s0), s1: Math.min(x1, h.s1), z0: Math.max(0, h.z0), z1: Math.min(hi, h.z1), head: h.head || null, up: h.up || 0, d: h.d || 0, sp: h.sp };
     }).filter(function (h) { return h.s1 - h.s0 > EPS && h.z1 - h.z0 > EPS; }));
     var xs = [x0, x1];
     U.holes.forEach(function (h) { xs.push(h.s0, h.s1); if (h.head) fracs(h.head).forEach(function (f) { xs.push(h.s0 + (h.s1 - h.s0) * f); }); });
@@ -107,6 +122,6 @@
     return { geos: sh.length ? [new THREE.ExtrudeGeometry(sh, { depth: spec.depth, bevelEnabled: false })] : [], merged: U.merged };
   }
 
-  var api = { build: build, unite: unite, outline: outline, topAt: topAt, fracs: fracs, SEG: SEG };
+  var api = { build: build, unite: unite, outline: outline, topAt: topAt, fracs: fracs, offTop: offTop, SEG: SEG };
   if (typeof module !== 'undefined' && module.exports) module.exports = api; else root.CastleStrip = api;
 })(typeof window !== 'undefined' ? window : this);

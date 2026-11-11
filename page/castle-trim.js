@@ -400,5 +400,58 @@
     return g;
   }
 
-  window.CastleTrim = { version: 11, tudor: tudor, geometry: geometry, merge: merge, mould: mould, prof: prof, rise: rise };
+  /* v15 (req 5219, the reveal door, castle-shell v226 ?cased=4; Godric's shot of 10 November 2026, 11.04 pm: v14's orders
+     stood proud of the face, the reverse of a real doorway): the orders step IN through the wall, as a 13th-century
+     doorway's do (Barnwell St Andrew's south door, two moulded orders with jamb shafts; britishlistedbuildings
+     101040245). The shell cuts the face s.n x OW wider all round the base hole, on the true offset of its head
+     (CastleStrip.offTop, prof's curve), s.n x DT deep; this kit fills it in dressed stone: the casing (bw) and the hood
+     on the face round the recess, the outer order's soffit faced, each further order a solid block stepping in with
+     its own arch, a shaft in each step's angle under a capital at the springing, and the innermost order's face round
+     the base hole where the leaf shuts against it. Voussoirs nR a side with 6 mm joints, jambs in courses of about
+     0.32 m. Frame: x across from the opening's middle, y as the caller's (s.sill, s.sp the springing), z out of the
+     ordered face at 0, into the wall negative. s: { a (the base hole's half width), sill, sp, kind 'pointed' | 'round',
+     n (1 or 2), OW, DT, bw, proj, nR } */
+  function reveal(THREE, s) {
+    CLIP = null;
+    var a = s.a, n = s.n, OW = s.OW, DT = s.DT, bw = s.bw, P = s.proj, kind = s.kind, sp = s.sp, y0 = s.sill, J = 0.006, E = EMBED;
+    var F = n * OW, nR = s.nR || (a > 0.8 ? 6 : 4), parts = [];
+    function piece(x0, x1, ya, yb, z0, z1) {   /* a block both sides of the middle, x0 to x1 out from it, z0 to z1 in the out frame */
+      [-1, 1].forEach(function (sd) {
+        var g = rect(THREE, sd > 0 ? x0 : -x1, sd > 0 ? x1 : -x0, ya, yb, z1 - z0, false);
+        if (g) { g.translate(0, 0, z0 + E); parts.push(g); }
+      });
+    }
+    function courses(x0, x1, ya, yb, z0, z1) {
+      var nc = Math.max(1, Math.round((yb - ya) / 0.32)), hc = (yb - ya) / nc;
+      for (var c = 0; c < nc; c++) piece(x0, x1, ya + c * hc, ya + (c + 1) * hc - (c < nc - 1 ? J : 0), z0, z1);
+    }
+    function arch(d0, d1, z0, z1, k) {
+      pring(THREE, kind, a, sp, d0, d1, z1 - z0, k || nR).forEach(function (g) { g.translate(0, 0, z0 + E); parts.push(g); });
+    }
+    var yj = y0 + J, yt = sp - J, D = n * DT;
+    /* the casing on the face, round the recess, and the hood over it with its stops */
+    courses(a + F - J, a + F + bw, yj, yt, -E, P - E); arch(F - J, F + bw, -E, P - E);
+    var HO = F + bw;
+    arch(HO, HO + 0.08, -E, P + 0.05 - E);
+    piece(a + HO + 0.008, a + HO + 0.1, sp - 0.16, yt, -E, P + 0.07 - E);
+    /* the outer order's soffit, faced 1.5 cm, from the face to the first step */
+    courses(a + F - 0.015, a + F + 0.01, yj, yt, -DT, 0.001); arch(F - 0.015, F + 0.01, -DT, 0.001);
+    /* each further order: a block stepping in, its face at s x DT, its soffit (n - s) x OW out from the base hole */
+    for (var st = 1; st < n; st++) {
+      var dIn = (n - st) * OW, dOut = (n - st + 1) * OW + 0.01;
+      courses(a + dIn, a + dOut, yj, yt, -D, -st * DT); arch(dIn, dOut, -D, -st * DT);
+    }
+    /* the innermost order's face round the base hole, where the leaf shuts: 1.5 cm proud of the back of the recess */
+    courses(a, a + OW + 0.003, yj, yt, -D - E, -D + 0.015); arch(-J, OW + 0.003, -D - E, -D + 0.015);
+    /* a shaft in each step's angle, on a base, under a capital at the springing */
+    for (var k = 1; k <= n; k++) {
+      var xc = a + (n - k + 1) * OW, zc = -k * DT;
+      [-1, 1].forEach(function (sd) { parts.push(rod(THREE, 'y', y0 + 0.2, sp - 0.13, sd * (xc - 0.04), zc + 0.04, 0.035)); });
+      piece(xc - 0.1, xc, y0 + J, y0 + 0.2, zc, zc + 0.1);
+      piece(xc - 0.1, xc, sp - 0.13, yt, zc, zc + 0.1);
+    }
+    return merge(THREE, parts);
+  }
+
+  window.CastleTrim = { version: 15, tudor: tudor, geometry: geometry, reveal: reveal, merge: merge, mould: mould, prof: prof, rise: rise };
 })();
