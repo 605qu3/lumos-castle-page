@@ -603,6 +603,10 @@ window.CastleShell = { build: function (F, M, placeId, o) {
      for Godric's eye, laid over the default; no flag, no change */
   /* v230 (req 5219 (e), Godric's 1 on req 5257, 11 November 2026): the porch (1) is the default; ?ghp=0 the old stepped
      rings on the flat wall, ?ghp=2 the thick wall, still a preview */
+  /* v236 (req 5270, the Blender trial): ?arch=<name> records the three places' strips as the shell derives them
+     (res.trial, the export's cross-check); ?arch=trial also leaves them and the porch's mass unbuilt, the glb built in
+     Blender standing in their place (page/arch/trial-5270-trial.glb, shell.html) */
+  var ARCH = (/[?&]arch=([\w-]+)/.exec(window.location.search || '') || [])[1] || null, TRIO = ['entrance-hall', 'great-hall-doors-passage', 'great-hall'];
   var GHP = (function () { var q = /[?&]ghp=([012])/.exec(window.location.search || ''); return q ? +q[1] : 1; })();
   function caseMv(g) { return DPRE ? DPRE.mv : CASED ? Object.assign({}, g.op.hmv || {}, CASED.mv) : g.op.hmv || null; }
   /* v121 (the ground floor's Pass 1 item 2, the Architect's 261st; Design's tags, req 1598): a room Design tags `stone`
@@ -2137,7 +2141,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
               var pp = toLocal(a[0] + ux * sE, a[1] + uy * sE, Q.floor), MXp = new THREE.Matrix4().makeRotationY(ang).setPosition(pp.x, pp.y, pp.z);
               var si = WALLS2 ? { id: Q.id, op: g.op.id, c: [a[0] + ux * sE, a[1] + uy * sE], u: [ux, uy], n: [nx, ny], fl: Q.floor } : null;
               [[PT.mass, GHP === 2 ? wallMat(row, a[0] + ux * sE, a[1] + uy * sE, E1[3]) : trimMat(row, a[0] + ux * sE, a[1] + uy * sE, E1[3])],
-               [PT.dress, trimMat(row, a[0] + ux * sE, a[1] + uy * sE, E1[3])]].forEach(function (pm) {
+               [PT.dress, trimMat(row, a[0] + ux * sE, a[1] + uy * sE, E1[3])]].filter(function (pm) { return !(ARCH === 'trial' && pm[0] === PT.mass); }).forEach(function (pm) {
                 pm[0].rotateY(Math.PI); pm[0].applyMatrix4(MXp); if (si) pm[0].userData.seatIn = si;
                 (trimB[pm[1].uuid] = trimB[pm[1].uuid] || { mat: pm[1], geos: [] }).geos.push(pm[0]);
               });
@@ -3570,53 +3574,8 @@ window.CastleShell = { build: function (F, M, placeId, o) {
      linings are slice 2). Out: out.walls2 { segments, drawn, merged, plan } for the checker. */
   function wallsV2() {
     var ids = Object.keys(W2); if (!ids.length) return;
-    var pool = gapQs.length > 1 ? gapQs.slice() : (function () {
-      var seen = {}, L = [];
-      (M.rooms || []).map(function (r) { return r.id; }).concat((M.stairs || []).map(function (x) { return slug(x.id); })).forEach(function (id) {
-        if (!id || seen[id]) return; seen[id] = 1;
-        var Q = findPlace(M, id);
-        if (Q && !Q.glasshouse && (Q.poly || Q.area) && Q.floor < P.floor + 2.5 && (Q.ceiling != null ? Q.ceiling : Q.floor + 3) > P.floor + 0.5) L.push(Q);
-      });
-      return L;
-    })();
-    ids.forEach(function (id) { if (!pool.some(function (q) { return q.id === id; })) pool.push(W2[id].Q); });
-    var places = pool.map(function (Q) {
-      var loops = Q.loops || (Q.poly ? [Q.poly] : null);
-      return loops && { id: Q.id, loops: loops, T: Q.wall || 0.8, z0: Q.floor, z1: Q.ceiling != null ? Q.ceiling : Q.floor + 3,
-        open: Q.ceiling == null || !!Q.sky || !!Q.openTop || (M.courts || []).indexOf(Q.rec) >= 0 };   /* v207: open overhead, outside air */
-    }).filter(Boolean);
-    /* a flush line stays open where a way between the two spans it (a corridor cut into named stretches) */
-    /* v204, req 3481 (10 November 2026): and only where the way also reaches the shared top; a mouth lower than the line's
-       ceiling leaves it a flush partition, cut by the mouth's own sweep, so the band over the mouth is drawn */
-    /* v229 (req 5219 item 1, docs/handoff/architect.md "Design gate, req 5219 item 1"): the way's head by its own cut, in
-       the castle's frame, against the lower of the two ceilings; v204 set the sill and height (over the opening's own
-       room's floor) against the top over ra's floor, so a way between rooms on two floors read wrong: rose-room-arch
-       (head 34.0 under the way's 34.1) read as reaching it from the rose room's raised floor and its band went unbuilt */
-    var headCache = {}, headOf = function (op) {
-      if (headCache[op.id] != null) return headCache[op.id];
-      var hz = -Infinity;
-      (op.between || []).forEach(function (rid) { try { window.CastleShell.openingCuts(M, slug(rid)).forEach(function (c) { if (c.op === op.id) hz = Math.max(hz, c.z1); }); } catch (e) {} });
-      return (headCache[op.id] = hz);
-    };
-    var openWhole = function (ra, rb, s0, s1, seg) {
-      var zr = seg && seg.zr, top = zr && zr[ra] && zr[rb] ? Math.min(zr[ra][1], zr[rb][1]) : -Infinity;
-      return (M.openings || []).some(function (op) { return matches(M, op, ra) && matches(M, op, rb) && isWay(op.kind || '') && (op.w || 0) >= s1 - s0 - 0.15 && headOf(op) >= top - 0.05; });
-    };
-    /* v234 (req 5281): each line's cuts from both rooms, site points, for the seat rule's piers (niches and recesses are no
-       opening through the line) */
-    var cutCache = {}, cutsOn = function (ra, rb) {
-      var L = [];
-      [ra, rb].forEach(function (id) {
-        if (!cutCache[id]) { cutCache[id] = []; try { window.CastleShell.openingCuts(M, id).forEach(function (c) {
-          var op = (M.openings || []).filter(function (o) { return o.id === c.op; })[0], k = op ? String(op.kind || '') : '';
-          if (c.spill || /niche|recess/.test(k)) return;
-          var dx = c.b[0] - c.a[0], dy = c.b[1] - c.a[1], l = Math.hypot(dx, dy); if (l < 1e-6) return;
-          cutCache[id].push([[c.a[0] + dx / l * c.s0, c.a[1] + dy / l * c.s0], [c.a[0] + dx / l * c.s1, c.a[1] + dy / l * c.s1]]); }); } catch (e) {} }
-        L = L.concat(cutCache[id]);
-      });
-      return L;
-    };
-    var G = CastleWalls.graph(places, { stand: P.id, openWhole: openWhole, cutsOn: cutsOn }), byId = {};
+    var WG = wallGraph(M, P, { pool: gapQs, extra: ids.map(function (id) { return W2[id].Q; }) }), places = WG.places, G = WG.G, byId = {};
+    if (ARCH) { window.__walls2 = out.walls2 = out.walls2 || {}; out.walls2.pool = places.map(function (q) { return q.id; }); out.walls2.extra = ids.slice(); }   /* req 5270: the pool and the built places, for the export */
     places.forEach(function (q) { byId[q.id] = q; });
     var eIdx = function (id, e) { var q = byId[id], k = 0; for (var j = 0; j < e[0]; j++) k += q.loops[j].length; return k + e[1]; };
     var faceOf = function (id, e) { var pts = byId[id].loops[e[0]], a = pts[e[1]], b = pts[(e[1] + 1) % pts.length]; return { a: a, b: b, L: Math.hypot(b[0] - a[0], b[1] - a[1]), n: pts.length }; };
@@ -3692,7 +3651,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
       var s0 = Math.min.apply(null, P2.map(function (p) { return p[0]; })), s1 = Math.max.apply(null, P2.map(function (p) { return p[0]; }));
       return s1 > 0.01 && s0 < len - 0.01 && s1 - s0 > 0.02 ? [s0, s1] : null;
     };
-    var res = out.walls2 = { segments: G.segments.length, drawn: 0, merged: 0, plan: G.plan, rows: [] }, nk = {}, segHoles = [], segBands = [];
+    var res = out.walls2 = { pool: (out.walls2 || {}).pool, extra: (out.walls2 || {}).extra, segments: G.segments.length, drawn: 0, merged: 0, plan: G.plan, rows: [] }, nk = {}, segHoles = [], segBands = [];
     res.ops = OPS.map(function (O) { return O.id + '@' + O.rooms.join('/'); });
     /* v226 (req 5219, ?cased=4): the reveal door's measures (the design gate, docs/handoff/architect.md "Design gate, req
        5219"): each order 0.16 wide and 0.28 deep, the casing 0.24 and the hood 0.08 round the recess on the face. The
@@ -3792,6 +3751,11 @@ window.CastleShell = { build: function (F, M, placeId, o) {
       e1 = runOn(e1, len, 1); e0 = runOn(e0, 0, -1);
       var spec = { len: len, hi: top - lo, depth: sg.off[1] - sg.off[0], e0: e0, e1: e1,
         holes: holes.map(function (h) { return { s0: h.s0, s1: h.s1, z0: h.z0 - lo, z1: h.z1 - lo, head: h.head, up: h.up }; }) };
+      if (ARCH && sg.rooms.some(function (r) { return TRIO.indexOf(r) >= 0; })) {
+        window.__walls2 = res; (res.trial = res.trial || []).push({ kind: sg.kind, owner: sg.owner, rooms: sg.rooms.slice(), a: sg.a, b: sg.b, n: sg.n, off: sg.off, t: sg.t, lo: lo, top: top, e0: e0, e1: e1,
+          holes: holes.map(function (h) { return { op: h.op, s0: h.s0, s1: h.s1, z0: h.z0, z1: h.z1, head: h.head, up: h.up, niche: !!h.niche }; }) });
+        if (ARCH === 'trial') return;
+      }
       /* v226 (req 5219, ?cased=4, the reveal door): a ringed door between this strip's two rooms, pointed or round, from the
          floor, takes its orders on the ordered room's face where the strip has the room: depth for the orders and 0.12 behind,
          the casing's width to the strip's ends and the next hole, the hood's crown under the strip's top; two orders, else
@@ -4553,6 +4517,75 @@ function farView(F, M, toLocal, panes, paneMat, shaft) {
   requestAnimationFrame(function () { draw(mode); });
   return { scene: scene, cube: rt, glass: glass, night: draw };
 }
+/* v235 (req 5270, the Blender trial, 11 November 2026): the wall graph lifted out of wallsV2 whole, so the shell and
+   tools/architect-blender-export-5270.mjs call one function: the neighbour pool (o.pool, the floor's gapQs, when it holds
+   more than one; else every room and stair standing across P's height), o.extra (the built places, added if missing),
+   the shell's openWhole and cutsOn, then CastleWalls.graph. Returns { G, places }. CastleShell.wallGraph(M, id, o) is
+   the same from a place id; o.ways adds the floor build's third list (every opening's between), as gapQs does */
+function wallGraph(M, P, o) {
+  o = o || {};
+  var pool = o.pool && o.pool.length > 1 ? o.pool.slice() : (function () {
+    var seen = {}, L = [];
+    (M.rooms || []).map(function (r) { return r.id; }).concat((M.stairs || []).map(function (x) { return slug(x.id); })).forEach(function (id) {
+      if (!id || seen[id]) return; seen[id] = 1;
+      var Q = findPlace(M, id);
+      if (Q && !Q.glasshouse && (Q.poly || Q.area) && Q.floor < P.floor + 2.5 && (Q.ceiling != null ? Q.ceiling : Q.floor + 3) > P.floor + 0.5) L.push(Q);
+    });
+    return L;
+  })();
+  (o.extra || []).forEach(function (Q) { if (!pool.some(function (q) { return q.id === Q.id; })) pool.push(Q); });
+  var places = pool.map(function (Q) {
+    var loops = Q.loops || (Q.poly ? [Q.poly] : null);
+    return loops && { id: Q.id, loops: loops, T: Q.wall || 0.8, z0: Q.floor, z1: Q.ceiling != null ? Q.ceiling : Q.floor + 3,
+      open: Q.ceiling == null || !!Q.sky || !!Q.openTop || (M.courts || []).indexOf(Q.rec) >= 0 };   /* v207: open overhead, outside air */
+  }).filter(Boolean);
+  /* a flush line stays open where a way between the two spans it (a corridor cut into named stretches) */
+  /* v204, req 3481 (10 November 2026): and only where the way also reaches the shared top; a mouth lower than the line's
+     ceiling leaves it a flush partition, cut by the mouth's own sweep, so the band over the mouth is drawn */
+  /* v229 (req 5219 item 1, docs/handoff/architect.md "Design gate, req 5219 item 1"): the way's head by its own cut, in
+     the castle's frame, against the lower of the two ceilings; v204 set the sill and height (over the opening's own
+     room's floor) against the top over ra's floor, so a way between rooms on two floors read wrong: rose-room-arch
+     (head 34.0 under the way's 34.1) read as reaching it from the rose room's raised floor and its band went unbuilt */
+  var headCache = {}, headOf = function (op) {
+    if (headCache[op.id] != null) return headCache[op.id];
+    var hz = -Infinity;
+    (op.between || []).forEach(function (rid) { try { window.CastleShell.openingCuts(M, slug(rid)).forEach(function (c) { if (c.op === op.id) hz = Math.max(hz, c.z1); }); } catch (e) {} });
+    return (headCache[op.id] = hz);
+  };
+  var openWhole = function (ra, rb, s0, s1, seg) {
+    var zr = seg && seg.zr, top = zr && zr[ra] && zr[rb] ? Math.min(zr[ra][1], zr[rb][1]) : -Infinity;
+    return (M.openings || []).some(function (op) { return matches(M, op, ra) && matches(M, op, rb) && isWay(op.kind || '') && (op.w || 0) >= s1 - s0 - 0.15 && headOf(op) >= top - 0.05; });
+  };
+  /* v234 (req 5281): each line's cuts from both rooms, site points, for the seat rule's piers (niches and recesses are no
+     opening through the line) */
+  var cutCache = {}, cutsOn = function (ra, rb) {
+    var L = [];
+    [ra, rb].forEach(function (id) {
+      if (!cutCache[id]) { cutCache[id] = []; try { window.CastleShell.openingCuts(M, id).forEach(function (c) {
+        var op = (M.openings || []).filter(function (o) { return o.id === c.op; })[0], k = op ? String(op.kind || '') : '';
+        if (c.spill || /niche|recess/.test(k)) return;
+        var dx = c.b[0] - c.a[0], dy = c.b[1] - c.a[1], l = Math.hypot(dx, dy); if (l < 1e-6) return;
+        cutCache[id].push([[c.a[0] + dx / l * c.s0, c.a[1] + dy / l * c.s0], [c.a[0] + dx / l * c.s1, c.a[1] + dy / l * c.s1]]); }); } catch (e) {} }
+      L = L.concat(cutCache[id]);
+    });
+    return L;
+  };
+  return { G: CastleWalls.graph(places, { stand: P.id, openWhole: openWhole, cutsOn: cutsOn }), places: places };
+}
+window.CastleShell.wallGraph = function (M, id, o) {
+  var P = findPlace(M, id); o = o || {};
+  if (o.ways && !o.pool) {   /* the floor build's pool, gapQs's rule and order: rooms, stairs, then every opening's between */
+    var seen = {}, L = [];
+    (M.rooms || []).map(function (r) { return r.id; }).concat((M.stairs || []).map(function (x) { return slug(x.id); }),
+      [].concat.apply([], (M.openings || []).map(function (op) { return op.between || []; })).map(slug)).forEach(function (j) {
+      if (!j || seen[j]) return; seen[j] = 1;
+      var Q = j === P.id ? P : findPlace(M, j);
+      if (Q && !Q.glasshouse && (Q.poly || Q.area) && Q.floor < P.floor + 2.5 && (Q.ceiling != null ? Q.ceiling : Q.floor + 3) > P.floor + 0.5) L.push(Q);
+    });
+    o = { pool: L, extra: o.extra };
+  }
+  return wallGraph(M, P, o);
+};
 /* v197 (req 3344/3397, the envelope's page adapter): findPlace out, so CastleEnvelope.declare reads the places the builder builds */
 window.CastleShell.findPlace = findPlace;
 /* v200 (req 3344): a place's walls' tops over its floor, top(x, y) on its plan edge, from the same section its builder
