@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Weather: windows test</title>
+<style>html,body{margin:0;height:100%;background:#111;overflow:hidden}#hud{position:fixed;left:8px;top:8px;color:#ddd;font:12px monospace;white-space:pre}</style>
+</head><body><div id="hud"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="castle-weather.js"></script>
+<script>
+/* A bare stone hall with five tall west windows, for the window weather alone (no castle). Flags, the check's fixtures:
+   ?sky=clear|cloudy|rain|snow|fog (what the weather is); ?ground=frozen (frost at the pane's edges); ?windy=1;
+   ?off=1 effect off (known bad); ?wrong=rain|snow shows that pane effect under the sky given by ?sky= (known bad: rain under a
+   clear sky); ?double=1 doubled density (known bad); ?cam=close (near one window); ?t= seconds; ?nohud=1. */
+var Q = new URLSearchParams(location.search), num = function (k, d) { return Q.has(k) ? +Q.get(k) : d; };
+var sky = Q.get('sky') || 'clear';
+var weather = { sky: Q.get('wrong') || sky, ground: Q.get('ground') || 'thawed', windy: Q.has('windy') };
+var W = innerWidth, H = innerHeight, r = new THREE.WebGLRenderer({ antialias: true }); r.setSize(W, H); r.setPixelRatio(Math.min(2, devicePixelRatio));
+document.body.appendChild(r.domElement);
+var sc = new THREE.Scene(); sc.background = new THREE.Color(0x15161a);
+var cam = new THREE.PerspectiveCamera(Q.get('cam') === 'close' ? 55 : 70, W / H, 0.1, 100);
+var L = 24, D = 12, HT = 11;
+if (Q.get('cam') === 'close') { cam.position.set(-6, 5.2, 0); cam.lookAt(-12, 5.9, -1); } else { cam.position.set(5, 1.7, 5.5); cam.lookAt(-6, 2.6, -2); }
+var stone = new THREE.MeshLambertMaterial({ color: 0x7d776c, side: THREE.DoubleSide });
+function box(w, h, d, x, y, z) { var m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), stone); m.position.set(x, y, z); sc.add(m); return m; }
+box(L, .2, D, 0, -.1, 0); box(L, .2, D, 0, HT, 0);
+box(L, HT, .3, 0, HT / 2, -D / 2); box(L, HT, .3, 0, HT / 2, D / 2); box(.3, HT, D, L / 2, HT / 2, 0);
+var wins = [];
+for (var i = 0; i < 5; i++) { var z0 = -D / 2 + (i + .5) * D / 5; wins.push({ at: [-L / 2, 3.2 + 2.75, z0], in: [1, 0], w: 1.6, h: 5.5, floor: 0, reach: 9 }); }
+box(.3, 3.2, D, -L / 2, 1.6, 0); box(.3, HT - 8.7, D, -L / 2, 8.7 + (HT - 8.7) / 2, 0);
+for (var j = 0; j <= 5; j++) { var zc = -D / 2 + j * D / 5 + (j === 0 ? .2 : j === 5 ? -.2 : 0); box(.3, 5.5, j === 0 || j === 5 ? .4 : .6, -L / 2, 5.95, zc); }
+sc.add(new THREE.HemisphereLight(0xcfd8e6, 0x3a332c, 1.1));
+/* the day outside, seen through the windows: a backdrop in the sky's own colour */
+var skyCol = { clear: 0x8fb4e0, cloudy: 0x9aa2ab, rain: 0x6d7681, snow: 0xaab4bd, fog: 0xc9cdd0 }[sky] || 0x8fb4e0;
+var back = new THREE.Mesh(new THREE.PlaneGeometry(60, 40), new THREE.MeshBasicMaterial({ color: skyCol })); back.position.set(-L / 2 - 8, 8, 0); back.rotation.y = Math.PI / 2; sc.add(back);
+var ground = new THREE.Mesh(new THREE.PlaneGeometry(60, 60), new THREE.MeshBasicMaterial({ color: Q.get('ground') === 'frozen' || sky === 'snow' ? 0xdfe6ea : 0x4f6a3c })); ground.rotation.x = -Math.PI / 2; ground.position.set(-L / 2 - 20, -1, 0); sc.add(ground);
+var panes = CastleWeather.panes(THREE, wins, { density: Q.has('double') ? 2 : num('density', 1) });
+sc.add(panes.group);
+var t0 = num('t', 0), clock = 0;
+function frame() {
+  clock += 1 / 60;
+  if (!Q.has('off')) panes.update(weather, t0 + clock); else panes.update({ sky: 'clear' }, 0);
+  r.render(sc, cam); requestAnimationFrame(frame);
+}
+frame();
+if (!Q.has('nohud')) document.getElementById('hud').textContent = 'sky ' + sky + (weather.sky !== sky ? ' (pane shows ' + weather.sky + ')' : '') + ' ground ' + weather.ground + (weather.windy ? ' windy' : '') + '\n' + JSON.stringify(panes.info()) + (Q.has('off') ? ' OFF' : '');
+window.weatherTest = { info: function () { return panes.info(); }, self: CastleWeather.paneTest, calls: function () { return r.info.render.calls; } };
+</script></body></html>

@@ -131,6 +131,113 @@
     } };
   }
 
+  /* ---- weather on the windows: CastleWeather.panes(THREE, windows, o) -> { group, update(weather, t), info() }
+     windows  the same list the shafts take ({ at, in, w, h }; floor and reach are ignored)
+     weather  { sky: 'clear'|'cloudy'|'rain'|'snow'|'fog', ground: 'frozen' for frost, windy: bool } as CastleEvents.weatherAt gives it,
+              or the sky word alone; o { density: 1 (pass mark), depth: metres of weather outside the glass (default 2.5), drops: per window }
+     Three draw calls a room at most (the pane, the streaks, the flakes), never more than two at once: rain is pane + streaks,
+     snow is pane + flakes, fog and frost are the pane alone, clear and cloudy draw nothing. Nothing glows as a sign. */
+  function wkind(w) {
+    var s = typeof w === 'string' ? w : (w && w.sky) || 'clear', ob = w && typeof w === 'object';
+    return { sky: s, frost: !!(ob && (w.ground === 'frozen' || w.ground === 'frost' || w.frost)), windy: !!(ob && w.windy) };
+  }
+  var PVERT = 'attribute vec2 aSize; varying vec2 vUv; varying vec2 vSize;' +
+    'void main(){ vUv=uv; vSize=aSize; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0); }';
+  var PFRAG = 'uniform float uKind; uniform float uFrost; uniform float uTime; uniform float uAmount; uniform float uWind; varying vec2 vUv; varying vec2 vSize;' +
+    'float h21(vec2 p){ p=fract(p*vec2(123.34,456.21)); p+=dot(p,p+45.32); return fract(p.x*p.y); }' +
+    'float vn(vec2 p){ vec2 i=floor(p), f=fract(p); f=f*f*(3.0-2.0*f); return mix(mix(h21(i),h21(i+vec2(1,0)),f.x),mix(h21(i+vec2(0,1)),h21(i+vec2(1,1)),f.x),f.y); }' +
+    'void main(){ vec2 m=vUv*vSize; vec3 col=vec3(0.82,0.86,0.9); float a=0.0;' +
+    'if(uKind>0.5&&uKind<1.5){' +                                                                    /* rain: beads and runs */
+      'vec2 p=m*vec2(7.0,5.0); vec2 g=floor(p), f=fract(p)-0.5; float hh=h21(g), h2=h21(g+7.1);' +
+      'vec2 off=(vec2(hh,h2)-0.5)*0.5; float r=0.07+0.13*h2; float d=length((f-off)*vec2(1.0,0.85));' +
+      'float bead=smoothstep(r,r*0.55,d)*step(0.35,hh);' +
+      'float rim=smoothstep(r,r*0.8,d)-smoothstep(r*0.8,r*0.5,d);' +
+      'float cx=floor(m.x*13.0), hc=h21(vec2(cx,3.0)); float lx=abs(fract(m.x*13.0)-0.5);' +
+      'float yy=fract(m.y*0.45+uTime*(0.04+0.08*hc)+hc+m.x*uWind*0.15); float trail=smoothstep(0.0,0.5,yy)*(1.0-smoothstep(0.5,0.56,yy));' +
+      'float run=step(0.55,hc)*smoothstep(0.09,0.02,lx)*trail*0.5;' +
+      'a=(0.05+bead*0.46+rim*0.34+run)*uAmount; col=mix(vec3(0.55,0.62,0.7),vec3(0.93,0.96,0.98),bead);' +
+    '} else if(uKind>1.5&&uKind<2.5){ a=0.07*uAmount; col=vec3(0.88,0.92,0.96);' +                   /* snow: a cold, pale pane */
+    '} else if(uKind>2.5){ float n=vn(m*2.2+uTime*0.02)*0.5+vn(m*5.0)*0.3; a=(0.5+0.3*n)*min(1.0,uAmount); col=vec3(0.86,0.88,0.89); }' +   /* fog: the view blanked pale */
+    'if(uFrost>0.0){ float e=min(min(vUv.x*vSize.x,(1.0-vUv.x)*vSize.x),min(vUv.y*vSize.y,(1.0-vUv.y)*vSize.y));' +
+      'float n=vn(m*9.0)*0.6+vn(m*22.0)*0.4; float fr=smoothstep(0.34+0.12*n,0.0,e-0.1*n)*uFrost;' +
+      'col=mix(col,vec3(0.94,0.97,1.0),fr); a=max(a,fr*(0.55+0.3*n)); }' +
+    'gl_FragColor=vec4(col,a); }';
+  var SVERT = 'uniform float uTime; uniform float uWind; uniform float uSpeed; uniform float uLen; attribute vec2 aRange; attribute vec3 aSeed; attribute vec2 aLean; attribute float aEnd; varying float vA;' +
+    'void main(){ vec3 p=position; float hv=aRange.y; float y=aRange.x+mod(p.y-aRange.x-uTime*uSpeed*(0.8+0.4*aSeed.z),hv);' +
+    'float k=uWind*0.35; p.y=y; p.x+=aLean.x*k*(y-aRange.x); p.z+=aLean.y*k*(y-aRange.x);' +
+    'p+=vec3(aLean.x*k,0.0,aLean.y*k)*(-uLen*aEnd*2.0); p.y+=uLen*aEnd;' +
+    'vA=(1.0-aEnd*0.9)*smoothstep(0.0,0.4,y-aRange.x)*smoothstep(0.0,0.4,aRange.x+hv-y);' +
+    'gl_Position=projectionMatrix*viewMatrix*modelMatrix*vec4(p,1.0); }';
+  var SFRAG = 'uniform float uAmount; varying float vA; void main(){ gl_FragColor=vec4(0.8,0.85,0.9,0.85*uAmount*vA); }';
+  var FVERT = 'uniform float uTime; uniform float uWind; uniform float uSize; attribute vec2 aRange; attribute vec3 aSeed; attribute vec2 aLean; varying float vA;' +
+    'void main(){ vec3 p=position; float hv=aRange.y; float y=aRange.x+mod(p.y-aRange.x-uTime*(0.45+0.35*aSeed.z),hv);' +
+    'p.y=y; float sw=sin(uTime*0.9+aSeed.x*30.0)*0.12+uWind*(y-aRange.x)*0.25; p.x+=aLean.x*sw; p.z+=aLean.y*sw;' +
+    'vec4 mv=viewMatrix*modelMatrix*vec4(p,1.0); gl_Position=projectionMatrix*mv; gl_PointSize=uSize*(0.6+0.8*aSeed.y)/max(0.5,-mv.z);' +
+    'vA=smoothstep(0.0,0.4,y-aRange.x)*smoothstep(0.0,0.4,aRange.x+hv-y); }';
+  var FFRAG = 'uniform float uAmount; varying float vA; void main(){ float d=length(gl_PointCoord-0.5); if(d>0.5) discard; gl_FragColor=vec4(0.97,0.98,1.0,uAmount*vA*smoothstep(0.5,0.15,d)); }';
+
+  function panes(THREE, windows, o) {
+    o = o || {};
+    var density = o.density == null ? 1 : o.density, depth = o.depth || 2.5, N = o.drops || 40;
+    var group = new THREE.Group(); group.name = 'castle-weather-panes';
+    var pp = [], pu = [], ps = [], pi = [], v = 0;
+    var sp = [], sr = [], sd = [], sl = [], se = [], fp = [], fr = [], fd = [], fl = [];
+    windows.forEach(function (w) {
+      var ux = -w.in[1], uz = w.in[0], hw = w.w / 2, hh = w.h / 2, o2 = 0.03;       /* the pane stands 3 cm inside the glass */
+      [[-hw, -hh, 0, 0], [hw, -hh, 1, 0], [hw, hh, 1, 1], [-hw, hh, 0, 1]].forEach(function (c) {
+        pp.push(w.at[0] + ux * c[0] + w.in[0] * o2, w.at[1] + c[1], w.at[2] + uz * c[0] + w.in[1] * o2); pu.push(c[2], c[3]); ps.push(w.w, w.h);
+      });
+      pi.push(v, v + 1, v + 2, v, v + 2, v + 3); v += 4;
+      var y0 = w.at[1] - hh - 0.3, hv = w.h + 0.9;
+      for (var i = 0; i < N; i++) {                                                  /* the weather outside: a slab of drops and flakes */
+        var q = [Math.random(), Math.random(), Math.random()], x = (q[0] - 0.5) * (w.w + 0.8), dz = 0.15 + q[2] * depth;
+        var bx = w.at[0] + ux * x - w.in[0] * dz, bz = w.at[2] + uz * x - w.in[1] * dz, by = y0 + q[1] * hv;
+        for (var e = 0; e < 2; e++) { sp.push(bx, by, bz); sr.push(y0, hv); sd.push(q[0], q[1], q[2]); sl.push(ux, uz); se.push(e); }
+      }
+      for (var j = 0; j < N * 2; j++) {
+        var r2 = [Math.random(), Math.random(), Math.random()], fx = (r2[0] - 0.5) * (w.w + 0.8), fz = 0.1 + r2[2] * depth;
+        fp.push(w.at[0] + ux * fx - w.in[0] * fz, y0 + r2[1] * hv, w.at[2] + uz * fx - w.in[1] * fz); fr.push(y0, hv); fd.push(r2[0], r2[1], r2[2]); fl.push(ux, uz);
+      }
+    });
+    function geo(attrs, idx) {
+      var g = new THREE.BufferGeometry();
+      attrs.forEach(function (a) { g.setAttribute(a[0], new THREE.Float32BufferAttribute(a[1], a[2])); });
+      if (idx) g.setIndex(idx); return g;
+    }
+    var pm = new THREE.ShaderMaterial({ vertexShader: PVERT, fragmentShader: PFRAG, transparent: true, depthWrite: false, side: THREE.DoubleSide, fog: false,
+      uniforms: { uKind: { value: 0 }, uFrost: { value: 0 }, uTime: { value: 0 }, uAmount: { value: 1 }, uWind: { value: 0 } } });
+    var sm = new THREE.ShaderMaterial({ vertexShader: SVERT, fragmentShader: SFRAG, transparent: true, depthWrite: false, fog: false,
+      uniforms: { uTime: { value: 0 }, uWind: { value: 0 }, uSpeed: { value: 9 }, uLen: { value: 0.35 }, uAmount: { value: 1 } } });
+    var fm = new THREE.ShaderMaterial({ vertexShader: FVERT, fragmentShader: FFRAG, transparent: true, depthWrite: false, fog: false,
+      uniforms: { uTime: { value: 0 }, uWind: { value: 0 }, uSize: { value: 90 }, uAmount: { value: 1 } } });
+    var pane = new THREE.Mesh(geo([['position', pp, 3], ['uv', pu, 2], ['aSize', ps, 2]], pi), pm);
+    var streaks = new THREE.LineSegments(geo([['position', sp, 3], ['aRange', sr, 2], ['aSeed', sd, 3], ['aLean', sl, 2], ['aEnd', se, 1]]), sm);
+    var flakes = new THREE.Points(geo([['position', fp, 3], ['aRange', fr, 2], ['aSeed', fd, 3], ['aLean', fl, 2]]), fm);
+    [pane, streaks, flakes].forEach(function (m, i) { m.frustumCulled = false; m.renderOrder = 7 + i; m.visible = false; group.add(m); });
+    var calls = 0;
+    function update(weather, t) {
+      var k = wkind(weather), kind = k.sky === 'rain' ? 1 : k.sky === 'snow' ? 2 : k.sky === 'fog' ? 3 : 0;
+      pane.visible = kind > 0 || k.frost; streaks.visible = kind === 1; flakes.visible = kind === 2;
+      calls = (pane.visible ? 1 : 0) + (streaks.visible ? 1 : 0) + (flakes.visible ? 1 : 0);
+      var wind = k.windy ? 1 : 0.15;
+      pm.uniforms.uKind.value = kind; pm.uniforms.uFrost.value = k.frost ? 1 : 0; pm.uniforms.uTime.value = t || 0;
+      pm.uniforms.uAmount.value = density; pm.uniforms.uWind.value = wind;
+      sm.uniforms.uTime.value = fm.uniforms.uTime.value = t || 0; sm.uniforms.uWind.value = fm.uniforms.uWind.value = wind;
+      sm.uniforms.uAmount.value = fm.uniforms.uAmount.value = Math.min(1.6, density);
+    }
+    return { group: group, update: update, info: function () {
+      return { pane: pane.visible, streaks: streaks.visible, flakes: flakes.visible, drawCalls: calls, windows: windows.length };
+    } };
+  }
+
+  function paneTest() {
+    var out = [];
+    out.push(['rain is rain', wkind('rain').sky === 'rain']);
+    out.push(['frost reads from ground', wkind({ sky: 'clear', ground: 'frozen' }).frost === true]);
+    out.push(['clear has no frost', wkind({ sky: 'clear', ground: 'thawed' }).frost === false]);
+    return out;
+  }
+
   /* the checks a page or a test runs on the numbers, not by eye: the beam's direction must equal the sun's travel */
   function selfTest() {
     var out = [], tr = travelOf({ bearing: 90, altitude: 30 }, [0, -1]);           /* sun due east, low: light travels west and down */
@@ -142,5 +249,5 @@
     return out;
   }
 
-  window.CastleWeather = { shafts: shafts, travelOf: travelOf, strength: strength, selfTest: selfTest };
+  window.CastleWeather = { shafts: shafts, panes: panes, paneTest: paneTest, travelOf: travelOf, strength: strength, selfTest: selfTest };
 }());
