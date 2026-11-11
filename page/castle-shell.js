@@ -485,6 +485,13 @@ function gapsOf(M, Q, E, H) {
       if (LT && LT.seat != null) sill = LT.seat;
       var oh = RC ? RC.h : LT ? LT.spring + Math.sqrt(3) / 2 * LW - sill : op.h || 2.2;
       var h = Q.sky ? oh + sill : Math.min(E[e.i].H != null ? E[e.i].H : H, oh + sill);
+      /* v222 (req 3344 1c): a way with two sills keeps one head, the higher side's; steps down inside a door leave its
+         head where it was (the hall chamber's door: 0.45 on the hall's platform, 0 in the chamber, one head at 2.65) */
+      if (op.sills && !RC && !LT && !Q.shaft && !Q.sky) {
+        var oP = findPlace(M, other(op, Q.id));
+        if (oP && !oP.shaft) { var oS = op.sills[oP.id] != null ? op.sills[oP.id] : (op.sill || 0), oTop = oP.floor + oS + oh - Q.floor;
+          if (oTop > oh + sill + 0.01) h = Math.min(E[e.i].H != null ? E[e.i].H : H, oTop); }
+      }
       /* v23: an arch's `soffit` gives its head at each room's face (absolute), under a room's raised head */
       var sof = op.soffit && !hid ? op.soffit : null, near = sof && sof[Q.id], far = sof && sof[other(op, Q.id)];
       if (near != null) h = near - Q.floor;
