@@ -570,9 +570,13 @@ window.CastleShell = { build: function (F, M, placeId, o) {
      LB26720). A preview for Godric's eye, laid over doorHead's mix (never its heads), off in every build.
      v220 (req 5203, Fawkes's send-back: a bolder choice beside the red and cream): ?cased=3 sets the door in receding orders,
      two more rings round the pale casing (castle-trim v14's M.orders), the first in the red, shafts in the steps, the hood
-     with its carved stops over the outer order */
+     with its carved stops over the outer order.
+     v221 (req 5207, Godric's 1, 10 November 2026, 9.05 pm: stepped rings): ?cased=3 is the default where the start place
+     stands on G (WBIN, as walls=v2), one floor at a time; &floor=all and every other level keep none; ?cased=0 is the
+     before on G, ?cased=1 and 2 the options not picked */
   var CASED = (function () {
-    var m = /[?&]cased=([123])/.exec(window.location.search || ''); if (!m) return null;
+    var q = /[?&]cased=([0123])/.exec(window.location.search || ''), m = q ? q : (WBIN === 'G' && o.floor !== 'all' ? [0, '3'] : null);
+    if (!m || m[1] === '0') return null;
     var plain = { bw: 0.22, proj: 0.045, chamfer: true, stop: false, bead: false, roll: false, impost: false, shaft: false };
     if (m[1] === '3') return { n: 3, mv: Object.assign({}, plain, { bw: 0.24, proj: 0.05, hood: 0.18, orders: 2 }) };
     return m[1] === '1' ? { n: 1, mv: plain } : { n: 2, mv: Object.assign({}, plain, { bw: 0.24, proj: 0.05, hood: 0.18, poly: true }) };
