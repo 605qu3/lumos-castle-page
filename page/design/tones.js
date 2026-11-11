@@ -4,11 +4,11 @@ window.CASTLE_TONES = {
  "about": "The castle's plain tones (Design, req 643, 20 October 2026; provisional, Godric to confirm on the walk): each surface's colour by day as sRGB hex, its dressing a shade step, its flags its own stone a step darker, and the lights' colours and strengths against a torch. The surfaces are the Architect's schedule (docs/architect/materials.md); assets/design/materials/make-tones.py writes this file.",
  "surfaces": {
   "founders-rubble": {
-   "hex": "#5e5b4f",
+   "hex": "#555656",
    "say": "P1 and P2: dark olive-grey, the darkest and roughest"
   },
   "houses-sandstone": {
-   "hex": "#726551",
+   "hex": "#7b6340",
    "say": "P3: sand",
    "schedule": "#c4aa82"
   },
@@ -18,12 +18,12 @@ window.CASTLE_TONES = {
    "schedule": "#a7aeb2"
   },
   "tudor-pink": {
-   "hex": "#5e646c",
+   "hex": "#516373",
    "say": "P5: slate blue-grey (req 2162)",
    "schedule": "#8a97a6"
   },
   "late-pale": {
-   "hex": "#a29a81",
+   "hex": "#b3a079",
    "say": "P6 and P7: pale yellow to palest",
    "schedule": "#dcd2b0"
   },
@@ -178,30 +178,30 @@ window.CASTLE_TONES = {
   }
  },
  "resolved": {
-  "founders-rubble/rubble": "#58564a",
-  "founders-rubble/coursed": "#5e5b4f",
-  "founders-rubble/ashlar": "#605d51",
-  "flags-founders-rubble": "#575549",
-  "flags-founders-rubble/worn": "#59564b",
-  "vault-founders-rubble": "#5a574c",
-  "founders-rubble/rubble/below": "#4a483e",
-  "founders-rubble/coursed/below": "#4f4d42",
-  "founders-rubble/ashlar/below": "#514f44",
-  "flags-founders-rubble/below": "#49473d",
-  "flags-founders-rubble/worn/below": "#4b493e",
-  "vault-founders-rubble/below": "#4c4a3f",
-  "houses-sandstone/rubble": "#6b5f4c",
-  "houses-sandstone/coursed": "#726551",
-  "houses-sandstone/ashlar": "#756753",
-  "flags-houses-sandstone": "#6a5e4b",
-  "flags-houses-sandstone/worn": "#6c604d",
-  "vault-houses-sandstone": "#6e614e",
-  "houses-sandstone/rubble/below": "#5c5241",
-  "houses-sandstone/coursed/below": "#625745",
-  "houses-sandstone/ashlar/below": "#645947",
-  "flags-houses-sandstone/below": "#5b5140",
-  "flags-houses-sandstone/worn/below": "#5d5241",
-  "vault-houses-sandstone/below": "#5e5442",
+  "founders-rubble/rubble": "#505151",
+  "founders-rubble/coursed": "#555656",
+  "founders-rubble/ashlar": "#575858",
+  "flags-founders-rubble": "#4f5050",
+  "flags-founders-rubble/worn": "#505152",
+  "vault-founders-rubble": "#515253",
+  "founders-rubble/rubble/below": "#424344",
+  "founders-rubble/coursed/below": "#474848",
+  "founders-rubble/ashlar/below": "#494a4a",
+  "flags-founders-rubble/below": "#414243",
+  "flags-founders-rubble/worn/below": "#434444",
+  "vault-founders-rubble/below": "#444545",
+  "houses-sandstone/rubble": "#745d3c",
+  "houses-sandstone/coursed": "#7b6340",
+  "houses-sandstone/ashlar": "#7e6542",
+  "flags-houses-sandstone": "#735c3b",
+  "flags-houses-sandstone/worn": "#755e3c",
+  "vault-houses-sandstone": "#775f3d",
+  "houses-sandstone/rubble/below": "#645031",
+  "houses-sandstone/coursed/below": "#6b5535",
+  "houses-sandstone/ashlar/below": "#6d5737",
+  "flags-houses-sandstone/below": "#634f30",
+  "flags-houses-sandstone/worn/below": "#655031",
+  "vault-houses-sandstone/below": "#675232",
   "high-grey/rubble": "#5e6163",
   "high-grey/coursed": "#646769",
   "high-grey/ashlar": "#66696b",
@@ -213,32 +213,32 @@ window.CASTLE_TONES = {
   "high-grey/ashlar/below": "#585a5c",
   "flags-high-grey/below": "#505254",
   "flags-high-grey/worn/below": "#515355",
-  "vault-high-grey/below": "#535556",
-  "tudor-pink/rubble": "#585e66",
-  "tudor-pink/coursed": "#5e646c",
-  "tudor-pink/ashlar": "#60666f",
-  "flags-tudor-pink": "#575d65",
-  "flags-tudor-pink/worn": "#595f66",
-  "vault-tudor-pink": "#5a6068",
-  "tudor-pink/rubble/below": "#4b5057",
-  "tudor-pink/coursed/below": "#50555c",
-  "tudor-pink/ashlar/below": "#52575e",
-  "flags-tudor-pink/below": "#4a4f56",
-  "flags-tudor-pink/worn/below": "#4c5157",
-  "vault-tudor-pink/below": "#4d5258",
-  "late-pale/rubble": "#99917a",
-  "late-pale/coursed": "#a29a81",
-  "late-pale/ashlar": "#a69d84",
-  "flags-late-pale": "#979078",
-  "flags-late-pale/worn": "#9a927b",
-  "vault-late-pale": "#9c947c",
-  "late-pale/rubble/below": "#89826d",
-  "late-pale/coursed/below": "#918a74",
-  "late-pale/ashlar/below": "#948d77",
-  "flags-late-pale/below": "#87816c",
-  "flags-late-pale/worn/below": "#8a836e",
-  "vault-late-pale/below": "#8c8570",
-  "late-pale/limewash": "#d7c9a3"
+  "vault-high-grey/below": "#535557",
+  "tudor-pink/rubble": "#4b5d6d",
+  "tudor-pink/coursed": "#516373",
+  "tudor-pink/ashlar": "#536576",
+  "flags-tudor-pink": "#4a5c6c",
+  "flags-tudor-pink/worn": "#4d5e6d",
+  "vault-tudor-pink": "#4d5f6f",
+  "tudor-pink/rubble/below": "#3f4f5e",
+  "tudor-pink/coursed/below": "#445463",
+  "tudor-pink/ashlar/below": "#465665",
+  "flags-tudor-pink/below": "#3e4e5d",
+  "flags-tudor-pink/worn/below": "#40505e",
+  "vault-tudor-pink/below": "#41515f",
+  "late-pale/rubble": "#aa9772",
+  "late-pale/coursed": "#b3a079",
+  "late-pale/ashlar": "#b7a37c",
+  "flags-late-pale": "#a79670",
+  "flags-late-pale/worn": "#ab9873",
+  "vault-late-pale": "#ad9a74",
+  "late-pale/rubble/below": "#998865",
+  "late-pale/coursed/below": "#a1906c",
+  "late-pale/ashlar/below": "#a4936f",
+  "flags-late-pale/below": "#978764",
+  "flags-late-pale/worn/below": "#9a8966",
+  "vault-late-pale/below": "#9c8b68",
+  "late-pale/limewash": "#e8d09a"
  },
  "toward": {
   "stones": [
@@ -256,5 +256,42 @@ window.CASTLE_TONES = {
    "kept": 0.55,
    "chroma": 0.8
   }
+ },
+ "period": {
+  "founders-rubble": [
+   -2,
+   0.4,
+   0.4,
+   0,
+   -3
+  ],
+  "houses-sandstone": [
+   0,
+   1.0,
+   1.0,
+   3,
+   10
+  ],
+  "high-grey": [
+   0,
+   0.6,
+   0.5,
+   0,
+   -1
+  ],
+  "tudor-pink": [
+   -1,
+   1.0,
+   1.0,
+   -2,
+   -6
+  ],
+  "late-pale": [
+   3,
+   1.0,
+   1.0,
+   2,
+   9
+  ]
  }
 };
