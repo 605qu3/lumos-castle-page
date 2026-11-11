@@ -600,7 +600,9 @@ window.CastleShell = { build: function (F, M, placeId, o) {
      into the Entrance Hall (0.30 to 0.86 m along 6 m, up to the bay's 7.6 m springing) with the orders set in it. Both at
      great-hall-doors-passage-east alone, nothing in the passage (its noTrimIn kept); castle-trim v16's portal. Previews
      for Godric's eye, laid over the default; no flag, no change */
-  var GHP = (function () { var q = /[?&]ghp=([12])/.exec(window.location.search || ''); return q ? +q[1] : 0; })();
+  /* v230 (req 5219 (e), Godric's 1 on req 5257, 11 November 2026): the porch (1) is the default; ?ghp=0 the old stepped
+     rings on the flat wall, ?ghp=2 the thick wall, still a preview */
+  var GHP = (function () { var q = /[?&]ghp=([012])/.exec(window.location.search || ''); return q ? +q[1] : 1; })();
   function caseMv(g) { return DPRE ? DPRE.mv : CASED ? Object.assign({}, g.op.hmv || {}, CASED.mv) : g.op.hmv || null; }
   /* v121 (the ground floor's Pass 1 item 2, the Architect's 261st; Design's tags, req 1598): a room Design tags `stone`
      (worn or rough flags: stores, service, shafts, hidden ways; page/design/room-tags-<F>.js) lays the schedule's flags a
