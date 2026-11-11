@@ -263,7 +263,7 @@
          about, the second (alt) returned beside the merged geometry as g.userData.alt for the caller's second material.
          Mirrored stones match (a stone and its fellow across the apex the same), the springers in the first stone, the
          jamb's top course the second so the turn runs on down; courses about 0.32 m with 6 mm joints */
-      var alt = [];
+      var alt = [], HO = bw, HP = PP + 0.05, NORD = 0;   /* v14: the hood's inner offset and its projection, moved out over any orders */
       if (!thin) {
         var nR = w > 1.6 ? 6 : 4;
         if (M.poly && jt - jb > 0.2) {
@@ -277,23 +277,45 @@
         if (M.poly && rst.length === 2 * nR) rst.forEach(function (gq, k) { var ix = k < nR ? k : 2 * nR - 1 - k; (ix % 2 ? alt : parts).push(gq); });
         else parts.push.apply(parts, rst);
         if (imp) pair(xi, cap(X + 0.05), jt, yr - J, P + 0.04, true);
+        /* v14 (req 5203, the bolder casing, ?cased=3): the door set in receding orders, as a great church's west door is:
+           M.orders more rings round the casing, each 0.16 wide and 0.07 prouder than the one inside it, their jambs the
+           same; the orders turn about in the two stones (the first order the second stone); a slim shaft (r 0.03) stands
+           in each step of the jambs under a block capital at the springing. An order the ceiling or the wall's end leaves
+           no room for is left out whole with every order outside it (pring's clip), never cut */
+        if (M.orders && bwe >= bw - 0.001) {
+          var OW = 0.16, OS = 0.07, pPrev = PP;
+          for (var k = 1; k <= M.orders; k++) {
+            var d0 = bw + (k - 1) * OW + J, d1 = bw + k * OW, pk = PP + OS * k;
+            if (d1 > mg) break;
+            var ro = pring(THREE, HK, a, yr, d0, d1, pk, nR);
+            if (!ro.length) break;
+            var tgt = k % 2 ? alt : parts, kp = parts;
+            tgt.push.apply(tgt, ro);
+            parts = tgt; pair(a + d0, a + d1, jb, jt, pk, ch); parts = kp;
+            var sx = a + d0 - 0.035, sz = pPrev + 0.025;
+            [-1, 1].forEach(function (sd) { parts.push(rod(THREE, 'y', jb, yr - 0.13, sd * sx, sz, 0.03)); });
+            pair(a + d0 - 0.075, a + d0, yr - 0.13, yr - J, pPrev + 0.07, true);
+            HO = d1; HP = pk + 0.05; pPrev = pk; NORD = k;
+          }
+        }
       }
       if (M.roll || M.bead) parts.push(pRod(THREE, HK, a, yr, 0.03, PP - E, 0.03));
       /* a bead's two rods stand or fall together (rod() drops a rod whose own side has no room) */
       if (M.bead && !thin && xi + 0.06 <= a + mg) [-1, 1].forEach(function (sd) { parts.push(rod(THREE, 'y', jb, yr, sd * (xi + 0.03), PP - E, 0.03)); });
       if (!thin && M.stop && jb > ys) pair(xi, cap(X + 0.008), ys, jb, PP + 0.016, false);
       if (!thin && M.hood && (!win || out)) {
-        parts.push.apply(parts, pring(THREE, HK, a, yr, bw, bw + 0.08, PP + 0.05, w > 1.6 ? 6 : 4));
-        if (M.poly && cap(X + 0.1) - cap(X + 0.008) > 0.05) {
+        var XH = a + HO;   /* v14: X itself where there are no orders */
+        parts.push.apply(parts, pring(THREE, HK, a, yr, HO, HO + 0.08, HP, w > 1.6 ? 6 : 4));
+        if ((M.poly || M.orders) && cap(XH + 0.1) - cap(XH + 0.008) > 0.05) {
           /* v11: the carved label stop: a block under the hood's end, its underside cut back in a slope to the wall, a
              boss on its face (a stylised carving at greybox scale; Barclay's are angels) */
-          var s0 = cap(X + 0.008), s1 = cap(X + 0.1), sxm = (s0 + s1) / 2;
+          var s0 = cap(XH + 0.008), s1 = cap(XH + 0.1), sxm = (s0 + s1) / 2;
           [-1, 1].forEach(function (sd) {
             var lo = sd > 0 ? s0 : -s1, hi = sd > 0 ? s1 : -s0;
-            parts.push(prism(THREE, lo, hi, [[-E, yr - 0.27], [PP + 0.02, yr - 0.27], [PP + 0.07, yr - 0.12], [PP + 0.07, yr - J], [-E, yr - J]]));
-            var bo = new THREE.IcosahedronGeometry(0.032, 1); bo.translate(sd * sxm, yr - 0.07, PP + 0.075); parts.push(bo);
+            parts.push(prism(THREE, lo, hi, [[-E, yr - 0.27], [HP - 0.03, yr - 0.27], [HP + 0.02, yr - 0.12], [HP + 0.02, yr - J], [-E, yr - J]]));
+            var bo = new THREE.IcosahedronGeometry(0.032, 1); bo.translate(sd * sxm, yr - 0.07, HP + 0.025); parts.push(bo);
           });
-        } else pair(cap(X + 0.008), cap(X + 0.1), yr - 0.14, yr - J, PP + 0.07, true);
+        } else pair(cap(XH + 0.008), cap(XH + 0.1), yr - 0.14, yr - J, HP + 0.02, true);
       }
       if (win && s.sill > 0.05) {
         if (out) parts.push(prism(THREE, -X - 0.05, X + 0.05, [[-E, y0 - 0.09], [PP + 0.07, y0 - 0.09], [PP + 0.07, y0 - 0.04], [PP + 0.015, ys], [-E, ys]]));
@@ -302,6 +324,7 @@
       CLIP = null;
       var gp = merge(THREE, parts);
       if (s.face === 'in') gp.rotateY(Math.PI);
+      if (M.orders) gp.userData.ord = NORD;   /* v14: how many orders stood (the preview's count, read by castle-shell) */
       if (alt.filter(Boolean).length) { var ga = merge(THREE, alt); if (s.face === 'in') ga.rotateY(Math.PI); gp.userData.alt = ga; }
       return gp;
     }

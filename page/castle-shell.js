@@ -567,10 +567,14 @@ window.CastleShell = { build: function (F, M, placeId, o) {
      "ashlar dressings and margins... chamfered margins") and lines a square head's reveal as a headed one is, a hood kept where the door has one (without it the Great Hall doors' head
      left 0.12 m2 open, the gate's 6.92 against 6.79); ?cased=2 adds
      the bold: voussoirs and jamb courses in two stones turn about, a hood with carved label stops (Barclay Church, HES
-     LB26720). A preview for Godric's eye, laid over doorHead's mix (never its heads), off in every build */
+     LB26720). A preview for Godric's eye, laid over doorHead's mix (never its heads), off in every build.
+     v220 (req 5203, Fawkes's send-back: a bolder choice beside the red and cream): ?cased=3 sets the door in receding orders,
+     two more rings round the pale casing (castle-trim v14's M.orders), the first in the red, shafts in the steps, the hood
+     with its carved stops over the outer order */
   var CASED = (function () {
-    var m = /[?&]cased=([12])/.exec(window.location.search || ''); if (!m) return null;
+    var m = /[?&]cased=([123])/.exec(window.location.search || ''); if (!m) return null;
     var plain = { bw: 0.22, proj: 0.045, chamfer: true, stop: false, bead: false, roll: false, impost: false, shaft: false };
+    if (m[1] === '3') return { n: 3, mv: Object.assign({}, plain, { bw: 0.24, proj: 0.05, hood: 0.18, orders: 2 }) };
     return m[1] === '1' ? { n: 1, mv: plain } : { n: 2, mv: Object.assign({}, plain, { bw: 0.24, proj: 0.05, hood: 0.18, poly: true }) };
   })();
   function caseMv(g) { return DPRE ? DPRE.mv : CASED ? Object.assign({}, g.op.hmv || {}, CASED.mv) : g.op.hmv || null; }
@@ -1666,7 +1670,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
       var rm = (M.rooms || []).filter(function (r) { return slug(r.id) === Q.id; })[0];
       var md = window.CastleTrim.mould(rm && rm.age || 'P3', cls, { late: !!(rm && rm.late), grand: !!g.op.grand }), mv = cls === 'door' ? caseMv(g) : null;   /* v219: ?cased= too */
       if (mv) for (var mk in mv) md[mk] = mv[mk];
-      return { trim: md.bw, hood: cls === 'door' && !!md.hood, lugs: !!md.lugs };   /* v192 (req 3220): a late P6 door's architrave ears (castle-trim.js:57-58; no other age or class has lugs), so panelling.js stops past them */
+      return { trim: md.bw + (md.orders ? md.orders * 0.16 : 0), hood: cls === 'door' && !!md.hood, lugs: !!md.lugs };   /* v192 (req 3220): a late P6 door's architrave ears (castle-trim.js:57-58; no other age or class has lugs), so panelling.js stops past them */
     }
     if (row && row.dress === 'panelled' && (!Q.area || (Q.round && !Q.shaft)) && !Q.loops && Q.ceiling != null && window.CastlePanelling) {
       var pops = [];
@@ -2106,6 +2110,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
             var mt = trimMat(row, a[0] + ux * sE, a[1] + uy * sE, E1[3]);
             (trimB[mt.uuid] = trimB[mt.uuid] || { mat: mt, geos: [] }).geos.push(geo);
             /* v219 (req 5176, ?cased=2): the second stone's voussoirs and courses, set and seated as the first's */
+            if (geo.userData.ord != null) { (window.__casedOrd = window.__casedOrd || []).push([g.op.id, face, geo.userData.ord, +E1[1].toFixed(2), +E1[2].toFixed(2)]); }   /* v220: the preview's count of orders per door face */
             var ga = geo.userData.alt;
             if (ga) {
               delete geo.userData.alt;
