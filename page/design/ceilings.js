@@ -89,6 +89,23 @@
       if (Math.abs(Math.abs(s) - a) < 1e-4) { if (alongX) p.setZ(i, p.getZ(i) + Math.sign(s) * BURY); else p.setX(i, p.getX(i) + Math.sign(s) * BURY); }
     }
     p.needsUpdate = true; m.geometry.computeVertexNormals();
+    /* req 5221: a passage's barrel (vault.along) reads curved: its stone takes a shade by the slope of each point, the crown lit
+       and the haunches falling away, and its voussoir courses, a joint every half metre along the walk and a stagger across, so the eye
+       follows the curve. The room's own material is cloned, so no other vault changes. */
+    if (V && (V.along === 'x' || V.along === 'z') && mats.vault && typeof document !== 'undefined') {
+      var nm = m.geometry.attributes.normal, col = new Float32Array(p.count * 3), uv = m.geometry.attributes.uv, span = alongX ? B.x1 - B.x0 : B.z1 - B.z0;
+      for (var k = 0; k < p.count; k++) {
+        var ny = Math.max(0, -nm.getY(k)), sh = 0.62 + 0.46 * Math.pow(ny, 1.6);
+        col[k * 3] = col[k * 3 + 1] = col[k * 3 + 2] = Math.min(1.1, sh);
+        var arc = alongX ? p.getZ(k) - mid : p.getX(k) - mid, along = alongX ? p.getX(k) - B.x0 : p.getZ(k) - B.z0;
+        uv.setXY(k, along / 0.5, (arc + a) / 0.45);
+      }
+      m.geometry.setAttribute('color', new THREE.BufferAttribute(col, 3)); uv.needsUpdate = true;
+      var cv = document.createElement('canvas'); cv.width = cv.height = 64; var cx = cv.getContext('2d');
+      cx.fillStyle = '#fff'; cx.fillRect(0, 0, 64, 64); cx.fillStyle = 'rgba(40,36,30,0.55)'; cx.fillRect(0, 0, 64, 3); cx.fillRect(0, 0, 3, 32); cx.fillRect(32, 32, 3, 32);
+      var tx = new THREE.CanvasTexture(cv); tx.wrapS = tx.wrapT = THREE.RepeatWrapping;
+      var vm = mats.vault.clone(); vm.vertexColors = true; vm.map = tx; vm.needsUpdate = true; m.material = vm;
+    }
     m.name = Q.id + '-barrel'; G.add(m);
     return { group: G, flat: false, springs: H.springs, crown: H.crown };
   }
