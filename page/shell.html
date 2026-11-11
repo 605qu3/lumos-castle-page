@@ -402,6 +402,8 @@ scene.add(shell.group);
     new THREE.GLTFLoader().load('arch/trial-5270-' + m[1] + '.glb?v=2', function (g) {
       var o = shell.toLocal(0, 0, 0); g.scene.position.set(o.x, o.y, o.z);
       g.scene.traverse(function (k) { if (k.isMesh) { window.__arch.meshes++; window.__arch.owners.push(k.userData.owner || ''); if (shell.archAdopt) { shell.archAdopt(k); window.__arch.adopted = (window.__arch.adopted || 0) + 1; var mt = (k.userData.mat || '?') + ':' + (k.material && k.material.type); window.__arch.mats = window.__arch.mats || {}; window.__arch.mats[mt] = (window.__arch.mats[mt] || 0) + 1; } } });
+      /* ?bare=1 keeps only what stood at load (BARE_KEEP) and hides the rest; the glb is architecture, so it is kept */
+      if (typeof BARE_KEEP !== 'undefined') g.scene.traverse(function (k) { BARE_KEEP.add(k); k.visible = true; });
       shell.group.add(g.scene); window.__arch.loaded = true;
     }, null, function (e) { window.__arch.err = String(e && e.message || e); console.error('arch glb: ' + window.__arch.err); });
   };
