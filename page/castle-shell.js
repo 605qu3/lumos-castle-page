@@ -2123,6 +2123,8 @@ window.CastleShell = { build: function (F, M, placeId, o) {
           var each = face === 'out' && g.lights ? g.op.lights.map(function (lt) { return [(lt[0] + lt[1]) / 2, lt[1] - lt[0], g.op.h, g.op.sill]; })
             : [[0, face === 'out' ? slot : w, g.h - g.sill, g.sill]];
           if (face === 'in' && g.op.noTrimIn && g.op.noTrimIn.indexOf(Q.id) >= 0) return;   /* v225: an opening's noTrimIn rooms take no casing in their face (req 5217) */
+          /* v231 (req 5268): the double doors' own opening (great-hall-doors, castle-model.js) stands in the same mouth as the passage's east end; with the porch there its stepped rings drew a second red order inside the porch's arch. The porch is the casing, so the doors' own take none in the Entrance Hall. */
+          if (GHP && face === 'in' && g.op.id === 'great-hall-doors') return;
           each.forEach(function (E1) {
             var sE = sm + E1[0];
             if (GHP && face === 'in' && cls === 'door' && g.op.id === 'great-hall-doors-passage-east' && CastleTrim.portal) {   /* v228: ?ghp= */
