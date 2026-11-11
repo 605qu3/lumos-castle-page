@@ -538,6 +538,13 @@
     ]
    },
    "ceiling": 4.5,
+   "vault": {
+    "kind": "barrel",
+    "along": "x",
+    "springs": 3.0,
+    "crown": 4.5,
+    "about": "req 5216 (Design, ceilings.js reads vault.along): the barrel runs east to west, the way the boys walk from the Entrance Hall to the Great Hall, so its ends meet the two doorways and their heads are no longer cut flat; a segment over the 5.2 m span, springing 3.0, crown 4.5"
+   },
    "state": "proposed",
    "cite": "PS 7",
    "about": "layout v71 c10 widened to the doors (great-hall-doors, 3.2 m at y 60.5), 5.2 by 3 m, 0.25 of wall to the hall cupboard; closes the void V21. Godric's 1 on req 1478 (2.57 pm, 28 October 2026)",
