@@ -178,6 +178,54 @@
         } else segs.push(exterior(f, r.s0, r.s1, null, zb(r.z0, r.z1)));
       });
     });
+    /* req 5268 (Godric's circled strip beside the Great Hall porch, 11 November 2026): a partition centred on a shared line
+       stands PART/2 proud of the owner's face, so where it meets the owner's own thicker band (the Entrance Hall's outer
+       wall, whose face is the line) its cut end showed as an upright strip. A flush partition whose end touches a
+       collinear exterior band of the same owner is seated with the owner's face on the line, as the band's is */
+    /* req 5281 (Fawkes for Godric, 9.55 am: seat only the end): seating the whole partition moved every long wall 0.15 m
+       toward its neighbour, so what stood in the owner's half (registers-archive's shelving, the Great Hall's west wall)
+       stood in front of the face. Seated now only an end that meets the band and reaches an opening within a pier
+       (PIER) of it, through to that opening's far jamb, so the 0.15 m step stands in a reveal, never on plain wall
+       (the design gate, docs/handoff/architect.md "Design gate, req 5281"). Where the seated ends cover the line it is
+       seated whole; a line they cover only in part stays centred and is listed in plan (no split piece is drawn); with no
+       cuts known (opts.cutsOn absent) nothing is seated */
+    var PIER = 1.2;
+    segs.forEach(function (sg) {
+      if (sg.kind !== 'flush' || !sg.off || sg.off[0] === 0 || !opts.cutsOn) return;
+      var L = Math.hypot(sg.b[0] - sg.a[0], sg.b[1] - sg.a[1]); if (L < 1e-6) return;
+      var u = [(sg.b[0] - sg.a[0]) / L, (sg.b[1] - sg.a[1]) / L], ends = {};
+      segs.forEach(function (ex) {
+        if (ex.kind !== 'exterior' || ex.owner !== sg.owner || ex.n[0] * sg.n[0] + ex.n[1] * sg.n[1] < 0.999) return;
+        if (ex.z[1] <= sg.z[0] + 0.05 || ex.z[0] >= sg.z[1] - 0.05) return;
+        if (Math.abs((ex.a[0] - sg.a[0]) * sg.n[0] + (ex.a[1] - sg.a[1]) * sg.n[1]) > 0.01) return;
+        [ex.a, ex.b].forEach(function (e) {
+          if (Math.hypot(e[0] - sg.a[0], e[1] - sg.a[1]) < 0.05) ends.a = 1;
+          if (Math.hypot(e[0] - sg.b[0], e[1] - sg.b[1]) < 0.05) ends.b = 1;
+        });
+      });
+      if (!ends.a && !ends.b) return;
+      var al = function (p) { return (p[0] - sg.a[0]) * u[0] + (p[1] - sg.a[1]) * u[1]; };
+      var ac = function (p) { return (p[0] - sg.a[0]) * sg.n[0] + (p[1] - sg.a[1]) * sg.n[1]; };
+      var iv = [];
+      (opts.cutsOn(sg.rooms[0], sg.rooms[1]) || []).forEach(function (c) {
+        if (Math.abs(ac(c[0])) > 0.3 || Math.abs(ac(c[1])) > 0.3) return;
+        var s0 = Math.max(0, Math.min(al(c[0]), al(c[1]))), s1 = Math.min(L, Math.max(al(c[0]), al(c[1])));
+        if (s1 - s0 > 0.05) iv.push([s0, s1]);
+      });
+      iv.sort(function (p, q) { return p[0] - q[0]; });
+      var mg = [];
+      iv.forEach(function (v) { var l = mg[mg.length - 1]; if (l && v[0] <= l[1] + 0.02) l[1] = Math.max(l[1], v[1]); else mg.push(v.slice()); });
+      if (!mg.length) return;
+      var fromA = ends.a && mg[0][0] <= PIER ? mg[0][1] : -1, fromB = ends.b && L - mg[mg.length - 1][1] <= PIER ? mg[mg.length - 1][0] : L + 1;
+      if (fromA < 0 && fromB > L) return;
+      /* whole where no plain stretch along it (between openings, or from its last jamb to its far corner, where another
+         wall meets it and the step hides in that corner) is longer than a pier */
+      var plainMax = Math.max(mg[0][0], L - mg[mg.length - 1][1]);
+      for (var k = 1; k < mg.length; k++) plainMax = Math.max(plainMax, mg[k][0] - mg[k - 1][1]);
+      var whole = plainMax <= PIER;
+      if (whole) { sg.off = [0, PART]; sg.seated = true; }
+      else plan.push({ rooms: sg.rooms, at: sg.a, to: sg.b, gap: sg.gap, note: 'seat-partial: an end meets the band at a jamb but plain wall runs on; left centred (req 5281)' });
+    });
     /* an exterior band stops short of any other room it would run into at its height: rooms cut into a thick wall
        (the West Tower's newel stair and its passage inside the falconers' room's 3.2 m drum) are voids in it, and
        their own faces build their own walls there (req 3166, west-tower-arch-5) */

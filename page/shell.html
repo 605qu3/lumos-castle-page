@@ -188,9 +188,9 @@ if (!/[?&]faceall=0/.test(location.search) && window.CastleStoneFace) ['founders
 <script src="charms/desks.js?v=2"></script>
 <script src="castle-trim.js?v=18"></script>
 <script src="design/lake-views.js?v=1"></script>
-<script src="castle-walls-v2.js?v=6"></script>
+<script src="castle-walls-v2.js?v=8"></script>
 <script src="castle-strip.js?v=4"></script>
-<script src="castle-shell.js?v=225"></script>
+<script src="castle-shell.js?v=228"></script>
 <script src="castle-exterior.js?v=31"></script>
 <script src="shell-w5b.js?v=25"></script>
 <script src="shell-bare.js?v=3"></script>
@@ -391,6 +391,24 @@ if (!shell) { var later = ((window.CASTLE_MODEL || {}).rooms || []).filter(funct
   kit.helpEl.hidden = false; kit.helpEl.textContent = later ? PLACE + ' stands from the ' + (later.first || 'PS') + ' castle, after the boy\'s year; add &book=' + (later.first || 'PS') + ' to see it'
     : 'No such place in the castle model: ' + PLACE; console.warn(kit.helpEl.textContent); return; }
 scene.add(shell.group);
+/* req 5270 (the Blender trial, mark M6; Godric's ask of 11 November 2026): ?arch=m6 loads a glb built in Blender in site
+   metres (Y up by its exporter) under shell.group, placed by the shell's own frame rule (toLocal of the site origin), so
+   its walls can be set beside the code's. No flag, nothing loads. */
+(function () {
+  var m = /[?&]arch=([\w-]+)/.exec(location.search); if (!m) return;
+  window.__arch = { flag: m[1], loaded: false, meshes: 0, owners: [], err: null };
+  var go = function () {
+    new THREE.GLTFLoader().load('arch/trial-5270-' + m[1] + '.glb?v=1', function (g) {
+      var o = shell.toLocal(0, 0, 0); g.scene.position.set(o.x, o.y, o.z);
+      g.scene.traverse(function (k) { if (k.isMesh) { window.__arch.meshes++; window.__arch.owners.push(k.userData.owner || ''); } });
+      shell.group.add(g.scene); window.__arch.loaded = true;
+    }, null, function (e) { window.__arch.err = String(e && e.message || e); console.error('arch glb: ' + window.__arch.err); });
+  };
+  if (THREE.GLTFLoader) return go();
+  var s = document.createElement('script'); s.src = 'people/GLTFLoader.js'; s.onload = go;
+  s.onerror = function () { window.__arch.err = 'GLTFLoader.js'; console.error('arch: GLTFLoader.js did not load'); };
+  document.head.appendChild(s);
+})();
 /* req 3344 step 0 (Godric's yes, 9 November 2026): the shell-only build. ?bare=1, or this place's floor in
    page/shell-bare.js, builds the shell and skips the dressing: W5B's and the lead's things are not built, and anything
    the page adds to the scene after this line (the per-room blocks, ROOM_THINGS, portraits) is hidden, so the gate and

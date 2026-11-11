@@ -562,10 +562,11 @@ window.CastleShell = { build: function (F, M, placeId, o) {
      wall once from the wall graph (castle-walls-v2.js) with true holes; v1 stays the default until the pass marks hold.
      v218 (req 5173, Godric's 1, 10 November 2026, 7.22 pm): v2 is the default where the start place stands on G (the
      level by its floor, as tools/envelope-gate.mjs bins it), one floor at a time; &floor=all spans levels and keeps v1, as
-     does every other level; ?walls=v1 is the before on G */
+     does every other level; ?walls=v1 is the before on G. v233 (req 5264, Godric's 1, 11 November 2026): floor 1 joins G,
+     ?walls=v1 its before too */
   var WLV = (M.levels || []).filter(function (l) { return l.z != null; }).sort(function (a, b) { return a.z - b.z; });
   var WBIN = (WLV.filter(function (l) { return l.z <= P.floor + 0.01; }).pop() || WLV[0] || {}).id;
-  var WALLS2 = (o.walls || (WBIN === 'G' && o.floor !== 'all' ? 'v2' : 'v1')) === 'v2' && !!window.CastleWalls && !!window.CastleStrip;
+  var WALLS2 = (o.walls || ((WBIN === 'G' || WBIN === '1') && o.floor !== 'all' ? 'v2' : 'v1')) === 'v2' && !!window.CastleWalls && !!window.CastleStrip;
   var DPRE = (function () {   /* req 1996: door-surround options for Godric's eye, the page's ?dpre=A|B|C|D; the plain build has none */
     var m = /[?&]dpre=([A-D])/.exec(window.location.search || ''); if (!m) return null;
     var rev = { n: 3, bw: 0.12, proj: 0.025, chamfer: true, stop: false, bead: false, hood: 0 };
@@ -752,9 +753,11 @@ window.CastleShell = { build: function (F, M, placeId, o) {
   }
   /* v219 (req 5176, ?cased=2): the bold casing's second stone, a red sandstone against the dressing's pale (Barclay's red
      on cream), the pale where the dressing is already the pink */
+  /* v232 (Godric, 11 November 2026, 8.59 am: the red is wrong): the second stone is the dressing stone itself, so the
+     stepped orders (?cased=3), the polychrome voussoirs (?cased=2) and the v219 lining carry no red; the alt geometry
+     still comes apart, kept for a later second stone if one is chosen */
   function trimAltMat(row, sx, sy, z) {
-    var st = row ? stoneAt(row, sx, sy, z) : 'late-pale', ds = DRESSED[st] || st, alt = ds === 'tudor-pink' ? 'late-pale' : 'tudor-pink';
-    return faced(alt, window.CastleStoneFace && CastleStoneFace.kind('ashlar'), alt === 'tudor-pink' ? 0xa65a44 : tone(alt + '/ashlar', alt, 1.0), true);   /* Edinburgh's red, a warm sandstone */
+    return trimMat(row, sx, sy, z);
   }
   function floorMat(row, sx, sy, two) {
     var st = stoneAt(row, sx, sy), kind = FLOOR_USE[row.use];
@@ -3599,7 +3602,21 @@ window.CastleShell = { build: function (F, M, placeId, o) {
       var zr = seg && seg.zr, top = zr && zr[ra] && zr[rb] ? Math.min(zr[ra][1], zr[rb][1]) : -Infinity;
       return (M.openings || []).some(function (op) { return matches(M, op, ra) && matches(M, op, rb) && isWay(op.kind || '') && (op.w || 0) >= s1 - s0 - 0.15 && headOf(op) >= top - 0.05; });
     };
-    var G = CastleWalls.graph(places, { stand: P.id, openWhole: openWhole }), byId = {};
+    /* v234 (req 5281): each line's cuts from both rooms, site points, for the seat rule's piers (niches and recesses are no
+       opening through the line) */
+    var cutCache = {}, cutsOn = function (ra, rb) {
+      var L = [];
+      [ra, rb].forEach(function (id) {
+        if (!cutCache[id]) { cutCache[id] = []; try { window.CastleShell.openingCuts(M, id).forEach(function (c) {
+          var op = (M.openings || []).filter(function (o) { return o.id === c.op; })[0], k = op ? String(op.kind || '') : '';
+          if (c.spill || /niche|recess/.test(k)) return;
+          var dx = c.b[0] - c.a[0], dy = c.b[1] - c.a[1], l = Math.hypot(dx, dy); if (l < 1e-6) return;
+          cutCache[id].push([[c.a[0] + dx / l * c.s0, c.a[1] + dy / l * c.s0], [c.a[0] + dx / l * c.s1, c.a[1] + dy / l * c.s1]]); }); } catch (e) {} }
+        L = L.concat(cutCache[id]);
+      });
+      return L;
+    };
+    var G = CastleWalls.graph(places, { stand: P.id, openWhole: openWhole, cutsOn: cutsOn }), byId = {};
     places.forEach(function (q) { byId[q.id] = q; });
     var eIdx = function (id, e) { var q = byId[id], k = 0; for (var j = 0; j < e[0]; j++) k += q.loops[j].length; return k + e[1]; };
     var faceOf = function (id, e) { var pts = byId[id].loops[e[0]], a = pts[e[1]], b = pts[(e[1] + 1) % pts.length]; return { a: a, b: b, L: Math.hypot(b[0] - a[0], b[1] - a[1]), n: pts.length }; };
