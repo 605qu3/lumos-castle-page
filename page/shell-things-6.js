@@ -580,7 +580,7 @@
     /* 6-THINGS drum-bend-6-west */
     /* docs/interiors/upper-floors-gaps-1028.md (drum-bend-6-west, corridors and passages): bare flags, a worn stone threshold at each door, one unlit torch bracket clear of every opening */
     'drum-bend-6-west': { items: [
-      ['b', 35.6, 6.55, 0, 35.82, 7.45, 0.012, 'stone'], ['b', 33.725, 11.15, 0, 34.625, 11.37, 0.012, 'stone'], ['b', 33.98, 3.58, 2.15, 34.02, 3.88, 2.2, 'iron'], ['y', 34.0, 3.86, 0.05, 2.2, 2.32, 'iron']] },
+      ['b', 35.6, 6.55, 0, 35.82, 7.45, 0.012, 'stone'], ['b', 33.725, 11.15, 0, 34.625, 11.37, 0.012, 'stone'], ['b', 32.78, 7.605, 2.15, 33.08, 7.645, 2.2, 'iron'], ['y', 33.06, 7.625, 0.05, 2.2, 2.32, 'iron']] },
     /* 6-THINGS end drum-bend-6-west */
     /* 6-THINGS west-tower-way-6 */
     /* docs/interiors/upper-floors-gaps-1028.md (west-tower-way-6, corridors and passages): bare flags, a worn stone threshold at each door, one unlit torch bracket clear of every opening */
@@ -612,7 +612,7 @@
     /* 6-THINGS lake-corridor-6-turn */
     /* docs/interiors/upper-floors-gaps-1028.md (lake-corridor-6-turn, corridors and passages): bare flags, a worn stone threshold at each door, one unlit torch bracket clear of every opening */
     'lake-corridor-6-turn': { items: [
-      ['b', 62.975, 6.7, 0, 63.875, 6.92, 0.012, 'stone'], ['b', 67.72, 4.93, 2.15, 68.02, 4.97, 2.2, 'iron'], ['y', 67.74, 4.95, 0.05, 2.2, 2.32, 'iron']] },
+      ['b', 62.975, 6.7, 0, 63.875, 6.92, 0.012, 'stone'], ['b', 59.28, 4.93, 2.15, 59.58, 4.97, 2.2, 'iron'], ['y', 59.56, 4.95, 0.05, 2.2, 2.32, 'iron']] },
     /* 6-THINGS end lake-corridor-6-turn */
     /* 6-THINGS lake-corridor-6-middle */
     /* docs/interiors/upper-floors-gaps-1028.md (lake-corridor-6-middle, a long walk, req 2243): the furnished family (a runner, benches, umbrella stands, a hall table, window seats, portraits, a clock) with its lighting plan of torches, sconces and chandeliers */
