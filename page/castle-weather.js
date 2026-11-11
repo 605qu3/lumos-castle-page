@@ -9,7 +9,8 @@
      windows  [{ at: [x,y,z] the glass's centre, in: [nx,nz] the horizontal unit normal pointing into the room,
                  w, h  the glass's width and height, floor: y of the floor the beam lands on, reach: longest beam (m) }]
      o        { north: [x,z] unit vector of north in the scene (default [0,-1]; east is then +x),
-                dust: motes per window (default 70), density: 1 (the pass mark), light: CastleLight.at() sun block }
+                dust: motes per window (default 70), density: 1 (the pass mark), light: CastleLight.at() sun block,
+                pool: false when the room draws its own patch of sun on the floor; a window may carry minAlt, the sun height below which it gives no beam }
    Cost: two draw calls for a whole room (one beam mesh, one dust Points), one 1x1 shader, no texture, no fog pass.
    The world rules hold: the sun's own light through glass, nothing glows as a sign, nothing marks a thing. */
 (function () {
@@ -71,6 +72,7 @@
       windows.forEach(function (w, wi) {
         var inx = w.in[0], inz = w.in[1];
         if (tr[0] * inx + tr[2] * inz <= 0.05 || tr[1] >= -0.02) return;      /* the sun is behind this glass: no beam through it */
+        if (w.minAlt != null && sun.altitude < w.minAlt) return;              /* a roof or a wall shades this light below that sun height (the room names it) */
         var ux = -inz, uz = inx, hw = w.w / 2, hh = w.h / 2, f = w.floor == null ? w.at[1] - 3 : w.floor;
         var low = w.at[1] - hh, len = Math.min(w.reach || 12, (low - f) / -tr[1]);
         if (len <= 0.2) return;
@@ -87,7 +89,7 @@
           idx.push(vi, vi + 1, vi + 2, vi, vi + 2, vi + 3); vi += 4;
         }
         var pl = P0.map(function (p) { var k2 = (p[1] - f) / -tr[1]; return [p[0] + tr[0] * k2, f + 0.03, p[2] + tr[2] * k2]; });
-        if (pl.every(function (p) { return Math.hypot(p[0] - w.at[0], p[2] - w.at[2]) <= (w.reach || 12) * 1.4; })) {   /* the sun's patch on the floor */
+        if (o.pool !== false && pl.every(function (p) { return Math.hypot(p[0] - w.at[0], p[2] - w.at[2]) <= (w.reach || 12) * 1.4; })) {   /* the sun's patch on the floor */
           pl.forEach(function (p) { pos.push(p[0], p[1], p[2]); nor.push(0, 1, 0); along.push(2); edge.push(0); });
           idx.push(vi, vi + 1, vi + 2, vi, vi + 2, vi + 3); vi += 4;
         }
@@ -139,7 +141,7 @@
      snow is pane + flakes, fog and frost are the pane alone, clear and cloudy draw nothing. Nothing glows as a sign. */
   function wkind(w) {
     var s = typeof w === 'string' ? w : (w && w.sky) || 'clear', ob = w && typeof w === 'object';
-    return { sky: s, frost: !!(ob && (w.ground === 'frozen' || w.ground === 'frost' || w.frost)), windy: !!(ob && w.windy) };
+    return { sky: s, frost: !!(ob && (w.ground === 'frozen' || w.ground === 'frost' || w.frost || w.frozen)), windy: !!(ob && w.windy) };
   }
   var PVERT = 'attribute vec2 aSize; varying vec2 vUv; varying vec2 vSize;' +
     'void main(){ vUv=uv; vSize=aSize; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0); }';

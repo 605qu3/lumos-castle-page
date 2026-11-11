@@ -167,6 +167,7 @@ if (!/[?&]faceall=0/.test(location.search) && window.CastleStoneFace) ['founders
 <script src="shell-w5b.js?v=25"></script>
 <script src="shell-bare.js?v=3"></script>
 <script src="castle-events.js?v=40"></script>
+<script src="castle-weather.js?v=1"></script>
 <script src="castle-sound.js?v=1"></script>
 <script>
 (function () {
@@ -913,11 +914,36 @@ if (ceiling) ceiling.material = skyMat;
 var WIN = MODEL.openings.filter(function (o) { return o.room === PLACE && /^great-hall-window-/.test(o.id); });
 var winSky = new THREE.MeshBasicMaterial({ color: 0x8aa6cc, side: THREE.DoubleSide });
 var HALL_Y = { n: 69.5, s: 51.5 };
+var WXON = !!window.CastleWeather && Q.get('wx') !== 'off';
 WIN.forEach(function (o) {
   var north = o.at[1] > 60.5, pane = new THREE.Mesh(new THREE.PlaneGeometry(o.w, o.h), winSky);
   pane.position.copy(P(o.at[0], o.at[1] + (north ? -0.05 : 0.05), o.sill + o.h / 2));
-  pane.lookAt(P(o.at[0], 60.5, o.sill + o.h / 2)); pane.name = 'window-sky'; room.add(pane);
+  pane.lookAt(P(o.at[0], 60.5, o.sill + o.h / 2)); pane.name = 'window-sky'; pane.visible = !WXON; room.add(pane);
 });
+/* weather at the windows (Weather lane; page/castle-weather.js, docs/weather/checks/window-weather.md; the Architect's window
+   records above are the list, row 5345): sunbeams with dust from the sun's own cue, and rain, snow, fog and frost on the
+   glass, which is the shell's own pane of each window (shell.panes, mid-reveal; the shell's pane stops writing depth so the
+   streaks and flakes behind it show). The module draws it all, 4 calls at most; ?wx=off lays it back.
+   The beams start at the inner face of the reveal, the floor patch stays the hall's own (pool: false), and the south
+   lights give no beam under a sun of 38 degrees (the south range's roof, as lightPatches reads it). The reveal's own
+   shading of a beam is not modelled: a beam is the whole inner face swept along the sun. */
+var WX = null, wxState = { sky: 'clear' }, wxShaftSun = { up: false, altitude: -1, bearing: 0 };
+if (WXON) (function () {
+  var beams = [], glass = [];
+  WIN.forEach(function (o) {
+    var north = o.at[1] > 60.5, inn = north ? [0, 1] : [0, -1], zc = o.sill + o.h / 2;
+    var gi = P(o.at[0], north ? HALL_Y.n : HALL_Y.s, zc);
+    beams.push({ at: [gi.x, gi.y, gi.z], in: inn, w: o.w, h: o.h, floor: 0, reach: 22, minAlt: north ? 0 : 38 });
+    var sp = shell.panes.filter(function (q) { return q.name === PLACE + '-pane-' + o.id; })[0];
+    if (sp) {
+      sp.material = sp.material.clone(); sp.material.depthWrite = false; sp.renderOrder = -1;
+      glass.push({ at: [sp.position.x, sp.position.y, sp.position.z], in: inn, w: o.w, h: o.h });
+    }
+  });
+  WX = { shafts: CastleWeather.shafts(THREE, beams, { north: [0, -1], pool: false }), panes: CastleWeather.panes(THREE, glass, {}) };
+  WX.shafts.group.name = 'weather-shafts'; WX.panes.group.name = 'weather-panes';
+  room.add(WX.shafts.group, WX.panes.group);
+})();
 var patchMat = new THREE.MeshBasicMaterial({ color: 0xfff0c8, transparent: true, opacity: 0.32, depthWrite: false, side: THREE.DoubleSide,
   polygonOffset: true, polygonOffsetFactor: -2 });
 var patchPos = new Float32Array(WIN.length * 6 * 3), patchGeo = new THREE.BufferGeometry();
@@ -1037,6 +1063,12 @@ function draw() {
     patchMat.color.set(0xc8d4ff); patchMat.opacity = 0.16; through = lightPatches(180, d.moon.altitude, 'south');
   }
   patches.visible = through > 0; st.light = through ? through + ' windows let a patch through' : 'sky light only';
+  if (WX) {
+    wxState = d.weather || { sky: 'clear' };
+    var bright = d.sun.up && cue('the high windows bright');
+    wxShaftSun = bright ? d.sun : { up: false, altitude: -1, bearing: 0 };
+    st.weather = JSON.stringify({ shafts: WX.shafts.info().windowsLit, panes: WX.panes.info().drawCalls });
+  }
   if (!(through && cue('the high windows bright'))) sunL.intensity = Math.min(sunL.intensity, 0.12);
   var open = d.time !== 'night' || d.meal !== 'none';
   if (DOOR) DOOR.mesh.visible = !open;
@@ -1464,6 +1496,7 @@ function frame() {
   turnDiners();
   redraw += dt; if (redraw > 30) { redraw = 0; draw(); }   /* the clock moves on while he stays: dusk comes, a meal begins */
   if (BARE) bareSweep();
+  if (WX) { WX.panes.update(wxState, T); WX.shafts.update(wxShaftSun, wxState.sky, T); }
   renderer.render(scene, camera);
   kit.stats(dt);
 }
