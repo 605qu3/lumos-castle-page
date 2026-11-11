@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Weather: sunbeams test</title>
+<style>html,body{margin:0;height:100%;background:#111;overflow:hidden}#hud{position:fixed;left:8px;top:8px;color:#ddd;font:12px monospace;white-space:pre}</style>
+</head><body><div id="hud"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="castle-weather.js"></script>
+<script>
+/* A bare stone hall of Godric's size for the sunbeam effect alone (no castle): five tall west windows. Flags, the
+   check's fixtures: ?bearing=&alt=&sky= force the sun; ?off=1 effect off (known bad); ?flip=1 beams 180 degrees from
+   the sun (known bad); ?double=1 doubled density (known bad); ?cam=low|high; ?t= seconds of dust drift. */
+var Q = new URLSearchParams(location.search), num = function (k, d) { return Q.has(k) ? +Q.get(k) : d; };
+var sun = { up: true, altitude: num('alt', 28), bearing: num('bearing', 250) };
+if (Q.has('flip')) sun.bearing = (sun.bearing + 180) % 360;   /* the bad fixture aims the beams away from where the sun is shown */
+if (Q.has('skew')) sun.bearing = (sun.bearing + num('skew', 70)) % 360;   /* the bad fixture: shafts aimed off the sun's bearing */
+var sky = Q.get('sky') || 'clear';
+var W = innerWidth, H = innerHeight, r = new THREE.WebGLRenderer({ antialias: true }); r.setSize(W, H); r.setPixelRatio(Math.min(2, devicePixelRatio));
+document.body.appendChild(r.domElement);
+var sc = new THREE.Scene(); sc.background = new THREE.Color(0x15161a);
+var cam = new THREE.PerspectiveCamera(70, W / H, 0.1, 100);
+var L = 24, D = 12, HT = 11;                         /* hall: x -12..12 (east +x), z -6..6 (north -z), 11 high */
+cam.position.set(Q.get('cam') === 'high' ? 4 : 5, Q.get('cam') === 'high' ? 6 : 1.7, 5.5); cam.lookAt(-6, 2.6, -2);
+var stone = new THREE.MeshLambertMaterial({ color: 0x7d776c, side: THREE.DoubleSide });
+function box(w, h, d, x, y, z) { var m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), stone); m.position.set(x, y, z); sc.add(m); return m; }
+box(L, .2, D, 0, -.1, 0); box(L, .2, D, 0, HT, 0);
+box(L, HT, .3, 0, HT / 2, -D / 2); box(L, HT, .3, 0, HT / 2, D / 2); box(.3, HT, D, L / 2, HT / 2, 0);
+/* the west wall with five slots cut as piers between the windows (windows 1.6 wide, 5.5 high, sill 3.2) */
+var pierZ = [-5, -3, -1, 1, 3, 5], wins = [];
+for (var i = 0; i < 5; i++) { var z0 = -D / 2 + (i + .5) * D / 5 ; wins.push({ at: [-L / 2, 3.2 + 2.75, z0 * 1], in: [1, 0], w: 1.6, h: 5.5, floor: 0, reach: 9 }); }
+box(.3, 3.2, D, -L / 2, 1.6, 0); box(.3, HT - 8.7, D, -L / 2, 8.7 + (HT - 8.7) / 2, 0);
+for (var j = 0; j <= 5; j++) { var zc = -D / 2 + j * D / 5 + (j === 0 ? .2 : j === 5 ? -.2 : 0); box(.3, 5.5, j === 0 || j === 5 ? .4 : .6, -L / 2, 5.95, zc); }
+sc.add(new THREE.HemisphereLight(0xcfd8e6, 0x3a332c, 1.1));
+wins.forEach(function (w) { var g = new THREE.Mesh(new THREE.PlaneGeometry(w.w, w.h), new THREE.MeshBasicMaterial({ color: 0xb8cde6 })); g.position.set(w.at[0] - .05, w.at[1], w.at[2]); g.rotation.y = Math.PI / 2; sc.add(g); });
+var shafts = CastleWeather.shafts(THREE, wins, { north: [0, -1], density: Q.has('double') ? 2 : num('density', 1) });
+sc.add(shafts.group);
+var t0 = num('t', 0), clock = 0;
+function frame() {
+  clock += 1 / 60;
+  if (!Q.has('off')) shafts.update(sun, sky, t0 + clock); else shafts.update({ up: false, altitude: -1, bearing: 0 }, sky, 0);
+  r.render(sc, cam); requestAnimationFrame(frame);
+}
+frame();
+var info = shafts.info();
+if (!Q.has('nohud')) document.getElementById('hud').textContent = 'sun bearing ' + sun.bearing + ' alt ' + sun.altitude + ' sky ' + sky + '\n' + JSON.stringify(shafts.info()) + (Q.has('off') ? ' OFF' : '');
+window.weatherTest = { info: function () { return shafts.info(); }, self: CastleWeather.selfTest, calls: function () { return r.info.render.calls; } };
+</script></body></html>
