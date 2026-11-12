@@ -399,7 +399,7 @@ scene.add(shell.group);
   var m = /[?&]arch=([\w-]+)/.exec(location.search); if (!m) return;
   window.__arch = { flag: m[1], loaded: false, meshes: 0, owners: [], err: null };
   var go = function () {
-    var files = [m[1] === 'trio' ? 'arch/castle-trio-5320.glb?v=13' : 'arch/trial-5270-' + m[1] + '.glb?v=7'];   /* req 5320 step 3: ?arch=trio, the trio built from the model */
+    var files = [m[1] === 'trio' ? 'arch/castle-trio-5320.glb?v=14' : 'arch/trial-5270-' + m[1] + '.glb?v=7'];   /* req 5320 step 3: ?arch=trio, the trio built from the model */
     if (m[1] === 'trial' && /[?&]surr=1/.test(location.search)) files.push('arch/trial-5289-surrounds.glb?v=8');   /* req 5289: the Blender surrounds of the nine openings */
     files.forEach(function (fn) { new THREE.GLTFLoader().load(fn, function (g) {
       var o = shell.toLocal(0, 0, 0); g.scene.position.set(o.x, o.y, o.z);
