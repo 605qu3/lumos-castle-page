@@ -819,9 +819,41 @@ window.CastleShell = { build: function (F, M, placeId, o) {
      userData its exporter carried (owner, mat, mx, my, mz): a wall wallMat of its owner's row at its band's middle, as
      the strips' (line 3946); the porch trimMat at the opening's centre and sill, as the porch's mass (?ghp=1). Then
      F.register on the wall layer, as every wall of the page */
+  /* v238 (req 5320 step 3, ?arch=trio, the Architect's gate of 11 November 2026, 8.51 pm): the trio glb's extras name the
+     room whose row paints a part (a reveal its opening's room) and that room's floor, so mz is over the floor as wallMat
+     reads it; a pane takes the page's pane; a row with a band (the Great Hall's founders-rubble under 6.0) is split by
+     each triangle's height over the floor; the trio's stone draws on its own copies of the materials, pushed back by a
+     polygon offset, so a code floor, vault or porch on the same plane is the one seen */
+  var archOff = {};
+  function archMat(m) {
+    if (!archOff[m.uuid]) { var c = m.clone(); c.polygonOffset = true; c.polygonOffsetFactor = 1; c.polygonOffsetUnits = 4; archOff[m.uuid] = c; }
+    return archOff[m.uuid];
+  }
+  function archBand(mesh, row, u) {
+    var g = mesh.geometry, P = g.attributes.position, I = g.index ? g.index.array : null, n = I ? I.length : P.count, lo = [], hi = [];
+    for (var j = 0; j < n; j += 3) {
+      var a = I ? I[j] : j, b = I ? I[j + 1] : j + 1, c = I ? I[j + 2] : j + 2, y = (P.getY(a) + P.getY(b) + P.getY(c)) / 3;
+      (y - (u.floor || 0) < row.band.top ? lo : hi).push(a, b, c);
+    }
+    if (!lo.length || !hi.length) return wallMat(row, u.mx, u.my, lo.length ? 0 : row.band.top + 1);
+    /* one material a mesh (F.register keeps its colour): the part over the band is a child mesh, adopted in its turn as
+       the traverse reaches it, with no floor (so no second split) and its mz over the band */
+    var g2 = g.clone(); g.setIndex(lo); g2.setIndex(hi);
+    var up = new THREE.Mesh(g2, mesh.material); up.name = mesh.name + '.over-band';
+    up.userData = Object.assign({}, u, { floor: null, mz: row.band.top + 1, part: 'over-band' });
+    mesh.add(up);
+    return wallMat(row, u.mx, u.my, 0);
+  }
   out.archAdopt = function (mesh) {
-    var u = mesh.userData || {}, row = W2[u.owner] ? W2[u.owner].row : rowOf({ id: u.owner, floor: 0 });
-    mesh.material = !row ? mats.wall : u.mat === 'trim' ? trimMat(row, u.mx, u.my, u.mz) : wallMat(row, u.mx, u.my, u.mz);
+    var u = mesh.userData || {}, id = u.room || u.owner, row = W2[id] ? W2[id].row : rowOf({ id: id, floor: 0 });
+    if (!row && u.host) { id = u.host; row = W2[id] ? W2[id].row : rowOf({ id: id, floor: 0 }); }   /* a pocket with no row: its host's stone */
+    if (u.mat === 'glass') {
+      if (!mats.pane) mats.pane = new THREE.MeshBasicMaterial({ color: new THREE.Color(tone('sky-day')).convertSRGBToLinear(), side: THREE.DoubleSide });
+      mesh.material = mats.pane; F.register(mesh, LAYER.wall); return mesh;
+    }
+    if (!row) (window.__archFall = window.__archFall || []).push(id);   /* the gate's mark 2: a part on the fallback material */
+    var m = !row ? mats.wall : u.mat === 'trim' ? trimMat(row, u.mx, u.my, u.mz) : row.band && u.floor != null ? archBand(mesh, row, u) : wallMat(row, u.mx, u.my, u.mz);
+    mesh.material = ARCH === 'trio' ? (Array.isArray(m) ? m.map(archMat) : archMat(m)) : m;
     F.register(mesh, LAYER.wall);
     return mesh;
   };
@@ -3774,7 +3806,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
       }
       /* v18 (req 5293): on the Blender trial the wall strips are not drawn (the glb has them), but the hole floors and the
          leaf, stop and wear reseat below still run for the trio, else the leaf stands 0.25 m deep and the threshold shows */
-      var TRIALSKIP = ARCH === 'trial' && sg.rooms.some(function (r) { return TRIO.indexOf(r) >= 0; });
+      var TRIALSKIP = (ARCH === 'trial' || ARCH === 'trio') && sg.rooms.some(function (r) { return TRIO.indexOf(r) >= 0; });
       /* v226 (req 5219, ?cased=4, the reveal door): a ringed door between this strip's two rooms, pointed or round, from the
          floor, takes its orders on the ordered room's face where the strip has the room: depth for the orders and 0.12 behind,
          the casing's width to the strip's ends and the next hole, the hood's crown under the strip's top; two orders, else
