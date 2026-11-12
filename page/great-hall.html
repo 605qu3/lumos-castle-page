@@ -167,7 +167,7 @@ if (!/[?&]faceall=0/.test(location.search) && window.CastleStoneFace) ['founders
 <script src="shell-w5b.js?v=25"></script>
 <script src="shell-bare.js?v=3"></script>
 <script src="castle-events.js?v=40"></script>
-<script src="castle-weather.js?v=3"></script>
+<script src="castle-weather.js?v=4"></script>
 <script src="castle-sound.js?v=1"></script>
 <script>
 (function () {
@@ -944,6 +944,16 @@ if (WXON) (function () {
   WX.shafts.group.name = 'weather-shafts'; WX.panes.group.name = 'weather-panes';
   room.add(WX.shafts.group, WX.panes.group);
 })();
+/* the enchanted ceiling's weather (Weather lane; CastleWeather.ceiling, docs/weather/checks/ceiling-weather.md; Magic's 2.1 on
+   row 5389): one cloud layer on the ceiling plane, tinted by the sky colour below it, and warm dry flakes that fall from the
+   ceiling and fade well above the candles, only at Christmas. The stars, ring, ribs and bosses are not touched; ?wx=off lays
+   it back. Nothing is drawn in a held room: the page only calls it from the frame. */
+var WXC = null, wxXmas = false;
+if (WXON && ceiling && CastleWeather.ceiling) (function () {
+  var pts = new Float32Array(260 * 3);
+  for (var i = 0; i < 260; i++) { var v = P(U(16.5, 63.5), U(52.5, 68.5), 14.7); pts[i * 3] = v.x; pts[i * 3 + 1] = v.y; pts[i * 3 + 2] = v.z; }
+  WXC = CastleWeather.ceiling(THREE, ceiling, { base: skyMat.color, flakes: { points: pts, drop: 6 } });
+})();
 var patchMat = new THREE.MeshBasicMaterial({ color: 0xfff0c8, transparent: true, opacity: 0.32, depthWrite: false, side: THREE.DoubleSide,
   polygonOffset: true, polygonOffsetFactor: -2 });
 var patchPos = new Float32Array(WIN.length * 6 * 3), patchGeo = new THREE.BufferGeometry();
@@ -1065,6 +1075,7 @@ function draw() {
   patches.visible = through > 0; st.light = through ? through + ' windows let a patch through' : 'sky light only';
   if (WX) {
     wxState = d.weather || { sky: 'clear' };
+    wxXmas = /christmas/.test(d.occasion || '');
     var bright = d.sun.up && cue('the high windows bright');
     wxShaftSun = bright ? d.sun : { up: false, altitude: -1, bearing: 0 };
     st.weather = JSON.stringify({ shafts: WX.shafts.info().windowsLit, panes: WX.panes.info().drawCalls });
@@ -1497,6 +1508,7 @@ function frame() {
   redraw += dt; if (redraw > 30) { redraw = 0; draw(); }   /* the clock moves on while he stays: dusk comes, a meal begins */
   if (BARE) bareSweep();
   if (WX) { WX.panes.update(wxState, T); WX.shafts.update(wxShaftSun, wxState.sky, T); }
+  if (WXC) WXC.update(wxState, T, { christmas: wxXmas });
   renderer.render(scene, camera);
   kit.stats(dt);
 }

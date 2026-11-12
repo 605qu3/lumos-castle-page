@@ -255,5 +255,88 @@
     return out;
   }
 
-  window.CastleWeather = { shafts: shafts, panes: panes, paneTest: paneTest, travelOf: travelOf, strength: strength, selfTest: selfTest };
+  /* ---- the Great Hall's enchanted ceiling, bewitched to look like the sky outside (Weather lane, design gate in
+     docs/handoff/weather.md "the Great Hall ceiling's weather"; Magic's section 2.1 answered row 5389: snow falls from the
+     ceiling only at Christmas, warm and dry; no lightning in the 1897 castle; stars, ring, ribs and cue are not touched).
+
+     CastleWeather.ceiling(THREE, mesh, o)  ->  { overlay, flakes, update(weather, t, flags), info() }
+       mesh   the room's ceiling mesh; a clone of its geometry is laid over it as one transparent cloud layer, a hair in
+              front of the sky colour and behind every rib and boss (polygon offset), no texture, one fragment shader
+       o      { base: THREE.Color the room already tints that sky with (read every frame), flakes: { points: Float32Array of
+                local [x,y,z] set just under the ceiling, drop: metres they fall before fading out } }
+       update(weather, t, flags)  flags { christmas: bool }: flakes only when weather.sky is snow AND it is Christmas
+     Two draw calls at most. Nothing is drawn by this call for a bare or held room: the page does not call it. */
+  var CVERT = 'varying vec2 vP; void main(){ vec4 w=modelMatrix*vec4(position,1.0); vP=w.xz; gl_Position=projectionMatrix*viewMatrix*w; }';
+  var CFRAG = 'uniform float uKind; uniform float uStorm; uniform float uTime; uniform float uWind; uniform vec3 uBase; varying vec2 vP;' +
+    'float h21(vec2 p){ p=fract(p*vec2(123.34,456.21)); p+=dot(p,p+45.32); return fract(p.x*p.y); }' +
+    'float vn(vec2 p){ vec2 i=floor(p), f=fract(p); f=f*f*(3.0-2.0*f); return mix(mix(h21(i),h21(i+vec2(1,0)),f.x),mix(h21(i+vec2(0,1)),h21(i+vec2(1,1)),f.x),f.y); }' +
+    'float fbm(vec2 p){ return vn(p)*0.5+vn(p*2.1+3.7)*0.3+vn(p*4.3+9.1)*0.2; }' +
+    'void main(){ float lum=dot(uBase,vec3(0.3,0.59,0.11)); float sp=0.02+0.05*uWind+0.06*uStorm;' +
+      'vec2 q=vP*0.12+vec2(uTime*sp,uTime*sp*0.4); float n=fbm(q+0.6*vec2(fbm(q*0.7+uTime*0.01),fbm(q*0.7+5.0)));' +
+      'float g=lum*1.5+0.03, a=0.0, k=1.0;' +
+      'if(uKind<0.5){ a=smoothstep(0.5,0.72,n)*0.75*smoothstep(0.1,0.3,lum); g=lum*1.8+0.1; }' +                  /* clear: a few thin clouds by day, none at night */
+      'else if(uKind<1.5){ a=0.9; k=0.6+0.8*n; }' +                                                              /* cloudy: a grey sheet */
+      'else if(uKind<2.5){ a=0.96; k=mix(0.55+0.6*n,0.18+0.55*n,uStorm); g=lum*1.2+0.02; }' +                         /* rain: darker; a storm darker still */
+      'else if(uKind<3.5){ a=0.9; k=0.9+0.25*n; g=mix(g,0.92,0.45); }' +                                           /* snow: a pale sheet */
+      'else { a=0.82; k=1.0+0.08*n; g=lum*1.7+0.08; }' +                                                           /* fog: milky and even */
+      'vec3 col=(vec3(g)*0.85+uBase*0.15)*k; gl_FragColor=vec4(col,a); }';
+  var CFVERT = 'uniform float uTime; uniform float uDrop; uniform float uSize; attribute vec3 aSeed; varying float vA;' +
+    'void main(){ vec3 p=position; float ph=mod(uTime*(0.35+0.25*aSeed.z)+aSeed.x*uDrop, uDrop);' +
+    'p.y-=ph; p.x+=sin(uTime*0.7+aSeed.y*30.0)*0.25; p.z+=cos(uTime*0.6+aSeed.x*30.0)*0.25;' +
+    'vec4 mv=viewMatrix*modelMatrix*vec4(p,1.0); gl_Position=projectionMatrix*mv; gl_PointSize=uSize*(0.6+0.5*aSeed.y)/max(0.5,-mv.z);' +
+    'vA=smoothstep(0.0,0.6,ph)*(1.0-smoothstep(uDrop*0.35,uDrop*0.8,ph)); }';
+  var CFFRAG = 'varying float vA; void main(){ float d=length(gl_PointCoord-0.5); if(d>0.5) discard; gl_FragColor=vec4(1.0,0.96,0.88,vA*smoothstep(0.5,0.15,d)); }';
+
+  /* the rule, apart from any drawing, so a check can read it: which sky, whether a storm, whether flakes */
+  function ceilingKind(weather, christmas) {
+    var k = wkind(weather), kind = { clear: 0, cloudy: 1, rain: 2, snow: 3, fog: 4 }[k.sky];
+    if (kind == null) kind = 0;
+    return { kind: kind, storm: kind === 2 && k.windy, flakes: kind === 3 && !!christmas };
+  }
+
+  function ceiling(THREE, mesh, o) {
+    o = o || {};
+    var mat = new THREE.ShaderMaterial({ vertexShader: CVERT, fragmentShader: CFRAG, transparent: true, depthWrite: false, side: THREE.DoubleSide, fog: false,
+      polygonOffset: true, polygonOffsetFactor: 0.5, polygonOffsetUnits: 2,
+      uniforms: { uKind: { value: 0 }, uStorm: { value: 0 }, uTime: { value: 0 }, uWind: { value: 0 }, uBase: { value: new THREE.Color(0x6f93c4) } } });
+    var overlay = new THREE.Mesh(mesh.geometry, mat);
+    overlay.position.copy(mesh.position); overlay.quaternion.copy(mesh.quaternion); overlay.scale.copy(mesh.scale);
+    overlay.renderOrder = 2; overlay.name = 'ceiling-weather'; overlay.frustumCulled = false;
+    (mesh.parent || mesh).add(overlay);
+    var flakes = null, fm = null, fd = o.flakes && o.flakes.drop || 6;
+    if (o.flakes && o.flakes.points) {
+      var n = o.flakes.points.length / 3, sd = new Float32Array(n * 3);
+      for (var i = 0; i < sd.length; i++) sd[i] = Math.random();
+      var g = new THREE.BufferGeometry();
+      g.setAttribute('position', new THREE.BufferAttribute(o.flakes.points, 3)); g.setAttribute('aSeed', new THREE.BufferAttribute(sd, 3));
+      fm = new THREE.ShaderMaterial({ vertexShader: CFVERT, fragmentShader: CFFRAG, transparent: true, depthWrite: false, fog: false,
+        uniforms: { uTime: { value: 0 }, uDrop: { value: fd }, uSize: { value: 120 } } });
+      flakes = new THREE.Points(g, fm); flakes.frustumCulled = false; flakes.renderOrder = 3; flakes.visible = false; flakes.name = 'ceiling-flakes';
+      (mesh.parent || mesh).add(flakes);
+    }
+    var last = null;
+    function update(weather, t, flags) {
+      var c = ceilingKind(weather, flags && flags.christmas), k = wkind(weather);
+      mat.uniforms.uKind.value = c.kind; mat.uniforms.uStorm.value = c.storm ? 1 : 0; mat.uniforms.uTime.value = t || 0;
+      mat.uniforms.uWind.value = k.windy ? 1 : 0.15;
+      if (o.base) mat.uniforms.uBase.value.copy(o.base);
+      if (flakes) { flakes.visible = c.flakes; fm.uniforms.uTime.value = t || 0; }
+      last = c;
+    }
+    return { overlay: overlay, flakes: flakes, update: update, info: function () {
+      return { kind: last ? last.kind : -1, storm: !!(last && last.storm), flakes: !!(flakes && flakes.visible), drawCalls: 1 + (flakes && flakes.visible ? 1 : 0) };
+    } };
+  }
+
+  function ceilingTest() {
+    var out = [];
+    out.push(['snow on an ordinary day: sheet, no flakes', ceilingKind({ sky: 'snow' }, false).flakes === false && ceilingKind({ sky: 'snow' }, false).kind === 3]);
+    out.push(['snow at Christmas: flakes', ceilingKind({ sky: 'snow' }, true).flakes === true]);
+    out.push(['rain never has flakes', ceilingKind({ sky: 'rain' }, true).flakes === false]);
+    out.push(['a storm is rain with wind', ceilingKind({ sky: 'rain', wind: 0.8, windy: true }, false).storm === true && ceilingKind({ sky: 'rain' }, false).storm === false]);
+    out.push(['a clear sky is clear', ceilingKind({ sky: 'clear' }, false).kind === 0]);
+    return out;
+  }
+
+  window.CastleWeather = { shafts: shafts, panes: panes, ceiling: ceiling, ceilingKind: ceilingKind, ceilingTest: ceilingTest, paneTest: paneTest, travelOf: travelOf, strength: strength, selfTest: selfTest };
 }());
