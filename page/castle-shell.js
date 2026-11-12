@@ -4021,17 +4021,21 @@ window.CastleShell = { build: function (F, M, placeId, o) {
           var cr = c.position.clone().sub(C); c.position.addScaledVector(nL, -cr.dot(nL));
         });
       });
-      if (TRIALSKIP) return;
-      segBands.push({ sg: sg, ux: ux, uy: uy, len: len, lo: lo, top: top });   /* req 3314: every band, for an 'in' casing's seat */
-      segHoles.push({ sg: sg, ux: ux, uy: uy, len: len, lo: lo, ops: holes.map(function (h) { return h.op; }), z0s: holes.map(function (h) { return h.z0; }) });
-      res.merged += S.merged;
-      if (S.merged) res.rows.push({ owner: sg.owner, rooms: sg.rooms, merged: S.merged, ops: holes.map(function (h) { return h.op; }) });
+      /* v242 (req 5320, "Gate, head linings in the trio's rooms", 12 November 2026): on the trio the strip's wall meshes,
+         bands, hole lists and reveal kit stay skipped (the glb has the walls), but its heads are lined below as on code,
+         else the trio's cut soffit showed bare stone under every arch (the code drew 27 linings, the trio 13) */
+      if (!TRIALSKIP) {
+        segBands.push({ sg: sg, ux: ux, uy: uy, len: len, lo: lo, top: top });   /* req 3314: every band, for an 'in' casing's seat */
+        segHoles.push({ sg: sg, ux: ux, uy: uy, len: len, lo: lo, ops: holes.map(function (h) { return h.op; }), z0s: holes.map(function (h) { return h.z0; }) });
+        res.merged += S.merged;
+        if (S.merged) res.rows.push({ owner: sg.owner, rooms: sg.rooms, merged: S.merged, ops: holes.map(function (h) { return h.op; }) });
+      }
       var oQ = W2[sg.owner] || W2[built[0]], sm = len / 2;
       var mat = oQ.row ? wallMat(oQ.row, sg.a[0] + ux * sm, sg.a[1] + uy * sm, (top - lo) / 2) : mats.wall;
       var o0 = toLocal(sg.a[0] + sg.n[0] * sg.off[0], sg.a[1] + sg.n[1] * sg.off[0], lo);
       var MX = new THREE.Matrix4().makeBasis(new THREE.Vector3(ux, 0, -uy), new THREE.Vector3(0, 1, 0), new THREE.Vector3(sg.n[0], 0, -sg.n[1])).setPosition(o0);
       var i0 = eIdx(sg.owner, oe);
-      S.geos.forEach(function (geo) {
+      (TRIALSKIP ? [] : S.geos).forEach(function (geo) {   /* v242: the trio's walls are the glb's */
         geo.applyMatrix4(MX);
         var key = sg.owner + ':' + i0, k = nk[key] = (nk[key] || 0) + 1;
         var m = F.register(new THREE.Mesh(geo, mat), LAYER.wall);
@@ -4041,7 +4045,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
       });
       /* v226 (req 5219): the reveal kit in the recess, its floor, and the ordered room's own face casing for this door taken
          off (the kit draws the casing round the recess) */
-      recList.forEach(function (r) {
+      (TRIALSKIP ? [] : recList).forEach(function (r) {
         var g = CastleTrim.reveal(THREE, { a: r.a, sill: r.h.z0, sp: r.sp, kind: r.h.head, n: r.n, OW: RV.OW, DT: RV.DT, bw: RV.bw, proj: RV.proj });
         var sc = (r.h.s0 + r.h.s1) / 2;
         if (!r.face1) g.rotateY(Math.PI);
