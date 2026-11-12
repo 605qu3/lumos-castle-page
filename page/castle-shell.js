@@ -880,9 +880,12 @@ window.CastleShell = { build: function (F, M, placeId, o) {
     }
     if (!row) (window.__archFall = window.__archFall || []).push(id);   /* the gate's mark 2: a part on the fallback material */
     var m = !row ? mats.wall : u.mat === 'trim' ? trimMat(row, u.mx, u.my, u.mz) : row.band && u.floor != null ? archBand(mesh, row, u) : wallMat(row, u.mx, u.my, u.mz);
-    mesh.material = ARCH === 'trio' ? (Array.isArray(m) ? m.map(function (x) { return archMat(x); }) : archMat(m)) : m;
+    /* v241 (req 5320, "Gate, the trio's trim off the offset", 12 November 2026): a casing (role trim) keeps trimMat's material
+       as the code route draws it, with no depth offset and no split of its near-level faces (they streaked its crowns) */
+    var TR = ARCH === 'trio' && u.role !== 'trim';
+    mesh.material = TR ? (Array.isArray(m) ? m.map(function (x) { return archMat(x); }) : archMat(m)) : m;
     F.register(mesh, LAYER.wall);
-    if (ARCH === 'trio') archFlat(mesh, m);
+    if (TR) archFlat(mesh, m);
     return mesh;
   };
 
