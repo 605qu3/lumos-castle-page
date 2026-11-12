@@ -9,6 +9,8 @@
   canvas { display: block; width: 100%; height: 100%; }
   #big { position: fixed; left: 12px; top: 8px; font: 700 64px/1 monospace; text-shadow: 0 2px 6px #000; }
   #sub { position: fixed; left: 14px; top: 78px; font: 15px/1.4 monospace; background: rgba(0,0,0,0.55); padding: 6px 8px; white-space: pre; }
+  #done { display: none; position: fixed; inset: 0; background: #0b0a09; padding: 18px; box-sizing: border-box; overflow: auto; font: 700 30px/1.35 monospace; white-space: pre-wrap; z-index: 5; }
+  #done small { display: block; font: 16px/1.4 system-ui; color: #bbb; margin-top: 14px; }
   #bar { position: fixed; right: 10px; top: 10px; display: flex; flex-direction: column; gap: 8px; }
   button { font: 600 17px system-ui; padding: 12px 16px; border-radius: 10px; border: 1px solid #888; background: #222; color: #fff; }
 </style>
@@ -23,6 +25,7 @@
 <canvas id="c"></canvas>
 <div id="big">starting</div>
 <div id="sub"></div>
+<div id="done"></div>
 <div id="bar"><button id="run">Run all five</button><button id="swap"></button></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="people/GLTFLoader.js"></script>
@@ -111,7 +114,16 @@
   function runAll() {
     var out = [], p = Promise.resolve();
     [1, 4, 8, 16, 32].forEach(function (n) { p = p.then(function () { return measure(n, 4); }).then(function (r) { out.push(r); results.push({ pp: r.pp, n: r.n, fps: r.fps, min: r.min }); try { sessionStorage.setItem('budget', JSON.stringify(results)); } catch (e) {} }); });
-    return p.then(function () { window.BUDGET = out; return out; });
+    return p.then(function () {
+      window.BUDGET = out;
+      var d = document.getElementById('done'), ok = out.filter(function (r) { return r.n === 8; })[0];
+      d.textContent = ['DONE. Screenshot this page.', '', (PP ? 'high-performance' : 'default GPU')].concat(
+        out.map(function (r) { return r.n + ' bodies: ' + r.fps + ' fps (low ' + r.min + ')'; }),
+        ['', '8 bodies: ' + (ok && ok.fps >= 30 ? 'PASS' : 'BELOW 30')]).join('\n');
+      var sm = document.createElement('small'); sm.textContent = 'Tap anywhere to go back.'; d.appendChild(sm);
+      d.style.display = 'block'; d.onclick = function () { d.style.display = 'none'; };
+      return out;
+    });
   }
   document.getElementById('run').onclick = function () { runAll(); };
   document.getElementById('swap').textContent = PP ? 'Reload with default GPU preference' : 'Reload with high-performance';
