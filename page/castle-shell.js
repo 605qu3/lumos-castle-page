@@ -608,8 +608,9 @@ window.CastleShell = { build: function (F, M, placeId, o) {
      Blender standing in their place (page/arch/trial-5270-trial.glb, shell.html) */
   var ARCH = (/[?&]arch=([\w-]+)/.exec(window.location.search || '') || [])[1] || null, TRIO = ['entrance-hall', 'great-hall-doors-passage', 'great-hall'];
   /* req 5289 (the Blender trial again): ?arch=trial&surr=1 leaves the code's stepped casings of the nine openings in the trio unbuilt, the glb's
-     surrounds (page/arch/trial-5289-surrounds.glb, shell.html) standing in their place. No flag, nothing changes */
-  var SURR = ARCH === 'trial' && /[?&]surr=1/.test(window.location.search || ''),
+     surrounds (page/arch/trial-5289-surrounds.glb, shell.html) standing in their place. No flag, nothing changes.
+     v240 (req 5320, step 3 (5) surrounds, 12 November 2026): ?arch=trio too, its glb carrying the nine as role trim parts */
+  var SURR = (ARCH === 'trial' && /[?&]surr=1/.test(window.location.search || '')) || ARCH === 'trio',
     SURR_OPS = ['front-doors', 'great-hall-doors-passage-west', 'kitchens-door', 'dungeon-stair', 'chamber-door', 'hall-chamber-door', 'classrooms-mouth', 'hall-cupboard-door', 'hall-slot-cupboard-door'];
   var GHP = (function () { var q = /[?&]ghp=([012])/.exec(window.location.search || ''); return q ? +q[1] : 1; })();
   function caseMv(g) { return DPRE ? DPRE.mv : CASED ? Object.assign({}, g.op.hmv || {}, CASED.mv) : g.op.hmv || null; }
