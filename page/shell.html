@@ -400,7 +400,7 @@ scene.add(shell.group);
   window.__arch = { flag: m[1], loaded: false, meshes: 0, owners: [], err: null };
   var go = function () {
     var files = [m[1] === 'trio' ? 'arch/castle-trio-5320.glb?v=12' : 'arch/trial-5270-' + m[1] + '.glb?v=7'];   /* req 5320 step 3: ?arch=trio, the trio built from the model */
-    if (m[1] === 'trial' && /[?&]surr=1/.test(location.search)) files.push('arch/trial-5289-surrounds.glb?v=7');   /* req 5289: the Blender surrounds of the nine openings */
+    if (m[1] === 'trial' && /[?&]surr=1/.test(location.search)) files.push('arch/trial-5289-surrounds.glb?v=8');   /* req 5289: the Blender surrounds of the nine openings */
     files.forEach(function (fn) { new THREE.GLTFLoader().load(fn, function (g) {
       var o = shell.toLocal(0, 0, 0); g.scene.position.set(o.x, o.y, o.z);
       g.scene.traverse(function (k) { if (k.isMesh) { window.__arch.meshes++; window.__arch.owners.push(k.userData.owner || ''); if (shell.archAdopt) { shell.archAdopt(k); window.__arch.adopted = (window.__arch.adopted || 0) + 1; var mt = (k.userData.mat || '?') + ':' + (k.material && k.material.type); window.__arch.mats = window.__arch.mats || {}; window.__arch.mats[mt] = (window.__arch.mats[mt] || 0) + 1; } } });
