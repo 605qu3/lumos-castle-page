@@ -178,6 +178,7 @@ Decisions, 8 October 2026, each Godric's from a plan to scale (assets/review/dor
 <script src="castle.js?v=12"></script>
 <script src="castle-ear.js?v=1"></script>
 <script src="castle-events.js?v=31"></script>
+<script src="castle-weather.js?v=3"></script>
 <script src="castle-map.js?v=2"></script>
 <script>
 (function () {
@@ -1317,6 +1318,30 @@ var castle = window.CastleEvents ? CastleEvents.start({
   }
 }) : null;
 
+/* weather at the windows (Weather lane; page/castle-weather.js, docs/weather/checks/window-weather.md; the Architect's three
+   window records, row 5388): sunbeams with dust from the sun's own cue, and rain, snow, fog and frost on the glass, drawn
+   3 cm inside each sky plane. The module draws it all, 4 calls at most; ?wx=off lays it back. North in this frame is the
+   page angle -48.7 (the model's bearing is the page's angle plus 48.7), so a beam leans the way the real sun does. */
+var WXON = !!window.CastleWeather && new URLSearchParams(location.search).get('wx') !== 'off';
+var WX = null, wxState = { sky: 'clear' }, wxSun = { up: false, altitude: -1, bearing: 0 }, wxNext = 0;
+if (WXON) (function () {
+  var glass = [], beams = [], nr = -48.7 * Math.PI / 180;
+  windows.forEach(function (w) {
+    var a = w.deg * Math.PI / 180, inn = [-Math.sin(a), Math.cos(a)], p = w.sky.position;
+    glass.push({ at: [p.x, p.y, p.z], in: inn, w: WIN.w, h: WIN.h, slab: { side: 0, up: 0, down: 0, from: -0.25, depth: 0.25 } });
+    beams.push({ at: [p.x, p.y, p.z], in: inn, w: WIN.w, h: WIN.h, floor: 0, reach: 6 });
+  });
+  WX = { shafts: CastleWeather.shafts(THREE, beams, { north: [Math.sin(nr), -Math.cos(nr)] }), panes: CastleWeather.panes(THREE, glass, {}) };
+  WX.shafts.group.name = 'weather-shafts'; WX.panes.group.name = 'weather-panes';
+  scene.add(WX.shafts.group, WX.panes.group);
+})();
+function wxRefresh() {
+  if (!WX || !castle) return;
+  wxState = castle.weather ? castle.weather() : { sky: 'clear' };
+  wxSun = castle.sun ? castle.sun() : wxSun;
+  if (clockTime() === 'night') wxSun = { up: false, altitude: -1, bearing: 0 };
+}
+
 /* the light first, by the clock, then the way he came: the arrival, either night, or the waking */
 setLight(clockTime());
 /* the lights-out trip's flag is bare (&bedtime); ?bedtime=N is a test's visit length in minutes, not a trip */
@@ -1374,6 +1399,7 @@ function frame() {
   updateStirs(sdt);
   updateDoor(dt);
   updateSnowball(sdt); updateSplat(sdt); updateMoonOwl(sdt); updateTrunkGlow(dt);
+  if (WX) { if (t >= wxNext) { wxNext = t + 1; wxRefresh(); } WX.panes.update(wxState, t); WX.shafts.update(wxSun, wxState.sky, t); }
   if (PAST_TEST) { pastTest += dt; if (pastTest > 5) { pastTest = 0; if (PAST_TEST === 'snowball') snowballFly(); else if (PAST_TEST === 'splat') { if (!splat) splatFly(); } else moonOwlFly(); } }
   moonClock += dt;
   if (moonClock > 60 && !night && !leaving) { moonClock = 0; setLight(light); }   /* the moon rises and sets through a long visit, never mid-sequence */

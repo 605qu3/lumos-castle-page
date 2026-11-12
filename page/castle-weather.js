@@ -190,14 +190,18 @@
         pp.push(w.at[0] + ux * c[0] + w.in[0] * o2, w.at[1] + c[1], w.at[2] + uz * c[0] + w.in[1] * o2); pu.push(c[2], c[3]); ps.push(w.w, w.h);
       });
       pi.push(v, v + 1, v + 2, v, v + 2, v + 3); v += 4;
-      var y0 = w.at[1] - hh - 0.3, hv = w.h + 0.9;
+      /* w.slab { side, up, down, from, depth } reshapes the slab for a room whose wall hides what is behind its glass: the
+         dormitory's sky planes sit in front of an opaque wall, so its slab stands just inside the glass (from -0.25, depth 0.25) */
+      var sb = w.slab || {}, sdn = sb.down == null ? 0.3 : sb.down, sup = sb.up == null ? 0.6 : sb.up, sside = sb.side == null ? 0.8 : sb.side,
+          sfrom = sb.from == null ? 0.15 : sb.from, sdep = sb.depth == null ? depth : sb.depth;
+      var y0 = w.at[1] - hh - sdn, hv = w.h + sdn + sup;
       for (var i = 0; i < N; i++) {                                                  /* the weather outside: a slab of drops and flakes */
-        var q = [Math.random(), Math.random(), Math.random()], x = (q[0] - 0.5) * (w.w + 0.8), dz = 0.15 + q[2] * depth;
+        var q = [Math.random(), Math.random(), Math.random()], x = (q[0] - 0.5) * (w.w + sside), dz = sfrom + q[2] * sdep;
         var bx = w.at[0] + ux * x - w.in[0] * dz, bz = w.at[2] + uz * x - w.in[1] * dz, by = y0 + q[1] * hv;
         for (var e = 0; e < 2; e++) { sp.push(bx, by, bz); sr.push(y0, hv); sd.push(q[0], q[1], q[2]); sl.push(ux, uz); se.push(e); }
       }
       for (var j = 0; j < N * 2; j++) {
-        var r2 = [Math.random(), Math.random(), Math.random()], fx = (r2[0] - 0.5) * (w.w + 0.8), fz = 0.1 + r2[2] * depth;
+        var r2 = [Math.random(), Math.random(), Math.random()], fx = (r2[0] - 0.5) * (w.w + sside), fz = sfrom - 0.05 + r2[2] * sdep;
         fp.push(w.at[0] + ux * fx - w.in[0] * fz, y0 + r2[1] * hv, w.at[2] + uz * fx - w.in[1] * fz); fr.push(y0, hv); fd.push(r2[0], r2[1], r2[2]); fl.push(ux, uz);
       }
     });
