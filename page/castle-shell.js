@@ -824,10 +824,35 @@ window.CastleShell = { build: function (F, M, placeId, o) {
      reads it; a pane takes the page's pane; a row with a band (the Great Hall's founders-rubble under 6.0) is split by
      each triangle's height over the floor; the trio's stone draws on its own copies of the materials, pushed back by a
      polygon offset, so a code floor, vault or porch on the same plane is the one seen */
+  /* v239 (req 5320, "Design gate, step 3 again" mark 1, 12 November 2026): the offset passes the page's rank ceiling on
+     both terms (a place's pieces past the stood one take factor and units to 6, its wall pieces units to 24; line 4240),
+     so the Great Hall's code floor, ranked back from the Entrance Hall, is again the one seen over the void's floor face.
+     Factor 1, units 4 lost to it: the doors shot's floor joints gone, its slabs a shade darker. The slope term only on
+     the flat faces (archFlat): on the upright ones it drew pale lines at a wall corner and up the porch's wall, the v177
+     fault (line 4232), and units alone on the flat ones lost the floor again (step3b and step3c, measured) */
   var archOff = {};
-  function archMat(m) {
-    if (!archOff[m.uuid]) { var c = m.clone(); c.polygonOffset = true; c.polygonOffsetFactor = 1; c.polygonOffsetUnits = 4; archOff[m.uuid] = c; }
-    return archOff[m.uuid];
+  function archMat(m, flat) {
+    var k = m.uuid + (flat ? ':flat' : '');
+    if (!archOff[k]) { var c = m.clone(); c.polygonOffset = true; c.polygonOffsetFactor = flat ? 7 : 0; c.polygonOffsetUnits = 28; archOff[k] = c; }
+    return archOff[k];
+  }
+  /* the mesh's flat triangles (|normal y| over 0.7) to a child mesh on the flat offset; the upright stay on the mesh */
+  function archFlat(mesh, m) {
+    var g = mesh.geometry, P = g.attributes.position, I = g.index ? g.index.array : null, n = I ? I.length : P.count, up = [], fl = [];
+    if (Array.isArray(m) || (g.groups && g.groups.length > 1)) return;
+    var a = new THREE.Vector3(), b = new THREE.Vector3(), c = new THREE.Vector3();
+    for (var j = 0; j < n; j += 3) {
+      var ia = I ? I[j] : j, ib = I ? I[j + 1] : j + 1, ic = I ? I[j + 2] : j + 2;
+      a.fromBufferAttribute(P, ia); b.fromBufferAttribute(P, ib); c.fromBufferAttribute(P, ic);
+      b.sub(a); c.sub(a); b.cross(c); var L = b.length();
+      (L > 1e-12 && Math.abs(b.y / L) > 0.7 ? fl : up).push(ia, ib, ic);
+    }
+    if (!fl.length) return;
+    if (!up.length) { mesh.material = archMat(m, true); return; }
+    var g2 = g.clone(); g.setIndex(up); g2.setIndex(fl);
+    var f = new THREE.Mesh(g2, archMat(m, true)); f.name = mesh.name + '.flat';
+    f.userData = Object.assign({}, mesh.userData, { part: 'flat' });
+    mesh.add(f); F.register(f, LAYER.wall);
   }
   function archBand(mesh, row, u) {
     var g = mesh.geometry, P = g.attributes.position, I = g.index ? g.index.array : null, n = I ? I.length : P.count, lo = [], hi = [];
@@ -846,6 +871,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
   }
   out.archAdopt = function (mesh) {
     var u = mesh.userData || {}, id = u.room || u.owner, row = W2[id] ? W2[id].row : rowOf({ id: id, floor: 0 });
+    if (u.part === 'flat') return mesh;   /* v239: archFlat's child, already on its material and registered */
     if (!row && u.host) { id = u.host; row = W2[id] ? W2[id].row : rowOf({ id: id, floor: 0 }); }   /* a pocket with no row: its host's stone */
     if (u.mat === 'glass') {
       if (!mats.pane) mats.pane = new THREE.MeshBasicMaterial({ color: new THREE.Color(tone('sky-day')).convertSRGBToLinear(), side: THREE.DoubleSide });
@@ -853,8 +879,9 @@ window.CastleShell = { build: function (F, M, placeId, o) {
     }
     if (!row) (window.__archFall = window.__archFall || []).push(id);   /* the gate's mark 2: a part on the fallback material */
     var m = !row ? mats.wall : u.mat === 'trim' ? trimMat(row, u.mx, u.my, u.mz) : row.band && u.floor != null ? archBand(mesh, row, u) : wallMat(row, u.mx, u.my, u.mz);
-    mesh.material = ARCH === 'trio' ? (Array.isArray(m) ? m.map(archMat) : archMat(m)) : m;
+    mesh.material = ARCH === 'trio' ? (Array.isArray(m) ? m.map(function (x) { return archMat(x); }) : archMat(m)) : m;
     F.register(mesh, LAYER.wall);
+    if (ARCH === 'trio') archFlat(mesh, m);
     return mesh;
   };
 
