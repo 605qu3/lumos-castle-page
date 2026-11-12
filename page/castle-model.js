@@ -562,8 +562,8 @@ window.CASTLE_MODEL = {
     {
       "id": "hall-cupboard", "first": "PS", "name": "the broom cupboard off the Entrance Hall, buckets and mops inside", "level": "G", "age": "P2", "use": "store",
       "look": {"rest": -20, "down": -55, "up": 35, "about": "degrees about the eye at 1.35, positive up (docs/architect/vertical-views.md)"},
-      "shape": { "rect": [66.4, 63.2, 67.6, 64.8] }, "floor": 0, "ceiling": 2.4,
-      "about": "Godric's 14.1 on architect-q14-batch1-1013 (13 October 2026, 7.40 pm; Magic's B21, the Architect's ledger, line 3): in the 3 m of wall between the two halls, its door on the Entrance Hall's west wall north of the Great Hall's doors; 1.6 m along the wall by 1.2 deep behind 0.4 m of the hall's wall, 1.4 m of wall left to the Great Hall; across the hall from the front doors; unlocked (PoA 21). Inside, among the buckets and mops, one bucket always upturned, just right to sit on (upturned-bucket; Godric's t1)",
+      "shape": { "rect": [66.4, 63.2, 67.6, 64.75] }, "floor": 0, "ceiling": 2.4,
+      "about": "Godric's 14.1 on architect-q14-batch1-1013 (13 October 2026, 7.40 pm; Magic's B21, the Architect's ledger, line 3): in the 3 m of wall between the two halls, its door on the Entrance Hall's west wall north of the Great Hall's doors; 1.6 m along the wall by 1.2 deep behind 0.4 m of the hall's wall, 1.4 m of wall left to the Great Hall; across the hall from the front doors; unlocked (PoA 21). Inside, among the buckets and mops, one bucket always upturned, just right to sit on (upturned-bucket; Godric's t1). North end 64.8 to 64.75, provisional (12 November 2026, Fawkes ruling on the porch read): 1.55 m along the wall, so 0.25 of stone stands between it and the elves' stair K at y 65.0, the castle's thinnest wall, where the model had left 0.20",
       "state": "designed", "cite": "PoA 21"
     },
     {
