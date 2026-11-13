@@ -474,7 +474,7 @@ window.CASTLE_MODEL = {
     {
       "id": "corridor", "first": "PS", "name": "the Fat Lady's corridor", "group": "gryffindor-suite", "level": "7", "age": "P3", "use": "passage",
       "look": {"rest": -1, "down": -45, "up": 45, "about": "the landing at -1.98: down -65, up +55 (req 303)"},
-      "shape": { "rect": [-1.5, 6.41, 1.5, 25.81] }, "walls": { "south": 0.3, "west": 0.3, "east": 0.45, "north": 0.3 },
+      "shape": { "poly": [[-0.9, 6.41], [1.5, 6.41], [1.5, 25.81], [-1.5, 25.81], [-1.5, 7.6]] }, "walls": { "south": 0.3, "west": 0.3, "east": 0.45, "north": 0.3 },
       "floor": 0, "ceiling": 4.5,
       "page": "corridor.html", "frame": { "x": -2.31, "y": 8.71, "turn": -90, "z": 0 },
       "state": "built", "cite": "PS 7"
