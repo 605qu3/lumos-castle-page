@@ -1,0 +1,31 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Vault bake test</title>
+<style>html,body{margin:0;background:#111}canvas{display:block}</style></head><body>
+<!-- no local three.js exists in the archive; same r128 tag and local loader as page/ipad-budget.html -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="../people/GLTFLoader.js"></script>
+<script>
+var errs=[];window.addEventListener('error',function(e){errs.push(e.message)});
+var r=new THREE.WebGLRenderer({antialias:true});r.setSize(innerWidth,innerHeight);document.body.appendChild(r.domElement);
+var s=new THREE.Scene();s.background=new THREE.Color(0x0d0d10);
+var Q=location.search,mid=/light=mid/.test(Q),gl=(Q.match(/glb=([\w.]+)/)||[0,'vault_mb_512.glb'])[1];
+if(mid){/* the castle's own mid-light (castle-light.js): fill 0.65 cool noon sky over 0x3a332c, a small ambient, gold candles 0xffb466 at 1.3 reach 13 decay 1.2 */
+s.add(new THREE.HemisphereLight(0xb8cde6,0x3a332c,0.65));s.add(new THREE.AmbientLight(0xffffff,0.12));
+var c=new THREE.PointLight(0xffb466,1.3,13,1.2);c.position.set(0,2.4,0.8);s.add(c);var c2=new THREE.PointLight(0xffb466,1.3,13,1.2);c2.position.set(0,2.2,-1.4);s.add(c2);}
+else{s.add(new THREE.HemisphereLight(0xfff0d8,0x504030,2.4));
+var d=new THREE.DirectionalLight(0xffe2b0,2.0);d.position.set(1,3,3);s.add(d);}
+var cam=new THREE.PerspectiveCamera(70,innerWidth/innerHeight,0.05,50);
+cam.position.set(0,1.6,0.2);cam.rotation.order='YXZ';cam.rotation.x=30*Math.PI/180;
+new THREE.GLTFLoader().load('../../assets/design/addon-trials-1110/'+gl,function(g){
+  g.scene.traverse(function(o){if(!o.isMesh)return;
+    var geo=o.geometry,m=o.material;
+    /* r128 has no texture.channel: the loader puts TEXCOORD_1 in uv2; the textures are baked on it, so it becomes uv */
+    var a=geo.attributes.uv2||geo.attributes.uv; geo.setAttribute('uv',a);geo.setAttribute('uv2',a);
+    o.material=new THREE.MeshStandardMaterial({map:m.map,normalMap:m.normalMap,aoMap:m.metalnessMap,
+      roughnessMap:m.roughnessMap,metalnessMap:m.metalnessMap,roughness:1,metalness:1,side:THREE.DoubleSide});});
+  s.add(g.scene);
+  requestAnimationFrame(function(){r.render(s,cam);
+    var i=r.info;window.__res=JSON.stringify({calls:i.render.calls,triangles:i.render.triangles,textures:i.memory.textures,errs:errs});
+    var p=document.createElement('pre');p.style.cssText='position:fixed;left:6px;top:6px;color:#fff;margin:0;font:12px monospace';
+    p.textContent=window.__res;document.body.appendChild(p);console.log(window.__res);});
+},undefined,function(e){console.error('load failed',e&&e.message||e)});
+</script></body></html>
