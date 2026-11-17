@@ -149,17 +149,19 @@
     'float h21(vec2 p){ p=fract(p*vec2(123.34,456.21)); p+=dot(p,p+45.32); return fract(p.x*p.y); }' +
     'float vn(vec2 p){ vec2 i=floor(p), f=fract(p); f=f*f*(3.0-2.0*f); return mix(mix(h21(i),h21(i+vec2(1,0)),f.x),mix(h21(i+vec2(0,1)),h21(i+vec2(1,1)),f.x),f.y); }' +
     'void main(){ vec2 m=vUv*vSize; vec3 col=vec3(0.82,0.86,0.9); float a=0.0;' +
-    'if(uKind>0.5&&uKind<1.5){' +                                                                    /* rain: beads and runs */
-      'vec2 p=m*vec2(7.0,5.0); vec2 g=floor(p), f=fract(p)-0.5; float hh=h21(g), h2=h21(g+7.1);' +
+    'if((uKind>0.5&&uKind<1.5)||uKind>3.5){ float sl=step(3.5,uKind);' +                            /* rain: beads and runs; sleet (4): the same, half the beads white slush sliding slowly */
+      'vec2 p=m*vec2(7.0,5.0); p.y+=sl*uTime*(0.06+0.2*h21(vec2(floor(p.x),9.0))); vec2 g=floor(p), f=fract(p)-0.5; float hh=h21(g), h2=h21(g+7.1);' +
       'vec2 off=(vec2(hh,h2)-0.5)*0.5; float r=0.07+0.13*h2; float d=length((f-off)*vec2(1.0,0.85));' +
       'float bead=smoothstep(r,r*0.55,d)*step(0.35,hh);' +
       'float rim=smoothstep(r,r*0.8,d)-smoothstep(r*0.8,r*0.5,d);' +
       'float cx=floor(m.x*13.0), hc=h21(vec2(cx,3.0)); float lx=abs(fract(m.x*13.0)-0.5);' +
       'float yy=fract(m.y*0.45+uTime*(0.04+0.08*hc)+hc+m.x*uWind*0.15); float trail=smoothstep(0.0,0.5,yy)*(1.0-smoothstep(0.5,0.56,yy));' +
       'float run=step(0.55,hc)*smoothstep(0.09,0.02,lx)*trail*0.5;' +
+      'float slush=sl*step(0.45,h2)*smoothstep(r*1.15,r*0.7,d)*step(0.35,hh);' +
       'a=(0.05+bead*0.46+rim*0.34+run)*uAmount; col=mix(vec3(0.55,0.62,0.7),vec3(0.93,0.96,0.98),bead);' +
+      'col=mix(col,vec3(0.90,0.92,0.94),slush); a=max(a,slush*0.9*uAmount);' +
     '} else if(uKind>1.5&&uKind<2.5){ a=0.07*uAmount; col=vec3(0.88,0.92,0.96);' +                   /* snow: a cold, pale pane */
-    '} else if(uKind>2.5){ float n=vn(m*1.5+vec2(uTime*0.03,0.0))*0.6+vn(m*4.0)*0.4; float see=clamp(2.0-uAmount,0.0,1.0)*uShapes;' +   /* fog: milky, far shapes fading */
+    '} else if(uKind>2.5&&uKind<3.5){ float n=vn(m*1.5+vec2(uTime*0.03,0.0))*0.6+vn(m*4.0)*0.4; float see=clamp(2.0-uAmount,0.0,1.0)*uShapes;' +   /* fog: milky, far shapes fading */
       'col=vec3(0.80,0.805,0.795)+0.03*(n-0.5);' +
       'float h1=0.20+0.07*vn(vec2(m.x*0.5,1.0))+0.035*vn(vec2(m.x*3.0,2.0))+0.025*vn(vec2(m.x*11.0,3.0))+0.012*vn(vec2(m.x*27.0,4.0));' +   /* the nearer skyline: hills and tree tops */
       'float h2=0.33+0.06*vn(vec2(m.x*0.35,5.0))+0.02*vn(vec2(m.x*2.0,6.0));' +   /* the farther, higher and fainter */
@@ -230,10 +232,12 @@
     [pane, streaks, flakes].forEach(function (m, i) { m.frustumCulled = false; m.renderOrder = 7 + i; m.visible = false; group.add(m); });
     var calls = 0;
     function update(weather, t) {
-      var k = wkind(weather), kind = k.sky === 'rain' ? 1 : k.sky === 'snow' ? 2 : k.sky === 'fog' ? 3 : 0;
-      pane.visible = kind > 0 || k.frost; streaks.visible = kind === 1; flakes.visible = kind === 2;
+      var k = wkind(weather), kind = k.sky === 'rain' ? 1 : k.sky === 'snow' ? 2 : k.sky === 'fog' ? 3 : k.sky === 'sleet' ? 4 : 0;
+      pane.visible = kind > 0 || k.frost; streaks.visible = kind === 1 || kind === 4; flakes.visible = kind === 2;
       calls = (pane.visible ? 1 : 0) + (streaks.visible ? 1 : 0) + (flakes.visible ? 1 : 0);
       var wind = k.windy ? 1 : 0.15;
+      if (kind === 4) wind = weather && weather.calm ? 0 : k.windy ? 1.4 : 1.1;   /* sleet always comes on the wind in the books (B4 ch21, B6 ch12); calm only for the check's bad */
+      sm.uniforms.uLen.value = kind === 4 ? 0.22 : 0.55; sm.uniforms.uSpeed.value = kind === 4 ? 6 : 9;
       pm.uniforms.uKind.value = kind; pm.uniforms.uFrost.value = k.frost ? 1 : 0; pm.uniforms.uTime.value = t || 0;
       pm.uniforms.uAmount.value = density; pm.uniforms.uWind.value = wind;
       sm.uniforms.uTime.value = fm.uniforms.uTime.value = t || 0; sm.uniforms.uWind.value = fm.uniforms.uWind.value = wind;
@@ -297,7 +301,7 @@
 
   /* the rule, apart from any drawing, so a check can read it: which sky, whether a storm, whether flakes */
   function ceilingKind(weather, christmas) {
-    var k = wkind(weather), kind = { clear: 0, cloudy: 1, rain: 2, snow: 3, fog: 4 }[k.sky];
+    var k = wkind(weather), kind = { clear: 0, cloudy: 1, rain: 2, snow: 3, fog: 4, sleet: 2 }[k.sky];   /* sleet: the ceiling shows it as rain's grey */
     if (kind == null) kind = 0;
     return { kind: kind, storm: kind === 2 && k.windy, flakes: kind === 3 && !!christmas };
   }
