@@ -159,7 +159,15 @@
       'float run=step(0.55,hc)*smoothstep(0.09,0.02,lx)*trail*0.5;' +
       'a=(0.05+bead*0.46+rim*0.34+run)*uAmount; col=mix(vec3(0.55,0.62,0.7),vec3(0.93,0.96,0.98),bead);' +
     '} else if(uKind>1.5&&uKind<2.5){ a=0.07*uAmount; col=vec3(0.88,0.92,0.96);' +                   /* snow: a cold, pale pane */
-    '} else if(uKind>2.5){ float n=vn(m*2.2+uTime*0.02)*0.5+vn(m*5.0)*0.3; a=(0.5+0.3*n)*min(1.0,uAmount); col=vec3(0.86,0.88,0.89); }' +   /* fog: the view blanked pale */
+    '} else if(uKind>2.5){ float n=vn(m*1.5+vec2(uTime*0.03,0.0))*0.6+vn(m*4.0)*0.4; float see=clamp(2.0-uAmount,0.0,1.0);' +   /* fog: milky, far shapes fading */
+      'col=vec3(0.80,0.805,0.795)+0.03*(n-0.5);' +
+      'float h1=0.20+0.07*vn(vec2(m.x*0.5,1.0))+0.035*vn(vec2(m.x*3.0,2.0))+0.025*vn(vec2(m.x*11.0,3.0))+0.012*vn(vec2(m.x*27.0,4.0));' +   /* the nearer skyline: hills and tree tops */
+      'float h2=0.33+0.06*vn(vec2(m.x*0.35,5.0))+0.02*vn(vec2(m.x*2.0,6.0));' +   /* the farther, higher and fainter */
+      'col=mix(col,vec3(0.60,0.62,0.61),smoothstep(h2+0.012,h2-0.012,vUv.y)*0.16*see);' +
+      'col=mix(col,vec3(0.50,0.53,0.52),smoothstep(h1+0.012,h1-0.012,vUv.y)*0.33*see);' +
+      'vec2 q=m*vec2(26.0,26.0); vec2 gq=floor(q), fq=fract(q)-0.5; float hq=h21(gq); float low=smoothstep(0.42,0.04,vUv.y);' +   /* condensation low on the glass */
+      'float dq=length(fq-(vec2(hq,h21(gq+3.3))-0.5)*0.4); float bq=smoothstep(0.24,0.14,dq)*step(1.0-low*0.8,hq);' +
+      'col=mix(col,vec3(0.68,0.70,0.70),bq*0.5); a=min(1.0,(0.88+0.06*n)*uAmount); }' +
     'if(uFrost>0.0){ float e=min(min(vUv.x*vSize.x,(1.0-vUv.x)*vSize.x),min(vUv.y*vSize.y,(1.0-vUv.y)*vSize.y));' +
       'float n=vn(m*9.0)*0.6+vn(m*22.0)*0.4; float fr=smoothstep(0.34+0.12*n,0.0,e-0.1*n)*uFrost;' +
       'col=mix(col,vec3(0.94,0.97,1.0),fr); a=max(a,fr*(0.55+0.3*n)); }' +
