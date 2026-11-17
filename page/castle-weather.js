@@ -282,7 +282,7 @@
     'void main(){ float lum=dot(uBase,vec3(0.3,0.59,0.11)); float sp=0.02+0.05*uWind+0.06*uStorm;' +
       'vec2 q=vP*0.12+vec2(uTime*sp,uTime*sp*0.4); float n=fbm(q+0.6*vec2(fbm(q*0.7+uTime*0.01),fbm(q*0.7+5.0)));' +
       'float g=lum*1.5+0.03, a=0.0, k=1.0;' +
-      'if(uKind<0.5){ a=smoothstep(0.5,0.72,n)*0.75*smoothstep(0.1,0.3,lum); g=lum*1.8+0.1; }' +                  /* clear: a few thin clouds by day, none at night */
+      'if(uKind<0.5){ a=smoothstep(0.64,0.82,n)*0.45*smoothstep(0.1,0.3,lum); g=lum*1.5+0.08; }' +                  /* clear: a few thin clouds by day, none at night (16 Nov: from 0.5 to 0.72 at 0.75 half the sky was cloud and read overcast) */
       'else if(uKind<1.5){ a=0.9; k=0.6+0.8*n; }' +                                                              /* cloudy: a grey sheet */
       'else if(uKind<2.5){ a=0.96; k=mix(0.55+0.6*n,0.18+0.55*n,uStorm); g=lum*1.2+0.02; }' +                         /* rain: darker; a storm darker still */
       'else if(uKind<3.5){ a=0.9; k=0.9+0.25*n; g=mix(g,0.92,0.45); }' +                                           /* snow: a pale sheet */
