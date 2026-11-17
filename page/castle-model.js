@@ -1980,7 +1980,7 @@ window.CASTLE_MODEL = {
     { "id": "corridor-landing", "kind": "landing, one of the moving stair's places", "room": "corridor",
       "shape": { "rect": [-1.5, 23.41, 1.5, 25.81] }, "z": -1.98, "state": "built" },
     { "id": "marble-staircase", "kind": "magnificent marble staircase, facing the front doors: its first flight and half-landing (the well's M1)",
-      "rooms": ["stair hall"], "span": [[73, 50], [87, 45.2]], "up": [0, -1], "from": 0, "to": 2.6, "treads": 15, "rise": 0.173,
+      "rooms": ["stair hall"], "span": [[73, 49.76], [87, 45.2]], "up": [0, -1], "from": 0, "to": 2.6, "treads": 15, "rise": 0.173,
       "landing": [70.4, 43, 89.6, 45.2], "state": "designed",
       "about": "the layout PDF's 9 ([73, 43, 87, 50]): 14 m wide, rising south from the Entrance Hall into the well, fifteen treads of 0.32 m to a half-landing at 2.6 m. Godric's 12.1 (13 October 2026, 4.57 pm; sheet architect-well-1013-1653): the half-landing widened to the strips (x 70.4 to 89.6), the stair dividing there into two flights rising south to the first-floor galleries (well-M1w, well-M1e), then one flight a floor up the east strip (well-M2 to well-M7), the six moving flights up the west (well-S1 to well-S6, the sixth to the Fat Lady's landing bay at +34.42), galleries along both long walls and a landing at each end on every floor; the entries well-* below, from tools/architect-well-sheet.py by tools/architect-well-model.py",
       "cite": "PS 7, PoA 14, PS 8, OotP 32; Godric's 12.1 (13 October 2026, 4.57 pm)" },
