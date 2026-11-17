@@ -336,7 +336,7 @@
    "ceiling": 4.5,
    "state": "proposed",
    "cite": "",
-   "about": "req 3221 item 3 (Fawkes, 7 November 2026, 11.40 pm): the storey over the hospital wing and its dispensary stood empty between Myrtle's bathroom (to y 25.0) and the staff bedroom (from 29.85), so the outside view saw through to the room beyond; an unentered store fills it, no door, its east face on the range's line at 160.05 like the bedroom's. Windows on that face to come with the range's dressing.",
+   "about": "req 3221 item 3 (Fawkes, 7 November 2026, 11.40 pm): the storey over the hospital wing and its dispensary stood empty between Myrtle's bathroom (to y 25.0) and the staff bedroom (from 29.85), so the outside view saw through to the room beyond; a store fills it, with a provisional way in (ledger 413, card req 5768), its east face on the range's line at 160.05 like the bedroom's. Windows on that face to come with the range's dressing.",
    "layout_space": "2:fill-3221",
    "entered_from": "docs/architect/floors/2.json"
   },
@@ -1437,7 +1437,7 @@
    "ceiling": 4.5,
    "state": "proposed",
    "cite": "",
-   "about": "req 3221 item 3 (voids.json row porters-squint): on 2 the angle between the Astronomy drum's outer face (r 8.0 from 80.0, 77.0) and the north wall, north of astronomy-stair-foot-2 (its wall 68.75 to 69.25), stood unroomed to the face at 72, so the outside view saw into it over the Entrance Hall; an unentered store fills it, no door, the outline of library-returns-store-4-east two floors up (pocket 4-P8's east end) run to the face at 72.0, east to 88.75 where the stair foot runs to 88.75 on this floor (0.5 to slug-club-dining-room), and its west end at x 83.85, 0.5 clear of astronomy-lobby-2-lantern-door (82.9, 68.75, w 0.9), whose way runs north through the drum wall there. No window: the model has none on this face on 2.",
+   "about": "req 3221 item 3 (voids.json row porters-squint): on 2 the angle between the Astronomy drum's outer face (r 8.0 from 80.0, 77.0) and the north wall, north of astronomy-stair-foot-2 (its wall 68.75 to 69.25), stood unroomed to the face at 72, so the outside view saw into it over the Entrance Hall; a store fills it, with a provisional way in (ledger 413, card req 5768), the outline of library-returns-store-4-east two floors up (pocket 4-P8's east end) run to the face at 72.0, east to 88.75 where the stair foot runs to 88.75 on this floor (0.5 to slug-club-dining-room), and its west end at x 83.85, 0.5 clear of astronomy-lobby-2-lantern-door (82.9, 68.75, w 0.9), whose way runs north through the drum wall there. No window: the model has none on this face on 2.",
    "layout_space": "2:fill-3221",
    "entered_from": "docs/architect/floors/2.json"
   }

@@ -953,7 +953,7 @@
    "ceiling": 4.5,
    "state": "proposed",
    "cite": "",
-   "about": "req 3221 item 3 (Fawkes, 7 November 2026, 11.40 pm; ledger 373): the north range's 2 m north wall behind the caretaker's office and its store (both windowless by canon, CoS 8 L9029) stood hollow from y 70.5 to the face at 72.0, so the outside view saw into it over the detention dungeon; an unentered store fills it, no door, the pair of caretakers-long-cupboard-1 on the floor above (104.25 to 117.75, 70.25 to 72.0). West of x 104 the same wall stays solid by design: the waiting chamber's window and the punishment room's slit run 2.0 m through it.",
+   "about": "req 3221 item 3 (Fawkes, 7 November 2026, 11.40 pm; ledger 373): the north range's 2 m north wall behind the caretaker's office and its store (both windowless by canon, CoS 8 L9029) stood hollow from y 70.5 to the face at 72.0, so the outside view saw into it over the detention dungeon; a store fills it, with a provisional way in (ledger 413, card req 5768), the pair of caretakers-long-cupboard-1 on the floor above (104.25 to 117.75, 70.25 to 72.0). West of x 104 the same wall stays solid by design: the waiting chamber's window and the punishment room's slit run 2.0 m through it.",
    "layout_space": "G:fill-3221",
    "entered_from": "docs/architect/floors/G.json"
   },

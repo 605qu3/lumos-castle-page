@@ -1552,7 +1552,7 @@
    "ceiling": 4.5,
    "state": "proposed",
    "cite": "",
-   "about": "req 3221 item 3 (voids.json row teachers-study-6-east): over the study's north-west corner the north wall under the P5 cross gable (nr-gable, x 108 to 118) stood unroomed on 7 from 36.4 up to the feast loft's floor at 41.6, so the outside view saw into it; an unentered store fills it, no door, behind the warming room's party wall at x 113.8, 0.5 off teachers-study-7-east-a (to y 69.0; the strip north of it boxed eaves under the hip until ledger 375, eaves-press-7-east-a since req 3234, 0.5 east of this press) and 3.6 north of feast-ladder-well (Hidden Ways' H36, untouched). East edge 115.5, where the gable's east plane stands 4.5 over the floor on feast-loft's numbers (1.8 in 1 from 36.4 at x 118); nr-gable's own eaves read 38.6, which leaves more room. No window: the model has none on this face on 6 or 7; feast-loft-window (113.0, 73.0) is the loft's.",
+   "about": "req 3221 item 3 (voids.json row teachers-study-6-east): over the study's north-west corner the north wall under the P5 cross gable (nr-gable, x 108 to 118) stood unroomed on 7 from 36.4 up to the feast loft's floor at 41.6, so the outside view saw into it; a store fills it, with a provisional way in (ledger 413, card req 5768), behind the warming room's party wall at x 113.8, 0.5 off teachers-study-7-east-a (to y 69.0; the strip north of it boxed eaves under the hip until ledger 375, eaves-press-7-east-a since req 3234, 0.5 east of this press) and 3.6 north of feast-ladder-well (Hidden Ways' H36, untouched). East edge 115.5, where the gable's east plane stands 4.5 over the floor on feast-loft's numbers (1.8 in 1 from 36.4 at x 118); nr-gable's own eaves read 38.6, which leaves more room. No window: the model has none on this face on 6 or 7; feast-loft-window (113.0, 73.0) is the loft's.",
    "layout_space": "7:fill-3221",
    "entered_from": "docs/architect/floors/7.json"
   },
@@ -1574,7 +1574,7 @@
    "ceiling": 4.5,
    "state": "proposed",
    "cite": "",
-   "about": "req 3234 (Exterior, 8 November 2026, 2.12 am; ledger 376): since ledger 375 (model v300) raised nr-east's eaves 38.6 to 41.6, the strip y 69.5 to 72.0 behind astronomy-waiting-room-7, once boxed eaves under the hip, stood a full storey with nothing on floor 7 at the curtain, so the outside saw the room's north wall 3 m back. An unentered store fills it, no door, no window (the model has none on this face on 6 or 7), 4.5 high as the rooms, on their party lines, by gable-press-7's precedent (ledger 374). Its use and name to come.",
+   "about": "req 3234 (Exterior, 8 November 2026, 2.12 am; ledger 376): since ledger 375 (model v300) raised nr-east's eaves 38.6 to 41.6, the strip y 69.5 to 72.0 behind astronomy-waiting-room-7, once boxed eaves under the hip, stood a full storey with nothing on floor 7 at the curtain, so the outside saw the room's north wall 3 m back. A store fills it, with a provisional way in (ledger 413, card req 5768), no window (the model has none on this face on 6 or 7), 4.5 high as the rooms, on their party lines, by gable-press-7's precedent (ledger 374). Its use and name to come.",
    "layout_space": "7:fill-3234",
    "entered_from": "docs/architect/floors/7.json"
   },
@@ -1596,7 +1596,7 @@
    "ceiling": 4.5,
    "state": "proposed",
    "cite": "",
-   "about": "req 3234 (Exterior, 8 November 2026, 2.12 am; ledger 376): since ledger 375 (model v300) raised nr-east's eaves 38.6 to 41.6, the strip y 69.5 to 72.0 behind teachers-study-7-east-a (west end 0.5 off gable-press-7), once boxed eaves under the hip, stood a full storey with nothing on floor 7 at the curtain, so the outside saw the room's north wall 3 m back. An unentered store fills it, no door, no window (the model has none on this face on 6 or 7), 4.5 high as the rooms, on their party lines, by gable-press-7's precedent (ledger 374). Its use and name to come.",
+   "about": "req 3234 (Exterior, 8 November 2026, 2.12 am; ledger 376): since ledger 375 (model v300) raised nr-east's eaves 38.6 to 41.6, the strip y 69.5 to 72.0 behind teachers-study-7-east-a (west end 0.5 off gable-press-7), once boxed eaves under the hip, stood a full storey with nothing on floor 7 at the curtain, so the outside saw the room's north wall 3 m back. A store fills it, with a provisional way in (ledger 413, card req 5768), no window (the model has none on this face on 6 or 7), 4.5 high as the rooms, on their party lines, by gable-press-7's precedent (ledger 374). Its use and name to come.",
    "layout_space": "7:fill-3234",
    "entered_from": "docs/architect/floors/7.json"
   },
@@ -1618,7 +1618,7 @@
    "ceiling": 4.5,
    "state": "proposed",
    "cite": "",
-   "about": "req 3234 (Exterior, 8 November 2026, 2.12 am; ledger 376): since ledger 375 (model v300) raised nr-east's eaves 38.6 to 41.6, the strip y 69.5 to 72.0 behind study-room-7-east, once boxed eaves under the hip, stood a full storey with nothing on floor 7 at the curtain, so the outside saw the room's north wall 3 m back. An unentered store fills it, no door, no window (the model has none on this face on 6 or 7), 4.5 high as the rooms, on their party lines, by gable-press-7's precedent (ledger 374). Its use and name to come.",
+   "about": "req 3234 (Exterior, 8 November 2026, 2.12 am; ledger 376): since ledger 375 (model v300) raised nr-east's eaves 38.6 to 41.6, the strip y 69.5 to 72.0 behind study-room-7-east, once boxed eaves under the hip, stood a full storey with nothing on floor 7 at the curtain, so the outside saw the room's north wall 3 m back. A store fills it, with a provisional way in (ledger 413, card req 5768), no window (the model has none on this face on 6 or 7), 4.5 high as the rooms, on their party lines, by gable-press-7's precedent (ledger 374). Its use and name to come.",
    "layout_space": "7:fill-3234",
    "entered_from": "docs/architect/floors/7.json"
   },
@@ -1640,7 +1640,7 @@
    "ceiling": 4.5,
    "state": "proposed",
    "cite": "",
-   "about": "req 3234 (Exterior, 8 November 2026, 2.12 am; ledger 376): since ledger 375 (model v300) raised nr-east's eaves 38.6 to 41.6, the strip y 69.5 to 72.0 behind teachers-study-7-east-b, once boxed eaves under the hip, stood a full storey with nothing on floor 7 at the curtain, so the outside saw the room's north wall 3 m back. An unentered store fills it, no door, no window (the model has none on this face on 6 or 7), 4.5 high as the rooms, on their party lines, by gable-press-7's precedent (ledger 374). Its use and name to come.",
+   "about": "req 3234 (Exterior, 8 November 2026, 2.12 am; ledger 376): since ledger 375 (model v300) raised nr-east's eaves 38.6 to 41.6, the strip y 69.5 to 72.0 behind teachers-study-7-east-b, once boxed eaves under the hip, stood a full storey with nothing on floor 7 at the curtain, so the outside saw the room's north wall 3 m back. A store fills it, with a provisional way in (ledger 413, card req 5768), no window (the model has none on this face on 6 or 7), 4.5 high as the rooms, on their party lines, by gable-press-7's precedent (ledger 374). Its use and name to come.",
    "layout_space": "7:fill-3234",
    "entered_from": "docs/architect/floors/7.json"
   }

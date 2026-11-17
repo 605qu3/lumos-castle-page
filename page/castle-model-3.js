@@ -1589,7 +1589,7 @@
    "ceiling": 4.5,
    "state": "proposed",
    "cite": "",
-   "about": "req 3221 item 3 (voids.json row porters-squint): on 3 the same angle between the Astronomy drum's outer face (r 8.0 from 80.0, 77.0) and the north wall, north of astronomy-stair-foot-3 (its wall 68.75 to 69.25), stood unroomed to the face; an unentered store fills it, no door, the pair of astronomy-drum-press-2 below and library-returns-store-4-east above (4's outline run to the face at 72.0, east to 87.75, 0.5 to defence-teachers-bedroom-3). No window: the model has none on this face on 3.",
+   "about": "req 3221 item 3 (voids.json row porters-squint): on 3 the same angle between the Astronomy drum's outer face (r 8.0 from 80.0, 77.0) and the north wall, north of astronomy-stair-foot-3 (its wall 68.75 to 69.25), stood unroomed to the face; a store fills it, with a provisional way in (ledger 413, card req 5768), the pair of astronomy-drum-press-2 below and library-returns-store-4-east above (4's outline run to the face at 72.0, east to 87.75, 0.5 to defence-teachers-bedroom-3). No window: the model has none on this face on 3.",
    "layout_space": "3:fill-3221",
    "entered_from": "docs/architect/floors/3.json"
   }
