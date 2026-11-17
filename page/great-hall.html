@@ -167,7 +167,7 @@ if (!/[?&]faceall=0/.test(location.search) && window.CastleStoneFace) ['founders
 <script src="shell-w5b.js?v=25"></script>
 <script src="shell-bare.js?v=3"></script>
 <script src="castle-events.js?v=40"></script>
-<script src="castle-weather.js?v=5"></script>
+<script src="castle-weather.js?v=6"></script>
 <script src="castle-sound.js?v=1"></script>
 <script>
 (function () {
@@ -940,7 +940,7 @@ if (WXON) (function () {
       glass.push({ at: [sp.position.x, sp.position.y, sp.position.z], in: inn, w: o.w, h: o.h });
     }
   });
-  WX = { shafts: CastleWeather.shafts(THREE, beams, { north: [0, -1], pool: false }), panes: CastleWeather.panes(THREE, glass, {}) };
+  WX = { shafts: CastleWeather.shafts(THREE, beams, { north: [0, -1], pool: false }), panes: CastleWeather.panes(THREE, glass, { fogShapes: false }) };   /* no far land in the fog: from the floor the north glass shows only sky (sills 5.4, lowest ray about 23 degrees; land at most 15.8, read on plain-3163vr's field, 16 November) */
   WX.shafts.group.name = 'weather-shafts'; WX.panes.group.name = 'weather-panes';
   room.add(WX.shafts.group, WX.panes.group);
 })();

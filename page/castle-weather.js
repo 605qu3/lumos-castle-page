@@ -145,7 +145,7 @@
   }
   var PVERT = 'attribute vec2 aSize; varying vec2 vUv; varying vec2 vSize;' +
     'void main(){ vUv=uv; vSize=aSize; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0); }';
-  var PFRAG = 'uniform float uKind; uniform float uFrost; uniform float uTime; uniform float uAmount; uniform float uWind; varying vec2 vUv; varying vec2 vSize;' +
+  var PFRAG = 'uniform float uKind; uniform float uFrost; uniform float uTime; uniform float uAmount; uniform float uWind; uniform float uShapes; varying vec2 vUv; varying vec2 vSize;' +
     'float h21(vec2 p){ p=fract(p*vec2(123.34,456.21)); p+=dot(p,p+45.32); return fract(p.x*p.y); }' +
     'float vn(vec2 p){ vec2 i=floor(p), f=fract(p); f=f*f*(3.0-2.0*f); return mix(mix(h21(i),h21(i+vec2(1,0)),f.x),mix(h21(i+vec2(0,1)),h21(i+vec2(1,1)),f.x),f.y); }' +
     'void main(){ vec2 m=vUv*vSize; vec3 col=vec3(0.82,0.86,0.9); float a=0.0;' +
@@ -159,7 +159,7 @@
       'float run=step(0.55,hc)*smoothstep(0.09,0.02,lx)*trail*0.5;' +
       'a=(0.05+bead*0.46+rim*0.34+run)*uAmount; col=mix(vec3(0.55,0.62,0.7),vec3(0.93,0.96,0.98),bead);' +
     '} else if(uKind>1.5&&uKind<2.5){ a=0.07*uAmount; col=vec3(0.88,0.92,0.96);' +                   /* snow: a cold, pale pane */
-    '} else if(uKind>2.5){ float n=vn(m*1.5+vec2(uTime*0.03,0.0))*0.6+vn(m*4.0)*0.4; float see=clamp(2.0-uAmount,0.0,1.0);' +   /* fog: milky, far shapes fading */
+    '} else if(uKind>2.5){ float n=vn(m*1.5+vec2(uTime*0.03,0.0))*0.6+vn(m*4.0)*0.4; float see=clamp(2.0-uAmount,0.0,1.0)*uShapes;' +   /* fog: milky, far shapes fading */
       'col=vec3(0.80,0.805,0.795)+0.03*(n-0.5);' +
       'float h1=0.20+0.07*vn(vec2(m.x*0.5,1.0))+0.035*vn(vec2(m.x*3.0,2.0))+0.025*vn(vec2(m.x*11.0,3.0))+0.012*vn(vec2(m.x*27.0,4.0));' +   /* the nearer skyline: hills and tree tops */
       'float h2=0.33+0.06*vn(vec2(m.x*0.35,5.0))+0.02*vn(vec2(m.x*2.0,6.0));' +   /* the farther, higher and fainter */
@@ -219,7 +219,7 @@
       if (idx) g.setIndex(idx); return g;
     }
     var pm = new THREE.ShaderMaterial({ vertexShader: PVERT, fragmentShader: PFRAG, transparent: true, depthWrite: false, side: THREE.DoubleSide, fog: false,
-      uniforms: { uKind: { value: 0 }, uFrost: { value: 0 }, uTime: { value: 0 }, uAmount: { value: 1 }, uWind: { value: 0 } } });
+      uniforms: { uKind: { value: 0 }, uFrost: { value: 0 }, uTime: { value: 0 }, uAmount: { value: 1 }, uWind: { value: 0 }, uShapes: { value: o.fogShapes === true ? 1 : 0 } } });   /* fogShapes: far land in the fog, off unless a room has read its window's sight line onto land (the hall's shows only sky, 16 November) */
     var sm = new THREE.ShaderMaterial({ vertexShader: SVERT, fragmentShader: SFRAG, transparent: true, depthWrite: false, fog: false,
       uniforms: { uTime: { value: 0 }, uWind: { value: 0 }, uSpeed: { value: 9 }, uLen: { value: 0.55 }, uAmount: { value: 1 } } });
     var fm = new THREE.ShaderMaterial({ vertexShader: FVERT, fragmentShader: FFRAG, transparent: true, depthWrite: false, fog: false,
