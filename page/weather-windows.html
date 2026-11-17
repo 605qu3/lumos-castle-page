@@ -4,10 +4,10 @@
 <style>html,body{margin:0;height:100%;background:#111;overflow:hidden}#hud{position:fixed;left:8px;top:8px;color:#ddd;font:12px monospace;white-space:pre}</style>
 </head><body><div id="hud"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="castle-weather.js?v=10"></script>
+<script src="castle-weather.js?v=11"></script>
 <script>
 /* A bare stone hall with five tall west windows, for the window weather alone (no castle). Flags, the check's fixtures:
-   ?sky=clear|cloudy|rain|snow|fog|sleet (what the weather is); ?ground=frozen (frost at the pane's edges); ?windy=1;
+   ?sky=clear|cloudy|rain|snow|fog|sleet|hail (what the weather is); ?ground=frozen (frost at the pane's edges); ?windy=1;
    ?off=1 effect off (known bad); ?wrong=rain|snow shows that pane effect under the sky given by ?sky= (known bad: rain under a
    clear sky); ?double=1 doubled density (known bad); ?cam=close (near one window); ?t= seconds; ?nohud=1. */
 var Q = new URLSearchParams(location.search), num = function (k, d) { return Q.has(k) ? +Q.get(k) : d; };
@@ -29,7 +29,7 @@ box(.3, 3.2, D, -L / 2, 1.6, 0); box(.3, HT - 8.7, D, -L / 2, 8.7 + (HT - 8.7) /
 for (var j = 0; j <= 5; j++) { var zc = -D / 2 + j * D / 5 + (j === 0 ? .2 : j === 5 ? -.2 : 0); box(.3, 5.5, j === 0 || j === 5 ? .4 : .6, -L / 2, 5.95, zc); }
 sc.add(new THREE.HemisphereLight(0xcfd8e6, 0x3a332c, 1.1));
 /* the day outside, seen through the windows: a backdrop in the sky's own colour */
-var skyCol = { clear: 0x8fb4e0, cloudy: 0x9aa2ab, rain: 0x6d7681, snow: 0xaab4bd, fog: 0xc9cdd0, sleet: 0x7b838c }[sky] || 0x8fb4e0;
+var skyCol = { clear: 0x8fb4e0, cloudy: 0x9aa2ab, rain: 0x6d7681, snow: 0xaab4bd, fog: 0xc9cdd0, sleet: 0x7b838c, hail: 0x737b85 }[sky] || 0x8fb4e0;
 var back = new THREE.Mesh(new THREE.PlaneGeometry(60, 40), new THREE.MeshBasicMaterial({ color: skyCol })); back.position.set(-L / 2 - 8, 8, 0); back.rotation.y = Math.PI / 2; sc.add(back);
 var ground = new THREE.Mesh(new THREE.PlaneGeometry(60, 60), new THREE.MeshBasicMaterial({ color: Q.get('ground') === 'frozen' || sky === 'snow' ? 0xdfe6ea : 0x4f6a3c })); ground.rotation.x = -Math.PI / 2; ground.position.set(-L / 2 - 20, -1, 0); sc.add(ground);
 var panes = CastleWeather.panes(THREE, wins, { density: Q.has('double') ? 2 : num('density', 1) });
