@@ -293,7 +293,7 @@
     'p.y-=ph; p.x+=sin(uTime*0.7+aSeed.y*30.0)*0.25; p.z+=cos(uTime*0.6+aSeed.x*30.0)*0.25;' +
     'vec4 mv=viewMatrix*modelMatrix*vec4(p,1.0); gl_Position=projectionMatrix*mv; gl_PointSize=uSize*(0.6+0.5*aSeed.y)/max(0.5,-mv.z);' +
     'vA=smoothstep(0.0,0.6,ph)*(1.0-smoothstep(uDrop*0.35,uDrop*0.8,ph)); }';
-  var CFFRAG = 'varying float vA; void main(){ float d=length(gl_PointCoord-0.5); if(d>0.5) discard; gl_FragColor=vec4(1.0,0.96,0.88,vA*smoothstep(0.5,0.15,d)); }';
+  var CFFRAG = 'varying float vA; void main(){ float d=length(gl_PointCoord-0.5); if(d>0.5) discard; gl_FragColor=vec4(0.97,0.98,1.0,vA*smoothstep(0.5,0.32,d)); }';   /* white, a crisp soft-edged disc: cream with a wide glow read as embers (16 Nov) */
 
   /* the rule, apart from any drawing, so a check can read it: which sky, whether a storm, whether flakes */
   function ceilingKind(weather, christmas) {
@@ -318,7 +318,7 @@
       var g = new THREE.BufferGeometry();
       g.setAttribute('position', new THREE.BufferAttribute(o.flakes.points, 3)); g.setAttribute('aSeed', new THREE.BufferAttribute(sd, 3));
       fm = new THREE.ShaderMaterial({ vertexShader: CFVERT, fragmentShader: CFFRAG, transparent: true, depthWrite: false, fog: false,
-        uniforms: { uTime: { value: 0 }, uDrop: { value: fd }, uSize: { value: 120 } } });
+        uniforms: { uTime: { value: 0 }, uDrop: { value: fd }, uSize: { value: o.flakes.size || 120 } } });
       flakes = new THREE.Points(g, fm); flakes.frustumCulled = false; flakes.renderOrder = 3; flakes.visible = false; flakes.name = 'ceiling-flakes';
       (mesh.parent || mesh).add(flakes);
     }
