@@ -757,8 +757,10 @@ window.CastleShell = { build: function (F, M, placeId, o) {
   function trimMat(row, sx, sy, z) {
     if (!row) return paintMat(shade(GREY.wall, 1.12), true);
     var st = stoneAt(row, sx, sy, z), ds = o.trim === 2 && DRESSED[st] || null;
-    if (ds) return faced(ds, window.CastleStoneFace && CastleStoneFace.kind('ashlar'), tone(ds + '/ashlar', ds, 1.0), true);
-    return faced(st, window.CastleStoneFace && CastleStoneFace.kind('ashlar'), tone(st + '/ashlar', st, 1.08), true);
+    /* v243 (the one-castle gate): the dressing takes the jointless 'dressed' face, so each trim piece reads as one stone;
+       its tone stays the ashlar's */
+    if (ds) return faced(ds, window.CastleStoneFace && CastleStoneFace.kind('dressed'), tone(ds + '/ashlar', ds, 1.0), true);
+    return faced(st, window.CastleStoneFace && CastleStoneFace.kind('dressed'), tone(st + '/ashlar', st, 1.08), true);
   }
   /* v219 (req 5176, ?cased=2): the bold casing's second stone, a red sandstone against the dressing's pale (Barclay's red
      on cream), the pale where the dressing is already the pink */
@@ -812,7 +814,10 @@ window.CastleShell = { build: function (F, M, placeId, o) {
     var s = PAINT && PAINT.stairs[id];
     if (!s) return null;
     /* v19 (req 5311, Design; GoF 'magnificent marble staircase'): the marble stairs' treads and risers take Design's marble-pale, as the prefects' bathroom floor does (v150); banisters stay the flat tone */
-    if (s.stone === 'marble' && window.FloorKit && FloorKit.kinds.indexOf('marble-pale') >= 0) return FloorKit.mat(paintMat(0x808080), 'marble-pale', 0.6);
+    /* Masonry (17 November 2026, the marble stair's seam and streaks): each tread and riser is one cut piece, so the stair takes
+       the kit's jointless 'marble-piece' (no slab line runs down the flight), projected along each face's own normal (floor-kit v2) */
+    var MK = window.FloorKit && FloorKit.kinds.indexOf('marble-piece') >= 0 ? 'marble-piece' : 'marble-pale';
+    if (s.stone === 'marble' && window.FloorKit && FloorKit.kinds.indexOf(MK) >= 0) return FloorKit.mat(paintMat(0x808080), MK, 0.6);
     return paintMat(s.stone === 'marble' ? tone('marble') : tone('flags-' + s.stone, s.stone, 0.86));
   }
   out.paint = { painted: painted, row: function (id) { return rowOf({ id: id, floor: 0 }); } };
@@ -883,7 +888,11 @@ window.CastleShell = { build: function (F, M, placeId, o) {
     /* v241 (req 5320, "Gate, the trio's trim off the offset", 12 November 2026): a casing (role trim) keeps trimMat's material
        as the code route draws it, with no depth offset and no split of its near-level faces (they streaked its crowns) */
     var TR = ARCH === 'trio' && u.role !== 'trim';
-    mesh.material = TR ? (Array.isArray(m) ? m.map(function (x) { return archMat(x); }) : archMat(m)) : m;
+    /* v244 (row 5862, step 2, 17 November 2026): under arch=whole the glb's stone takes the same depth offset, so where a page
+       part the walk keeps (trim, the vanishing step's hollow) lies flush on the glb's face, the page's wins the tie (42 same-facing
+       triangles, tools/test_arch_whole_one_castle.mjs e2); no archFlat split on the whole castle */
+    var TW = ARCH === 'whole' && u.role !== 'trim';
+    mesh.material = TR || TW ? (Array.isArray(m) ? m.map(function (x) { return archMat(x); }) : archMat(m)) : m;
     F.register(mesh, LAYER.wall);
     if (TR) archFlat(mesh, m);
     return mesh;
