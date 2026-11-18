@@ -180,7 +180,7 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <script src="design/stone-face.js?v=4"></script>
 <script>/* the Architect's 392nd, Godric's 1 on req 2246 (31 October 2026): the stone face on every stone, all floors, not only late-pale; ?faceall=0 lays it back to flat for a comparison */
 if (!/[?&]faceall=0/.test(location.search) && window.CastleStoneFace) ['founders-rubble', 'tudor-pink', 'high-grey', 'houses-sandstone'].forEach(function (s) { CastleStoneFace.FACED[s] = true; });</script>
-<script src="design/ceilings.js?v=18"></script>
+<script src="design/ceilings.js?v=22"></script>
 <script src="design/wall-courses.js?v=1"></script>
 <script src="design/panelling.js?v=2"></script>
 <script src="design/ironwork.js?v=2"></script>
@@ -197,6 +197,7 @@ if (!/[?&]faceall=0/.test(location.search) && window.CastleStoneFace) ['founders
 <script src="shell-bare.js?v=3"></script>
 <script src="depth-ties.js?v=1"></script>
 <script src="corridor/suit.js?v=6"></script>
+<script src="objects/armour-set.js?v=1"></script><!-- req 5917 -->
 <script src="corridor/knight.js?v=2"></script>
 <script src="shell-w5a.js?v=175"></script>
 <script src="shell-things-2.js?v=26"></script>
@@ -5906,8 +5907,20 @@ var GALLERY = (function () {
     var pl = new THREE.Mesh(new THREE.BoxGeometry(0.7, H, 0.7), stone);
     pl.position.copy(at); pl.position.y += H / 2; pl.rotation.y = Math.atan2(north.x, north.z); pl.name = 'gallery-plinth-' + y + (face > 0 ? 'w' : 'e');
     pl.raycast = function () {}; shell.group.add(pl);
-    var s = CastleSuit.make(THREE, renderer, { kind: kind, src: '../assets/layers/corridor-armour.png' }), d = east.multiplyScalar(face);
-    s.group.position.copy(at); s.group.position.y += H; s.group.rotation.y = Math.atan2(d.x, d.z); s.group.name = 'gallery-suit-' + y + (face > 0 ? 'w' : 'e');    s.onReady(function () { s.light(k); s.group.traverse(function (m) { if (m.isMesh) m.raycast = function () {}; }); });
+    /* req 5917, Godric 18 November 2026, 7.20 am (option 1): the four real suits dressed fourteen ways, halberds held (the free
+       halberd, Objects' h1 to h7); the mace and shield stay off until each passes its check. ?oldsuits keeps today's pale suits.
+       Placed as tools/objects-armour-swap.mjs placed them: the same spot and facing, the back 5 cm off the wall as before */
+    var NEW = window.CastleArmour && !/[?&]oldsuits/.test(location.search), s, d = east.multiplyScalar(face);
+    if (NEW) {
+      CastleArmour.halberdGlb(true);
+      s = CastleArmour.make(THREE, renderer, { kind: kind, index: out.suits.length, base: 'objects/armour/' });
+      s.group.position.copy(at); s.group.position.y += H; s.group.rotation.y = Math.atan2(d.x, d.z);
+      s.group.position.addScaledVector(d.clone().normalize(), s.back - 0.15 * (kind === 'boy' ? 1.45 / 1.70 : 1));
+    } else {
+      s = CastleSuit.make(THREE, renderer, { kind: kind, src: '../assets/layers/corridor-armour.png' });
+      s.group.position.copy(at); s.group.position.y += H; s.group.rotation.y = Math.atan2(d.x, d.z);
+    }
+    s.group.name = 'gallery-suit-' + y + (face > 0 ? 'w' : 'e');    s.onReady(function () { s.light(k); s.group.traverse(function (m) { if (m.isMesh) m.raycast = function () {}; }); });
     shell.group.add(s.group); out.suits.push(s);
   }
   ROWS.forEach(function (r) {
