@@ -41,18 +41,19 @@
      each suit's material takes a small hall panorama, made once a renderer (the idea is CastleSuit's hallEnv in
      page/corridor/suit.js: a dark vault, warm stone, two cool windows and a torch's glow, the flags below) */
   var envs = [];
-  function hallEnv() {
-    for (var i = 0; i < envs.length; i++) if (envs[i][0] === renderer) return envs[i][1];
+  function hallEnv(noWin) {   /* noWin: the same panorama without the two cool windows (a check's control only) */
+    for (var i = 0; i < envs.length; i++) if (envs[i][0] === renderer && envs[i][2] === String(noWin || '')) return envs[i][1];
     var c = document.createElement('canvas'); c.width = 512; c.height = 256;
     var x = c.getContext('2d'), gd = x.createLinearGradient(0, 0, 0, 256);
-    gd.addColorStop(0, '#2a2624'); gd.addColorStop(0.36, '#665c54'); gd.addColorStop(0.5, '#8a8076'); gd.addColorStop(0.56, '#584b40'); gd.addColorStop(1, '#2c241e');
+    if (noWin === 'flat') { gd.addColorStop(0, '#7a7068'); gd.addColorStop(1, '#7a7068'); }
+    else { gd.addColorStop(0, '#2a2624'); gd.addColorStop(0.36, '#665c54'); gd.addColorStop(0.5, '#8a8076'); gd.addColorStop(0.56, '#584b40'); gd.addColorStop(1, '#2c241e'); }
     x.fillStyle = gd; x.fillRect(0, 0, 512, 256);
-    [[88, '#e6ecf2'], [232, '#dde5ec']].forEach(function (w) { x.fillStyle = w[1]; x.fillRect(w[0], 72, 40, 58); });
+    if (!noWin) [[88, '#e6ecf2'], [232, '#dde5ec']].forEach(function (w) { x.fillStyle = w[1]; x.fillRect(w[0], 72, 40, 58); });
     var tg = x.createRadialGradient(404, 98, 2, 404, 98, 40); tg.addColorStop(0, 'rgba(255,198,128,0.9)'); tg.addColorStop(1, 'rgba(255,198,128,0)');
     x.fillStyle = tg; x.fillRect(364, 58, 80, 80);
     var t = new THREE.CanvasTexture(c); t.encoding = THREE.sRGBEncoding; t.mapping = THREE.EquirectangularReflectionMapping;
     var pm = new THREE.PMREMGenerator(renderer), e = pm.fromEquirectangular(t).texture; pm.dispose(); t.dispose();
-    envs.push([renderer, e]);
+    envs.push([renderer, e, String(noWin || '')]);
     return e;
   }
   /* each kind's variant [suit, finish, mirror, scale]. The gallery's walk back in time (shell.html GALLERY ROWS) is set so
@@ -187,9 +188,29 @@
       new THREE.GLTFLoader().load(base + ARM_GLB[name], function (g) {
         A.parts = parts(g.scene);
         A.parts.forEach(function (q) { if (!q.mat.envMap && renderer) q.mat.envMap = hallEnv(); q.mat.userData.env = 1; });
+        if (name === 'mace' && DIAG.length) A.parts = A.parts.map(diagPart);   /* a check's isolation pass only (?macediag on the test page) */
         A.waiters.splice(0).forEach(function (f) { f(A.parts); });
       }, undefined, function (e) { console.error('armour-set: ' + base + ARM_GLB[name], e); A.waiters.splice(0).forEach(function (f) { f(null); }); });
     });
+  }
+  /* the mace's render branch (row 5868, 18 November 2026): one shading factor off at a time, so the factor that paints the
+     side view's pale line is measured, not guessed; only on the test page (?macediag=a,b), never in a room */
+  var DIAG = [];
+  function diagPart(q) {
+    var m = q.mat.clone(), g = q.geo;
+    if (DIAG.indexOf('nmap') >= 0) m.normalMap = null;
+    if (DIAG.indexOf('mr') >= 0) { m.metalnessMap = null; m.roughnessMap = null; m.metalness = 1; m.roughness = 0.45; }
+    if (DIAG.indexOf('base') >= 0) { m.map = null; m.color = col(0x8c8f93); }
+    if (DIAG.indexOf('env') >= 0 && renderer) m.envMap = hallEnv(true);
+    if (DIAG.indexOf('envflat') >= 0 && renderer) m.envMap = hallEnv('flat');   /* an even grey hall, the vault and floor as light as the walls */
+    if (DIAG.indexOf('front') >= 0) m.side = THREE.FrontSide;
+    if (DIAG.indexOf('rough') >= 0) m.roughness = 1.6;   /* the map's roughness (about 0.35) lifted to about 0.56 */
+    if (DIAG.indexOf('envi') >= 0) { m.envMapIntensity = 2; m.userData.env = 2; }   /* userData too: suit.light resets the intensity from it */
+    if (DIAG.indexOf('pbr') >= 0) m.color.setScalar(3.3);   /* the map's steel (about 110 sRGB, 0.155 linear) up to about 190 sRGB (0.51), a bare metal's range */
+    if (DIAG.indexOf('metal') >= 0) m.metalness = 0.8;   /* the map's metalness (about 0.87) down to about 0.70 */
+    if (DIAG.indexOf('flat') >= 0) { g = (g.index ? g.toNonIndexed() : g.clone()); g.computeVertexNormals(); }
+    m.needsUpdate = true;
+    return { geo: g, mat: m };
   }
   function merge(geos) {   /* non-indexed geometries into one (position, normal) */
     var pos = [], nor = [];
@@ -356,5 +377,5 @@
     g.name = 'armour-set';
     return suit;
   }
-  window.CastleArmour = { make: make, variant: variant, alike: alike, VARIANTS: VARIANTS, SUITS: SUITS, ARMS: ARMS, NEAR: NEAR, FAR: FAR, showArms: function (b) { ARMS_ON = !!b; }, buildArm: buildArm, maceFlat: function (b) { MACE_FLAT = !!b; if (b) ARM_CODE = true; delete armCache.mace; }, armCode: function (b) { ARM_CODE = !!b; } };
+  window.CastleArmour = { make: make, variant: variant, alike: alike, VARIANTS: VARIANTS, SUITS: SUITS, ARMS: ARMS, NEAR: NEAR, FAR: FAR, showArms: function (b) { ARMS_ON = !!b; }, buildArm: buildArm, maceFlat: function (b) { MACE_FLAT = !!b; if (b) ARM_CODE = true; delete armCache.mace; }, armCode: function (b) { ARM_CODE = !!b; }, maceDiag: function (list) { DIAG = list || []; delete armGlb.mace; delete armCache.mace; } };
 })();
