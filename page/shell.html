@@ -410,7 +410,7 @@ scene.add(shell.group);
       g.scene.traverse(function (k) { if (k.isMesh) { window.__arch.meshes++; window.__arch.owners.push(k.userData.owner || ''); if (shell.archAdopt) { shell.archAdopt(k); window.__arch.adopted = (window.__arch.adopted || 0) + 1; var mt = (k.userData.mat || '?') + ':' + (k.material && k.material.type); window.__arch.mats = window.__arch.mats || {}; window.__arch.mats[mt] = (window.__arch.mats[mt] || 0) + 1; } } });
       /* ?bare=1 keeps only what stood at load (BARE_KEEP) and hides the rest; the glb is architecture, so it is kept */
       if (typeof BARE_KEEP !== 'undefined') g.scene.traverse(function (k) { BARE_KEEP.add(k); k.visible = true; });
-      shell.group.add(g.scene); window.__arch.loaded = true;
+      shell.group.add(g.scene); if (m[1] === 'whole') window.__archScene = g.scene; window.__arch.loaded = true;
     }, null, function (e) { window.__arch.err = String(e && e.message || e); console.error('arch glb: ' + window.__arch.err); }); });
   };
   if (THREE.GLTFLoader) return go();
@@ -10232,6 +10232,9 @@ function tap(cx, cy) {
   pointer.set(((cx - r.left) / r.width) * 2 - 1, -((cy - r.top) / r.height) * 2 + 1);
   raycaster.setFromCamera(pointer, camera);
   var hits = raycaster.intersectObjects(shell.group.children, false).filter(function (h) { return h.object.visible || h.object.userData.way; });
+  /* under ?arch=whole the glb's stone takes the tap too, so a way behind its stone is not reached and he walks where he sees */
+  if (window.__archScene) { var gH = raycaster.intersectObject(window.__archScene, true).filter(function (h) { return h.object.visible; })[0];
+    if (gH) hits = hits.filter(function (h) { return h.distance <= gH.distance + 0.05; }); }
   /* req 856 (Interaction; Godric's stair fault, 21 October 2026, 11.10 am): arrived by a way, he stands a step outside
      its plane, so at the start the way he came by yields to what lies behind it (the stair hall's marble flights,
      not well-mouth and back); from any place inside it is in front of him and takes him out as before */
