@@ -4234,6 +4234,23 @@ window.CastleShell = { build: function (F, M, placeId, o) {
     return n;
   }
   function inFace(m) { for (var p = m.parent; p; p = p.parent) if (p.isMesh) return true; return false; }
+  /* v243 (the one-castle gate, Godric's ?arch=whole walk of 17 November 2026): under arch=whole the glb is the castle, so
+     the page's own wall strips, floors, ceilings and flights are not drawn anywhere (TRIALSKIP widened by kind, not by
+     room); one owner per surface, so no coplanar tie. They are kept built with a material that never draws
+     (material.visible false: no draw call), so every ray the walk and the taps cast still meets them as before. Run
+     before the merges, and kept out of the merge around, so each keeps its own name. Doors, leaves, stops, casings,
+     rails, furniture, lights and glass stay drawn. out.archHidden names what was taken off */
+  out.archHidden = [];
+  if (ARCH === 'whole') {
+    var NODRAW = new THREE.MeshBasicMaterial({ visible: false }), ARCHKIND = /-wall-\d|-web-\d|-stilt-shaft-|-barrel$|-niche-hourglass-|-roof-step$|-roof-\d|-drum$|-ceiling$|-floor$|-holefloor-|-threshold-|-landing$|-niche-floor-|-lining-floor-|-flight-\d|^marble-staircase-\d|^well-[MS]\d/;
+    group.traverse(function (m) {
+      if (!m.isMesh || m.userData.way || m.userData.layer === LAYER.door) return;
+      var ceil = false;   /* a place's ceiling, anything under its -ceilings group: its vault, ribs, beams, corbels (not the carved faces) */
+      for (var p = m.parent; p && p !== group; p = p.parent) if (/-ceilings$/.test(p.name || '')) ceil = !/-corbel-face/.test(m.name || '');
+      if (!ceil && !m.userData.landing && !ARCHKIND.test(m.name || '')) return;
+      m.userData.archHidden = true; m.material = NODRAW; out.archHidden.push(m.name);
+    });
+  }
   out.merged = mergeDrawn(group, function (m) { return m.parent === group && m.userData.stair && !m.userData.way && !m.userData.hidden; },
     function (m) { return m.userData.stair + '|' + (m.userData.owner || ''); });
   group.children.filter(function (g) { return !g.isMesh && /-(ceilings|panelling)$/.test(g.name); }).forEach(function (g) {
@@ -4255,7 +4272,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
   out.mergedAround = /[?&]merge=0\b/.test(location.search) ? 0 : mergeDrawn(group, function (m) {   /* merge=0: the A/B */
     var u = m.userData;
     return m.parent === group && u.owner && u.owner !== P.id && RK0[u.owner] != null && (u.layer === LAYER.wall || u.layer === LAYER.floor) &&
-      !u.stair && !u.way && !u.hidden && !u.tap && !KEPT.has(m) && !/-(pane|threshold|glass|sky)/.test(m.name);
+      !u.stair && !u.way && !u.hidden && !u.tap && !u.archHidden && !KEPT.has(m) && !/-(pane|threshold|glass|sky)/.test(m.name);
   }, function (m) { return RK0[m.userData.owner] + '|' + m.userData.layer; });
   out.merged += out.mergedAround;
   out.mergeDrawn = mergeDrawn;
