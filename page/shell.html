@@ -177,10 +177,11 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <script src="design/room-use.js?v=2"></script>
 <script src="design/floor-kit.js?v=2"></script>
 <script src="design/tones.js?v=7"></script>
-<script src="design/stone-face.js?v=3"></script>
+<script src="design/stone-face.js?v=4"></script>
 <script>/* the Architect's 392nd, Godric's 1 on req 2246 (31 October 2026): the stone face on every stone, all floors, not only late-pale; ?faceall=0 lays it back to flat for a comparison */
 if (!/[?&]faceall=0/.test(location.search) && window.CastleStoneFace) ['founders-rubble', 'tudor-pink', 'high-grey', 'houses-sandstone'].forEach(function (s) { CastleStoneFace.FACED[s] = true; });</script>
-<script src="design/ceilings.js?v=14"></script>
+<script src="design/ceilings.js?v=18"></script>
+<script src="design/wall-courses.js?v=1"></script>
 <script src="design/panelling.js?v=2"></script>
 <script src="design/ironwork.js?v=2"></script>
 <script src="charms/spells.js?v=41"></script>
@@ -190,7 +191,7 @@ if (!/[?&]faceall=0/.test(location.search) && window.CastleStoneFace) ['founders
 <script src="design/lake-views.js?v=1"></script>
 <script src="castle-walls-v2.js?v=8"></script>
 <script src="castle-strip.js?v=4"></script>
-<script src="castle-shell.js?v=244"></script>
+<script src="castle-shell.js?v=246"></script>
 <script src="castle-exterior.js?v=32"></script>
 <script src="shell-w5b.js?v=25"></script>
 <script src="shell-bare.js?v=3"></script>
@@ -391,6 +392,14 @@ if (!shell) { var later = ((window.CASTLE_MODEL || {}).rooms || []).filter(funct
   kit.helpEl.hidden = false; kit.helpEl.textContent = later ? PLACE + ' stands from the ' + (later.first || 'PS') + ' castle, after the boy\'s year; add &book=' + (later.first || 'PS') + ' to see it'
     : 'No such place in the castle model: ' + PLACE; console.warn(kit.helpEl.textContent); return; }
 scene.add(shell.group);
+/* row 5870 (Masonry, 17 November 2026): ?courses=plinth,string,cornice (or bench, corbels; the gate's knowns flush, floor,
+   with &coursesflags=nocut,nomitre) sweeps the mason's courses along this place's walls from design/wall-courses.js, on
+   the wall layer; skipped under arch=whole until that build is certified (the Architect, 10.08 pm). No flag, nothing. */
+if (window.WallCourses && Q.get('courses') && !/[?&]arch=whole/.test(location.search)) {
+  var cflags = {}; (Q.get('coursesflags') || '').split(',').forEach(function (f) { if (f) cflags[f] = 1; });
+  window.__courses = WallCourses.apply({ M: MODEL, place: PLACE, toLocal: shell.toLocal, scene: scene, group: shell.group,
+    kinds: Q.get('courses').split(','), flags: cflags, register: function (m) { kit.register(m, 0); } });
+}
 /* req 5270 (the Blender trial, mark M6; Godric's ask of 11 November 2026): ?arch=m6 loads a glb built in Blender in site
    metres (Y up by its exporter) under shell.group, placed by the shell's own frame rule (toLocal of the site origin), so
    its walls can be set beside the code's. No flag, nothing loads. castle-shell v237: each mesh takes the page's own
@@ -10232,9 +10241,13 @@ function tap(cx, cy) {
   pointer.set(((cx - r.left) / r.width) * 2 - 1, -((cy - r.top) / r.height) * 2 + 1);
   raycaster.setFromCamera(pointer, camera);
   var hits = raycaster.intersectObjects(shell.group.children, false).filter(function (h) { return h.object.visible || h.object.userData.way; });
-  /* under ?arch=whole the glb's stone takes the tap too, so a way behind its stone is not reached and he walks where he sees */
+  /* row 5862 step 4 (Fawkes 22:24, route 1): under ?arch=whole the glb's stone takes the tap too, so a way behind its stone is not
+     reached and he walks where he sees (the tap above is not recursive and never met the glb group: the lake door loop) */
   if (window.__archScene) { var gH = raycaster.intersectObject(window.__archScene, true).filter(function (h) { return h.object.visible; })[0];
-    if (gH) hits = hits.filter(function (h) { return h.distance <= gH.distance + 0.05; }); }
+    if (gH) hits = hits.filter(function (h) { return (h.object.userData.way || h.object.name.indexOf('door-') === 0) ? h.distance + 0.8 < gH.distance : h.distance <= gH.distance + 0.05; }); }
+  /* (the Architect, 17 November 2026, 10.54 pm, Fawkes 22:54: a way or a door is reached only when the glb has no stone within the
+     wall it pierces, 0.8 m (castle-shell.js WALL_T) past its plane: the 9.06 am glb's uncut walls stood 0 to 0.26 m behind the stair hall's mouths; a page part
+     flush on the glb's face keeps the tie of 0.05 as before) */
   /* req 856 (Interaction; Godric's stair fault, 21 October 2026, 11.10 am): arrived by a way, he stands a step outside
      its plane, so at the start the way he came by yields to what lies behind it (the stair hall's marble flights,
      not well-mouth and back); from any place inside it is in front of him and takes him out as before */
