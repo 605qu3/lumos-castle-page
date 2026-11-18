@@ -81,11 +81,16 @@
   var PASS = { headless: true, bareheaded: true };
   /* what each copy holds (the arms, ARMS below): a halberd in the right gauntlet unless its kind says otherwise; the
      Blois suit keeps its own sword, its hands together on the pommel, so it holds nothing more */
-  var ARM_OF = { shield: 'shield', mace: 'mace' };
+  var ARM_OF = { mace: 'mace' };
   function armFor(kind, suit) { return suit === 'blois' ? null : ARM_OF[kind] || 'halberd'; }
+  /* what hangs on the wall beside a copy (18 November 2026): the shield kind's shield. Its left arm hangs straight (18
+     degrees off upright, measured), so a shield on its forearm would face sideways, never the aisle; on the wall at its
+     left, flat, face out, as halls hung arms by their suits. Its closed right fist then holds a halberd like the other
+     field copies (provisional, on Godric's sheet); both only under ?arms */
+  var WALL_OF = { shield: 'shield' };
   function variant(kind, index) {
     var v = VARIANTS[kind];
-    if (v) return { suit: v[0], finish: v[1], mirror: !!v[2], scale: v[3] || 1, arm: armFor(kind, v[0]) };
+    if (v) return { suit: v[0], finish: v[1], mirror: !!v[2], scale: v[3] || 1, arm: armFor(kind, v[0]), wall: WALL_OF[kind] || null };
     var c = CYCLE[((index || 0) % CYCLE.length + CYCLE.length) % CYCLE.length];
     return { suit: c[0], finish: c[1], mirror: (index || 0) % 3 === 1, scale: 1, arm: armFor(kind, c[0]) };
   }
@@ -168,6 +173,24 @@
   var armCache = {};
   var MACE_FLAT = false;   /* the failed head (flat 5 mm flanges, not turned), only as the 16-view mark's control (?maceflat on the test page) */
   var ARMS_ON = false;   /* the mace and shield, off until their hold passes its look (CastleArmour.showArms(true) for a check); the halberd is on in a closed fist (row 5906) */
+  /* the arms from free models (Fawkes, 18 November 2026, 12.55 am: a true 3D model first, CC0 or CC BY, code only where
+     none fits; prepared by tools/objects-arms-prep.py, credits in objects/arms/CREDITS.txt). Each glb's origin is its grip
+     (the mace's: the middle of its spiral grip, hung head down), so it hangs from the fist's measured centre as the code
+     arm did. ARM_CODE keeps the code-built arm, only as a check's control (?armcode or ?maceflat on the test page) */
+  var ARM_GLB = { mace: 'mace-ornate-1.glb', shield: 'shield-14c-1.glb' }, ARM_CODE = false, armGlb = {};
+  var SHIELD = { width: 0.576, height: 0.66, centre: 1.25, gap: 0.05 };   /* the free heater as prepared (docs/objects/armour-5868/arms/shield-14c-1.json); its middle at shoulder height, 5 cm clear of the suit's widest point */
+  function loadArm(base, name, done) {   /* one glb an arm a page, shared by every copy: done(parts), or done(null) on a failure */
+    var A = armGlb[name] || (armGlb[name] = { waiters: [] });
+    if (A.parts) return done(A.parts);
+    A.waiters.push(done); if (A.waiters.length > 1) return;
+    loader(function () {
+      new THREE.GLTFLoader().load(base + ARM_GLB[name], function (g) {
+        A.parts = parts(g.scene);
+        A.parts.forEach(function (q) { if (!q.mat.envMap && renderer) q.mat.envMap = hallEnv(); q.mat.userData.env = 1; });
+        A.waiters.splice(0).forEach(function (f) { f(A.parts); });
+      }, undefined, function (e) { console.error('armour-set: ' + base + ARM_GLB[name], e); A.waiters.splice(0).forEach(function (f) { f(null); }); });
+    });
+  }
   function merge(geos) {   /* non-indexed geometries into one (position, normal) */
     var pos = [], nor = [];
     geos.forEach(function (g) { g = g.index ? g.toNonIndexed() : g; pos.push(g.attributes.position.array); nor.push(g.attributes.normal.array); });
@@ -239,9 +262,11 @@
      pole set through the fist reads as beside it, never gripped), so no arm is set in a fist: the halberd stands on its
      butt 8 cm outside the gauntlet, touches the gauntlet's outer face and leans in to rest on the shoulder; the mace hangs
      at the left hip from the belt; the shield stands on its point before the left leg, leaning back on the thigh */
-  function placeArm(name, grip, inner) {   /* the arm in the suit's own frame (inner: mirrored and scaled with the suit) */
-    var g = new THREE.Group(); g.name = 'armour-arm-' + name;
-    buildArm(name).forEach(function (q) { var m = new THREE.Mesh(q[0], q[1]); m.raycast = function () {}; g.add(m); });
+  function placeArm(name, grip, inner, armBase, done) {   /* the arm in the suit's own frame (inner: mirrored and scaled with the suit); done(g) once its meshes are in */
+    var g = new THREE.Group(), glb = ARM_GLB[name] && !ARM_CODE; g.name = 'armour-arm-' + name;
+    function add(list) { list.forEach(function (q) { var m = new THREE.Mesh(q[0], q[1]); m.raycast = function () {}; g.add(m); }); }
+    if (glb) loadArm(armBase, name, function (ps) { if (ps) add(ps.map(function (q) { return [q.geo, q.mat]; })); if (done) done(g); });
+    else add(buildArm(name));
     if (name === 'halberd' && grip.fist) {   /* a closed fist (row 5906): the haft upright through its measured centre, the blade outward */
       g.position.set(grip.x, 0, grip.z);
       g.children.forEach(function (m) { m.rotation.y = Math.PI; });
@@ -251,10 +276,17 @@
       g.rotation.z = -Math.atan2(out, grip.y);   /* the top leans in, toward the suit's middle (+x) */
       g.rotation.y = 0;   /* the blade (built on +x) then points in over the shoulder: turn it outward */
       g.children.forEach(function (m) { m.rotation.y = Math.PI; });
-    } else if (name === 'mace' && grip.fist) { g.position.set(grip.x, grip.y, grip.z); }   /* hanging head down from the closed fist (row 5906) */
+    } else if (name === 'mace' && grip.fist) {   /* hanging head down from the closed fist (row 5906) */
+      g.position.set(grip.x, grip.y, grip.z);
+      /* the free mace's six flanges lie at 22.5 + 60k degrees round its haft in the mirrored suit's frame, one 7.5 degrees
+         off edge-on to the aisle (+z): a blind read saw that flange's lit rim as a seam splitting the head (18 November
+         2026, 1.22 am). An eighth of a turn puts them at 60k degrees, none within 30 degrees of edge-on from the aisle */
+      if (glb) g.rotation.y = Math.PI / 8;
+    }
     else if (name === 'mace') { g.position.set(0.21, 1.02, 0.07); g.rotation.z = 0.08; }   /* from the belt at the left hip, head down */
     else { g.position.set(0.11, 0.01, 0.27); g.rotation.x = 0.26; }   /* point on the floor, the top back against the thigh */
     inner.add(g);
+    if (!glb && done) done(g);
     return g;
   }
   function shadowMat() {
@@ -270,7 +302,7 @@
     var kind = opts.kind || 'default';
     if (PASS[kind] && window.CastleSuit) return window.CastleSuit.make(T, r, opts);
     var index = opts.index === undefined ? made : opts.index; made++;
-    var v = variant(kind, index), base = opts.base || 'objects/armour/', S = load(base, v.suit), g = new THREE.Group(), waiting = [];
+    var v = variant(kind, index), base = opts.base || 'objects/armour/', armBase = opts.armBase || base.replace(/armour\/?$/, 'arms/'), S = load(base, v.suit), g = new THREE.Group(), waiting = [];
     var inner = new THREE.Group(); inner.scale.set(v.mirror ? -v.scale : v.scale, v.scale, v.scale); g.add(inner);
     var suit = { group: g, kind: kind, variant: v, mats: [], body: null, ready: false, back: SUITS[v.suit].back * v.scale,
       onReady: function (f) { if (suit.ready) f(suit); else waiting.push(f); },
@@ -289,10 +321,31 @@
       lod.addLevel(near, 0); lod.addLevel(level(S.lods[0]), NEAR); lod.addLevel(level(S.lods[1]), FAR);
       lod.name = 'armour-set-lod'; inner.add(lod);
       suit.body = near.children[0]; suit.mats = mats.slice();
-      if (v.arm && (ARMS_ON || (v.arm === 'halberd' && S.fist))) {   /* the halberd wherever the suit's fist is closed (row 5906, its look passed 18 November 2026); the mace and shield only under ?arms */ suit.arm = placeArm(v.arm, S.grip, inner); suit.arm.traverse(function (o) { if (o.material && suit.mats.indexOf(o.material) < 0) { o.material.emissive = o.material.emissive || new THREE.Color(0, 0, 0); if (o.material.userData.env === undefined) o.material.userData.env = 1; suit.mats.push(o.material); } }); }
-      suit.ready = true; waiting.splice(0).forEach(function (f) { f(suit); });
+      function finish() { suit.ready = true; waiting.splice(0).forEach(function (f) { f(suit); }); }
+      if (v.arm && (ARMS_ON || (v.arm === 'halberd' && S.fist && !v.wall))) {   /* the halberd wherever the suit's fist is closed (row 5906, its look passed 18 November 2026); the mace and shield only under ?arms */
+        suit.arm = placeArm(v.arm, S.grip, inner, armBase, function (ag) {   /* the suit is ready once its arm's meshes are in (a glb arm loads once a page) */
+          ag.traverse(function (o) { if (o.material && suit.mats.indexOf(o.material) < 0) { o.material.emissive = o.material.emissive || new THREE.Color(0, 0, 0); if (o.material.userData.env === undefined) o.material.userData.env = 1; suit.mats.push(o.material); } });
+          finish();
+        });
+      } else finish();
     }
     if (S.ready) fill(); else S.waiters.push(fill);
+    /* suit.wall(d): the caller, who knows the room, says how far behind the copy's origin its wall stands (metres, along
+       -z); the copy's wall piece (WALL_OF) then hangs there, flat, beside its left arm. No wall said, nothing hung */
+    suit.wall = function (d) {
+      if (!v.wall || !ARMS_ON || !(d > 0)) return;
+      suit.onReady(function () {
+        var half = 0;
+        S.near.forEach(function (q) { var p = q.geo.attributes.position; for (var i = 0; i < p.count; i++) { var y = p.getY(i); if (y > 0.9 && y < 1.6) half = Math.max(half, Math.abs(p.getX(i))); } });
+        var w = new THREE.Group(); w.name = 'armour-wall-' + v.wall;
+        w.position.set(half * v.scale + SHIELD.gap + SHIELD.width / 2, SHIELD.centre * v.scale, -d + 0.01);
+        g.add(w); suit.wallArm = w; suit.wallReady = false;
+        loadArm(armBase, v.wall, function (ps) {
+          if (ps) ps.forEach(function (q) { var m = new THREE.Mesh(q.geo, q.mat); m.raycast = function () {}; w.add(m); if (suit.mats.indexOf(q.mat) < 0) { q.mat.emissive = q.mat.emissive || new THREE.Color(0, 0, 0); suit.mats.push(q.mat); } });
+          suit.wallReady = true;
+        });
+      });
+    };
     if (opts.shadow !== false) {
       var sh = new THREE.Mesh(new THREE.PlaneGeometry(0.55, 0.4), opts.shadow || cache.shadow || (cache.shadow = shadowMat()));
       sh.rotation.x = -Math.PI / 2; sh.position.set(0, 0.008, 0); sh.scale.setScalar(v.scale); g.add(sh);
@@ -300,5 +353,5 @@
     g.name = 'armour-set';
     return suit;
   }
-  window.CastleArmour = { make: make, variant: variant, alike: alike, VARIANTS: VARIANTS, SUITS: SUITS, ARMS: ARMS, NEAR: NEAR, FAR: FAR, showArms: function (b) { ARMS_ON = !!b; }, buildArm: buildArm, maceFlat: function (b) { MACE_FLAT = !!b; delete armCache.mace; } };
+  window.CastleArmour = { make: make, variant: variant, alike: alike, VARIANTS: VARIANTS, SUITS: SUITS, ARMS: ARMS, NEAR: NEAR, FAR: FAR, showArms: function (b) { ARMS_ON = !!b; }, buildArm: buildArm, maceFlat: function (b) { MACE_FLAT = !!b; if (b) ARM_CODE = true; delete armCache.mace; }, armCode: function (b) { ARM_CODE = !!b; } };
 })();

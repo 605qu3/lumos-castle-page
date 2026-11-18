@@ -19,11 +19,12 @@
 <div id="stats">starting</div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="../people/GLTFLoader.js"></script>
-<script src="armour-set.js?v=11"></script>
+<script src="armour-set.js?v=14"></script>
 <script>
 (function () {
   var Q = new URLSearchParams(location.search), night = Q.get('night') === '1';
   if (Q.has('arms')) CastleArmour.showArms(true);
+  if (Q.has('armcode')) CastleArmour.armCode(true);   /* ?armcode: the code-built arms (the failed ones), a check's control */
   if (Q.has('maceflat')) CastleArmour.maceFlat(true);   /* ?maceflat: the failed head of 18 November (flat 5 mm flanges, not turned), the mark's control */   /* ?arms: the halberd, shield and mace, off by default until they pass */
   var canvas = document.getElementById('c'), renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
   renderer.outputEncoding = THREE.sRGBEncoding; renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.0;
@@ -41,7 +42,7 @@
     var key2 = Q.get('suit'), kind = Q.get('kind') || Object.keys(CastleArmour.VARIANTS).filter(function (k) { var v = CastleArmour.VARIANTS[k]; return v[0] === key2 && v[1] === 'own' && !v[3]; })[0];
     var s = CastleArmour.make(THREE, renderer, { kind: kind || 'default', index: ['field', 'redcloth', 'sallet', 'blois'].indexOf(key2), base: 'armour/' });
     var dist = +(Q.get('dist') || 4), ly = +(Q.get('look') || 1.1), ax = +(Q.get('ax') || 0);   /* ?look: the height the camera looks at (a hand, 0.9); ?ax: the x it stands on and looks at, from the front */
-    wall.position.set(0, 3, -s.back - 0.05); s.group.position.set(0, 0, 0); scene.add(s.group); suits.push(s);
+    wall.position.set(0, 3, -s.back - 0.05); s.group.position.set(0, 0, 0); scene.add(s.group); suits.push(s); s.wall(s.back + 0.05);   /* the wall piece (the shield kind's shield), under ?arms */
     if (Q.get('view') === 'side') { cam.position.set(-dist, 1.35, 0.15); cam.lookAt(0, ly, 0.15); }   /* from the suit's right */
     else if (Q.get('view') === 'left') { cam.position.set(dist, 1.35, 0.15); cam.lookAt(0, ly, 0.15); }   /* from its left */
     else cam.position.set(ax, 1.35, dist), cam.lookAt(ax, ly, 0);

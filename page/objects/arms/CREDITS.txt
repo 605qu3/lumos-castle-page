@@ -1,0 +1,6 @@
+Arms held by the suits of armour in ../armour (Lumos castle, row 5868). Each is a free model, prepared (turned to hang
+from the suit's fist, its grip at the origin, textures scaled to 1024 px) by tools/objects-arms-prep.py.
+
+mace-ornate-1.glb: "Ornate Medieval Mace" by Ulan Cabanilla, Poly Haven (https://polyhaven.com/a/ornate_medieval_mace), CC0 1.0 (public domain; no credit required, given with thanks). Licence: https://polyhaven.com/license
+
+shield-14c-1.glb: "14th Century Shield" by ijdonnelly11 (https://sketchfab.com/ijdonnelly11), CC BY 4.0, via Sketchfab (https://sketchfab.com/3d-models/f81d4888067145dba05895f056c5274e). Licence: http://creativecommons.org/licenses/by/4.0/ Changed: its straps and back cushion cut, scaled to 0.66 m tall, its unlit surface made lit (tools/objects-arms-prep.py, 18 November 2026).
