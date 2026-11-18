@@ -21,8 +21,10 @@
   var SUITS = {
     field: { file: 'armour-field-1', back: 0.18, what: 'dark field armour, close helmet',
              fist: [-0.2822, 0.8734, 0.1032] },   /* the closed right fist's centre, measured (tools/objects-armour-grip.py, row 5906) */
-    redcloth: { file: 'armour-redcloth-2', back: 0.18, what: 'worn bright steel with red cloth' },
-    sallet: { file: 'armour-sallet-3', back: 0.19, what: 'blackened suit, open sallet' },
+    redcloth: { file: 'armour-redcloth-2', back: 0.18, what: 'worn bright steel with red cloth',
+             fist: [-0.2997, 0.9128, 0.1036] },   /* measured, as field's */
+    sallet: { file: 'armour-sallet-3', back: 0.19, what: 'blackened suit, open sallet',
+             fist: [-0.3626, 0.9177, 0.1067] },   /* measured, as field's */
     blois: { file: 'armour-blois-5', back: 0.31, what: 'fluted Blois suit, a sword point down' }
   };
   /* finishes: a multiplier on the suit's own colour, and how much of its mirror is lost to wear (dull: the env map's
@@ -164,7 +166,7 @@
     shield: { height: 0.62, width: 0.48, thick: 0.02 }
   };
   var armCache = {};
-  var ARMS_ON = false;   /* off until the hold passes its look (two failures, 17 November 2026, 11.12 and 11.16 pm: row to Fawkes); CastleArmour.showArms(true) for a check */
+  var ARMS_ON = false;   /* the mace and shield, off until their hold passes its look (CastleArmour.showArms(true) for a check); the halberd is on in a closed fist (row 5906) */
   function merge(geos) {   /* non-indexed geometries into one (position, normal) */
     var pos = [], nor = [];
     geos.forEach(function (g) { g = g.index ? g.toNonIndexed() : g; pos.push(g.attributes.position.array); nor.push(g.attributes.normal.array); });
@@ -265,7 +267,7 @@
       lod.addLevel(near, 0); lod.addLevel(level(S.lods[0]), NEAR); lod.addLevel(level(S.lods[1]), FAR);
       lod.name = 'armour-set-lod'; inner.add(lod);
       suit.body = near.children[0]; suit.mats = mats.slice();
-      if (v.arm && ARMS_ON) { suit.arm = placeArm(v.arm, S.grip, inner); suit.arm.traverse(function (o) { if (o.material && suit.mats.indexOf(o.material) < 0) { o.material.emissive = o.material.emissive || new THREE.Color(0, 0, 0); if (o.material.userData.env === undefined) o.material.userData.env = 1; suit.mats.push(o.material); } }); }
+      if (v.arm && (ARMS_ON || (v.arm === 'halberd' && S.fist))) {   /* the halberd wherever the suit's fist is closed (row 5906, its look passed 18 November 2026); the mace and shield only under ?arms */ suit.arm = placeArm(v.arm, S.grip, inner); suit.arm.traverse(function (o) { if (o.material && suit.mats.indexOf(o.material) < 0) { o.material.emissive = o.material.emissive || new THREE.Color(0, 0, 0); if (o.material.userData.env === undefined) o.material.userData.env = 1; suit.mats.push(o.material); } }); }
       suit.ready = true; waiting.splice(0).forEach(function (f) { f(suit); });
     }
     if (S.ready) fill(); else S.waiters.push(fill);
