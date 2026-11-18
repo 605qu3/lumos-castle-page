@@ -207,6 +207,8 @@
         f.rotateY(k * Math.PI * 2 / A.flanges); f.translate(0, -(hl - hh) + 0.08 - hh, 0); fl.push(f);
       }
       out.push([merge([haft].concat(fl)), M.steel]);
+      var grip = new THREE.CylinderGeometry(0.018, 0.018, 0.1, 8);   /* a leather-bound grip where the fist closes, the halberd haft's size (inferred) */
+      out.push([grip, M.wood]);
     } else if (name === 'shield') {   /* a heater shield, flat-topped, its point down, its face to +z */
       var w = A.width / 2, h = A.height;
       var face = slab([[-w, h], [w, h], [w, h * 0.55], [w * 0.55, h * 0.18], [0, 0], [-w * 0.55, h * 0.18], [-w, h * 0.55]], A.thick);
@@ -230,7 +232,8 @@
       g.rotation.z = -Math.atan2(out, grip.y);   /* the top leans in, toward the suit's middle (+x) */
       g.rotation.y = 0;   /* the blade (built on +x) then points in over the shoulder: turn it outward */
       g.children.forEach(function (m) { m.rotation.y = Math.PI; });
-    } else if (name === 'mace') { g.position.set(0.21, 1.02, 0.07); g.rotation.z = 0.08; }   /* from the belt at the left hip, head down */
+    } else if (name === 'mace' && grip.fist) { g.position.set(grip.x, grip.y, grip.z); }   /* hanging head down from the closed fist (row 5906) */
+    else if (name === 'mace') { g.position.set(0.21, 1.02, 0.07); g.rotation.z = 0.08; }   /* from the belt at the left hip, head down */
     else { g.position.set(0.11, 0.01, 0.27); g.rotation.x = 0.26; }   /* point on the floor, the top back against the thigh */
     inner.add(g);
     return g;
