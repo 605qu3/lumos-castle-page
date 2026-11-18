@@ -25,6 +25,7 @@
   var Q = new URLSearchParams(location.search), night = Q.get('night') === '1';
   if (Q.has('arms')) CastleArmour.showArms(true);
   if (Q.has('armcode')) CastleArmour.armCode(true);   /* ?armcode: the code-built arms (the failed ones), a check's control */
+  if (Q.has('halberdglb')) CastleArmour.halberdGlb(true);   /* ?halberdglb: the free halberd (RomarovArt's, conformed to the Met 14.25.284), a check only */
   if (Q.get('macediag')) CastleArmour.maceDiag(Q.get('macediag').split(','));   /* ?macediag=nmap,mr,base,env,front,flat: one shading factor off at a time (the mace's render branch) */
   if (Q.has('maceflat')) CastleArmour.maceFlat(true);   /* ?maceflat: the failed head of 18 November (flat 5 mm flanges, not turned), the mark's control */   /* ?arms: the halberd, shield and mace, off by default until they pass */
   var canvas = document.getElementById('c'), renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });

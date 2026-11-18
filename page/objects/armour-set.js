@@ -286,7 +286,11 @@
   function placeArm(name, grip, inner, armBase, done) {   /* the arm in the suit's own frame (inner: mirrored and scaled with the suit); done(g) once its meshes are in */
     var g = new THREE.Group(), glb = ARM_GLB[name] && !ARM_CODE; g.name = 'armour-arm-' + name;
     function add(list) { list.forEach(function (q) { var m = new THREE.Mesh(q[0], q[1]); m.raycast = function () {}; g.add(m); }); }
-    if (glb) loadArm(armBase, name, function (ps) { if (ps) add(ps.map(function (q) { return [q.geo, q.mat]; })); if (done) done(g); });
+    if (glb) loadArm(armBase, name, function (ps) {
+      if (ps) add(ps.map(function (q) { return [q.geo, q.mat]; }));
+      if (name === 'halberd') g.children.forEach(function (m) { m.rotation.y = Math.PI; });   /* the free halberd's blade (+x) outward, as the code one's */
+      if (done) done(g);
+    });
     else add(buildArm(name));
     if (name === 'halberd' && grip.fist) {   /* a closed fist (row 5906): the haft upright through its measured centre, the blade outward */
       g.position.set(grip.x, 0, grip.z);
@@ -377,5 +381,6 @@
     g.name = 'armour-set';
     return suit;
   }
-  window.CastleArmour = { make: make, variant: variant, alike: alike, VARIANTS: VARIANTS, SUITS: SUITS, ARMS: ARMS, NEAR: NEAR, FAR: FAR, showArms: function (b) { ARMS_ON = !!b; }, buildArm: buildArm, maceFlat: function (b) { MACE_FLAT = !!b; if (b) ARM_CODE = true; delete armCache.mace; }, armCode: function (b) { ARM_CODE = !!b; }, maceDiag: function (list) { DIAG = list || []; delete armGlb.mace; delete armCache.mace; } };
+  window.CastleArmour = { make: make, variant: variant, alike: alike, VARIANTS: VARIANTS, SUITS: SUITS, ARMS: ARMS, NEAR: NEAR, FAR: FAR, showArms: function (b) { ARMS_ON = !!b; }, buildArm: buildArm, maceFlat: function (b) { MACE_FLAT = !!b; if (b) ARM_CODE = true; delete armCache.mace; }, armCode: function (b) { ARM_CODE = !!b; }, halberdGlb: function (b) { if (b) ARM_GLB.halberd = 'halberd-romarov-1.glb'; else delete ARM_GLB.halberd; delete armGlb.halberd; },   /* the free halberd, a check's only (?halberdglb on the test page) until card 5917 is answered */
+    maceDiag: function (list) { DIAG = list || []; delete armGlb.mace; delete armCache.mace; } };
 })();
