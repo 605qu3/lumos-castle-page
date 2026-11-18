@@ -10253,7 +10253,9 @@ function tap(cx, cy) {
      not well-mouth and back); from any place inside it is in front of him and takes him out as before */
   if (here === START && kit.from && hits.length && hits[0].object.userData.way) {
     var came = thingOf(hits[0].object);
-    if (came && came.to === kit.from) hits.shift();
+    if (came && came.to === kit.from && hits.length > 1 && (tappables.indexOf(hits[1].object) >= 0 || flightOf(hits[1].object))) hits.shift();
+    /* (the Architect, 17 November 2026, 11.06 pm, Fawkes 23:03: 856's yield only when what lies behind is a tappable or a flight;
+       arrived in a corridor through a stair hall mouth, nothing does, and the yield left him no way home from where he stood) */
   }
   /* v20 (Events' ninety-second, 4.01 am): a tap through an open way at a way or door beyond it is a tap on that one
      (lake-passage-b-north seen through lake-passage-b-south's mouth, its plane always first on the ray); the near way
