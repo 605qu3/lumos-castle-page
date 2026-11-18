@@ -280,9 +280,11 @@
       g.position.set(grip.x, grip.y, grip.z);
       /* the free mace's six flanges lie at 22.5 + 60k degrees round its haft in the mirrored suit's frame, one 7.5 degrees
          off edge-on to the aisle (+z): a blind read saw that flange's lit rim as a seam splitting the head (18 November
-         2026, 1.22 am). This +22.5 degree turn, under the suit's mirror, puts them at 45 + 60k: the nearest 15 degrees off
-         edge-on, not the 30 intended (measured 1.40 am); -22.5 gives 0 + 60k, 30 off. Which stands is Fawkes's (row below) */
-      if (glb) g.rotation.y = Math.PI / 8;
+         2026, 1.22 am). A +22.5 degree turn ran backwards under the suit's mirror (15 off, measured 1.40 am); this -22.5
+         (Fawkes on row 5921) puts the nearest 30 off from the front but one edge-on from the suit's side, read there as a
+         seam (1.48 am): front and side are 90 degrees apart and the flanges' planes repeat every 60, so no turn clears
+         every view a walker gets (tools/objects-mace-turn.py prints them all). The turn is not the cure; under ?arms only */
+      if (glb) g.rotation.y = -Math.PI / 8;
     }
     else if (name === 'mace') { g.position.set(0.21, 1.02, 0.07); g.rotation.z = 0.08; }   /* from the belt at the left hip, head down */
     else { g.position.set(0.11, 0.01, 0.27); g.rotation.x = 0.26; }   /* point on the floor, the top back against the thigh */
