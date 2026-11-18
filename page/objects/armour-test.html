@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The castle's armour set</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #0b0a09; overflow: hidden; }
+  canvas { display: block; width: 100%; height: 100%; }
+  #stats { position: fixed; left: 8px; top: 8px; font: 12px monospace; color: #aaa; }
+</style>
+</head>
+<body>
+<!-- the armour set (armour-set.js, CastleArmour) for a check, not a room. ?row=1 stands the default's copies in a row
+     along a wall (?n= how many, default 8); ?suit=<field|redcloth|sallet|blois>&dist=<metres>&level=<0|1|2>[&kind=<a kind>][&view=side] stands one
+     suit that far from the camera with its detail held at one level (for the switch distances); ?night=1 the torches'
+     light. The camera is the castle's: fov 42 on a wide screen, 58 on a tall one, eye 1.35 m. -->
+<canvas id="c"></canvas>
+<div id="stats">starting</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="../people/GLTFLoader.js"></script>
+<script src="armour-set.js?v=6"></script>
+<script>
+(function () {
+  var Q = new URLSearchParams(location.search), night = Q.get('night') === '1';
+  if (Q.has('arms')) CastleArmour.showArms(true);   /* ?arms: the halberd, shield and mace, off by default until they pass */
+  var canvas = document.getElementById('c'), renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
+  renderer.outputEncoding = THREE.sRGBEncoding; renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.0;
+  renderer.setPixelRatio(Math.min(2, window.devicePixelRatio || 1));
+  var scene = new THREE.Scene(); scene.background = new THREE.Color(0x0b0a09);
+  function col(h) { return new THREE.Color(h).convertSRGBToLinear(); }
+  var floor = new THREE.Mesh(new THREE.PlaneGeometry(40, 40), new THREE.MeshStandardMaterial({ color: col(night ? 0x4a4038 : 0x8a8074), roughness: 0.9 }));
+  floor.rotation.x = -Math.PI / 2; scene.add(floor);
+  var wall = new THREE.Mesh(new THREE.PlaneGeometry(40, 6), new THREE.MeshStandardMaterial({ color: col(night ? 0x5a4c40 : 0xa8a094), roughness: 0.95 }));
+  scene.add(wall);
+  scene.add(new THREE.HemisphereLight(col(night ? 0x6a5040 : 0xdfe6ee), col(night ? 0x201812 : 0x5a5048), night ? 0.5 : 1.0));
+  var key = new THREE.DirectionalLight(col(night ? 0xffb070 : 0xfff6ea), night ? 1.1 : 1.6); key.position.set(-2, 3, 3); scene.add(key);
+  var cam = new THREE.PerspectiveCamera(42, 1, 0.1, 80), suits = [], level = Q.get('level');
+  if (Q.get('suit')) {   /* one suit, its back 5 cm off the wall, the camera dist metres in front at eye height */
+    var key2 = Q.get('suit'), kind = Q.get('kind') || Object.keys(CastleArmour.VARIANTS).filter(function (k) { var v = CastleArmour.VARIANTS[k]; return v[0] === key2 && v[1] === 'own' && !v[3]; })[0];
+    var s = CastleArmour.make(THREE, renderer, { kind: kind || 'default', index: ['field', 'redcloth', 'sallet', 'blois'].indexOf(key2), base: 'armour/' });
+    var dist = +(Q.get('dist') || 4), ly = +(Q.get('look') || 1.1), ax = +(Q.get('ax') || 0);   /* ?look: the height the camera looks at (a hand, 0.9); ?ax: the x it stands on and looks at, from the front */
+    wall.position.set(0, 3, -s.back - 0.05); s.group.position.set(0, 0, 0); scene.add(s.group); suits.push(s);
+    if (Q.get('view') === 'side') { cam.position.set(-dist, 1.35, 0.15); cam.lookAt(0, ly, 0.15); }   /* from the suit's right */
+    else if (Q.get('view') === 'left') { cam.position.set(dist, 1.35, 0.15); cam.lookAt(0, ly, 0.15); }   /* from its left */
+    else cam.position.set(ax, 1.35, dist), cam.lookAt(ax, ly, 0);
+  } else {   /* a row of the default's copies along the wall, seen down its length */
+    var n = +(Q.get('n') || 8);
+    wall.position.set(0, 3, -0.5); wall.rotation.y = 0;
+    for (var i = 0; i < n; i++) {
+      var r = CastleArmour.make(THREE, renderer, { index: i, base: 'armour/' });
+      r.group.position.set(-6 + i * 1.6, 0, -0.5 + r.back + 0.05); scene.add(r.group); suits.push(r);
+    }
+    cam.position.set(-8.5, 1.35, 3.2); cam.lookAt(2, 1.0, -0.5);
+  }
+  function hold() {   /* ?level: every copy's detail held at one level */
+    if (level === null) return;
+    scene.traverse(function (o) { if (o.isLOD) { o.autoUpdate = false; o.levels.forEach(function (l, j) { l.object.visible = j === +level; }); } });
+  }
+  function size() { var w = innerWidth, h = innerHeight; renderer.setSize(w, h, false); cam.aspect = w / h; cam.fov = w / h < 1 ? 58 : 42; cam.updateProjectionMatrix(); }
+  addEventListener('resize', size); size();
+  var frames = 0, t0 = performance.now(), stats = document.getElementById('stats');
+  (function loop() {
+    hold(); suits.forEach(function (s) { s.light(night ? 1 : 0); });
+    renderer.render(scene, cam); frames++;
+    var t = performance.now(); if (t - t0 > 1000) { stats.textContent = Math.round(frames * 1000 / (t - t0)) + ' fps, ' + renderer.info.render.calls + ' draw calls, ' + (renderer.info.render.triangles / 1000).toFixed(1) + 'k triangles'; frames = 0; t0 = t; }
+    requestAnimationFrame(loop);
+  })();
+  window.lumosArmour = { suits: suits, ready: function () { return suits.every(function (s) { return s.ready; }); } };
+})();
+</script>
+</body>
+</html>

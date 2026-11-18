@@ -1,0 +1,6 @@
+Suits of armour in this folder (Lumos castle, row 5868). Each is a free model under CC BY 4.0, prepared (stood 1.70 m, parts not armour removed, lower-detail copies made) by tools/objects-armour-5868.py.
+
+armour-blois-5.glb (and -lod1, -lod2): "Castle of Blois - Knight Armor" by Damien Brisson (https://sketchfab.com/DamienBrisson), CC Attribution, via Sketchfab. Licence: http://creativecommons.org/licenses/by/4.0/
+armour-field-1.glb (and -lod1, -lod2): "Knight armor" by SlagPerch 3D (https://sketchfab.com/slagperch3d), CC Attribution, via Sketchfab. Licence: http://creativecommons.org/licenses/by/4.0/ Changed: its right gauntlet closed round a halberd haft (tools/objects-armour-grip.py, 18 November 2026).
+armour-redcloth-2.glb (and -lod1, -lod2): "Armor" by Evgenii Sobolev (https://sketchfab.com/ESobolev), CC Attribution, via Sketchfab. Licence: http://creativecommons.org/licenses/by/4.0/
+armour-sallet-3.glb (and -lod1, -lod2): "Lowpoly armor on a dummy" by Agitek Softworks Inc. (https://sketchfab.com/agitek), CC Attribution, via Sketchfab. Licence: http://creativecommons.org/licenses/by/4.0/
