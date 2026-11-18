@@ -166,6 +166,7 @@
     shield: { height: 0.62, width: 0.48, thick: 0.02 }
   };
   var armCache = {};
+  var MACE_FLAT = false;   /* the failed head (flat 5 mm flanges, not turned), only as the 16-view mark's control (?maceflat on the test page) */
   var ARMS_ON = false;   /* the mace and shield, off until their hold passes its look (CastleArmour.showArms(true) for a check); the halberd is on in a closed fist (row 5906) */
   function merge(geos) {   /* non-indexed geometries into one (position, normal) */
     var pos = [], nor = [];
@@ -183,7 +184,12 @@
     var steel = new THREE.MeshStandardMaterial({ color: col(0x8c8f93), metalness: 1, roughness: 0.42 });
     if (renderer) steel.envMap = hallEnv();
     steel.userData.env = 1;
-    return (armCache.mats = { steel: steel, wood: new THREE.MeshStandardMaterial({ color: col(0x5a4330), roughness: 0.8 }),
+    /* the mace's core between its flanges, in their shadow: darker and rougher (the bare shiny core caught one bright
+       streak down the head's middle, read as a pale line; tools/objects-mace-pin.py, 18 November 2026) */
+    var deep = new THREE.MeshStandardMaterial({ color: col(0x3c3e41), metalness: 1, roughness: 0.78 });
+    if (renderer) deep.envMap = steel.envMap;
+    deep.userData.env = 1;
+    return (armCache.mats = { steel: steel, deep: deep, wood: new THREE.MeshStandardMaterial({ color: col(0x5a4330), roughness: 0.8 }),
       paint: new THREE.MeshStandardMaterial({ color: col(0x6e5a44), roughness: 0.85 }) });
   }
   function buildArm(name) {   /* [[geo, mat], ...] in the arm's own frame: y up from the floor (halberd, mace) or its foot (shield) */
@@ -203,8 +209,14 @@
       var hl = A.length, hh = A.head, fl = [];
       var haft = new THREE.CylinderGeometry(0.014, 0.014, hl - hh, 8); haft.translate(0, -(hl - hh) / 2 + 0.08, 0);
       for (var k = 0; k < A.flanges; k++) {
-        var f = slab([[0.012, 0], [A.across / 2 - 0.006, 0], [A.across / 2, hh * 0.1], [A.across / 2, hh * 0.55], [0.012, hh]], 0.005);   /* full width at the tip (y 0, the bottom), tapering toward the haft: a point at the tip read as a pin (18 November 2026) */
-        f.rotateY(k * Math.PI * 2 / A.flanges); f.translate(0, -(hl - hh) + 0.08 - hh, 0); fl.push(f);
+        var f = slab([[0.012, 0], [A.across / 2 - 0.006, 0], [A.across / 2, hh * 0.1], [A.across / 2, hh * 0.55], [0.012, hh]], 1);   /* full width at the tip (y 0, the bottom), tapering toward the haft: a point at the tip read as a pin (18 November 2026) */
+        /* a wedge section, as forged flanges are: 11 mm at the root (inside the core), an edge of 1.5 mm at the rim. A flat
+           5 mm plate seen edge-on read as a pin below the head and a pale line down it (two blind reads, 18 November 2026;
+           Fawkes's ruling on req 5919) */
+        var fp = f.attributes.position;
+        for (var v = 0; v < fp.count; v++) { var fx = fp.getX(v), ft = MACE_FLAT ? 0.005 : 0.011 - 0.0095 * Math.max(0, Math.min(1, (fx - 0.012) / (A.across / 2 - 0.012))); fp.setZ(v, fp.getZ(v) * ft); }
+        f.computeVertexNormals();
+        f.rotateY((k + (MACE_FLAT ? 0 : 0.5)) * Math.PI * 2 / A.flanges);   /* half a step round: no flange edge-on to the aisle (the gallery's main view) */ f.translate(0, -(hl - hh) + 0.08 - hh, 0); fl.push(f);
       }
       /* the head's solid core and the button at its tip (18 November 2026: a read saw a slit down the head's middle and a
          rod below it, the flanges meeting round nothing and tapering to a point), and a knob closing the haft's top */
@@ -212,8 +224,8 @@
       var core = new THREE.CylinderGeometry(0.026, 0.026, hh, 8);   /* 5 cm across: a 4 cm core caught one bright line and read as a slit */ core.translate(0, hb + hh / 2, 0);
       var button = new THREE.SphereGeometry(0.026, 8, 6, 0, Math.PI * 2, Math.PI / 2, Math.PI / 2); button.translate(0, hb, 0);   /* a domed end under the core */
       var knob = new THREE.SphereGeometry(0.02, 8, 6); knob.translate(0, 0.08, 0);
-      fl.push(core, button, knob);
-      out.push([merge([haft].concat(fl)), M.steel]);
+      fl.push(knob);
+      out.push([merge([haft].concat(fl)), M.steel], [merge([core, button]), M.deep]);
       var grip = new THREE.CylinderGeometry(0.018, 0.018, 0.1, 8);   /* a leather-bound grip where the fist closes, the halberd haft's size (inferred) */
       out.push([grip, M.wood]);
     } else if (name === 'shield') {   /* a heater shield, flat-topped, its point down, its face to +z */
@@ -288,5 +300,5 @@
     g.name = 'armour-set';
     return suit;
   }
-  window.CastleArmour = { make: make, variant: variant, alike: alike, VARIANTS: VARIANTS, SUITS: SUITS, ARMS: ARMS, NEAR: NEAR, FAR: FAR, showArms: function (b) { ARMS_ON = !!b; } };
+  window.CastleArmour = { make: make, variant: variant, alike: alike, VARIANTS: VARIANTS, SUITS: SUITS, ARMS: ARMS, NEAR: NEAR, FAR: FAR, showArms: function (b) { ARMS_ON = !!b; }, buildArm: buildArm, maceFlat: function (b) { MACE_FLAT = !!b; delete armCache.mace; } };
 })();

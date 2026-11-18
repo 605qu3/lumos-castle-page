@@ -19,11 +19,12 @@
 <div id="stats">starting</div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="../people/GLTFLoader.js"></script>
-<script src="armour-set.js?v=8"></script>
+<script src="armour-set.js?v=11"></script>
 <script>
 (function () {
   var Q = new URLSearchParams(location.search), night = Q.get('night') === '1';
-  if (Q.has('arms')) CastleArmour.showArms(true);   /* ?arms: the halberd, shield and mace, off by default until they pass */
+  if (Q.has('arms')) CastleArmour.showArms(true);
+  if (Q.has('maceflat')) CastleArmour.maceFlat(true);   /* ?maceflat: the failed head of 18 November (flat 5 mm flanges, not turned), the mark's control */   /* ?arms: the halberd, shield and mace, off by default until they pass */
   var canvas = document.getElementById('c'), renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
   renderer.outputEncoding = THREE.sRGBEncoding; renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.0;
   renderer.setPixelRatio(Math.min(2, window.devicePixelRatio || 1));
@@ -44,6 +45,10 @@
     if (Q.get('view') === 'side') { cam.position.set(-dist, 1.35, 0.15); cam.lookAt(0, ly, 0.15); }   /* from the suit's right */
     else if (Q.get('view') === 'left') { cam.position.set(dist, 1.35, 0.15); cam.lookAt(0, ly, 0.15); }   /* from its left */
     else cam.position.set(ax, 1.35, dist), cam.lookAt(ax, ly, 0);
+    if (Q.get('az') !== null) {   /* ?az: degrees round the point (ax, ly, 0.1), 0 the front, at eye height and dist m (the mace's 16-view mark, req 5919) */
+      var az = +Q.get('az') * Math.PI / 180; cam.position.set(ax + dist * Math.sin(az), 1.35, 0.1 + dist * Math.cos(az)); cam.lookAt(ax, ly, 0.1);
+    }
+    if (Q.has('nowall')) wall.visible = false;   /* ?nowall: for the views from behind */
   } else {   /* a row of the default's copies along the wall, seen down its length */
     var n = +(Q.get('n') || 8);
     wall.position.set(0, 3, -0.5); wall.rotation.y = 0;
