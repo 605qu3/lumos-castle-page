@@ -203,9 +203,16 @@
       var hl = A.length, hh = A.head, fl = [];
       var haft = new THREE.CylinderGeometry(0.014, 0.014, hl - hh, 8); haft.translate(0, -(hl - hh) / 2 + 0.08, 0);
       for (var k = 0; k < A.flanges; k++) {
-        var f = slab([[0.012, 0], [A.across / 2, hh * 0.2], [A.across / 2, hh * 0.75], [0.012, hh]], 0.005);
+        var f = slab([[0.012, 0], [A.across / 2 - 0.006, 0], [A.across / 2, hh * 0.1], [A.across / 2, hh * 0.55], [0.012, hh]], 0.005);   /* full width at the tip (y 0, the bottom), tapering toward the haft: a point at the tip read as a pin (18 November 2026) */
         f.rotateY(k * Math.PI * 2 / A.flanges); f.translate(0, -(hl - hh) + 0.08 - hh, 0); fl.push(f);
       }
+      /* the head's solid core and the button at its tip (18 November 2026: a read saw a slit down the head's middle and a
+         rod below it, the flanges meeting round nothing and tapering to a point), and a knob closing the haft's top */
+      var hb = -(hl - hh) + 0.08 - hh;
+      var core = new THREE.CylinderGeometry(0.026, 0.026, hh, 8);   /* 5 cm across: a 4 cm core caught one bright line and read as a slit */ core.translate(0, hb + hh / 2, 0);
+      var button = new THREE.SphereGeometry(0.026, 8, 6, 0, Math.PI * 2, Math.PI / 2, Math.PI / 2); button.translate(0, hb, 0);   /* a domed end under the core */
+      var knob = new THREE.SphereGeometry(0.02, 8, 6); knob.translate(0, 0.08, 0);
+      fl.push(core, button, knob);
       out.push([merge([haft].concat(fl)), M.steel]);
       var grip = new THREE.CylinderGeometry(0.018, 0.018, 0.1, 8);   /* a leather-bound grip where the fist closes, the halberd haft's size (inferred) */
       out.push([grip, M.wood]);
