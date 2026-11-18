@@ -280,7 +280,8 @@
       g.position.set(grip.x, grip.y, grip.z);
       /* the free mace's six flanges lie at 22.5 + 60k degrees round its haft in the mirrored suit's frame, one 7.5 degrees
          off edge-on to the aisle (+z): a blind read saw that flange's lit rim as a seam splitting the head (18 November
-         2026, 1.22 am). An eighth of a turn puts them at 60k degrees, none within 30 degrees of edge-on from the aisle */
+         2026, 1.22 am). This +22.5 degree turn, under the suit's mirror, puts them at 45 + 60k: the nearest 15 degrees off
+         edge-on, not the 30 intended (measured 1.40 am); -22.5 gives 0 + 60k, 30 off. Which stands is Fawkes's (row below) */
       if (glb) g.rotation.y = Math.PI / 8;
     }
     else if (name === 'mace') { g.position.set(0.21, 1.02, 0.07); g.rotation.z = 0.08; }   /* from the belt at the left hip, head down */
