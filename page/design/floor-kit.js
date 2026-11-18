@@ -13,9 +13,14 @@
   }
   function blots(g, N, r, n, r0, r1, dark) {
     for (var i = 0; i < n; i++) {
-      var x = r() * N, y = r() * N, rad = r0 + r() * (r1 - r0), gr = g.createRadialGradient(x, y, 0, x, y, rad);
-      gr.addColorStop(0, 'rgba(' + (dark ? '0,0,0' : '255,255,255') + ',' + (0.05 + r() * 0.08) + ')'); gr.addColorStop(1, 'rgba(0,0,0,0)');
-      g.fillStyle = gr; g.fillRect(x - rad, y - rad, rad * 2, rad * 2);
+      var x = r() * N, y = r() * N, rad = r0 + r() * (r1 - r0), al = 0.05 + r() * 0.08;
+      /* v2 (Masonry, 17 November 2026): drawn again across each edge it crosses, so the repeat shows no straight shade step */
+      for (var ox = -N; ox <= N; ox += N) for (var oy = -N; oy <= N; oy += N) {
+        if (x + ox + rad < 0 || x + ox - rad > N || y + oy + rad < 0 || y + oy - rad > N) continue;
+        var gr = g.createRadialGradient(x + ox, y + oy, 0, x + ox, y + oy, rad);
+        gr.addColorStop(0, 'rgba(' + (dark ? '0,0,0' : '255,255,255') + ',' + al + ')'); gr.addColorStop(1, 'rgba(0,0,0,0)');
+        g.fillStyle = gr; g.fillRect(x + ox - rad, y + oy - rad, rad * 2, rad * 2);
+      }
     }
   }
   function plank(g, x, y, w, h, c, r, alongX) {   /* one board with its grain, lit a touch from above */
@@ -25,6 +30,27 @@
       g.fillStyle = 'rgba(' + (dk ? '40,22,8' : '255,235,200') + ',' + a + ')';
       if (alongX) g.fillRect(x, y + o, w, 1 + r()); else g.fillRect(x + o, y, 1 + r(), h);
     }
+  }
+  /* v2 (Masonry): a vein that runs past the canvas edge is drawn again from the far side, so it carries across the repeat. The
+     path is built after each shift (a canvas path is fixed in place once built, so shifting before stroke moves nothing) */
+  function wrapStroke(g, N, build) { for (var ox = -N; ox <= N; ox += N) for (var oy = -N; oy <= N; oy += N) { g.save(); g.translate(ox, oy); g.beginPath(); build(); g.stroke(); g.restore(); } }
+  /* one honed piece (Masonry, 17 November 2026): cloud in the stone and a few long soft veins, each a broad faint wash with a
+     narrower one in it, wrapped across the edges; no joint, no hard line */
+  function honed(g, N, r, base, vein) {
+    g.fillStyle = rgb(base[0], base[1], base[2]); g.fillRect(0, 0, N, N);
+    g.globalAlpha = 0.25; blots(g, N, r, 24, 120, 320, true); g.globalAlpha = 0.6; blots(g, N, r, 30, 80, 260, false); g.globalAlpha = 1;
+    for (var v = 0; v < 5; v++) {
+      var x = r() * N, y = r() * N, a = r() * Math.PI, pts = [[x, y]];
+      for (var k = 0; k < 6; k++) { a += (r() - 0.5) * 0.9; x += Math.cos(a) * 120; y += Math.sin(a) * 120; pts.push([x, y]); }
+      [[22 + r() * 16, 0.05], [7 + r() * 5, 0.05]].forEach(function (st) {
+        g.strokeStyle = 'rgba(' + vein[0] + ',' + vein[1] + ',' + vein[2] + ',' + st[1] + ')'; g.lineWidth = st[0]; g.lineCap = 'round'; g.lineJoin = 'round';
+        wrapStroke(g, N, function () {
+          g.moveTo(pts[0][0], pts[0][1]);
+          for (var q = 1; q < pts.length - 1; q++) g.quadraticCurveTo(pts[q][0], pts[q][1], (pts[q][0] + pts[q + 1][0]) / 2, (pts[q][1] + pts[q + 1][1]) / 2);
+        });
+      });
+    }
+    grain(g, N, r, 5);
   }
   function slab(g, N, r, base, vein, va) {   /* four slabs a side; each its own tint, long veins that wander, a sheen, a pale joint */
     var n = 2, s = N / n;
@@ -45,11 +71,26 @@
     /* the flags as the shell lays them now, but worn: big irregular stones, soft edges, a dark joint */
     flags: { rep: 4, draw: function (g, N, r) {
       g.fillStyle = rgb(70, 66, 62); g.fillRect(0, 0, N, N); var px = N / 4, y = 0;
-      while (y < 4) { var h = 0.55 + r() * 0.3, x = -r() * 0.6; while (x < 4) { var w = 0.6 + r() * 0.5, v = 118 + r() * 34, j = 0.014 * px;
-        var c = mix([v, v - 2, v - 6], [v - 14, v - 16, v - 18], r());
-        g.fillStyle = rgb(c[0], c[1], c[2]); var rx = x * px + j, ry = y * px + j, rw = w * px - 2 * j, rh = h * px - 2 * j, k = 0.05 * Math.min(rw, rh);
-        g.beginPath(); g.moveTo(rx + k, ry); g.arcTo(rx + rw, ry, rx + rw, ry + rh, k); g.arcTo(rx + rw, ry + rh, rx, ry + rh, k); g.arcTo(rx, ry + rh, rx, ry, k); g.arcTo(rx, ry, rx + rw, ry, k); g.fill();
-        x += w; } y += h; }
+      /* v2 (Masonry): the rows fitted to fill the 4 m exactly and each row closed on itself, a flag across the edge drawn on
+         both sides, so the repeat cuts no flag in half and no row out of step */
+      var hs = [], hsum = 0; while (hsum < 4) { var h0 = 0.55 + r() * 0.3; hs.push(h0); hsum += h0; }
+      if (hs.length > 1 && hsum - 4 > hs[hs.length - 1] / 2) hsum -= hs.pop();
+      hs.forEach(function (h0) {
+        var h = h0 * 4 / hsum, x0 = -r() * 0.6, x = x0, row = [];
+        while (x < x0 + 4 - 1e-9) { var w = 0.6 + r() * 0.5; row.push([x, w]); x += w; }
+        var over = x - (x0 + 4), last = row[row.length - 1];
+        if (row.length > 1 && over > last[1] / 2) { row.pop(); row[row.length - 1][1] += last[1] - over; } else last[1] -= over;
+        row.forEach(function (sw) {
+          var v = 118 + r() * 34, j = 0.014 * px, c = mix([v, v - 2, v - 6], [v - 14, v - 16, v - 18], r());
+          g.fillStyle = rgb(c[0], c[1], c[2]);
+          for (var ox = -N; ox <= N; ox += N) {
+            var rx = sw[0] * px + j + ox, ry = y * px + j, rw = sw[1] * px - 2 * j, rh = h * px - 2 * j, k = 0.05 * Math.min(rw, rh);
+            if (rx > N || rx + rw < 0) continue;
+            g.beginPath(); g.moveTo(rx + k, ry); g.arcTo(rx + rw, ry, rx + rw, ry + rh, k); g.arcTo(rx + rw, ry + rh, rx, ry + rh, k); g.arcTo(rx, ry + rh, rx, ry, k); g.arcTo(rx, ry, rx + rw, ry, k); g.fill();
+          }
+        });
+        y += h;
+      });
       blots(g, N, r, 90, 40, 190, true); blots(g, N, r, 50, 30, 120, false); grain(g, N, r, 16); } },
     /* granite setts, small cobbled blocks laid in staggered courses */
     setts: { rep: 1.6, draw: function (g, N, r) {
@@ -117,6 +158,9 @@
       grain(g, N, r, 10); } },
     /* req 1990: a pale veined marble for the prefects' rooms (honed, a little polished): two-by-two slabs, thin grey veins, a soft sheen */
     'marble-pale': { rep: 2.4, draw: function (g, N, r) { slab(g, N, r, [226, 223, 216], [118, 124, 132], 0.30); } },
+    /* v2 (Masonry, 17 November 2026): the same marble as one piece with no joint in it, for a stair's treads and risers: each
+       is one cut slab, its own edges its joints, so no slab line runs down the middle of a flight */
+    'marble-piece': { rep: 2.4, draw: function (g, N, r) { honed(g, N, r, [226, 223, 216], [118, 124, 132]); } },
     /* the same slabs in a warm cream with brown-gold veins */
     'marble-cream': { rep: 2.4, draw: function (g, N, r) { slab(g, N, r, [224, 214, 192], [150, 116, 70], 0.34); } },
     /* req 1995: the Victorian black and white, nine-inch glazed squares (about 0.23 m) on the chequer, a keyline of grey grout, the white a
@@ -138,20 +182,29 @@
     var g = cv.getContext('2d'); KINDS[kind].draw(g, N, rnd(kind.length * 7919 + 17));
     var t = new THREE.CanvasTexture(cv); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.anisotropy = 8; return (maps[kind] = t);
   }
-  function dress(old, kind, gain) {
-    var key = kind + ':' + old.uuid; if (mats[key]) return mats[key];
+  function dress(old, kind, gain, proj) {
+    proj = proj || 'face';
+    var key = kind + ':' + proj + ':' + old.uuid; if (mats[key]) return mats[key];
     var m = old.clone(); m.color.set(0xffffff); m.map = null; m.userData = { floorKit: kind }; var t = tex(kind), rep = KINDS[kind].rep;
     m.onBeforeCompile = function (sh) {
       sh.uniforms.kitMap = { value: t };
-      sh.vertexShader = 'varying vec3 vKitP;\n' + sh.vertexShader.replace('#include <begin_vertex>', '#include <begin_vertex>\nvKitP = (modelMatrix * vec4(transformed, 1.0)).xyz;');
-      sh.fragmentShader = 'uniform sampler2D kitMap;\nvarying vec3 vKitP;\n' + sh.fragmentShader.replace('#include <color_fragment>',
-        '#include <color_fragment>\ndiffuseColor.rgb = pow(texture2D(kitMap, vKitP.xz / ' + rep.toFixed(3) + ').rgb, vec3(2.2)) * ' + (gain || 0.5).toFixed(3) + ';');
+      /* v2 (Masonry, 17 November 2026, Fawkes's word 9.10 pm): each face takes the texture along its own normal, as
+         stone-face.js does: a floor or tread from above, an upright face (a riser, a stringer) from the side. 'down', the
+         kit's old projection from above on every face, stays as a flag for the check's known bads (page/design/stone-check.html):
+         on an upright face it smears the texture into vertical streaks */
+      sh.vertexShader = 'varying vec3 vKitP;\nvarying vec3 vKitN;\n' + sh.vertexShader.replace('#include <begin_vertex>', '#include <begin_vertex>\nvKitP = (modelMatrix * vec4(transformed, 1.0)).xyz;\nvKitN = normalize(mat3(modelMatrix) * objectNormal);');
+      var uv = proj === 'down' ? 'vec2 kuv = vKitP.xz;\n' : 'vec3 kn = abs(normalize(vKitN));\nvec2 kuv = kn.x > kn.z ? vKitP.zy : vKitP.xy;\nif (kn.y > max(kn.x, kn.z)) kuv = vKitP.xz;\n';
+      sh.fragmentShader = 'uniform sampler2D kitMap;\nvarying vec3 vKitP;\nvarying vec3 vKitN;\n' + sh.fragmentShader.replace('#include <color_fragment>',
+        '#include <color_fragment>\n' + uv + 'diffuseColor.rgb = pow(texture2D(kitMap, kuv / ' + rep.toFixed(3) + ').rgb, vec3(2.2)) * ' + (gain || 0.5).toFixed(3) + ';');
     };
+    /* each kind's repeat, gain and projection its own program (three keys a program by this function's source alone, so two
+       kinds would otherwise share the first one's repeat) */
+    m.customProgramCacheKey = function () { return 'floorkit|' + rep + '|' + (gain || 0.5) + '|' + proj; };
     m.needsUpdate = true; return (mats[key] = m);
   }
   /* FloorKit.apply('oak', 1.0): every mesh named *-floor (not a niche's) in the live scene takes the kind */
   /* the page copy of Design's probe (assets/design/materials/floor-kit.js, req 1911); `mat` added for the shell (req 1928) */
-  window.FloorKit = { kinds: Object.keys(KINDS), mat: dress, apply: function (kind, gain) {
+  window.FloorKit = { kinds: Object.keys(KINDS), mat: dress, tex: tex, rep: function (k) { return KINDS[k].rep; }, apply: function (kind, gain) {
     var n = 0, sc = window.lumosGreybox.scene;
     sc.traverse(function (o) { if (o.isMesh && /-floor$/.test(o.name || '') && !/niche/.test(o.name)) {
       var mm = o.material; if (Array.isArray(mm)) return; o.material = dress(mm, kind, gain); n++; } });

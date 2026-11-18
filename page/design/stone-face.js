@@ -18,7 +18,9 @@
 (function () {
   'use strict';
   var FACED = { 'late-pale': true };
-  var KINDS = { coursed: 'coursed', ashlar: 'ashlar', rubble: 'rubble', limewash: 'limewash', flags: 'flags' };
+  /* v2 (the one-castle gate, 17 November 2026): 'dressed', a trim stone's face, one stone with no joints in it (its 6 mm
+     piece gaps carry the joints), so a voussoir or pilaster no longer shows the wall's coursing running through it */
+  var KINDS = { coursed: 'coursed', ashlar: 'ashlar', rubble: 'rubble', limewash: 'limewash', flags: 'flags', dressed: 'dressed' };
   var maps = {};
 
   function rnd(s) { return function () { s = (s * 16807) % 2147483647; return s / 2147483647; }; }
@@ -31,9 +33,14 @@
     function blots(n, r0, r1, lo, hi, a) {   /* soft weathering, larger than a stone, so the repeat does not show */
       for (var i = 0; i < n; i++) {
         var x = r() * N, y = r() * N, rad = r0 + r() * (r1 - r0), v = Math.round(lo + r() * (hi - lo));
-        var gr = g.createRadialGradient(x, y, 0, x, y, rad), c = v + ',' + v + ',' + v;
-        gr.addColorStop(0, 'rgba(' + c + ',' + a + ')'); gr.addColorStop(1, 'rgba(' + c + ',0)');
-        g.fillStyle = gr; g.fillRect(x - rad, y - rad, 2 * rad, 2 * rad);
+        /* v3 (Masonry, 17 November 2026): each blot drawn again across every edge it crosses, so the 4 m repeat carries
+           no straight shade step (the probe page/design/stone-check.html measures it) */
+        for (var ox = -N; ox <= N; ox += N) for (var oy = -N; oy <= N; oy += N) {
+          if (x + ox + rad < 0 || x + ox - rad > N || y + oy + rad < 0 || y + oy - rad > N) continue;
+          var gr = g.createRadialGradient(x + ox, y + oy, 0, x + ox, y + oy, rad), c = v + ',' + v + ',' + v;
+          gr.addColorStop(0, 'rgba(' + c + ',' + a + ')'); gr.addColorStop(1, 'rgba(' + c + ',0)');
+          g.fillStyle = gr; g.fillRect(x + ox - rad, y + oy - rad, 2 * rad, 2 * rad);
+        }
       }
     }
     function speckle(a) {
@@ -50,7 +57,11 @@
       gr.addColorStop(0, grey(v + 8)); gr.addColorStop(0.5, grey(v)); gr.addColorStop(1, grey(v - 10));
       g.fillStyle = gr; g.fill();
     }
-    if (kind === 'limewash') {
+    if (kind === 'dressed') {   /* the ashlar's own stone (its mean grey 242), weathered and speckled the same, no joint */
+      g.fillStyle = grey(242); g.fillRect(0, 0, N, N);
+      blots(160, 60, 220, 200, 255, 0.18);
+      speckle(12);
+    } else if (kind === 'limewash') {
       g.fillStyle = grey(240); g.fillRect(0, 0, N, N);
       blots(500, 30, 140, 222, 252, 0.3);
       g.strokeStyle = 'rgba(150,150,150,0.10)'; g.lineWidth = 3;   /* the courses under the wash, just showing */
@@ -60,20 +71,31 @@
       var rubble = kind === 'rubble', flags = kind === 'flags';
       var joint = rubble ? 0.025 : flags ? 0.012 : kind === 'ashlar' ? 0.006 : 0.012;
       g.fillStyle = grey(rubble ? 168 : 180); g.fillRect(0, 0, N, N);   /* the joint, in shade */
-      var y = 0;
-      while (y < 4) {
-        var h = rubble ? 0.16 + r() * 0.2 : flags ? 0.6 : kind === 'ashlar' ? 0.4 : 0.3, x = -(r() * 0.6);
-        while (x < 4) {
+      /* v3 (Masonry, 17 November 2026): the layout tiles. The courses are fitted to fill the 4 m exactly (a cut course at
+         the repeat put the courses out of step every 4 m up a wall), and each course closes on itself: its last stone ends
+         where its first began, 4 m on, and a stone crossing the edge is drawn on both sides (a stone cut at the repeat
+         met another with no joint). */
+      var hs = [], hsum = 0;
+      while (hsum < 4 - 1e-9) { var h0 = rubble ? 0.16 + r() * 0.2 : flags ? 0.6 : kind === 'ashlar' ? 0.4 : 0.3; hs.push(h0); hsum += h0; }
+      if (hsum - 4 > 4 - (hsum - hs[hs.length - 1]) && hs.length > 1) { hsum -= hs.pop(); }
+      var y = 0, fit = 4 / hsum;
+      hs.forEach(function (h0) {
+        var h = h0 * fit, x0 = -(r() * 0.6), x = x0, row = [];
+        while (x < x0 + 4 - 1e-9) {
           var w = rubble ? 0.25 + r() * 0.45 : flags ? 0.6 + Math.floor(r() * 3) * 0.15 : kind === 'ashlar' ? 0.8 : 0.45 + r() * 0.2;
-          var v = rubble ? 222 + r() * 30 : 232 + r() * 20, j = joint * px / 2;
-          if (rubble) {   /* a rubble stone sits a little up or down in its course, never quite square */
-            var dy = (r() - 0.5) * 0.04 * px, sh = h * px - 2 * j - r() * 0.05 * px;
-            stone(x * px + j, y * px + j + dy, w * px - 2 * j, sh, 0.25 + r() * 0.25, v);
-          } else stone(x * px + j, y * px + j, w * px - 2 * j, h * px - 2 * j, flags ? 0.03 : 0.04, v);
-          x += w;
+          row.push([x, w]); x += w;
         }
+        var over = x - (x0 + 4), last = row[row.length - 1];
+        if (row.length > 1 && over > last[1] / 2) { row.pop(); row[row.length - 1][1] += last[1] - over; }   /* fold a sliver into its neighbour */
+        else last[1] -= over;
+        row.forEach(function (sw) {
+          var v = rubble ? 222 + r() * 30 : 232 + r() * 20, j = joint * px / 2, w = sw[1];
+          var dy = rubble ? (r() - 0.5) * 0.04 * px : 0, sh = rubble ? h * px - 2 * j - r() * 0.05 * px : h * px - 2 * j, rd = rubble ? 0.25 + r() * 0.25 : flags ? 0.03 : 0.04;
+          for (var ox = -N; ox <= N; ox += N)
+            if (sw[0] * px + ox < N && (sw[0] + w) * px + ox > 0) stone(sw[0] * px + j + ox, y * px + j + dy, w * px - 2 * j, sh, rd, v);
+        });
         y += h;
-      }
+      });
       blots(160, 60, 220, 200, 255, 0.18);
       speckle(rubble ? 20 : 12);
     }
@@ -97,5 +119,5 @@
     return m;
   }
 
-  window.CastleStoneFace = { version: 1, FACED: FACED, kind: function (d) { return KINDS[d] || null; }, dress: dress, maps: maps };
+  window.CastleStoneFace = { version: 3, FACED: FACED, kind: function (d) { return KINDS[d] || null; }, dress: dress, maps: maps };
 })();

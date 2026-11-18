@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Stone check</title>
+<style>html, body { margin: 0; background: #111; color: #ddd; font: 12px monospace; } canvas { display: inline-block; margin: 2px; }</style>
+</head>
+<body>
+<div id="out"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="stone-face.js?v=3"></script>
+<script src="floor-kit.js?v=3"></script>
+<script>
+/* stone-check.html: Masonry's instrument (gates 1 and 2, docs/handoff/masonry.md, 17 November 2026). Each case is one
+   plane, 4 m square, lit by an even light and rendered face-on by an orthographic camera, its middle 2.4 m read back.
+   Two numbers per case:
+     S, the streak ratio: mean vertical step over mean horizontal step, in the face's own axes. A texture smeared along
+        the face (a downward projection on an upright face) drives it to 0; an even stone reads near 1.
+     L, the line index: the larger of the spread of the row means and of the column means, over the spread of all the
+        pixels. Courses and joints raise it; one jointless stone keeps it low.
+   Knowns are made by flags (stone-face kinds, FloorKit's proj 'down'), never painted. window.stoneCheck holds the
+   result as JSON; ?show draws each case's read on the page. Not a page the boys see. */
+(function () {
+  'use strict';
+  var SF = window.CastleStoneFace, FK = window.FloorKit, show = /[?&]show/.test(location.search);
+  var R = 256, VIEW = 2.4;
+  var renderer = new THREE.WebGLRenderer({ antialias: false, preserveDrawingBuffer: true });
+  renderer.outputEncoding = THREE.sRGBEncoding; renderer.setSize(R, R);
+  var rt = new THREE.WebGLRenderTarget(R, R), px = new Uint8Array(R * R * 4);
+  var FACES = {   /* the face's normal and its own up */
+    'to+z': { n: [0, 0, 1], up: [0, 1, 0] },
+    'to+x': { n: [1, 0, 0], up: [0, 1, 0] },
+    'tilt60': { n: [0, Math.sin(Math.PI / 6), Math.cos(Math.PI / 6)], up: [0, Math.cos(Math.PI / 6), -Math.sin(Math.PI / 6)] },
+    'up': { n: [0, 1, 0], up: [0, 0, -1] }
+  };
+  function std(a) { var m = 0, i; for (i = 0; i < a.length; i++) m += a[i]; m /= a.length; var v = 0; for (i = 0; i < a.length; i++) v += (a[i] - m) * (a[i] - m); return Math.sqrt(v / a.length); }
+  function measure(mat, face, seam, view) {
+    var f = FACES[face], scene = new THREE.Scene(), n = new THREE.Vector3().fromArray(f.n), up = new THREE.Vector3().fromArray(f.up);
+    scene.add(new THREE.AmbientLight(0xffffff, 1.0));
+    var C = new THREE.Vector3(1.37, 1.91, 0.73);   /* off the world's origin, so no repeat lines up with the frame by chance */
+    /* seam: the repeat's edges (every `seam` metres in world space) put through the frame's middle on both axes */
+    if (seam) C.set(face === 'to+x' ? 1.37 : seam, face === 'up' ? 1.91 : seam, face === 'to+z' ? 0.73 : seam);
+    var g = new THREE.PlaneGeometry(4, 4), mesh = new THREE.Mesh(g, mat);
+    mesh.position.copy(C); mesh.lookAt(C.clone().add(n)); mesh.up.copy(up); mesh.quaternion.setFromRotationMatrix(new THREE.Matrix4().lookAt(C.clone().add(n), C, up)); scene.add(mesh);
+    var V = view || VIEW, cam = new THREE.OrthographicCamera(-V / 2, V / 2, V / 2, -V / 2, 0.1, 20);
+    cam.position.copy(C).add(n.clone().multiplyScalar(5)); cam.up.copy(up); cam.lookAt(C); cam.updateMatrixWorld();
+    renderer.setRenderTarget(rt); renderer.render(scene, cam); renderer.readRenderTargetPixels(rt, 0, 0, R, R, px); renderer.setRenderTarget(null);
+    var lum = new Float32Array(R * R), i, x, y;
+    for (i = 0; i < R * R; i++) lum[i] = 0.299 * px[i * 4] + 0.587 * px[i * 4 + 1] + 0.114 * px[i * 4 + 2];
+    var dx = 0, dy = 0, rows = [], cols = [];
+    for (y = 1; y < R; y++) for (x = 1; x < R; x++) { dx += Math.abs(lum[y * R + x] - lum[y * R + x - 1]); dy += Math.abs(lum[y * R + x] - lum[(y - 1) * R + x]); }
+    for (y = 0; y < R; y++) { var s = 0; for (x = 0; x < R; x++) s += lum[y * R + x]; rows.push(s / R); }
+    for (x = 0; x < R; x++) { var t = 0; for (y = 0; y < R; y++) t += lum[y * R + x]; cols.push(t / R); }
+    /* J, the joint index: a joint is a thin line, so the rows (or columns) it lies along carry a mean step far above the
+       typical row's. J is the highest row's or column's mean step over the median one; one stone with no joint stays near 1 */
+    var ry = [], cx = [];
+    for (y = 1; y < R; y++) { var a1 = 0; for (x = 0; x < R; x++) a1 += Math.abs(lum[y * R + x] - lum[(y - 1) * R + x]); ry.push(a1 / R); }
+    for (x = 1; x < R; x++) { var a2 = 0; for (y = 0; y < R; y++) a2 += Math.abs(lum[y * R + x] - lum[y * R + x - 1]); cx.push(a2 / R); }
+    function peak(v) { var o = v.slice().sort(function (p, q) { return p - q; }), med = o[o.length >> 1]; return med < 0.05 ? 1 : o[o.length - 1] / med; }
+    var J = Math.max(peak(ry), peak(cx));
+    /* K, the seam index: the frame's middle rows and columns (where a seam case puts the repeat's edge) over the median */
+    function mid(v) { var o = v.slice().sort(function (p, q) { return p - q; }), med = o[o.length >> 1], h = v.length >> 1, m = 0; for (var k = h - 3; k <= h + 2; k++) m = Math.max(m, v[k]); return med < 0.05 ? 1 : m / med; }
+    var K = Math.max(mid(ry), mid(cx));
+    var all = std(lum), mean = rows.reduce(function (a, b) { return a + b; }, 0) / R;
+    if (show) { renderer.render(scene, cam); var c = document.createElement('canvas'); c.width = c.height = R; c.getContext('2d').drawImage(renderer.domElement, 0, 0); document.body.appendChild(c); }
+    g.dispose();
+    return { S: +(dy / Math.max(dx, 1e-6)).toFixed(3), L: +(Math.max(std(rows), std(cols)) / Math.max(all, 1e-6)).toFixed(3), J: +J.toFixed(2), K: +K.toFixed(2), mean: +mean.toFixed(1) };
+  }
+  function std3(hex) { return new THREE.MeshStandardMaterial({ color: new THREE.Color(hex).convertSRGBToLinear(), roughness: 0.9, metalness: 0 }); }
+  function faced(kind, hex) { var m = std3(hex || 0xd8d2c6); SF.dress(THREE, m, kind); return m; }
+  function byUV(kind) {   /* the kit's own texture laid by the plane's UVs: an honest map on any face */
+    var t = FK.tex(kind).clone(); t.needsUpdate = true; t.encoding = THREE.sRGBEncoding; t.wrapS = t.wrapT = THREE.RepeatWrapping;
+    t.repeat.set(4 / FK.rep(kind), 4 / FK.rep(kind));
+    var m = new THREE.MeshStandardMaterial({ map: t, color: new THREE.Color(0.6, 0.6, 0.6), roughness: 0.9, metalness: 0 }); return m;
+  }
+  function kit(kind, proj) { return FK.mat(std3(0x808080), kind, 0.6, proj); }
+  var cases = [], q = new URLSearchParams(location.search);
+  function add(group, label, known, mk, face, seam, view) { cases.push({ group: group, label: label, known: known, face: face, seam: seam || 0, r: measure(mk(), face, seam, view) }); }
+  /* gate 1, the trim's face: L */
+  ['ashlar', 'coursed', 'rubble'].forEach(function (k) { add('trim', 'faced ' + k, 'bad', function () { return faced(k); }, 'to+z'); });
+  add('trim', 'flat pale', 'good', function () { return std3(0xd8d2c6); }, 'to+z');
+  add('trim', 'flat warm', 'good', function () { return std3(0xc9a77a); }, 'to+z');
+  add('trim', 'kit marble-pale by UV, inside one slab', 'good', function () { return byUV('marble-pale'); }, 'to+z', 0, 0.3);
+  ['to+z', 'to+x'].forEach(function (f) { add('trim', 'candidate dressed', 'candidate', function () { return faced('dressed'); }, f); });
+  /* gate 2, the marble stair: S */
+  ['to+z', 'to+x', 'tilt60'].forEach(function (f) { add('stair', 'kit marble-pale proj down', 'bad', function () { return kit('marble-pale', 'down'); }, f); });
+  ['to+z', 'to+x', 'tilt60'].forEach(function (f) { add('stair', 'marble-pale by UV', 'good', function () { return byUV('marble-pale'); }, f); });
+  ['to+z', 'to+x', 'tilt60'].forEach(function (f) { add('stair', 'marble-piece by UV', 'good', function () { return byUV('marble-piece'); }, f); });
+  ['to+z', 'to+x', 'tilt60', 'up'].forEach(function (f) { add('stair', 'candidate kit marble-pale', 'candidate', function () { return kit('marble-pale'); }, f); });
+  if (FK.kinds.indexOf('marble-piece') >= 0) ['to+z', 'to+x', 'tilt60', 'up'].forEach(function (f) { add('stair', 'candidate kit marble-piece', 'candidate', function () { return kit('marble-piece'); }, f); });
+  /* the repeat's seam: a jointless face must carry no line where its texture repeats (stone-face 4 m, the kit its rep) */
+  ['to+z', 'to+x', 'up'].forEach(function (f) { add('seam', 'candidate dressed', 'candidate', function () { return faced('dressed'); }, f, 4); });
+  if (FK.kinds.indexOf('marble-piece') >= 0) ['to+z', 'to+x', 'up'].forEach(function (f) { add('seam', 'candidate kit marble-piece', 'candidate', function () { return kit('marble-piece'); }, f, FK.rep('marble-piece')); });
+  ['to+z', 'up'].forEach(function (f) { add('seam', 'kit flags', 'report', function () { return kit('flags'); }, f, FK.rep('flags')); });
+  ['to+z', 'up'].forEach(function (f) { add('seam', 'faced flags', 'report', function () { return faced('flags'); }, f, 4); });
+  /* the marks (gates 1 and 2): trim J under 4 (joints 5 to 21, one stone 1 to 3.3); stair S within 0.8 to 1.25 of the same
+     marble's S laid honestly by UV (a smear 0 to 0.6); seam K under 2. Each known must land on its own side */
+  var ref = {}; cases.forEach(function (c) { if (c.group === 'stair' && /by UV/.test(c.label)) ref[c.label.split(' ')[0]] = c.r.S; });
+  cases.forEach(function (c) {
+    var k = (/marble-piece/.test(c.label) ? 'marble-piece' : 'marble-pale'), pass;
+    if (c.group === 'trim') pass = c.r.J < 4;
+    else if (c.group === 'stair') { c.ratio = +(c.r.S / ref[k]).toFixed(2); pass = c.ratio >= 0.8 && c.ratio <= 1.25; }
+    else pass = c.r.K < 2;
+    c.pass = pass; c.sorted = c.known === 'good' ? pass : c.known === 'bad' ? !pass : null;
+  });
+  var knowns = cases.filter(function (c) { return c.sorted !== null; });
+  window.stoneCheck = { knownsSorted: knowns.every(function (c) { return c.sorted; }), candidatesPass: cases.filter(function (c) { return c.known === 'candidate'; }).every(function (c) { return c.pass; }), version: 1, sf: SF.version, cases: cases };
+  document.getElementById('out').textContent = JSON.stringify(window.stoneCheck);
+})();
+</script>
+</body>
+</html>
