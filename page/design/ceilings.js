@@ -148,12 +148,26 @@
   }
 
   /* a squat round pier: a square base, the drum, a cushion and a square abacus the four bays spring from */
+  /* Masonry (17 November 2026, gate 6, row 5869; Godric, 9.12 pm: "make the columns look like columns"): a column turned
+     as a mason dresses it, from one profile: a moulded base (a roll, a hollow, a smaller roll, after the English attic
+     base) standing on its plinth at yb, the round shaft, and a capital (a necking ring and a bell spreading to the
+     abacus) whose top is yt. The parts overlap a few mm where they meet and have no flat faces of their own, so no two
+     faces lie in one plane. octagon: an eight-sided slab, the plinth and the abacus of English work, never a box */
+  var BASE_H = 0.2, CAP_H = 0.36;
+  function turned(THREE, pts, seg) { return new THREE.LatheGeometry(pts.map(function (q) { return new THREE.Vector2(q[0], q[1]); }), seg || 24); }
+  function column(THREE, P, mat, x, z, yb, yt, r) {
+    var add = function (g, py) { var m = new THREE.Mesh(g, mat); m.position.set(x, py, z); P.add(m); return m; };
+    add(turned(THREE, [[r * 1.32, 0], [r * 1.36, 0.035], [r * 1.3, 0.075], [r * 1.12, 0.09], [r * 1.08, 0.115], [r * 1.18, 0.14], [r * 1.14, 0.17], [r * 1.0, 0.19], [r * 0.98, BASE_H + 0.01]]), yb - 0.005);
+    add(new THREE.CylinderGeometry(r, r, yt - yb - BASE_H - CAP_H + 0.02, 24, 1, true), (yb + BASE_H + yt - CAP_H) / 2);
+    add(turned(THREE, [[r * 0.98, -0.01], [r * 1.1, 0.0], [r * 1.12, 0.035], [r * 1.0, 0.06], [r * 1.02, 0.1], [r * 1.18, 0.2], [r * 1.42, 0.3], [r * 1.5, CAP_H + 0.005]]), yt - CAP_H);
+  }
+  function octagon(THREE, R, h) { var g = new THREE.CylinderGeometry(R, R, h, 8); g.rotateY(Math.PI / 8); return g; }
+
   function pier(THREE, x, z, y0, top, mat, name) {
-    var P = new THREE.Group(), r = PIER_R, ab = 0.16, cu = 0.22, ba = 0.18, drum = top - ab - cu - ba;
-    var base = new THREE.Mesh(new THREE.BoxGeometry(2.3 * r, ba, 2.3 * r), mat); base.position.set(x, y0 + ba / 2, z); P.add(base);
-    var d = new THREE.Mesh(new THREE.CylinderGeometry(r, r * 1.04, drum, 20), mat); d.position.set(x, y0 + ba + drum / 2, z); P.add(d);
-    var c = new THREE.Mesh(new THREE.CylinderGeometry(1.15 * r, r, cu, 20), mat); c.position.set(x, y0 + ba + drum + cu / 2, z); P.add(c);
-    var a = new THREE.Mesh(new THREE.BoxGeometry(2.6 * r, ab, 2.6 * r), mat); a.position.set(x, top + y0 - ab / 2, z); P.add(a);
+    var P = new THREE.Group(), r = PIER_R, ab = 0.14, ba = 0.24;
+    var pl = new THREE.Mesh(octagon(THREE, 1.5 * r, ba), mat); pl.position.set(x, y0 + ba / 2, z); P.add(pl);
+    column(THREE, P, mat, x, z, y0 + ba, top + y0 - ab, r);
+    var a = new THREE.Mesh(octagon(THREE, 1.62 * r, ab), mat); a.position.set(x, top + y0 - ab / 2, z); P.add(a);
     P.name = name;
     return P;
   }
@@ -364,14 +378,14 @@
   /* a clustered pier (req 3284, the Entrance Hall's, model v308): a 1.0 square core with a round shaft of 0.7 on each
      face (a quatrefoil 1.4 across), a base block, a capital ring where the ribs spring, and a springing block */
   function clusterPier(THREE, x, z, y0, top, mat, name) {
-    var P = new THREE.Group(), ba = 0.2, cap = 0.3, drum = top - ba - cap;
+    /* gate 6: one octagonal plinth and one octagonal abacus over a core, four shafts each turned with its own base and
+       capital (column), as a clustered pier of the thirteenth century */
+    var P = new THREE.Group(), ba = 0.28, ab = 0.14, yb = y0 + ba, yt = y0 + top - ab;
     var add = function (g, px, py, pz) { var m = new THREE.Mesh(g, mat); m.position.set(px, py, pz); P.add(m); };
-    add(new THREE.BoxGeometry(1.4, ba, 1.4), x, y0 + ba / 2, z);
-    add(new THREE.BoxGeometry(1.0, drum, 1.0), x, y0 + ba + drum / 2, z);
-    [[0.35, 0], [-0.35, 0], [0, 0.35], [0, -0.35]].forEach(function (o) {
-      add(new THREE.CylinderGeometry(0.35, 0.37, drum, 16), x + o[0], y0 + ba + drum / 2, z + o[1]);
-      add(new THREE.CylinderGeometry(0.42, 0.35, cap, 16), x + o[0], y0 + ba + drum + cap / 2, z + o[1]);
-    });
+    add(octagon(THREE, 1.02, ba), x, y0 + ba / 2, z);
+    add(new THREE.CylinderGeometry(0.5, 0.5, yt - yb + 0.02, 16, 1, true), x, (yb + yt) / 2, z);
+    [[0.42, 0], [-0.42, 0], [0, 0.42], [0, -0.42]].forEach(function (o) { column(THREE, P, mat, x + o[0], z + o[1], yb, yt, 0.3); });
+    add(octagon(THREE, 1.08, ab), x, yt + ab / 2, z);
     P.name = name;
     return P;
   }
@@ -427,11 +441,67 @@
       G.add(boss(THREE, beasts[k++ % 4], mx, y + h(mx, mz), mz, Math.max(0.16, Math.min(0.3, Math.min(ax, az) * 0.09)), mats.stone, Q.id + '-boss-' + i + '-' + j));
     })(K.xs[i - 1], K.xs[i], K.zs[j - 1], K.zs[j]);
     K.piers.forEach(function (p, n) { G.add(clusterPier(THREE, p[0], p[1], B.y, H.springs, mats.stone, Q.id + '-pier-' + n)); });
+    /* gate 6: every bay line's springing on a wall carried by a moulded corbel at the nave's springing, deep enough to
+       stand a stilted bay's shaft (0.2 off the wall) on it; on the diagonal at the corners */
+    var log = carryLogFor(Q.id), CD = 0.38, CWg = 0.5, near = function (a, b) { return Math.abs(a - b) < 0.05; };
+    K.xs.forEach(function (x, i) {
+      var end = near(x, B.x0) ? 1 : near(x, B.x1) ? -1 : 0;
+      [[B.z0, 1], [B.z1, -1]].forEach(function (w, s) {
+        corbelAt(THREE, G, mats.dress || mats.stone, x, w[0], end, w[1], y + 0.02, end ? CD * 1.2 : CD, 0.5, end ? cornerW(CD * 1.2, CWg) : CWg, Q.id + '-springer-corbel-x' + i + (s ? 'b' : 'a'), log, !!end);
+      });
+    });
+    K.zs.forEach(function (z, j) {
+      if (near(z, B.z0) || near(z, B.z1)) return;   /* the corners, set above */
+      [[B.x0, 1], [B.x1, -1]].forEach(function (w, s) {
+        corbelAt(THREE, G, mats.dress || mats.stone, w[0], z, w[1], 0, y + 0.02, CD, 0.5, CWg, Q.id + '-springer-corbel-z' + j + (s ? 'b' : 'a'), log);
+      });
+    });
     return { group: G, flat: false, springs: H.springs, crown: H.crown, bays: (K.xs.length - 1) * (K.zs.length - 1), piers: K.piers.length, stilted: stilts.length };
   }
 
   /* a rib vault: bays along the long side, about square, the webs a pointed groin, a transverse rib between bays,
      the two diagonals across each, and the beast's boss where they cross, lion, eagle, badger and snake in turn */
+  /* Masonry (17 November 2026, gate 6, row 5869): the carrier at a rib's springing, shared by every ribbed kind.
+     ogeeGeo is starVault's corbel profile lifted out of its closure (an ogee from depth D at its top to 4 cm at its foot,
+     swept W along the wall, its back 2 cm inside the wall); corbelAt sets one at a wall point (x, z) in the vault's frame,
+     facing the room along (ox, oz), its top yTop 2 cm up into the rib above it. ?carry=none leaves the springings bare
+     (the before). Every springing and every carrier is counted in CastleCeilings.carryLogs[room] */
+  function ogeeGeo(THREE, D, Hc, W, steps) {
+    var sh = new THREE.Shape(), n = steps || 14, t, d;
+    sh.moveTo(-0.02, 0.02); sh.lineTo(D, 0.02); sh.lineTo(D, -0.08); sh.lineTo(D - 0.03, -0.1);
+    for (var i = 1; i <= n; i++) { t = i / n; d = 0.04 + (D - 0.07) * (1 - t * t * (3 - 2 * t)); sh.lineTo(d, -0.1 - (Hc - 0.18) * t); }
+    sh.lineTo(0.04, -Hc + 0.04); sh.quadraticCurveTo(0.06, -Hc, 0.0, -Hc); sh.lineTo(-0.02, -Hc); sh.closePath();
+    var g = new THREE.ExtrudeGeometry(sh, { depth: W, bevelEnabled: false, curveSegments: 6 });
+    g.translate(0, 0, -W / 2); return g;
+  }
+  function carryMode() { return (/[?&]carry=(\w+)/.exec(location.search) || [])[1] || 'shaft'; }
+  function carryLogFor(id) {
+    var C = (window.CastleCeilings = window.CastleCeilings || {}), L = C.carryLogs = C.carryLogs || {};
+    return (L[id] = L[id] || { springings: 0, carried: 0 });
+  }
+  /* v19 (row 5869, the blind look of 17 November, 11.20 pm): a corner corbel is set on the diagonal, so a block narrower
+     than twice its depth left its front corners clear of both walls, a gap seen from the floor. v20 (the advisor, 11.35 pm:
+     v19's wide block buried up to 0.33 m into each wall, through a thin partition): a corner corbel is drawn at least
+     2 D + 4 cm wide and its sides then clamped onto the two wall planes (corbelAt's corner), a true corner corbel. */
+  function cornerW(D, W) { return Math.max(W, 2 * D + 0.04); }
+  function corbelAt(THREE, G, mat, x, z, ox, oz, yTop, D, Hc, W, name, log, corner) {
+    log.springings++;
+    if (carryMode() === 'none') return null;
+    var out = new THREE.Vector3(ox, 0, oz).normalize(), up = new THREE.Vector3(0, 1, 0), along = new THREE.Vector3().crossVectors(out, up);
+    var g = ogeeGeo(THREE, D, Hc, W);
+    if (corner) {   /* v20: its sides laid on the two wall planes (|along| = out + 2 cm), so it fills the corner and buries 1.4 cm */
+      var P = g.attributes.position;
+      for (var i = 0; i < P.count; i++) { var a = P.getZ(i), lim = Math.max(P.getX(i), 0) + 0.02; if (Math.abs(a) > lim) P.setZ(i, a < 0 ? -lim : lim); }
+      g.computeVertexNormals();
+    }
+    g.applyMatrix4(new THREE.Matrix4().makeBasis(out, up, along).setPosition(x, yTop - 0.02, z));
+    var m = new THREE.Mesh(g, mat); m.name = name; m.userData.carrier = true; G.add(m); log.carried++;
+    /* v22: where it stands and which way it faces (the ceiling group's frame, the shell's), kept in the room's carry log, since
+       the scene merges meshes and drops their userData; tools/masonry-bearing.js casts back into the wall it claims */
+    (log.list = log.list || []).push({ name: name, at: [x, yTop, z], out: [out.x, out.z], corner: !!corner });
+    return m;
+  }
+
   function ribVault(THREE, Q, B, mats, toLocal) {
     var VV = Q.rec && Q.rec.vault;
     if (toLocal && VV && VV.piers && VV.piers.length && Array.isArray(VV.piers[0])) return ribGrid(THREE, Q, B, mats, toLocal);
@@ -449,6 +519,16 @@
       G.add(rib(THREE, line(THREE, [x1, z0], [x0, z1], y, h), y, top, rr * 1.3, rr, mats.stone, Q.id + '-diagonal-' + i + 'b'));
       if (i) G.add(rib(THREE, alongX ? line(THREE, [x0, z0], [x0, z1], y, h) : line(THREE, [x0, z0], [x1, z0], y, h), y, top, rr * 1.4, rr * 1.1, mats.stone, Q.id + '-transverse-' + i));
       G.add(boss(THREE, beasts[i % 4], mx, top, mz, Math.max(0.16, Math.min(0.32, wide * 0.06)), mats.stone, Q.id + '-boss-' + i));
+    }
+    /* gate 6: every springing carried, a moulded corbel under each bay line's ribs on both long walls, set on the
+       diagonal at the room's corners (a corner's diagonal rib lands there alone) */
+    var log = carryLogFor(Q.id), D = Math.max(0.18, rr * 2.4), CW = rr * 3.2 + 0.1;
+    for (var j = 0; j <= n; j++) {
+      var u = (alongX ? B.x0 : B.z0) + j * L / n, end = j === 0 ? 1 : j === n ? -1 : 0;
+      [[alongX ? B.z0 : B.x0, 1], [alongX ? B.z1 : B.x1, -1]].forEach(function (w, s) {
+        var x = alongX ? u : w[0], z = alongX ? w[0] : u, ox = alongX ? end : w[1], oz = alongX ? w[1] : end;
+        corbelAt(THREE, G, mats.dress || mats.stone, x, z, ox, oz, y + 0.02, end ? D * 1.2 : D, 0.45, end ? cornerW(D * 1.2, CW) : CW, Q.id + '-springer-corbel-' + j + (s ? 'b' : 'a'), log, !!end);
+      });
     }
     return { group: G, flat: false, springs: H.springs, crown: H.crown, bays: n };
   }
@@ -489,10 +569,53 @@
     var SPRING_H = Math.min(1.2, rise * 0.3), SPRING_W = 0.8, SPRING_D = 0.55;
     var springer = function (u, side, nm) {
       var dir = side ? -1 : 1, v0 = (side ? c1 : c0) - dir * 0.02, d = SPRING_D + 0.02;
-      var g = new THREE.BoxGeometry(alongX ? SPRING_W : d, SPRING_H, alongX ? d : SPRING_W), m = new THREE.Mesh(g, mats.stone);
+      var g = new THREE.BoxGeometry(alongX ? SPRING_W : d, SPRING_H, alongX ? d : SPRING_W), m = new THREE.Mesh(g, mats.dress || mats.stone);
       var p = P(Math.min(Math.max(u, lines[0] + SPRING_W / 2 - 0.02), lines[lines.length - 1] - SPRING_W / 2 + 0.02), v0 + dir * d / 2);
       m.position.set(p[0], y + SPRING_H / 2 - 0.1, p[1]); m.name = Q.id + '-springer-' + nm; G.add(m);
+      carry(p, dir, y - 0.1, nm);
     };
+    /* Masonry (17 November 2026, gate 4; Godric's walk: the springers hung as boxes): every springer is carried. 'corbel'
+       (?carry=corbel): a moulded corbel under it, an ogee from the springer's face back into the wall over CORB_H; 'shaft' (the
+       bold, the default provisionally till Godric's eye, Masonry's 1 on the card): a vaulting shaft with its capital under the springer, standing on a smaller corbel at SHAFT_FROM
+       over the floor (the hall's fireplaces stand under two piers, so no shaft runs to the floor); 'none' (?carry=none):
+       today's bare box, for the before. Each piece bears 2 cm into its wall and 2 cm up into the stone above, so no face
+       lies in another's plane; named '-springer-' so the vault's fade leaves them solid */
+    var CARRY = (/[?&]carry=(\w+)/.exec(location.search) || [])[1] || 'shaft';
+    var CORB_H = 0.95, SHAFT_FROM = Math.min(6.0, H.springs - 2.5), SHAFT_R = 0.15;
+    function placeIn(g, p, dir, yb) {   /* a piece drawn with x out of the wall, y up, z along it, set at the wall point p */
+      var out = alongX ? new THREE.Vector3(0, 0, dir) : new THREE.Vector3(dir, 0, 0), up = new THREE.Vector3(0, 1, 0);
+      var along = new THREE.Vector3().crossVectors(out, up);   /* right-handed, so the faces keep their winding */
+      g.applyMatrix4(new THREE.Matrix4().makeBasis(out, up, along).setPosition(p[0], yb, p[1]));
+      return g;
+    }
+    function ogee(D, Hc, W, steps) { return ogeeGeo(THREE, D, Hc, W, steps); }   /* gate 6: one profile, shared with every ribbed kind */
+    function piece(g, p, dir, yb, nm) {
+      var m = new THREE.Mesh(placeIn(g, p, dir, yb), mats.dress || mats.stone); m.name = Q.id + '-springer-carry-' + nm; G.add(m);
+      g.computeBoundingBox(); var bb = g.boundingBox;
+      CLOG.pieces.push({ nm: nm, top: +bb.max.y.toFixed(3), box: [bb.min.x, bb.min.y, bb.min.z, bb.max.x, bb.max.y, bb.max.z] });   /* box: in the vault's frame, read by tools/masonry-hall-bearing.js */
+      return m;
+    }
+    /* the check's log (gate 4): each springer's underside and every carrier piece's top (the backs sit 4 cm inside the wall by construction) */
+    var CLOG = { room: Q.id, carry: CARRY, springers: [], pieces: [] };
+    (window.CastleCeilings = window.CastleCeilings || {}).carryLog = CLOG;
+    function carry(p, dir, yb, nm) {   /* yb: the springer's underside; p: its middle, 2 cm into the wall */
+      CLOG.springers.push({ nm: nm, under: +yb.toFixed(3), box: [p[0] - (alongX ? SPRING_W : SPRING_D + 0.02) / 2, yb, p[1] - (alongX ? SPRING_D + 0.02 : SPRING_W) / 2, p[0] + (alongX ? SPRING_W : SPRING_D + 0.02) / 2, yb + SPRING_H, p[1] + (alongX ? SPRING_D + 0.02 : SPRING_W) / 2] });
+      var w0 = alongX ? p[1] - dir * (SPRING_D / 2 + 0.01) : p[0] - dir * (SPRING_D / 2 + 0.01);   /* the wall point, 2 cm in */
+      var at = alongX ? [p[0], w0] : [w0, p[1]];
+      if (CARRY === 'none') return;
+      if (CARRY !== 'shaft') { piece(ogee(SPRING_D - 0.03, CORB_H, SPRING_W - 0.1), at, dir, yb, nm); return; }
+      var cap = 0.42, y0 = B.y + SHAFT_FROM, y1 = yb - cap, r = SHAFT_R, off = r * 0.55;
+      /* the capital: a bell from the shaft up to a square abacus under the springer */
+      var bell = new THREE.LatheGeometry([[r, 0], [r + 0.02, 0.04], [r + 0.01, 0.07], [r * 1.25, 0.2], [r * 1.9, 0.3], [r * 1.9, 0.32]].map(function (q) { return new THREE.Vector2(q[0], q[1]); }), 20);
+      bell.translate(off, 0, 0); piece(bell, at, dir, y1, nm + '-bell');
+      var ab = new THREE.BoxGeometry(r * 4.2 + 0.02, 0.12, r * 4.2); ab.translate(r * 2.1 - 0.02, 0.38, 0); piece(ab, at, dir, y1, nm + '-abacus');
+      /* the shaft, its back inside the wall */
+      var sf = new THREE.CylinderGeometry(r, r, y1 - y0 + 0.04, 20); sf.translate(off, (y1 - y0) / 2, 0); piece(sf, at, dir, y0, nm + '-shaft');
+      /* its foot: a ring and the corbel it stands on */
+      var ring = new THREE.LatheGeometry([[r * 1.35, 0], [r * 1.35, 0.06], [r * 1.15, 0.1], [r, 0.12]].map(function (q) { return new THREE.Vector2(q[0], q[1]); }), 20);
+      ring.translate(off, -0.02, 0); piece(ring, at, dir, y0, nm + '-ring');
+      piece(ogee(off + r * 1.35 + 0.04, 0.6, r * 2.9), at, dir, y0 - 0.02, nm + '-foot');
+    }
     var YIELD = { diagonal: [0.97, 0.94], a: [0.91, 0.88], b: [0.85, 0.82] };
     var knob = function (u, v, beast, r, nm) { var p = P(u, v); G.add(boss(THREE, beast, p[0], y + h(p[0], p[1]), p[1], r, mats.stone, Q.id + '-boss-' + nm)); };
     add([lines[0], mid], [lines[lines.length - 1], mid], 'ridge', R1 * 1.6);
@@ -514,6 +637,31 @@
       [R1p, R2p, T1, T2].forEach(function (p, j) { knob(p[0], p[1], null, 0.18, 'bay-' + i + '-' + j); });
     }
     fadeToSky(THREE, G, y, top);
+    /* Masonry, 18 November 2026, row 5962 (the card's options, off unless asked; nothing here is the hall's default): ?ribdeco=pendant,
+       a pendant boss hung from each cross arch where it stands 80 per cent up, carved with the house beasts in turn, in the manner of
+       the pendants at Oxford's Divinity School (1480s) and Henry VII's chapel, Westminster (1503 to 1509); ?ribdeco=boss, the same
+       beast set flat into the arch with no drop. Added after the fade, so they stay solid: they hang below the line where the ribs go */
+    var DECO = (/[?&]ribdeco=(\w+)/.exec(location.search) || [])[1];
+    if (DECO === 'pendant' || DECO === 'boss') {
+      var archAt = function (u, sgn, f) {   /* the point on cross arch u, on the c0 side (sgn 1) or the c1 side (-1), where it stands f of the rise up */
+        var lo = 0, hi = half - 0.01;
+        for (var it = 0; it < 40; it++) { var m = (lo + hi) / 2, vv = sgn > 0 ? c0 + m : c1 - m; if (pointed(half, rise, vv - mid) < f * rise) lo = m; else hi = m; }
+        var s = (lo + hi) / 2, v2 = sgn > 0 ? c0 + s : c1 - s, p = P(u, v2); return [p[0], y + pointed(half, rise, v2 - mid), p[1]];
+      };
+      var dm = mats.dress || mats.stone, bi = 0, DROP = DECO === 'pendant' ? 1.25 : 0, PR = 0.3;
+      lines.forEach(function (u, i) {
+        if (!i || i >= lines.length - 1) return;
+        [1, -1].forEach(function (sgn) {
+          var A = archAt(u, sgn, 0.80), beast = beasts[bi++ % beasts.length], yb = A[1] - DROP;
+          if (DROP) {   /* the drop: a collar on the arch, a lantern-shaped body swelling then tapering to the boss's disc */
+            var prof = [[0.001, 0], [0.13, -0.02], [0.17, -0.12], [0.12, -0.2], [0.2, -0.45], [0.27, -0.75], [0.3, -DROP + 0.2], [0.26, -DROP + 0.08], [0.001, -DROP + 0.06]].map(function (q) { return [q[0], q[1]]; });
+            var pm = new THREE.Mesh(turned(THREE, prof, 20), dm); pm.position.set(A[0], A[1], A[2]); pm.name = Q.id + '-pendant-' + bi; G.add(pm);
+          }
+          var bs = boss(THREE, beast, A[0], yb + (DROP ? 0.06 : 0.0), A[2], PR, dm, Q.id + '-pendant-boss-' + bi);
+          G.add(bs);
+        });
+      });
+    }
     return { group: G, flat: true, springs: H.springs, crown: H.crown, bays: lines.length - 1 };
   }
 
@@ -521,27 +669,46 @@
      fully transparent at the apex, never a cut-off): each vertex of every rib and boss gets aFade, 1 at the springing
      height y0 easing to 0 at the crown y1 (a smoothstep, so no kink), and a clone of its material multiplies its alpha by
      it. The springer stones stay solid (the ribs begin inside them). Done once at build, in the vault's own frame */
+  /* Masonry, 18 November 2026 (Godric, 8.43 pm: "the ribs only disappear entirely much closer to the apex"): the ribs are solid
+     stone up to 86 per cent of the rise and gone at 98 per cent, so the sky shows only in the very crown (the old curve, a
+     smoothstep over the whole rise, was 6 per cent opaque at 85; ?ribfade=old brings it back for the before) */
+  var FADE_OLD = /[?&]ribfade=old\b/.test(location.search), FADE_OPAQUE_TO = 0.86, FADE_GONE_AT = 0.98;
   var fadeMats = [];
   function fadeMat(THREE, m) {
     for (var i = 0; i < fadeMats.length; i++) if (fadeMats[i][0] === m) return fadeMats[i][1];
     var c = m.clone(); c.transparent = true;
     c.onBeforeCompile = function (sh) {
       sh.vertexShader = 'attribute float aFade;\nvarying float vFade;\n' + sh.vertexShader.replace('#include <begin_vertex>', '#include <begin_vertex>\n  vFade = aFade;');
-      sh.fragmentShader = 'varying float vFade;\n' + sh.fragmentShader.replace('#include <dithering_fragment>', '#include <dithering_fragment>\n  gl_FragColor.a *= vFade;');
+      /* aFade is the plain height fraction (0 at the springing, 1 at the crown); the curve lives here, per pixel, so a rib's
+         segments cannot soften it below the line it is opaque to */
+      sh.fragmentShader = 'varying float vFade;\n' + sh.fragmentShader.replace('#include <dithering_fragment>', '#include <dithering_fragment>\n  gl_FragColor.a *= ' +
+        (FADE_OLD ? '1.0 - vFade * vFade * (3.0 - 2.0 * vFade);' : '1.0 - smoothstep(' + FADE_OPAQUE_TO.toFixed(3) + ', ' + FADE_GONE_AT.toFixed(3) + ', vFade);'));
     };
-    c.customProgramCacheKey = function () { return 'vaultfade'; };
+    c.customProgramCacheKey = function () { return FADE_OLD ? 'vaultfade' : 'vaultfade-late'; };
     fadeMats.push([m, c]); return c;
   }
   function fadeToSky(THREE, G, y0, y1) {
     var v = new THREE.Vector3();
+    /* the check's log (the mark: solid to 85 per cent of the rise, gone at the apex): the alpha the shader gives each rib vertex,
+       by the same formula in JS, read as CastleCeilings.fadeLog */
+    var FL = { mode: FADE_OLD ? 'old' : 'late', verts: 0, minAlphaTo85: 1, maxAlphaAtApex: 0, apexVerts: 0, alphaAt85: FADE_OLD ? 1 - 0.85 * 0.85 * (3 - 1.7) : 1 };
+    var alphaOf = function (t) {
+      if (FADE_OLD) return 1 - t * t * (3 - 2 * t);
+      var s = Math.max(0, Math.min(1, (t - FADE_OPAQUE_TO) / (FADE_GONE_AT - FADE_OPAQUE_TO))); return 1 - s * s * (3 - 2 * s);
+    };
+    (window.CastleCeilings = window.CastleCeilings || {}).fadeLog = FL;
     G.updateMatrixWorld(true);
     G.traverse(function (o) {
       if (!o.isMesh || /springer/.test(o.name || '') || !o.geometry || !o.geometry.attributes.position) return;
       var p = o.geometry.attributes.position, a = new Float32Array(p.count);
+      /* a boss is a carving, not a rib: it is wholly there or wholly gone by where it hangs, never a dark half-faded disc under the crown */
+      var bossAt = o.parent && /-boss-/.test(o.parent.name || '') ? (new THREE.Box3().setFromObject(o.parent).max.y - y0) / Math.max(0.01, y1 - y0) : null;
       for (var i = 0; i < p.count; i++) {
         v.fromBufferAttribute(p, i).applyMatrix4(o.matrixWorld);
-        var t = Math.max(0, Math.min(1, (v.y - y0) / Math.max(0.01, y1 - y0)));
-        a[i] = 1 - t * t * (3 - 2 * t);
+        a[i] = bossAt !== null ? (bossAt >= FADE_OPAQUE_TO ? 1 : 0) : Math.max(0, Math.min(1, (v.y - y0) / Math.max(0.01, y1 - y0)));
+        FL.verts++;
+        if (a[i] <= 0.85) FL.minAlphaTo85 = Math.min(FL.minAlphaTo85, alphaOf(a[i]));
+        if (a[i] >= 0.995) { FL.apexVerts++; FL.maxAlphaAtApex = Math.max(FL.maxAlphaAtApex, alphaOf(a[i])); }
       }
       o.geometry.setAttribute('aFade', new THREE.BufferAttribute(a, 1));
       o.material = Array.isArray(o.material) ? o.material.map(function (m) { return fadeMat(THREE, m); }) : fadeMat(THREE, o.material);
@@ -565,6 +732,8 @@
     for (var k = 0; k < 8; k++) {
       var a = k / 8 * Math.PI * 2, s = Math.sin(a), c = Math.cos(a);
       G.add(rib(THREE, line(THREE, [cx + s * Math.max(rp, 0.05), cz + c * Math.max(rp, 0.05)], [cx + s * (R - 0.05), cz + c * (R - 0.05)], y, h), y, top, 0.12, 0.09, mats.stone, Q.id + '-rib-' + k));
+      /* gate 6: the rib's foot at the wall carried by a moulded corbel facing the room's middle */
+      corbelAt(THREE, G, mats.dress || mats.stone, cx + s * R, cz + c * R, -s, -c, y + 0.02, 0.3, 0.42, 0.36, Q.id + '-springer-corbel-' + k, carryLogFor(Q.id));
     }
     if (pil) G.add(pier(THREE, cx, cz, B.y, H.springs, mats.stone, Q.id + '-pillar'));
     else G.add(boss(THREE, null, cx, top, cz, 0.3, mats.stone, Q.id + '-boss'));
@@ -599,5 +768,11 @@
     return G;
   }
 
-  window.CastleCeilings = { forPlace: forPlace, surround: surround, corbels: corbels, yawn: { levels: yawnLevels, set: yawnSet, rule: YAWN }, faces: { files: FACES, stone: stoneTexture, color: STONE_FACE, list: function (id) { return (faceSets[id] || []).slice(); }, cell: function (id, k) { return (hash(id) + k) % 6; }, base: function (b) { if (b) facesBase = b; return facesBase; } }, arch: arch, rule: { SPRING_MIN: SPRING_MIN, RISE_MAX: RISE_MAX, AISLE_MAX: AISLE_MAX, BEAM_STEP: BEAM_STEP, PIER_R: PIER_R } };
+  window.CastleCeilings = { forPlace: forPlace, surround: surround, corbels: corbels, yawn: { levels: yawnLevels, set: yawnSet, rule: YAWN }, faces: { files: FACES, stone: stoneTexture, color: STONE_FACE, list: function (id) { return (faceSets[id] || []).slice(); }, cell: function (id, k) { return (hash(id) + k) % 6; }, base: function (b) { if (b) facesBase = b; return facesBase; } }, arch: arch,
+    /* v21 (row 5869): the mason's kit for other builders (the shell's groin wall corbels, the greenhouse's columns): one turned
+       column (base, shaft, capital) and one moulded corbel (ogee, 2 cm into wall and load; corner true lays its sides on two
+       walls), each added to the group given, so every carrier in the castle is the same stone */
+    kit: { column: function (THREE, G, mat, x, z, yb, yt, r) { column(THREE, G, mat, x, z, yb, yt, r); return G; },
+      corbel: function (THREE, G, mat, x, z, ox, oz, yTop, D, Hc, W, name, corner) { return corbelAt(THREE, G, mat, x, z, ox, oz, yTop, D, Hc, corner ? cornerW(D, W) : W, name, carryLogFor(name.split('-springer')[0]), corner); } },
+    rule: { SPRING_MIN: SPRING_MIN, RISE_MAX: RISE_MAX, AISLE_MAX: AISLE_MAX, BEAM_STEP: BEAM_STEP, PIER_R: PIER_R } };
 })();
