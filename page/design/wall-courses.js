@@ -16,6 +16,16 @@
    flush (a band whose face lies in the wall's plane), floor (a plinth whose underside lies on the floor), nocut (no stop
    at openings), nomitre (each run stops short of its corner). Page comments name the owner Godric. */
 (function () {
+  /* 18 November 2026, Godric's yes on card 5897 (option 1): the Great Hall wears the bench, the 6 m moulding and the
+     corbel row with no setting. shell.html reads ?courses= when it loads, after this file, so the default is written into
+     the address here (courses=none opts out, an explicit courses= is kept). */
+  try {
+    var sp = new URLSearchParams(location.search), pl = sp.get('place');
+    if (pl === 'great-hall' && !sp.has('courses') && !/[?&]arch=whole/.test(location.search)) {
+      sp.set('courses', 'bench,string,corbels');
+      history.replaceState(null, '', location.pathname + '?' + sp.toString() + location.hash);
+    }
+  } catch (e) {}
   var PROFILES = {
     plinth: { at: 'floor', pts: [[0.10, -0.03], [0.10, 0.34], [-0.02, 0.48]] },
     bench: { at: 'floor', pts: [[0.40, -0.03], [0.40, 0.36], [0.44, 0.40], [0.44, 0.43], [0.42, 0.45], [-0.02, 0.45]] },
