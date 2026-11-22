@@ -103,21 +103,27 @@
     return t;
   }
 
-  function dress(THREE, m, kind) {
+  /* v4 (Masonry, 17 November 2026, the Great Hall's end wall in two shades): `band`, { y, color }, lays a second stone
+     below the world height y (a room's lower band, as the Great Hall's founders' rubble under 6 m), decided per pixel, so
+     every wall piece of the room agrees at the same level whatever its size or what stands behind it */
+  function dress(THREE, m, kind, band) {
     if (!m || !kind || !KINDS[kind] || (m.userData && m.userData.faced)) return m;
     var tex = maps[kind] || (maps[kind] = face(THREE, kind));
     m.userData.faced = kind;
+    if (band) m.userData.faceBand = band.y;
     m.onBeforeCompile = function (sh) {
       sh.uniforms.faceMap = { value: tex };
+      if (band) { sh.uniforms.faceBandY = { value: band.y }; sh.uniforms.faceBandCol = { value: band.color }; }
       sh.vertexShader = 'varying vec3 vFaceP;\nvarying vec3 vFaceN;\n' + sh.vertexShader.replace('#include <begin_vertex>',
         '#include <begin_vertex>\nvFaceP = (modelMatrix * vec4(transformed, 1.0)).xyz;\nvFaceN = normalize(mat3(modelMatrix) * objectNormal);');
-      sh.fragmentShader = 'uniform sampler2D faceMap;\nvarying vec3 vFaceP;\nvarying vec3 vFaceN;\n' + sh.fragmentShader.replace('#include <color_fragment>',
-        '#include <color_fragment>\nvec3 fn = abs(normalize(vFaceN));\nvec2 fuv = fn.x > fn.z ? vFaceP.zy : vFaceP.xy;\nif (fn.y > max(fn.x, fn.z)) fuv = vFaceP.xz;\n' +
+      sh.fragmentShader = 'uniform sampler2D faceMap;\nvarying vec3 vFaceP;\nvarying vec3 vFaceN;\n' + (band ? 'uniform float faceBandY;\nuniform vec3 faceBandCol;\n' : '') + sh.fragmentShader.replace('#include <color_fragment>',
+        '#include <color_fragment>\n' + (band ? 'if (vFaceP.y < faceBandY) diffuseColor.rgb = faceBandCol;\n' : '') + 'vec3 fn = abs(normalize(vFaceN));\nvec2 fuv = fn.x > fn.z ? vFaceP.zy : vFaceP.xy;\nif (fn.y > max(fn.x, fn.z)) fuv = vFaceP.xz;\n' +
         'diffuseColor.rgb *= pow(texture2D(faceMap, fuv * 0.25).rgb, vec3(2.2));');
     };
+    if (band) m.customProgramCacheKey = function () { return 'stoneface-band|' + kind; };
     m.needsUpdate = true;
     return m;
   }
 
-  window.CastleStoneFace = { version: 3, FACED: FACED, kind: function (d) { return KINDS[d] || null; }, dress: dress, maps: maps };
+  window.CastleStoneFace = { version: 4, FACED: FACED, kind: function (d) { return KINDS[d] || null; }, dress: dress, maps: maps };
 })();
