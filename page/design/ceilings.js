@@ -502,15 +502,43 @@
     return m;
   }
 
-  function ribVault(THREE, Q, B, mats, toLocal) {
+  /* v25 (req 5869, gate 8, Masonry, 21 November 2026): the openings on a room's walls arrive from the shell as opts.openings
+     (the Architect's req 5945: per wall edge, a and b the span's ends in this frame, sill and head as heights). A corbel's
+     footprint (u +/- half along the wall, from yTop - Hc to yTop) stands over a void where one of them overlaps it; ribVault moves
+     each inner bay line to the nearest place 0.3 clear of the cuts (a window's trim stands proud of its edge: the blind look of 21 Nov saw a corbel against it at 0.05) so no corbel hangs over a window or door (?openfit=none leaves them, the before) */
+  function flatOps(ops) { return [].concat.apply([], ops || []).filter(function (op) { return op && op.a && op.b; }); }
+  function overVoid(ops, alongX, wallC, u, half, yTop, Hc) {
+    return ops.some(function (op) {
+      if (Math.abs(alongX ? op.a[1] - wallC : op.a[0] - wallC) > 0.4) return false;
+      var lo = alongX ? Math.min(op.a[0], op.b[0]) : Math.min(op.a[1], op.b[1]), hi = alongX ? Math.max(op.a[0], op.b[0]) : Math.max(op.a[1], op.b[1]);
+      return u + half > lo && u - half < hi && op.sill < yTop && op.head > yTop - Hc;
+    });
+  }
+  function ribVault(THREE, Q, B, mats, toLocal, opts) {
     var VV = Q.rec && Q.rec.vault;
     if (toLocal && VV && VV.piers && VV.piers.length && Array.isArray(VV.piers[0])) return ribGrid(THREE, Q, B, mats, toLocal);
     var G = new THREE.Group(), alongX = B.x1 - B.x0 >= B.z1 - B.z0, L = alongX ? B.x1 - B.x0 : B.z1 - B.z0;
     var wide = alongX ? B.z1 - B.z0 : B.x1 - B.x0, n = Math.max(1, Math.round(L / wide)), H = heights(Q, wide / 2), rise = H.crown - H.springs;
     var y = B.y + H.springs, top = B.y + H.crown, beasts = (window.LumosCarving || {}).BEASTS || ['lion', 'eagle', 'badger', 'snake'];
     var rr = Math.max(0.07, Math.min(0.14, wide * 0.025));
+    var cuts = [], fitLog = carryLogFor(Q.id), ops = /[?&]openfit=none/.test(location.search) ? [] : flatOps(opts && opts.openings);
+    var cHalf = (rr * 3.2 + 0.1) / 2, w0 = alongX ? B.z0 : B.x0, w1 = alongX ? B.z1 : B.x1, yT = y + 0.02;
+    function wallsClear(u, m) { return !overVoid(ops, alongX, w0, u, cHalf + m, yT, 0.45) && !overVoid(ops, alongX, w1, u, cHalf + m, yT, 0.45); }
+    for (var cj = 0; cj <= n; cj++) {
+      var cu = (alongX ? B.x0 : B.z0) + cj * L / n;
+      if (ops.length && cj > 0 && cj < n && !wallsClear(cu, 0.3)) {
+        var moved = false;
+        /* first 0.3 clear of every cut, else 0.05 (a window's trim stands proud of its edge) */
+        [0.3, 0.05].forEach(function (mg) {
+          if (mg < 0.1 && wallsClear(cu, 0.05)) return;   /* already clear of the cuts themselves: keep the bay line */
+          for (var dd = 0.05; dd <= 0.4 * L / n && !moved; dd += 0.05) [dd, -dd].forEach(function (d2) { if (!moved && wallsClear(cu + d2, mg)) { cu += d2; moved = true; } });
+        });
+        if (moved) fitLog.shifted = (fitLog.shifted || 0) + 1; else if (!wallsClear(cu, 0.05)) fitLog.stillOver = (fitLog.stillOver || 0) + 1;
+      }
+      cuts.push(cu);
+    }
     for (var i = 0; i < n; i++) {
-      var a0 = (alongX ? B.x0 : B.z0) + i * L / n, a1 = a0 + L / n;
+      var a0 = cuts[i], a1 = cuts[i + 1];
       var x0 = alongX ? a0 : B.x0, x1 = alongX ? a1 : B.x1, z0 = alongX ? B.z0 : a0, z1 = alongX ? B.z1 : a1;
       var mx = (x0 + x1) / 2, mz = (z0 + z1) / 2, ax = (x1 - x0) / 2, az = (z1 - z0) / 2;
       var h = (function (mx, mz, ax, az) { return function (x, z) { return Math.max(pointed(az, rise, z - mz), pointed(ax, rise, x - mx)); }; })(mx, mz, ax, az);
@@ -524,7 +552,7 @@
        diagonal at the room's corners (a corner's diagonal rib lands there alone) */
     var log = carryLogFor(Q.id), D = Math.max(0.18, rr * 2.4), CW = rr * 3.2 + 0.1;
     for (var j = 0; j <= n; j++) {
-      var u = (alongX ? B.x0 : B.z0) + j * L / n, end = j === 0 ? 1 : j === n ? -1 : 0;
+      var u = cuts[j], end = j === 0 ? 1 : j === n ? -1 : 0;
       [[alongX ? B.z0 : B.x0, 1], [alongX ? B.z1 : B.x1, -1]].forEach(function (w, s) {
         var x = alongX ? u : w[0], z = alongX ? w[0] : u, ox = alongX ? end : w[1], oz = alongX ? w[1] : end;
         corbelAt(THREE, G, mats.dress || mats.stone, x, z, ox, oz, y + 0.02, end ? D * 1.2 : D, 0.45, end ? cornerW(D * 1.2, CW) : CW, Q.id + '-springer-corbel-' + j + (s ? 'b' : 'a'), log, !!end);
@@ -746,7 +774,7 @@
     if (kind === 'barrel') r = barrel(THREE, Q, B, o.mats);
     else if (kind === 'groin') r = groin(THREE, Q, B, o.mats, o.toLocal);
     else if (kind === 'beams') r = beams(THREE, Q, B, o.mats);
-    else if (kind === 'rib') r = ribVault(THREE, Q, B, o.mats, o.toLocal);
+    else if (kind === 'rib') r = ribVault(THREE, Q, B, o.mats, o.toLocal, o);
     else if (kind === 'star' && V && V.piers) r = starVault(THREE, Q, B, o.mats, o.toLocal);
     else if (kind === 'umbrella') r = umbrella(THREE, Q, B, o.mats, o.toLocal);
     else return null;
