@@ -151,10 +151,12 @@ line, the mote, travel and reveal) is castle.js's, unedited.
     <button type="button" data-act="res">Res</button>
     <button type="button" data-act="exp">Exp</button>
     <button type="button" data-act="reset">Reset</button>
+    <button type="button" data-act="alohomora" id="aloho" aria-pressed="false" title="Alohomora: shut doors open to their rooms">Alohomora</button>
     <button type="button" data-act="help">?</button>
   </div>
 </div>
 <button id="back" type="button" hidden>Back</button>
+<script>/* req 5866: the Alohomora button shows its state */ (function () { var b = document.getElementById('aloho'); if (b && /[?&]alohomora=1/.test(location.search)) { b.textContent = 'Alohomora on'; b.setAttribute('aria-pressed', 'true'); } })();</script>
 <div id="help">Drag to look around.</div>
 <div id="lines"></div>
 <div id="roomnote" hidden></div>
@@ -180,7 +182,7 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <script src="design/stone-face.js?v=4"></script>
 <script>/* the Architect's 392nd, Godric's 1 on req 2246 (31 October 2026): the stone face on every stone, all floors, not only late-pale; ?faceall=0 lays it back to flat for a comparison */
 if (!/[?&]faceall=0/.test(location.search) && window.CastleStoneFace) ['founders-rubble', 'tudor-pink', 'high-grey', 'houses-sandstone'].forEach(function (s) { CastleStoneFace.FACED[s] = true; });</script>
-<script src="design/ceilings.js?v=25"></script>
+<script src="design/ceilings.js?v=27"></script>
 <script src="design/wall-courses.js?v=1"></script>
 <script src="design/panelling.js?v=2"></script>
 <script src="design/ironwork.js?v=2"></script>
@@ -221,6 +223,20 @@ if (!/[?&]faceall=0/.test(location.search) && window.CastleStoneFace) ['founders
 'use strict';
 
 var Q = new URLSearchParams(location.search);
+/* req 5866, Alohomora (Godric, 17 November 2026: "most doors are locked - i need to be able to access them"): with ?alohomora=1, or
+   the button by Reset, a shut door whose room the model knows opens and walks him into that room's grey shell, and its door
+   from inside walks him back. Off by default: the boys' doors stay shut. Kept shut whatever the switch: the forbidden door,
+   and the class doors, which stay polite until Clementine has taken him (page/events/class-doors.json: astronomy, charms,
+   defence, herbology, history, potions, transfiguration, the kit room), each by the room it opens into. Kept too (Fawkes,
+   8.30 pm, 21 November 2026; the walker's a1): doors whose way back is not in view on arrival, until the arrival facing row
+   turns him to them (cleaning-cupboard-corridor-door, passage-3-charms-corridor-door, service-passage-7-lobby-room-corridor-door,
+   passage-7-back-stair-room-corridor-door), and one whose door stand inside stands against a wall end, until the stand fix
+   reaches the plain page (library-returns-desk-4-library-corridor-door). */
+var ALOHO = Q.get('alohomora') === '1', ALOHO_KEPT = { 'forbidden-door': 1, 'cleaning-cupboard-corridor-door': 1, 'passage-3-charms-corridor-door': 1,
+  'service-passage-7-lobby-room-corridor-door': 1, 'passage-7-back-stair-room-corridor-door': 1, 'library-returns-desk-4-library-corridor-door': 1 }, ALOHO_KEPT_TO = { 'astronomy-tower-top': 1, 'charms-classroom': 1,
+  'defence-classroom': 1, 'greenhouse-one': 1, 'greenhouse-three': 1, 'history-of-magic-classroom': 1, 'potions-dungeon': 1,
+  'transfiguration-classroom': 1, 'quidditch-kit-room': 1, 'forbidden-corridor': 1 };
+function alohoOpens(d) { return ALOHO && d && d.to && !ALOHO_KEPT[d.id] && !ALOHO_KEPT_TO[d.to] && !!(d.page || (window.CastleShell && CastleShell.findPlace(MODEL, d.to))); }
 /* ?clean: the review shots' frame, the panels and buttons hidden so the room fills the phone (Design's ask, req 643) */
 if (Q.has('clean')) { var cs = document.createElement('style'); cs.textContent = '#hud, #help, #lines, #roomnote, #back { visibility: hidden !important; }'; document.head.appendChild(cs); }
 var PLACE = Q.get('place') || 'entrance-hall';
@@ -262,7 +278,8 @@ var STARTS = { 'entrance-hall': 'front-doors', 'stair-hall': 'well-mouth', 'tape
 var kit = window.castleFrame ? castleFrame({
   background: 0x0b0a09, fog: 0.012,
   zoom: { max: 3 },
-  onAct: function (act) { if (act === 'reset') goBack(); }
+  onAct: function (act) { if (act === 'reset') goBack();
+    if (act === 'alohomora') { var u = new URLSearchParams(location.search); if (ALOHO) u.delete('alohomora'); else u.set('alohomora', '1'); location.replace(location.pathname + '?' + u.toString()); } }
 }) : null;
 if (!kit) { if (!window.castleFrame) document.getElementById('help').textContent = 'castle.js did not load. Check the connection and reload.'; return; }
 var canvas = kit.canvas, backBtn = kit.backBtn, clamp = kit.clamp, lerp = kit.lerp, easeInOut = kit.easeInOut;
@@ -862,6 +879,7 @@ function goBack() {
 /* a shut door answers: it shakes on its latch, and the hooks hear of it (the events' lines, t1's polite doors) */
 var shakes = [];
 function answer(d, point) {
+  if (alohoOpens(d)) { if (hooks.onDoorTap) hooks.onDoorTap({ id: d.id, to: d.to, place: d.place, alohomora: true }); kit.travel(wayUrl(d)); return; }   /* req 5866 */
   lineDoor = d;
   lastTickle = point ? tickleAt(d, point) : null;
   turnDone = null;
@@ -10233,7 +10251,7 @@ function through(d) {
 function wayUrl(d) {
   /* on a floor built whole he leaves from the room the way is in, not the page's first */
   return (d.page || 'shell.html?place=' + encodeURIComponent(d.to)) + (d.page ? '?' : '&') + 'from=' + encodeURIComponent((FLOOR_WALK && d.place) || PLACE) +
-    (FLOOR_WALK && !d.page ? '&floor=' + FLOOR_WALK : '') + (!d.page && /[?&]arch=whole/.test(location.search) ? '&arch=whole' : '');   /* row 5729: the unchecked grey walk goes on through the doors */
+    (FLOOR_WALK && !d.page ? '&floor=' + FLOOR_WALK : '') + (!d.page && /[?&]arch=whole/.test(location.search) ? '&arch=whole' : '') + (ALOHO ? '&alohomora=1' : '');   /* req 5866: the switch goes with him */   /* row 5729: the unchecked grey walk goes on through the doors */
 }
 /* req 1335, the door load: as he walks to the stand of a way that leaves this page, its page is fetched ahead, so the
    tap there finds it in the cache (a phone over the air gains most; the files it loads are the same, already cached) */

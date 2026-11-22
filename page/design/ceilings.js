@@ -349,6 +349,115 @@
     }
     return pts;
   }
+  /* Masonry, 21 November 2026, gate 11 (Godric on req 5975, 7.54 pm: "The ribs are far too thin looking where they meet columns:";
+     14 November: "They come down like skinny pipes onto the columns in the entrance hall"): ?ribfoot= in ribGrid only, off by default.
+       bundle  (1) the tas-de-charge (Feher 2021; Ungewitter 1901 pp. 99 to 101: the late free pier's springer a vertical octagonal
+               core the ribs grow out of): each rib leaves its pier at the abacus's edge, 0.62 out, and rises straight up until its own
+               curve reaches that offset (at Notre-Dame the transverse rib rises "little less than 2 metres" over the abaci, Wendland and
+               Gielen 2022), a vertical octagonal core between the eight stems to the lowest turn; the ribs keeled, 1.4 deep to their
+               width, 1.45 times wider at the foot. v27's first form, a sloped core 1.2 m tall, read as a blank dark pyramid with the
+               ribs as thin as today's (blind look, 8.27 pm): FAIL A, this is its one edit
+       keel    (2) the same keeled section (Ungewitter pp. 70 to 72: height to width ideally 1.4; Bond 1905: "depth is more valuable than
+               breadth"), each rib swelling to twice its width over its first metre, so the eight gather on the abacus, no core
+       thick   (3) today's round ribs at 1.5 times
+     ribDeep builds its own section frame: across the rib (sx, level) and in its vertical plane (ux, down to the soffit), so the depth
+     hangs below the web and the keel is on the soffit; rib() is untouched. CastleCeilings.ribFoot logs, in every mode, each rib's
+     half-width and plan offset from its foot at heights over the springing, for tools/masonry-rib-foot.js */
+  var RIBFOOT = (/[?&]ribfoot=(\w+)/.exec(location.search) || [])[1] || null;
+  var RIBFOOT_OPT = { bundle: { w: 1.0, d: 1.4, keel: 0.35, swell: 1.45, swellLen: 2.5, stem: 0.62, core: true },
+    keel: { w: 1.0, d: 1.4, keel: 0.35, swell: 2.0, swellLen: 1.0 }, thick: { round: 1.5 } }[RIBFOOT] || null;
+  function ribFootLog(id) {
+    var C = (window.CastleCeilings = window.CastleCeilings || {}), L = C.ribFoot = C.ribFoot || {};
+    return (L[id] = L[id] || { mode: RIBFOOT || 'today', ribs: [], cores: [], turns: [] });
+  }
+  function ribSwell(o, along) { if (!o || !o.swell) return 1; var t = Math.max(0, Math.min(1, along / o.swellLen)); return 1 + (o.swell - 1) * (1 - t * t * (3 - 2 * t)); }
+  /* the log: from each end of a rib, at heights hs over that end, the plan offset from the end and the half-width across */
+  function ribSample(THREE, log, pts, y0, y1, r0, r1, name, o, org) {   /* org: the rib's own ends before any stem moved them, so offsets are from the pier */
+    var curve = new THREE.CatmullRomCurve3(pts), arc = curve.getLength(), N = 200, hs = [0.25, 0.5, 0.75, 1.0, 1.2, 1.5];
+    [0, 1].forEach(function (end) {
+      var e = org ? org[end] : curve.getPointAt(end), out = [];
+      hs.forEach(function (h) {
+        for (var i = 0; i <= N; i++) {
+          var u = end ? 1 - i / N : i / N, c = curve.getPointAt(u);
+          if (c.y - e.y < h) continue;
+          var f = Math.max(0, Math.min(1, (c.y - y0) / Math.max(0.01, y1 - y0))), r = r0 + (r1 - r0) * f;
+          var hw = o && o.round ? r * o.round : o ? r * o.w * ribSwell(o, Math.min(u, 1 - u) * arc) : r;
+          out.push([h, +(c.x - e.x).toFixed(3), +(c.z - e.z).toFixed(3), +hw.toFixed(3)]);
+          break;
+        }
+      });
+      log.ribs.push({ nm: name, end: end, at: [+e.x.toFixed(3), +e.y.toFixed(3), +e.z.toFixed(3)], depthOverWidth: o && o.d ? o.d / o.w : 1, s: out });
+    });
+  }
+  function ribDeep(THREE, pts, y0, y1, r0, r1, mat, name, o) {
+    var curve = new THREE.CatmullRomCurve3(pts), ts = Math.max(24, pts.length * 3), rs = 12, arc = curve.getLength();
+    var pos = new Float32Array((ts + 1) * (rs + 1) * 3), idx = [], t = new THREE.Vector3(), sx = new THREE.Vector3(), ux = new THREE.Vector3(), UP = new THREE.Vector3(0, 1, 0);
+    for (var i = 0; i <= ts; i++) {
+      var u = i / ts, c = curve.getPointAt(u); curve.getTangentAt(u, t);
+      sx.crossVectors(t, UP); if (sx.lengthSq() < 1e-8) sx.set(1, 0, 0); sx.normalize();
+      ux.crossVectors(sx, t).normalize(); if (ux.y > 0) ux.negate();
+      var f = Math.max(0, Math.min(1, (c.y - y0) / Math.max(0.01, y1 - y0))), r = (r0 + (r1 - r0) * f) * ribSwell(o, Math.min(u, 1 - u) * arc);
+      for (var j = 0; j <= rs; j++) {
+        var a = j / rs * Math.PI * 2, cs = Math.cos(a), sn = Math.sin(a);
+        var dn = sn > 0 ? r * o.d * sn * (1 + o.keel * Math.pow(sn, 8)) : r * o.w * sn;   /* below: deep, keeled; above: round, in the web */
+        var k = (i * (rs + 1) + j) * 3;
+        pos[k] = c.x + sx.x * r * o.w * cs + ux.x * dn; pos[k + 1] = c.y + sx.y * r * o.w * cs + ux.y * dn; pos[k + 2] = c.z + sx.z * r * o.w * cs + ux.z * dn;
+      }
+    }
+    for (i = 0; i < ts; i++) for (var jj = 0; jj < rs; jj++) {
+      var p0 = i * (rs + 1) + jj, p1 = p0 + rs + 1;
+      idx.push(p0, p1, p0 + 1, p1, p1 + 1, p0 + 1);
+    }
+    var g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.BufferAttribute(pos, 3)); g.setIndex(idx); g.computeVertexNormals();
+    /* outward faces: the normal at a ring's soffit vertex must point away from the curve */
+    var mid = Math.floor(ts / 2), cc = curve.getPointAt(mid / ts), q = (mid * (rs + 1) + Math.round(rs / 4)) * 3, nr = g.attributes.normal;
+    if ((pos[q] - cc.x) * nr.getX(q / 3) + (pos[q + 1] - cc.y) * nr.getY(q / 3) + (pos[q + 2] - cc.z) * nr.getZ(q / 3) < 0) {
+      for (i = 0; i < idx.length; i += 3) { var tmp = idx[i + 1]; idx[i + 1] = idx[i + 2]; idx[i + 2] = tmp; }
+      g.setIndex(idx); g.computeVertexNormals();
+    }
+    var m = new THREE.Mesh(g, mat); m.name = name;
+    return m;
+  }
+  /* the springer core: an octagon on the abacus, faces square to the eight ribs, from rBot at the abacus to rTop at its top, rTop
+     the farthest rib's plan offset at that height over cos 22.5, so every rib leaves through its top edge, never outside it */
+  function springerCore(THREE, x, z, yb, H, rBot, rTop, mat, name) {
+    var g = new THREE.CylinderGeometry(rTop, rBot, H, 8); g.rotateY(Math.PI / 8);
+    var m = new THREE.Mesh(g, mat); m.position.set(x, yb + H / 2, z); m.name = name;
+    return m;
+  }
+  /* one rib of a rib grid, as the flag says; the log in every mode */
+  var GRID_PIERS = null;   /* set by ribGrid for its own ribs: the free piers' plan points */
+  function stemAtPiers(THREE, pts, D) {   /* option 1: an end at a free pier moves out to D in plan and rises straight to its curve */
+    var atPier = function (q) { return (GRID_PIERS || []).some(function (p) { return Math.abs(p[0] - q.x) < 0.05 && Math.abs(p[1] - q.z) < 0.05; }); };
+    var turn = null;
+    var fix = function (a) {
+      var F = a[0], dx = 0, dz = 0, k;
+      for (k = 1; k < a.length; k++) { dx = a[k].x - F.x; dz = a[k].z - F.z; if (Math.hypot(dx, dz) > 1e-3) break; }
+      var L = Math.hypot(dx, dz); if (!L) return a; dx /= L; dz /= L;
+      var fine = new THREE.CatmullRomCurve3(a).getPoints(400), hD = null, rest = [];
+      for (k = 0; k < fine.length; k++) { var o = Math.hypot(fine[k].x - F.x, fine[k].z - F.z); if (o >= D) { hD = fine[k].y; rest = fine.slice(k); break; } }
+      if (hD === null) return a;
+      var out = [], n = 6;
+      for (k = 0; k < n; k++) out.push(new THREE.Vector3(F.x + dx * D, F.y + (hD - F.y) * k / n, F.z + dz * D));
+      turn = turn === null ? hD - F.y : Math.min(turn, hD - F.y);
+      var step = Math.max(1, Math.floor(rest.length / 24));
+      for (k = 0; k < rest.length; k += step) out.push(rest[k]);
+      if (out[out.length - 1] !== rest[rest.length - 1]) out.push(rest[rest.length - 1]);
+      return out;
+    };
+    var a = pts.slice();
+    if (atPier(a[0])) a = fix(a);
+    if (atPier(a[a.length - 1])) a = fix(a.reverse()).reverse();
+    return { pts: a, turn: turn };
+  }
+  function gridRib(THREE, G, log, pts, y0, y1, r0, r1, mat, name) {
+    var o = RIBFOOT_OPT, org = [pts[0].clone(), pts[pts.length - 1].clone()];
+    if (o && o.stem) { var st = stemAtPiers(THREE, pts, o.stem); pts = st.pts; if (st.turn !== null) log.turns.push(st.turn); }
+    ribSample(THREE, log, pts, y0, y1, r0, r1, name, o, org);
+    if (o && o.round) G.add(rib(THREE, pts, y0, y1, r0 * o.round, r1 * o.round, mat, name));
+    else if (o) G.add(ribDeep(THREE, pts, y0, y1, r0, r1, mat, name, o));
+    else G.add(rib(THREE, pts, y0, y1, r0, r1, mat, name));
+  }
 
   /* a boss where ribs meet: a short drum hanging from the vault, its face toward the floor; a beast cut on it by
      LumosCarving (carving.js, Godric's 3 on design-bosses-1020: the beast alone) where a beast is named and carving.js
@@ -399,7 +508,8 @@
   function ribGrid(THREE, Q, B, mats, toLocal) {
     var G = new THREE.Group(), V = Q.rec.vault, K = bays(Q, B, toLocal), H = heights(Q, 0), rise = H.crown - H.springs;
     var y = B.y + H.springs, top = B.y + H.crown, beasts = (window.LumosCarving || {}).BEASTS || ['lion', 'eagle', 'badger', 'snake'];
-    var rr = 0.11, k = 0, shaftN = 0, stilts = [], smooth = function (t) { t = Math.max(0, Math.min(1, t)); return t * t * (3 - 2 * t); };
+    GRID_PIERS = K.piers;
+    var rr = 0.11, k = 0, shaftN = 0, stilts = [], RF = ribFootLog(Q.id), smooth = function (t) { t = Math.max(0, Math.min(1, t)); return t * t * (3 - 2 * t); };
     (V.bays || []).forEach(function (b) {
       if (!b.rect) return;
       var a = toLocal(b.rect[0], b.rect[1], Q.floor), c = toLocal(b.rect[2], b.rect[3], Q.floor);
@@ -433,14 +543,20 @@
         }); });
       }
       var w = field(THREE, x0, x1, z0, z1, y, h, mats.vault, SEG); w.name = Q.id + '-web-' + i + '-' + j; G.add(w);
-      G.add(rib(THREE, line(THREE, [x0, z0], [x1, z1], y, h), y, top, rr * 1.3, rr, mats.stone, Q.id + '-diagonal-' + i + '-' + j + 'a'));
-      G.add(rib(THREE, line(THREE, [x1, z0], [x0, z1], y, h), y, top, rr * 1.3, rr, mats.stone, Q.id + '-diagonal-' + i + '-' + j + 'b'));
+      gridRib(THREE, G, RF, line(THREE, [x0, z0], [x1, z1], y, h), y, top, rr * 1.3, rr, mats.stone, Q.id + '-diagonal-' + i + '-' + j + 'a');
+      gridRib(THREE, G, RF, line(THREE, [x1, z0], [x0, z1], y, h), y, top, rr * 1.3, rr, mats.stone, Q.id + '-diagonal-' + i + '-' + j + 'b');
       /* the bay lines: one rib on each interior line, drawn by the bay on its low side (x0 / z0 side owns it) */
-      if (i > 1) G.add(rib(THREE, line(THREE, [x0, z0], [x0, z1], y, h), y, top, rr * 1.4, rr * 1.1, mats.stone, Q.id + '-wall-rib-x' + i + '-' + j));
-      if (j > 1) G.add(rib(THREE, line(THREE, [x0, z0], [x1, z0], y, h), y, top, rr * 1.4, rr * 1.1, mats.stone, Q.id + '-wall-rib-z' + i + '-' + j));
+      if (i > 1) gridRib(THREE, G, RF, line(THREE, [x0, z0], [x0, z1], y, h), y, top, rr * 1.4, rr * 1.1, mats.stone, Q.id + '-wall-rib-x' + i + '-' + j);
+      if (j > 1) gridRib(THREE, G, RF, line(THREE, [x0, z0], [x1, z0], y, h), y, top, rr * 1.4, rr * 1.1, mats.stone, Q.id + '-wall-rib-z' + i + '-' + j);
       G.add(boss(THREE, beasts[k++ % 4], mx, y + h(mx, mz), mz, Math.max(0.16, Math.min(0.3, Math.min(ax, az) * 0.09)), mats.stone, Q.id + '-boss-' + i + '-' + j));
     })(K.xs[i - 1], K.xs[i], K.zs[j - 1], K.zs[j]);
     K.piers.forEach(function (p, n) { G.add(clusterPier(THREE, p[0], p[1], B.y, H.springs, mats.stone, Q.id + '-pier-' + n)); });
+    if (RIBFOOT_OPT && RIBFOOT_OPT.core) K.piers.forEach(function (p, n) {   /* gate 11, option 1: the core between the stems, upright, to the lowest turn */
+      var CH = Math.max(0.6, Math.min.apply(null, RF.turns.length ? RF.turns : [1.2]) - 0.1), R = RIBFOOT_OPT.stem / Math.cos(Math.PI / 8);
+      G.add(springerCore(THREE, p[0], p[1], y - 0.02, CH, R, R, mats.stone, Q.id + '-springer-core-' + n));
+      RF.cores.push({ n: n, at: [p[0], y - 0.02, p[1]], h: +CH.toFixed(3), rBot: +R.toFixed(3), rTop: +R.toFixed(3) });
+    });
+    GRID_PIERS = null;
     /* gate 6: every bay line's springing on a wall carried by a moulded corbel at the nave's springing, deep enough to
        stand a stilted bay's shaft (0.2 off the wall) on it; on the diagonal at the corners */
     var log = carryLogFor(Q.id), CD = 0.38, CWg = 0.5, near = function (a, b) { return Math.abs(a - b) < 0.05; };
@@ -665,11 +781,12 @@
       [R1p, R2p, T1, T2].forEach(function (p, j) { knob(p[0], p[1], null, 0.18, 'bay-' + i + '-' + j); });
     }
     fadeToSky(THREE, G, y, top);
-    /* Masonry, 18 November 2026, row 5962 (the card's options, off unless asked; nothing here is the hall's default): ?ribdeco=pendant,
-       a pendant boss hung from each cross arch where it stands 80 per cent up, carved with the house beasts in turn, in the manner of
-       the pendants at Oxford's Divinity School (1480s) and Henry VII's chapel, Westminster (1503 to 1509); ?ribdeco=boss, the same
-       beast set flat into the arch with no drop. Added after the fade, so they stay solid: they hang below the line where the ribs go */
-    var DECO = (/[?&]ribdeco=(\w+)/.exec(location.search) || [])[1];
+    /* Masonry, 18 November 2026, row 5962: a pendant boss hung from each cross arch where it stands 80 per cent up, carved with the
+       house beasts in turn, in the manner of the pendants at Oxford's Divinity School (1480s) and Henry VII's chapel, Westminster
+       (1503 to 1509); ?ribdeco=boss, the same beast set flat into the arch with no drop. Added after the fade, so they stay solid:
+       they hang below the line where the ribs go. v26, 21 November 2026: the pendants are the hall's default by Godric's 1 on
+       req 5966 (7.54 pm); ?ribdeco=none takes them off for the before */
+    var DECO = (/[?&]ribdeco=(\w+)/.exec(location.search) || [])[1] || 'pendant';
     if (DECO === 'pendant' || DECO === 'boss') {
       var archAt = function (u, sgn, f) {   /* the point on cross arch u, on the c0 side (sgn 1) or the c1 side (-1), where it stands f of the rise up */
         var lo = 0, hi = half - 0.01;
@@ -677,16 +794,21 @@
         var s = (lo + hi) / 2, v2 = sgn > 0 ? c0 + s : c1 - s, p = P(u, v2); return [p[0], y + pointed(half, rise, v2 - mid), p[1]];
       };
       var dm = mats.dress || mats.stone, bi = 0, DROP = DECO === 'pendant' ? 1.25 : 0, PR = 0.3;
+      /* each pendant's and boss's box in the vault's frame (taken before it joins G), for tools/masonry-hall-pendant-clear.js:
+         the shell merges the vault by material, so the scene keeps no pendant by name */
+      CLOG.pendants = [];
+      var logBox = function (o, nm) { var bb = new THREE.Box3().setFromObject(o); CLOG.pendants.push({ nm: nm, box: [bb.min.x, bb.min.y, bb.min.z, bb.max.x, bb.max.y, bb.max.z] }); };
       lines.forEach(function (u, i) {
         if (!i || i >= lines.length - 1) return;
         [1, -1].forEach(function (sgn) {
           var A = archAt(u, sgn, 0.80), beast = beasts[bi++ % beasts.length], yb = A[1] - DROP;
           if (DROP) {   /* the drop: a collar on the arch, a lantern-shaped body swelling then tapering to the boss's disc */
             var prof = [[0.001, 0], [0.13, -0.02], [0.17, -0.12], [0.12, -0.2], [0.2, -0.45], [0.27, -0.75], [0.3, -DROP + 0.2], [0.26, -DROP + 0.08], [0.001, -DROP + 0.06]].map(function (q) { return [q[0], q[1]]; });
-            var pm = new THREE.Mesh(turned(THREE, prof, 20), dm); pm.position.set(A[0], A[1], A[2]); pm.name = Q.id + '-pendant-' + bi; G.add(pm);
+            var pm = new THREE.Mesh(turned(THREE, prof, 20), dm); pm.position.set(A[0], A[1], A[2]); pm.name = Q.id + '-pendant-' + bi;
+            logBox(pm, 'pendant-' + bi); G.add(pm);
           }
           var bs = boss(THREE, beast, A[0], yb + (DROP ? 0.06 : 0.0), A[2], PR, dm, Q.id + '-pendant-boss-' + bi);
-          G.add(bs);
+          logBox(bs, 'pendant-boss-' + bi); G.add(bs);
         });
       });
     }

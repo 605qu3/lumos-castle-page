@@ -651,6 +651,9 @@ window.CastleShell = { build: function (F, M, placeId, o) {
     if (!PAINT || painted.indexOf(Q.id) < 0) return null;
     if (PAINT.rooms[Q.id]) {   /* v121 worn; v145 use */
       var wn = wornAt(Q.id), us = ROOM_USE[Q.id];
+      /* Masonry (17 November 2026): a banded room's row carries its floor's height, so its walls lay the band at the room's
+         own level (wallMat's bandMat) */
+      if (PAINT.rooms[Q.id].band) return Object.assign({ worn: wn, use: us, bandAt: Q.floor || 0 }, PAINT.rooms[Q.id]);
       return wn || us ? Object.assign({ worn: wn, use: us }, PAINT.rooms[Q.id]) : PAINT.rooms[Q.id];
     }
     var lv = (M.levels || []).filter(function (l) { return Math.abs(l.z - Q.floor) < 0.05; })[0];
@@ -743,7 +746,32 @@ window.CastleShell = { build: function (F, M, placeId, o) {
     /* a panelled room's walls Design's oak, a limewashed room's its plaster, till tones.js gives "<stone>/panelled" its own */
     if (!(R && R[st + '/' + row.dress]) && (row.dress === 'panelled' || row.dress === 'limewash'))
       return paintMat(tone(row.dress === 'panelled' ? 'oak' : 'plaster'), true);
+    if (row.band && row.bandAt != null && !row.mass) { var bm = bandMat(row); if (bm) return bm; }
     return faced(st, window.CastleStoneFace && CastleStoneFace.kind(row.dress), tone(st + '/' + row.dress, st), true);
+  }
+  /* Masonry (17 November 2026, the Great Hall's end wall in two shades, Godric's walk): a wall piece took one stone, read at
+     (top - lo) / 2 of its strip (half its height, not its middle), so a full-height piece came out the upper stone and a
+     piece over a door the band's: the end wall split down the middle by what stood behind it. A banded row's walls now
+     take one material that lays the band's stone below the band's height and the row's above, decided per pixel in the
+     shader (stone-face v4), level on every wall of the room and on a course joint (6 m is fifteen 0.4 m ashlar courses) */
+  /* Masonry (17 November 2026, gate 4): a vault's springers and the corbels or shafts that carry them are dressed stone, each
+     one piece: the wall's stone at the springing with the jointless 'dressed' face, so the wall's coursing never runs
+     through them (as it ran through the trim) */
+  function springDress(row, mx, my, VB) {
+    var st = stoneAt(row, mx, my, VB && VB.springs != null ? VB.springs : 99);
+    return faced(st, window.CastleStoneFace && CastleStoneFace.kind('dressed'), tone(st + '/ashlar', st, 1.0), true);
+  }
+  function bandMat(row) {
+    var CSF = window.CastleStoneFace, kind = CSF && CSF.kind(row.dress), b = row.band;
+    if (!kind || !CSF.FACED[row.stone] || !CSF.FACED[b.stone]) return null;
+    var k = 'band|' + row.stone + '|' + b.stone + '|' + b.top + '|' + row.bandAt + '|' + kind;
+    if (!paintMats[k]) {
+      var up = tone(row.stone + '/' + row.dress, row.stone), lo = tone(b.stone + '/' + row.dress, b.stone);
+      var m = paintMats[k] = F.solid(up); m.side = THREE.DoubleSide;
+      CSF.dress(THREE, m, kind, { y: toLocal(0, 0, row.bandAt + b.top).y, color: F.solid(lo).color.clone() });
+      m.clone = keepFace;
+    }
+    return paintMats[k];
   }
   /* v91 (the Architect's 182nd, Godric's word of 27 October 2026, 8.06 pm: trim on both faces of every opening; a pilot,
      o.trim, shell.html?trim=1): an opening's dressing is its wall's stone cut and laid smooth, a shade lighter */
@@ -1545,8 +1573,16 @@ window.CastleShell = { build: function (F, M, placeId, o) {
           if (at.length) QC = Object.assign({}, QC, { beamsAt: at });
         }
       }
-      CV = window.CastleCeilings.forPlace(THREE, QC, { toLocal: toLocal, kind: row.ceiling,
-        mats: { vault: mats.ceil, stone: stoneM, corbel: corbelMat(stoneM), beam: paintMat(tone('oak-beams'), true) } });
+      /* req 5945 (Masonry, 18 November 2026): the openings on each wall, from gapsOf (the cuts the builder makes), handed to the
+         ceiling in its local frame: { id, edge, a: [x, z] and b: [x, z] the span's ends along the wall, sill and head as heights,
+         hidden }. Data only: ceilings.js decides where a springing stands beside a head. */
+      var OPS5945 = (function () { try { var EC = edgesOf(Q.loops || [Q.poly], Q.loopH, Q.loopT);
+        return gapsOf(M, Q, EC, H).gaps.map(function (gs, i) { var e = EC[i], L = Math.hypot(e.b[0] - e.a[0], e.b[1] - e.a[1]) || 1, ux = (e.b[0] - e.a[0]) / L, uy = (e.b[1] - e.a[1]) / L;
+          return gs.map(function (g) { var p0 = toLocal(e.a[0] + ux * g.s0, e.a[1] + uy * g.s0, Q.floor + (g.sill || 0)), p1 = toLocal(e.a[0] + ux * g.s1, e.a[1] + uy * g.s1, Q.floor + (g.h || 0));
+            return { id: g.op && g.op.id, edge: i, a: [p0.x, p0.z], b: [p1.x, p1.z], sill: p0.y, head: p1.y, hidden: !!g.hidden }; }); }); } catch (err) { return null; } })();
+      (window.__ops5945 = window.__ops5945 || {})[Q.id] = OPS5945;   /* readable by the checks */
+      CV = window.CastleCeilings.forPlace(THREE, QC, { toLocal: toLocal, kind: row.ceiling, openings: OPS5945,
+        mats: { vault: mats.ceil, stone: stoneM, corbel: corbelMat(stoneM), beam: paintMat(tone('oak-beams'), true), dress: springDress(row, mx, my, VB) } });
       /* v188: ceilings.js's beam corbels each face the room along the beam's span, away from their own wall end */
       if (CV) CV.group.traverse(function (o) {
         if (o.userData.corbel && o.material === corbelMat(stoneM)) {
