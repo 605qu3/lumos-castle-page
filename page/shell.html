@@ -162,27 +162,27 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <div id="roomnote" hidden></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="castle.js?v=15"></script>
-<script src="castle-model.js?v=646"></script>
+<script src="castle-model.js?v=647"></script>
 <!-- the floor files: tools/castle-floor.py writes this block, never by hand -->
-<script src="castle-model-B.js?v=9"></script>
-<script src="castle-model-G.js?v=20"></script>
+<script src="castle-model-B.js?v=11"></script>
+<script src="castle-model-G.js?v=21"></script>
 <script src="castle-model-1.js?v=13"></script>
 <script src="castle-model-2.js?v=19"></script>
 <script src="castle-model-3.js?v=14"></script>
 <script src="castle-model-4.js?v=12"></script>
 <script src="castle-model-5.js?v=13"></script>
-<script src="castle-model-6.js?v=10"></script>
+<script src="castle-model-6.js?v=12"></script>
 <script src="castle-model-7.js?v=16"></script>
 <!-- /the floor files -->
 <script src="castle-paint.js?v=119"></script>
 <script src="design/room-tags-G.js?v=1"></script>
 <script src="design/room-use.js?v=2"></script>
-<script src="design/floor-kit.js?v=2"></script>
+<script src="design/floor-kit.js?v=4"></script>
 <script src="design/tones.js?v=7"></script>
 <script src="design/stone-face.js?v=4"></script>
 <script>/* the Architect's 392nd, Godric's 1 on req 2246 (31 October 2026): the stone face on every stone, all floors, not only late-pale; ?faceall=0 lays it back to flat for a comparison */
 if (!/[?&]faceall=0/.test(location.search) && window.CastleStoneFace) ['founders-rubble', 'tudor-pink', 'high-grey', 'houses-sandstone'].forEach(function (s) { CastleStoneFace.FACED[s] = true; });</script>
-<script src="design/ceilings.js?v=27"></script>
+<script src="design/ceilings.js?v=30"></script>
 <script src="design/wall-courses.js?v=1"></script>
 <script src="design/panelling.js?v=2"></script>
 <script src="design/ironwork.js?v=2"></script>
@@ -193,7 +193,8 @@ if (!/[?&]faceall=0/.test(location.search) && window.CastleStoneFace) ['founders
 <script src="design/lake-views.js?v=1"></script>
 <script src="castle-walls-v2.js?v=8"></script>
 <script src="castle-strip.js?v=4"></script>
-<script src="castle-shell.js?v=246"></script>
+<script src="castle-shell.js?v=260"></script>
+<script>/* req 5922, one wall face: the prep's carved outlines, read by castle-shell.js findPlace under ?arch=whole only */ if (/[?&]arch=whole/.test(location.search)) document.write('<script src="arch/clear-5590.js?v=1"><\/script>');</script>
 <script src="castle-exterior.js?v=32"></script>
 <script src="shell-w5b.js?v=25"></script>
 <script src="shell-bare.js?v=3"></script>
@@ -402,12 +403,18 @@ PAINTED = PAINTED.concat(['drum-bend-1-west', 'drum-bend-1', 'drum-bend-1-east',
 PAINTED = PAINTED.concat(['postern-passage-g']);
 /* req 1335 (Godric's 1, 12.14 am, 28 October 2026): &floor=on builds every painted place on this floor in one frame,
    &floor=all every place; he walks it through, door to door, with no page between (castle-shell.js v94) */
+/* v259 (23 November 2026, the Architect): the arrival look's two rules: the openLook mend on (?lookmend=0 turns it off), the short passage rule off (?shortlook=1 turns it on) */
+window.lumosLook = { mend: Q.get('lookmend') !== '0', short: Q.get('shortlook') === '1' };
 var FLOOR_WALK = /^(on|all)$/.test(Q.get('floor') || '') ? Q.get('floor') : null;
-var shell = window.CastleShell && MODEL ? CastleShell.build(kit, MODEL, PLACE, { from: kit.from, start: STARTS[PLACE], paint: PAINTED, far: !Q.has('nofar'), floor: FLOOR_WALK, bays: Q.get('bays') || 'piers', trim: Q.has('trim') ? +Q.get('trim') : 2, walls: Q.get('walls'), exterior: Q.has('exterior') }) : null;
+var shell = window.CastleShell && MODEL ? CastleShell.build(kit, MODEL, PLACE, { from: kit.from, by: Q.get('by'), start: STARTS[PLACE], paint: PAINTED, far: !Q.has('nofar'), floor: FLOOR_WALK, bays: Q.get('bays') || 'piers', trim: Q.has('trim') ? +Q.get('trim') : 2, walls: Q.get('walls'), exterior: Q.has('exterior') }) : null;
 /* the 160th: a room later than his year builds nothing, and said only "no such place", so Divination (from PoA) shot
    black headless twice with a clean console; the line now says which year it stands from and the query that opens it */
 if (!shell) { var later = ((window.CASTLE_MODEL || {}).rooms || []).filter(function (r) { return r.id === PLACE && !stands(r); })[0];
-  kit.helpEl.hidden = false; kit.helpEl.textContent = later ? PLACE + ' stands from the ' + (later.first || 'PS') + ' castle, after the boy\'s year; add &book=' + (later.first || 'PS') + ' to see it'
+  /* v259b (23 November 2026, the Architect): a place set aside in the model, one later than his year and one past its last
+     year each say so; before, all three said "after the boy's year" (witch-landing, set aside, said it stands from PS) */
+  kit.helpEl.hidden = false; kit.helpEl.textContent = later ? (later.state === 'set aside' ? PLACE + ' is set aside in the castle model and stands in no year'
+      : BOOKS.indexOf(later.first || 'PS') > BOOK ? PLACE + ' stands from the ' + (later.first || 'PS') + ' castle, after the boy\'s year; add &book=' + (later.first || 'PS') + ' to see it'
+      : PLACE + ' stands only to the ' + later.last + ' castle, before the boy\'s year; add &book=' + later.last + ' to see it')
     : 'No such place in the castle model: ' + PLACE; console.warn(kit.helpEl.textContent); return; }
 scene.add(shell.group);
 /* row 5870 (Masonry, 17 November 2026): ?courses=plinth,string,cornice (or bench, corbels; the gate's knowns flush, floor,
@@ -10249,8 +10256,8 @@ function through(d) {
 }
 /* a built room has its own page (the bay's mouth to corridor.html); a way still a shell, this page */
 function wayUrl(d) {
-  /* on a floor built whole he leaves from the room the way is in, not the page's first */
-  return (d.page || 'shell.html?place=' + encodeURIComponent(d.to)) + (d.page ? '?' : '&') + 'from=' + encodeURIComponent((FLOOR_WALK && d.place) || PLACE) +
+  /* on a floor built whole he leaves from the room the way is in, not the page's first; by= names the door he goes by (req 5979, line 2) */
+  return (d.page || 'shell.html?place=' + encodeURIComponent(d.to)) + (d.page ? '?' : '&') + 'from=' + encodeURIComponent((FLOOR_WALK && d.place) || PLACE) + '&by=' + encodeURIComponent(d.id) +
     (FLOOR_WALK && !d.page ? '&floor=' + FLOOR_WALK : '') + (!d.page && /[?&]arch=whole/.test(location.search) ? '&arch=whole' : '') + (ALOHO ? '&alohomora=1' : '');   /* req 5866: the switch goes with him */   /* row 5729: the unchecked grey walk goes on through the doors */
 }
 /* req 1335, the door load: as he walks to the stand of a way that leaves this page, its page is fetched ahead, so the
@@ -11988,6 +11995,7 @@ window.lumosGreybox = { scene: scene, camera: camera, zoom: kit.zoom, tap: tap, 
     return ASTRO.on ? { sky: !!(ASTRO.sky && ASTRO.sky.mesh.visible), stars: !!(ASTRO.sky && ASTRO.sky.cat), cloud: !!(ASTRO.cloud && ASTRO.cloud.visible),
       when: ASTRO.when ? ASTRO.when.toString() : null, moon: ASTRO.moon || null, page: ASTRO.page, live: ASTRO.live, log: !!ASTRO.log, drawn: d.length } : null; },
   knots: function (id) { var d = shell.doors.filter(function (x) { return x.id === id; })[0]; return d && d.knots ? knotSpots(d) : null; } };
+window.lumosGreybox.wayUrl = wayUrl;   /* req 5979 line 2, for checks: the page's own link for a door or way (the arrival counter reads by= from it) */
 /* req 1335, for checks: the floor as built, and n doors with a far stand walked through and back by through() */
 window.lumosGreybox.floorWalk = FLOOR_WALK ? { shell: shell, things: things,   /* req 1402: the sweep reads the build */
   info: function () { var lit = floorLamps ? floorLamps.filter(function (L) { return L.layers.test(camera.layers); }).length : null;

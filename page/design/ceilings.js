@@ -316,6 +316,32 @@
 
   /* a pointed arch's height at s from its middle: two arcs from centres on the springing line meeting at the crown,
      rise r over half-span a (sharper than a half round where r > a, a drop arch where r < a) */
+  /* gate 16 (Godric's 1 on the arch card, 22 November 2026): a four-centred rib where the rise r is less than the half span a, where pointed()'s
+     two centres cross the middle and the path humps and dips at the crown. Each half: a lower arc of radius rho centred on
+     the impost at a - rho, an upper arc on their common tangent at angle phi, its centre past the lower centre on that line,
+     through the crown (0, r); phi chosen so each half meets the crown at NAVE4 degrees from level (10, his pick; another ?nave4= is a look only:
+     the springers in design/kit were cut from the 10 degree rings and will not fit another) */
+  var NAVE4 = +((/[?&]nave4=([\d.]+)/.exec(location.search) || [])[1] || 10), P4C = {};
+  function four(a, r) {
+    var key = a.toFixed(4) + '|' + r.toFixed(4); if (P4C[key]) return P4C[key];
+    var rho = a * 4 / 6, best = null;
+    for (var i = 1; i < 9000; i++) {
+      var ph = i / 100 * Math.PI / 180, ux = Math.cos(ph), uy = Math.sin(ph), clx = a - rho, wx = -clx, wy = r;
+      var den = 2 * (wx * ux + wy * uy - rho); if (Math.abs(den) < 1e-9) continue;
+      var k = (rho * rho - (wx * wx + wy * wy)) / den; if (k <= 0) continue;
+      var cux = clx - k * ux, cuy = -k * uy; if (cux >= 0) continue;
+      var deg = Math.atan2(-cux, r - cuy) * 180 / Math.PI;
+      if (!best || Math.abs(deg - NAVE4) < Math.abs(best.deg - NAVE4)) best = { rho: rho, clx: clx, Ru: rho + k, cux: cux, cuy: cuy, Ts: clx + rho * ux, deg: deg };
+    }
+    return (P4C[key] = best);
+  }
+  function pointed4(a, r, s) {
+    if (r >= a || r <= 0) return pointed(a, r, s);
+    s = Math.abs(s); if (s >= a) return 0;
+    var F = four(a, r); if (!F) return pointed(a, r, s);
+    if (s >= F.Ts) { var v = F.rho * F.rho - (s - F.clx) * (s - F.clx); return v > 0 ? Math.sqrt(v) : 0; }
+    var w = F.Ru * F.Ru - (s - F.cux) * (s - F.cux); return F.cuy + Math.sqrt(Math.max(0, w));
+  }
   function pointed(a, r, s) {
     s = Math.abs(s);
     if (s >= a || r <= 0) return 0;
@@ -450,13 +476,258 @@
     if (atPier(a[a.length - 1])) a = fix(a.reverse()).reverse();
     return { pts: a, turn: turn };
   }
+  var KIT_CUR = null;   /* set by ribGrid while it builds the kit room (gate 12) */
   function gridRib(THREE, G, log, pts, y0, y1, r0, r1, mat, name) {
+    if (KIT_CUR) { ribSample(THREE, log, pts, y0, y1, r0, r1, name, null, null); gridKitRib(THREE, G, KIT_CUR, pts, /diagonal/.test(name) ? KIT_CUR.wd : KIT_CUR.wb, mat, name); return; }
     var o = RIBFOOT_OPT, org = [pts[0].clone(), pts[pts.length - 1].clone()];
     if (o && o.stem) { var st = stemAtPiers(THREE, pts, o.stem); pts = st.pts; if (st.turn !== null) log.turns.push(st.turn); }
     ribSample(THREE, log, pts, y0, y1, r0, r1, name, o, org);
     if (o && o.round) G.add(rib(THREE, pts, y0, y1, r0 * o.round, r1 * o.round, mat, name));
     else if (o) G.add(ribDeep(THREE, pts, y0, y1, r0, r1, mat, name, o));
     else G.add(rib(THREE, pts, y0, y1, r0, r1, mat, name));
+  }
+  /* Masonry, 21 November 2026, gate 12 (req 5982; Fawkes 20:39's yes at 10.06 pm, docs/handoff/masonry.md "Gate 12"): ?ribkit=1,
+     the Entrance Hall only, off by default. Every rib of the room takes Willis's moulded section (On the Construction of the
+     Vaults of the Middle Ages, 1842, fig. 4: the St Saviour's, Southwark aisle rib, 1.19 deep to its width; the outline is
+     docs/masonry/rib-kit-willis.json, written by tools/masonry-rib-kit-profile.py, copied here as KIT_SECTION), 0.36 m across
+     at the diagonals and 0.40 at the bay ribs (Ungewitter's rule for a 13.7 m diagonal). The frame is the rib's own plane:
+     every ribGrid rib runs over one straight plan line, so its sideways axis is that line's level normal, fixed for the whole
+     rib, and its depth runs in the plane square to the path, hung on the soffit side; nothing in it can twist where the path
+     stands upright. Both ends capped. At a free pier the rib starts at the springer's top (Viollet-le-Duc's rule: where every
+     pair of neighbouring ribs' backs have parted, 2.38 m by tools/masonry-rib-kit-foot.py), 5 mm clear of it, an honest
+     joint; below that the springer is one Blender piece a pier (tools/masonry-rib-kit-springer.py, from the rings this code
+     logs, so its top bed is this rib's first ring), loaded into the vault's group when it arrives. Bosses, corbels and the
+     stilted bays' shafts grow to carry the deeper ribs. CastleCeilings.ribKit logs every rib's rings at the piers, its checks
+     (twist, open edges, folds) and the springers' arrival. */
+  var RIBKIT = /[?&]ribkit=1/.test(location.search);
+  var KIT_ROOMS = { 'entrance-hall': { wd: 0.36, wb: 0.40, top: 2.38, glb: 'design/kit/eh-springers.glb?v=2' } };
+  var KIT_SECTION = [[0.0,0.0],[0.275,0.0],[0.5,0.22],[0.5,0.44],[0.5,0.5],[0.44,0.505],[0.3961,0.5137],[0.4765,0.5897],[0.4991,0.6981],[0.4559,0.7999],[0.3623,0.8589],[0.2517,0.8538],[0.2,0.835],[0.12,0.83],[0.085,0.845],[0.0848,0.8943],[0.1494,0.9727],[0.1538,1.0741],[0.0963,1.1578],[0.0,1.19],[-0.0963,1.1578],[-0.1538,1.0741],[-0.1494,0.9727],[-0.0848,0.8943],[-0.085,0.845],[-0.12,0.83],[-0.2,0.835],[-0.2517,0.8538],[-0.3623,0.8589],[-0.4559,0.7999],[-0.4991,0.6981],[-0.4765,0.5897],[-0.3961,0.5137],[-0.44,0.505],[-0.5,0.5],[-0.5,0.44],[-0.5,0.22],[-0.275,0.0]];
+  var KIT_DR = 1.19, KIT_GAP = 0.005;
+  function kitOn(id) { return RIBKIT && KIT_ROOMS[id] ? KIT_ROOMS[id] : null; }
+  function kitLog() {
+    var C = (window.CastleCeilings = window.CastleCeilings || {});
+    return (C.ribKit = C.ribKit || { ribs: [], rings: {}, springers: { asked: 0, loaded: 0, meshes: 0, err: null } });
+  }
+  /* the section's loop with each sharp corner split in two, so the arrises stay sharp and the rolls round */
+  var KIT_LOOP = (function () {
+    var P = KIT_SECTION, n = P.length, out = [];
+    for (var i = 0; i < n; i++) {
+      var a = P[(i + n - 1) % n], b = P[i], c = P[(i + 1) % n];
+      var t1 = Math.atan2(b[1] - a[1], b[0] - a[0]), t2 = Math.atan2(c[1] - b[1], c[0] - b[0]), turn = Math.abs(Math.atan2(Math.sin(t2 - t1), Math.cos(t2 - t1)));
+      out.push(i); if (turn > 0.6) out.push(i);
+    }
+    return out;
+  })();
+  /* the frame at curve parameter u: c the point, t the tangent, n the plan line's level normal, ux the depth axis (soffit side) */
+  function kitFrame(THREE, curve, u, n, sgn) {
+    var c = curve.getPointAt(Math.max(0, Math.min(1, u))), t = curve.getTangentAt(Math.max(0, Math.min(1, u)));
+    var ux = new THREE.Vector3().crossVectors(t, n).normalize().multiplyScalar(sgn);
+    return { c: c, t: t, ux: ux };
+  }
+  /* one kit rib over pts, swept from curve parameter u0 to u1; joint (a bay rib's half, the apex joint) adds one ring on the
+     joint's plane, carried straight along the tangent of the ring next to it, at the end the half meets the other */
+  function kitRib(THREE, pts, W, mat, name, u0, u1, ringsOut, joint) {
+    var curve = new THREE.CatmullRomCurve3(pts), L = curve.getLength(), A = pts[0], B = pts[pts.length - 1];
+    var n = new THREE.Vector3(-(B.z - A.z), 0, B.x - A.x).normalize();
+    var mid = new THREE.Vector3().crossVectors(curve.getTangentAt(0.5), n), sgn = mid.y > 0 ? -1 : 1;   /* the soffit faces down at the crown */
+    var S = KIT_SECTION, LP = KIT_LOOP, D = KIT_DR * W, R = LP.length, KP = kitParams(curve, u0, u1), i;
+    var params = KP.us.map(function (u) { return { u: u }; });
+    if (joint) { if (joint.at === 'end') params.push({ u: u1, onPlane: true }); else params.unshift({ u: u0, onPlane: true }); }
+    var pos = [], uv = [], idx = [], rings = [], per = [0];
+    for (var k = 1; k < R; k++) { var p0 = S[LP[k - 1]], p1 = S[LP[k]]; per.push(per[k - 1] + Math.hypot(p1[0] - p0[0], p1[1] - p0[1]) * W); }
+    params.forEach(function (pr) {
+      var F = kitFrame(THREE, curve, pr.u, n, sgn), ring = [];
+      LP.forEach(function (pi, k) {
+        var q = S[pi], v = F.c.clone().addScaledVector(n, q[0] * W).addScaledVector(F.ux, q[1] * W);
+        if (pr.onPlane) kitToPlane(v, F.t, joint);
+        pos.push(v.x, v.y, v.z); uv.push(pr.u * L + (pr.onPlane ? 0.01 : 0), per[k]); ring.push(v);
+      });
+      rings.push(ring);
+    });
+    var NR = rings.length;
+    for (i = 0; i < NR - 1; i++) for (var k2 = 0; k2 < R; k2++) {
+      var k3 = (k2 + 1) % R; if (LP[k2] === LP[k3]) continue;   /* the two halves of a split corner */
+      var a = i * R + k2, b = i * R + k3, c = a + R, d = b + R;
+      idx.push(a, c, b, b, c, d);
+    }
+    /* the caps: the section's own triangulation, flat, on the end rings' own points */
+    var tri = THREE.ShapeUtils.triangulateShape(S.map(function (q) { return new THREE.Vector2(q[0], q[1]); }), []);
+    [0, NR - 1].forEach(function (ri, e) {
+      var base = pos.length / 3;
+      S.forEach(function (q, si) { var v = rings[ri][LP.indexOf(si)]; pos.push(v.x, v.y, v.z); uv.push(q[0] * W, q[1] * W); });
+      tri.forEach(function (t3) { if (e) idx.push(base + t3[0], base + t3[1], base + t3[2]); else idx.push(base + t3[0], base + t3[2], base + t3[1]); });
+    });
+    var g = new THREE.BufferGeometry();
+    g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); g.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
+    g.setIndex(idx); g.computeVertexNormals();
+    /* outward: a soffit vertex's normal at the middle ring points away from the path; else every face turned */
+    var mr = Math.floor(NR / 2), sk = LP.indexOf(S.reduce(function (m, q, j) { return q[1] > S[m][1] ? j : m; }, 0)), vi = mr * R + sk, cc = kitFrame(THREE, curve, params[mr].u, n, sgn).c;
+    var nr = g.attributes.normal, P = g.attributes.position;
+    if ((P.getX(vi) - cc.x) * nr.getX(vi) + (P.getY(vi) - cc.y) * nr.getY(vi) + (P.getZ(vi) - cc.z) * nr.getZ(vi) < 0) {
+      for (i = 0; i < idx.length; i += 3) { var tmp = idx[i + 1]; idx[i + 1] = idx[i + 2]; idx[i + 2] = tmp; }
+      g.setIndex(idx); g.computeVertexNormals();
+    }
+    if (ringsOut) ringsOut.push({ nm: name, W: W, n: [n.x, n.y, n.z], rings: rings.map(function (r) { return r.map(function (v) { return [+v.x.toFixed(4), +v.y.toFixed(4), +v.z.toFixed(4)]; }); }) });
+    var m = new THREE.Mesh(g, mat); m.name = name; m.userData.kit = { W: W, D: D, u0: u0, u1: u1, n: [n.x, n.z], sgn: sgn, len: L, R: R, rings: NR, iR: LP.indexOf(2), iL: LP.indexOf(S.length - 2), sag: KP.sag, tris: idx.length / 3 };
+    var KLs = kitLog(); KLs.sag = Math.max(KLs.sag || 0, KP.sag); KLs.tris = (KLs.tris || 0) + idx.length / 3;
+    return m;
+  }
+  /* the apex joint (gate 12, FAIL A of the fold check, 10.35 pm: a bay rib's deep section folded over itself at its pointed
+     crown, where the spline rounds the apex over one segment, a bend tighter than the rib is deep): a bay rib is two halves
+     meeting on the plane through its highest point square to its plan line; each half is swept up to one segment short of the
+     apex and carried straight on along its own tangent to that plane, as a mason cuts the apex joint */
+  function kitToPlane(v, t, joint) {
+    var e = (v.x - joint.o.x) * joint.d.x + (v.y - joint.o.y) * joint.d.y + (v.z - joint.o.z) * joint.d.z, td = t.x * joint.d.x + t.y * joint.d.y + t.z * joint.d.z;   /* the plane may lean (gate 15's mitre) */
+    if (Math.abs(td) > 1e-4) v.addScaledVector(t, -e / td);
+    return v;
+  }
+  /* gate 12, the fps cure (Fawkes 20:39, 11.11 pm; FAIL A of the fps mark: 476k triangles from rings every 12 cm): the rings of
+     a sweep from u0 to u1 placed by the path's own sag: the next ring is the farthest along whose straight run from the last
+     stays within KIT_SAG of the path (the silhouette's budget, 10 mm, about a pixel at the nearest pier from view A), both ends
+     always; the largest sag is logged (the silhouette check) */
+  var KIT_SAG = 0.010;
+  function kitParams(curve, u0, u1) {
+    var L = curve.getLength(), N = Math.max(40, Math.ceil(Math.abs(u1 - u0) * L / 0.02)), us = [], i;
+    for (i = 0; i <= N; i++) us.push(Math.min(1, Math.max(0, u0 + (u1 - u0) * i / N)));   /* gate 15: a hair over 1 throws in getPointAt */
+    var P = us.map(function (u) { return curve.getPointAt(u); }), out = [u0], last = 0, sag = 0;
+    var sagOf = function (i0, i1) {
+      var m = 0;
+      for (var j = i0 + 1; j < i1; j++) m = Math.max(m, P[j].distanceTo(P[i0].clone().lerp(P[i1], (j - i0) / (i1 - i0))));
+      return m;
+    };
+    while (last < N) {
+      var nx = last + 1;
+      while (nx + 1 <= N && sagOf(last, nx + 1) <= KIT_SAG) nx++;
+      sag = Math.max(sag, sagOf(last, nx)); out.push(us[nx]); last = nx;
+    }
+    return { us: out, sag: sag };
+  }
+  /* the curve parameter where the path, from its end at a free pier, first stands h over that end */
+  function kitCut(THREE, curve, fromEnd, h) {
+    var y0 = curve.getPointAt(fromEnd).y;
+    for (var i = 0; i <= 2000; i++) { var u = fromEnd ? 1 - i / 2000 : i / 2000; if (curve.getPointAt(u).y - y0 >= h) return u; }
+    return fromEnd ? 0 : 1;
+  }
+  /* a rib of the kit room: cut at the springer's top where an end stands on a free pier; the springer's own part logged as
+     rings from 0.25 m below the abacus (carried on along the tangent, so the bed cut is clean) up to the cut, for Blender */
+  function gridKitRib(THREE, G, K, pts, W, mat, name) {
+    var curve = new THREE.CatmullRomCurve3(pts), L = curve.getLength(), KL = kitLog(), u0 = 0, u1 = 1;
+    var atPier = function (q) { return (GRID_PIERS || []).some(function (p) { return Math.abs(p[0] - q.x) < 0.05 && Math.abs(p[1] - q.z) < 0.05; }); };
+    var ends = [atPier(pts[0]), atPier(pts[pts.length - 1])];
+    if (ends[0]) { u0 = kitCut(THREE, curve, 0, K.top); KL.rings[name + ':0'] = kitSpringerPart(THREE, pts, W, 0, u0); u0 += KIT_GAP / L; }
+    if (ends[1]) { u1 = kitCut(THREE, curve, 1, K.top); KL.rings[name + ':1'] = kitSpringerPart(THREE, pts, W, 1, u1); u1 -= KIT_GAP / L; }
+    var m;
+    if (/wall-rib/.test(name)) {   /* a bay rib: the apex joint */
+      var ua = u0, ya = -1e9;
+      for (var i = 0; i <= 600; i++) { var u = u0 + (u1 - u0) * i / 600, y = curve.getPointAt(u).y; if (y > ya) { ya = y; ua = u; } }
+      var o = curve.getPointAt(ua), A = pts[0], B = pts[pts.length - 1], dl = Math.hypot(B.x - A.x, B.z - A.z), dir = new THREE.Vector3((B.x - A.x) / dl, 0, (B.z - A.z) / dl);
+      /* gate 15 (Masonry, 22 November 2026; Godric's 1 on the rib card: "The ribs appear broken near the apex"): each half is
+         its own curve, from its springing to the crown's control point, so neither rounds over the crown (the one curve
+         through the crown rounded it, and the halves cut short of that rounding and run on along their tangents met the old
+         upright joint 7 to 104 mm apart); each half is swept to dl short of the crown, dl the rib's depth times the tangent of
+         half the angle the halves turn through there (so its last ring stands wholly behind the joint), then carried straight
+         to the plane where the two straight runs cross, square to neither (it bisects them: a mitre), so the two end rings
+         are one. A pier end starts on the whole curve's own cut, where the springer's part ends */
+      var kc = 0; for (var q = 1; q < pts.length - 1; q++) if (pts[q].y > pts[kc].y) kc = q;
+      var pa = pts.slice(0, kc + 1), pb = pts.slice(kc), cA = new THREE.CatmullRomCurve3(pa), cB = new THREE.CatmullRomCurve3(pb), La = cA.getLength(), Lb = cB.getLength();
+      var onHalf = function (c, yc, lo, hi) {   /* the parameter on a half where it stands at height yc, lo its low end, hi its crown end (one rising side) */
+        for (var it = 0; it < 50; it++) { var mid = (lo + hi) / 2; if (c.getPointAt(mid).y < yc) lo = mid; else hi = mid; }
+        return (lo + hi) / 2;
+      };
+      var a0 = 0, b1 = 1, J = { nm: name };
+      if (ends[0]) { var Pc0 = curve.getPointAt(u0 - KIT_GAP / L); a0 = onHalf(cA, Pc0.y, 0, 1) + KIT_GAP / La; J.bed0 = cA.getPointAt(a0 - KIT_GAP / La).distanceTo(Pc0); }
+      if (ends[1]) { var Pc1 = curve.getPointAt(u1 + KIT_GAP / L); b1 = onHalf(cB, Pc1.y, 1, 0) - KIT_GAP / Lb; J.bed1 = cB.getPointAt(b1 + KIT_GAP / Lb).distanceTo(Pc1); }
+      var ea = cA.getTangentAt(1), eb = cB.getTangentAt(0), th = Math.acos(Math.max(-1, Math.min(1, ea.dot(eb)))) / 2, dl = KIT_DR * W * Math.tan(th) + 0.02;
+      var ca = 1 - dl / La, cb = dl / Lb;
+      var Pa = cA.getPointAt(ca), ta = cA.getTangentAt(ca), Pb = cB.getPointAt(cb), tb = cB.getTangentAt(cb);
+      var sa = Pa.x * dir.x + Pa.z * dir.z, sb = Pb.x * dir.x + Pb.z * dir.z, ka = ta.x * dir.x + ta.z * dir.z, kb = tb.x * dir.x + tb.z * dir.z;
+      var det = ka * (-tb.y) + kb * ta.y, lam = ((sb - sa) * (-tb.y) + kb * (Pb.y - Pa.y)) / det;
+      var X = Pa.clone().addScaledVector(ta, lam), N = ta.clone().add(tb).normalize();
+      J.X = [X.x, X.y, X.z]; J.crown = [pts[kc].x, pts[kc].y, pts[kc].z]; J.dl = dl; J.th = th;
+      (KL.joints = KL.joints || []).push(J);
+      var m1 = kitRib(THREE, pa, W, mat, name + '-a', a0, ca, null, { o: X, d: N, at: 'end' }), m2 = kitRib(THREE, pb, W, mat, name + '-b', cb, b1, null, { o: X, d: N.clone().negate(), at: 'start' });
+      G.add(m1); G.add(m2); m = m1;
+      KL.ribs.push({ nm: name, W: W, u0: u0, u1: u1, apex: ua, piers: ends });
+    } else {
+      m = kitRib(THREE, pts, W, mat, name, u0, u1, null); G.add(m);
+      KL.ribs.push({ nm: name, W: W, u0: u0, u1: u1, piers: ends });
+    }
+    return m;
+  }
+  /* the springer's share of one rib: rings of the section from 0.25 m past the pier end to the cut, in the vault group's frame */
+  function kitSpringerPart(THREE, pts, W, end, uc) {
+    var curve = new THREE.CatmullRomCurve3(pts), A = pts[0], B = pts[pts.length - 1], S = KIT_SECTION;
+    var n = new THREE.Vector3(-(B.z - A.z), 0, B.x - A.x).normalize(), mid = new THREE.Vector3().crossVectors(curve.getTangentAt(0.5), n), sgn = mid.y > 0 ? -1 : 1;
+    var KP = end ? kitParams(curve, 1, uc) : kitParams(curve, 0, uc), us = KP.us, rings = [];
+    var F0 = kitFrame(THREE, curve, end ? 1 : 0, n, sgn), back = F0.t.clone().multiplyScalar(end ? 0.25 : -0.25);
+    rings.push(S.map(function (q) { var v = F0.c.clone().add(back).addScaledVector(n, q[0] * W).addScaledVector(F0.ux, q[1] * W); return [+v.x.toFixed(4), +v.y.toFixed(4), +v.z.toFixed(4)]; }));
+    us.forEach(function (u) {
+      var F = kitFrame(THREE, curve, u, n, sgn);
+      rings.push(S.map(function (q) { var v = F.c.clone().addScaledVector(n, q[0] * W).addScaledVector(F.ux, q[1] * W); return [+v.x.toFixed(4), +v.y.toFixed(4), +v.z.toFixed(4)]; }));
+    });
+    return { W: W, end: end, uc: uc, bedY: curve.getPointAt(end ? 1 : 0).y, sag: KP.sag, rings: rings };
+  }
+  /* a boss deep enough to show below the kit's soffits where the ribs cross: a drum from the web down past the deepest rib */
+  function kitBoss(THREE, beast, x, y, z, r, H, mat, name) {
+    var G = boss(THREE, beast, x, y, z, r, mat, name), body = G.children[0], face = G.children[1];
+    body.geometry.dispose(); body.geometry = new THREE.CylinderGeometry(r * 0.85, r, H, 24); body.position.set(x, y - H / 2 + 0.02, z);
+    face.position.set(x, y - H + 0.02 - 0.005, z);
+    return G;
+  }
+  /* the springers, one Blender piece a pier, put into the vault's group when they arrive, in the room's stone */
+  /* gate 17 (Godric's 1 on the rib card, 21 November 2026: a carved capital carrying all three rib ends): every stilt
+     shaft under ?ribkit=1 ends in one turned capital, the section of F. A. Paley, A Manual of Gothic Moldings (1891),
+     pl. X, fig. 5, Walesby: neck 0.24 D high projecting 0.17 D, bell 1.19 D flaring to 0.54 D, abacus 0.44 D high
+     projecting 0.69 D, round in plan (Paley p. 74, the English rule), D the shaft's diameter. Its abacus is never smaller
+     than the farthest point of the kit rib ends it carries plus 30 mm (Willis 1842 fig. 6: the abacus is every rib's bed).
+     Closed (the profile starts and ends on the axis); its top 12 mm over the shaft's own, so no two faces share a plane.
+     Its back is flattened 20 mm inside each wall its shaft stands against, so it never shows past a thin wall or in an opening.
+     ?capk= scales its radii about the axis, for the gate's known cases only. */
+  var CAPK = +((/[?&]capk=([\d.]+)/.exec(location.search) || [])[1] || 1);
+  function kitCapitals(THREE, G, shafts, mat, id) {
+    G.updateMatrixWorld(true);
+    var inv = new THREE.Matrix4().copy(G.matrixWorld).invert(), ends = [], out = [];
+    G.traverse(function (o) {
+      if (!o.isMesh || !o.userData.kit) return;
+      var K = o.userData.kit, P = o.geometry.attributes.position, R = K.R, M = new THREE.Matrix4().multiplyMatrices(inv, o.matrixWorld);
+      [0, K.rings - 1].forEach(function (ri) { for (var k = 0; k < R; k++) ends.push(new THREE.Vector3(P.getX(ri * R + k), P.getY(ri * R + k), P.getZ(ri * R + k)).applyMatrix4(M)); });
+    });
+    shafts.forEach(function (sh, n) {
+      var rs = sh.r, D = 2 * rs, hN = 0.24 * D, hB = 1.19 * D, hA = 0.44 * D, H = hN + hB + hA, top = sh.top + 0.012, need = 0;
+      ends.forEach(function (v) { if (Math.abs(v.y - sh.top) < 1.0) { var d = Math.hypot(v.x - sh.x, v.z - sh.z); if (d < 0.8) need = Math.max(need, d); } });
+      var rA = Math.max(rs + 0.69 * D, need + 0.03), pts = [[0, 0], [rs * 0.98, 0], [rs + 0.1 * D, 0.04 * D], [rs + 0.17 * D, 0.12 * D], [rs + 0.1 * D, 0.2 * D], [rs, hN]];
+      for (var t = 1; t <= 6; t++) pts.push([rs + 0.54 * D * (t / 6) * (t / 6), hN + hB * t / 6]);
+      pts.push([rA, hN + hB], [rA, H - 0.06 * D], [rA - 0.03 * D, H], [0, H]);
+      var g = turned(THREE, pts.map(function (q) { return [q[0] * CAPK, q[1]]; }), 32), P = g.attributes.position;
+      for (var vi = 0; vi < P.count; vi++) {   /* its back flattened 20 mm inside each wall the shaft stands against */
+        if (sh.wx !== null) { var lx = sh.wx - sh.x + Math.sign(sh.wx - sh.x) * 0.02; if ((P.getX(vi) - lx) * Math.sign(lx) > 0) P.setX(vi, lx); }
+        if (sh.wz !== null) { var lz = sh.wz - sh.z + Math.sign(sh.wz - sh.z) * 0.02; if ((P.getZ(vi) - lz) * Math.sign(lz) > 0) P.setZ(vi, lz); }
+      }
+      g.computeVertexNormals();
+      var m = new THREE.Mesh(g, mat);
+      m.position.set(sh.x, top - H, sh.z); m.name = id + '-shaft-capital-' + n; G.add(m);
+      out.push({ n: n, at: [+sh.x.toFixed(3), +top.toFixed(3), +sh.z.toFixed(3)], rA: +(rA * CAPK).toFixed(3), need: +need.toFixed(3), H: +H.toFixed(3) });
+    });
+    kitLog().capitals = out;
+  }
+  function kitSpringers(THREE, G, K, mat) {
+    var KL = kitLog(); KL.springers.asked++;
+    var go = function () {
+      new THREE.GLTFLoader().load(K.glb, function (g) {
+        g.scene.updateMatrixWorld(true);
+        var list = []; g.scene.traverse(function (o) { if (o.isMesh) list.push(o); });
+        list.forEach(function (o) {
+          var m = new THREE.Mesh(o.geometry.clone().applyMatrix4(o.matrixWorld), mat); m.name = 'kit-' + o.name;
+          if (!m.geometry.attributes.normal) m.geometry.computeVertexNormals();
+          G.add(m); KL.springers.meshes++;
+        });
+        KL.springers.loaded++;
+      }, undefined, function (e) { KL.springers.err = String(e && e.message || e); console.error('ribkit: ' + K.glb + ' did not load'); });
+    };
+    if (THREE.GLTFLoader) return go();
+    var s = document.createElement('script'); s.src = 'people/GLTFLoader.js'; s.onload = go;
+    s.onerror = function () { KL.springers.err = 'GLTFLoader.js'; console.error('ribkit: GLTFLoader.js did not load'); };
+    document.head.appendChild(s);
   }
 
   /* a boss where ribs meet: a short drum hanging from the vault, its face toward the floor; a beast cut on it by
@@ -509,7 +780,8 @@
     var G = new THREE.Group(), V = Q.rec.vault, K = bays(Q, B, toLocal), H = heights(Q, 0), rise = H.crown - H.springs;
     var y = B.y + H.springs, top = B.y + H.crown, beasts = (window.LumosCarving || {}).BEASTS || ['lion', 'eagle', 'badger', 'snake'];
     GRID_PIERS = K.piers;
-    var rr = 0.11, k = 0, shaftN = 0, stilts = [], RF = ribFootLog(Q.id), smooth = function (t) { t = Math.max(0, Math.min(1, t)); return t * t * (3 - 2 * t); };
+    var KR = kitOn(Q.id); KIT_CUR = KR; if (KR) { kitLog().piers = K.piers.slice(); kitLog().springs = y; kitLog().room = Q.id; }
+    var rr = 0.11, k = 0, shaftN = 0, stilts = [], shafts = [], RF = ribFootLog(Q.id), smooth = function (t) { t = Math.max(0, Math.min(1, t)); return t * t * (3 - 2 * t); };
     (V.bays || []).forEach(function (b) {
       if (!b.rect) return;
       var a = toLocal(b.rect[0], b.rect[1], Q.floor), c = toLocal(b.rect[2], b.rect[3], Q.floor);
@@ -518,7 +790,7 @@
     for (var i = 1; i < K.xs.length; i++) for (var j = 1; j < K.zs.length; j++) (function (x0, x1, z0, z1) {
       var mx = (x0 + x1) / 2, mz = (z0 + z1) / 2, ax = (x1 - x0) / 2, az = (z1 - z0) / 2, mid = (x0 + x1 + z0 + z1) / 4;
       var st = stilts.filter(function (s) { return s.x0 - 0.1 <= x0 && s.x1 + 0.1 >= x1 && s.z0 - 0.1 <= z0 && s.z1 + 0.1 >= z1; })[0];
-      var base = function (x, z) { return Math.max(pointed(az, rise, z - mz), pointed(ax, rise, x - mx)); };
+      var PT = KR ? pointed4 : pointed, base = function (x, z) { return Math.max(PT(az, rise, z - mz), PT(ax, rise, x - mx)); };
       var h = base;
       if (st) {
         /* req 3305: a stilt rect may hold several bays (an aisle whole). Its web is lifted toward the outer wall(s) of the
@@ -538,8 +810,9 @@
         zsft.forEach(function (zz) { xsft.forEach(function (xx) {
           var cz = ex ? (Math.abs(zz - st.z0) < 0.1 ? zz + 0.2 : Math.abs(zz - st.z1) < 0.1 ? zz - 0.2 : zz) : zz;
           var cx = ex ? xx : (Math.abs(xx - st.x0) < 0.1 ? xx + 0.2 : Math.abs(xx - st.x1) < 0.1 ? xx - 0.2 : xx);
-          var sh = new THREE.Mesh(new THREE.CylinderGeometry(0.13, 0.15, st.lift + 0.1, 12), mats.stone);
+          var sh = new THREE.Mesh(new THREE.CylinderGeometry(KR ? 0.22 : 0.13, KR ? 0.24 : 0.15, st.lift + 0.1, 12), mats.stone);
           sh.position.set(cx, y + st.lift / 2 - 0.05, cz); sh.name = Q.id + '-stilt-shaft-' + i + '-' + j + '-' + shaftN++; G.add(sh);
+          if (KR) shafts.push({ x: cx, z: cz, top: y + st.lift, r: 0.22, wx: ex ? (ex > 0 ? st.x1 : st.x0) : (cx !== xx ? xx : null), wz: ez ? (ez > 0 ? st.z1 : st.z0) : (cz !== zz ? zz : null) });
         }); });
       }
       var w = field(THREE, x0, x1, z0, z1, y, h, mats.vault, SEG); w.name = Q.id + '-web-' + i + '-' + j; G.add(w);
@@ -548,7 +821,8 @@
       /* the bay lines: one rib on each interior line, drawn by the bay on its low side (x0 / z0 side owns it) */
       if (i > 1) gridRib(THREE, G, RF, line(THREE, [x0, z0], [x0, z1], y, h), y, top, rr * 1.4, rr * 1.1, mats.stone, Q.id + '-wall-rib-x' + i + '-' + j);
       if (j > 1) gridRib(THREE, G, RF, line(THREE, [x0, z0], [x1, z0], y, h), y, top, rr * 1.4, rr * 1.1, mats.stone, Q.id + '-wall-rib-z' + i + '-' + j);
-      G.add(boss(THREE, beasts[k++ % 4], mx, y + h(mx, mz), mz, Math.max(0.16, Math.min(0.3, Math.min(ax, az) * 0.09)), mats.stone, Q.id + '-boss-' + i + '-' + j));
+      if (KR) G.add(kitBoss(THREE, beasts[k++ % 4], mx, y + h(mx, mz), mz, 0.34, KIT_DR * KR.wb + 0.1, mats.stone, Q.id + '-boss-' + i + '-' + j));
+      else G.add(boss(THREE, beasts[k++ % 4], mx, y + h(mx, mz), mz, Math.max(0.16, Math.min(0.3, Math.min(ax, az) * 0.09)), mats.stone, Q.id + '-boss-' + i + '-' + j));
     })(K.xs[i - 1], K.xs[i], K.zs[j - 1], K.zs[j]);
     K.piers.forEach(function (p, n) { G.add(clusterPier(THREE, p[0], p[1], B.y, H.springs, mats.stone, Q.id + '-pier-' + n)); });
     if (RIBFOOT_OPT && RIBFOOT_OPT.core) K.piers.forEach(function (p, n) {   /* gate 11, option 1: the core between the stems, upright, to the lowest turn */
@@ -556,10 +830,11 @@
       G.add(springerCore(THREE, p[0], p[1], y - 0.02, CH, R, R, mats.stone, Q.id + '-springer-core-' + n));
       RF.cores.push({ n: n, at: [p[0], y - 0.02, p[1]], h: +CH.toFixed(3), rBot: +R.toFixed(3), rTop: +R.toFixed(3) });
     });
-    GRID_PIERS = null;
+    if (KR) { kitSpringers(THREE, G, KR, mats.stone); kitCapitals(THREE, G, shafts, mats.stone, Q.id); }
+    GRID_PIERS = null; KIT_CUR = null;
     /* gate 6: every bay line's springing on a wall carried by a moulded corbel at the nave's springing, deep enough to
        stand a stilted bay's shaft (0.2 off the wall) on it; on the diagonal at the corners */
-    var log = carryLogFor(Q.id), CD = 0.38, CWg = 0.5, near = function (a, b) { return Math.abs(a - b) < 0.05; };
+    var log = carryLogFor(Q.id), CD = KR ? 0.54 : 0.38, CWg = KR ? 0.9 : 0.5, near = function (a, b) { return Math.abs(a - b) < 0.05; };
     K.xs.forEach(function (x, i) {
       var end = near(x, B.x0) ? 1 : near(x, B.x1) ? -1 : 0;
       [[B.z0, 1], [B.z1, -1]].forEach(function (w, s) {

@@ -31,6 +31,17 @@
       if (alongX) g.fillRect(x, y + o, w, 1 + r()); else g.fillRect(x + o, y, 1 + r(), h);
     }
   }
+  /* v3 (Masonry, 22 November 2026, gate 14): one row of boards fitted to close on the canvas width, as v2 fits the flags, so the
+     boards' ends break joint at the repeat instead of all ending on one line; each board drawn by its own seeded draw (rr) at
+     its place and again one canvas over, so a board across the edge carries one tone and one grain on both sides */
+  function boardRow(N, r, x0, min, draw) {
+    var x = x0, row = [];
+    while (x < x0 + N - 1e-9) { var len = N * (min + r() * (1 - min)); row.push([x, len]); x += len; }
+    var over = x - (x0 + N), last = row[row.length - 1];
+    if (row.length > 1 && over > last[1] / 2) { row.pop(); row[row.length - 1][1] += last[1] - over; } else last[1] -= over;
+    row.forEach(function (b) { var seed = 1 + Math.floor(r() * 2147483000);
+      for (var ox = -N; ox <= N; ox += N) if (b[0] + ox < N && b[0] + ox + b[1] > 0) draw(b[0] + ox, b[1], rnd(seed)); });
+  }
   /* v2 (Masonry): a vein that runs past the canvas edge is drawn again from the far side, so it carries across the repeat. The
      path is built after each shift (a canvas path is fixed in place once built, so shifting before stroke moves nothing) */
   function wrapStroke(g, N, build) { for (var ox = -N; ox <= N; ox += N) for (var oy = -N; oy <= N; oy += N) { g.save(); g.translate(ox, oy); g.beginPath(); build(); g.stroke(); g.restore(); } }
@@ -95,10 +106,13 @@
     /* granite setts, small cobbled blocks laid in staggered courses */
     setts: { rep: 1.6, draw: function (g, N, r) {
       g.fillStyle = rgb(58, 55, 52); g.fillRect(0, 0, N, N); var rows = 8, rh = N / rows, y;
+      /* v3 (Masonry, 22 November 2026, gate 14): each course's five setts once, a sett across the edge drawn on both sides in
+         one tone, so the odd courses' half setts no longer meet in two tones at the repeat */
       for (y = 0; y < rows; y++) { var cols = 5, cw = N / cols, off = (y % 2) * cw / 2;
-        for (var x = -1; x <= cols; x++) { var v = 96 + r() * 44, c = mix([v, v - 3, v - 8], [v - 6, v - 10, v - 18], r()), j = 3;
-          g.fillStyle = rgb(c[0], c[1], c[2]); var rx = x * cw + off + j, ry = y * rh + j, rw = cw - 2 * j - r() * 6, rhh = rh - 2 * j - r() * 5, k = 9 + r() * 6;
-          g.beginPath(); g.moveTo(rx + k, ry); g.arcTo(rx + rw, ry, rx + rw, ry + rhh, k); g.arcTo(rx + rw, ry + rhh, rx, ry + rhh, k); g.arcTo(rx, ry + rhh, rx, ry, k); g.arcTo(rx, ry, rx + rw, ry, k); g.fill(); } }
+        for (var x = 0; x < cols; x++) { var v = 96 + r() * 44, c = mix([v, v - 3, v - 8], [v - 6, v - 10, v - 18], r()), j = 3;
+          g.fillStyle = rgb(c[0], c[1], c[2]); var rw = cw - 2 * j - r() * 6, rhh = rh - 2 * j - r() * 5, k = 9 + r() * 6, ry = y * rh + j;
+          for (var ox = -N; ox <= N; ox += N) { var rx = x * cw + off + j + ox; if (rx > N || rx + rw < 0) continue;
+            g.beginPath(); g.moveTo(rx + k, ry); g.arcTo(rx + rw, ry, rx + rw, ry + rhh, k); g.arcTo(rx + rw, ry + rhh, rx, ry + rhh, k); g.arcTo(rx, ry + rhh, rx, ry, k); g.arcTo(rx, ry, rx + rw, ry, k); g.fill(); } } }
       blots(g, N, r, 40, 30, 120, true); grain(g, N, r, 22); } },
     /* quarry tile, square terracotta with a little variation and a pale grout */
     quarry: { rep: 1.2, draw: function (g, N, r) {
@@ -120,18 +134,16 @@
     /* deal boards, scrubbed pale pine, wide and long, nail heads at the joists */
     deal: { rep: 1.8, draw: function (g, N, r) {
       g.fillStyle = rgb(120, 98, 70); g.fillRect(0, 0, N, N); var bw = N / 8, y;
-      for (y = 0; y < 8; y++) { var x = -r() * N * 0.5;
-        while (x < N) { var len = N * (0.5 + r() * 0.5), v = r(), c = mix([204, 176, 130], [180, 148, 104], v);
-          plank(g, x + 2, y * bw + 2, len - 4, bw - 4, c, r, true);
-          g.fillStyle = 'rgba(60,40,24,0.6)'; [0.25, 0.75].forEach(function (f) { g.beginPath(); g.arc(x + len * f, y * bw + bw * 0.5, 2, 0, 7); g.fill(); });
-          x += len; } }
+      for (y = 0; y < 8; y++) boardRow(N, r, -r() * N * 0.5, 0.5, function (x, len, rr) {
+        var c = mix([204, 176, 130], [180, 148, 104], rr());
+        plank(g, x + 2, y * bw + 2, len - 4, bw - 4, c, rr, true);
+        g.fillStyle = 'rgba(60,40,24,0.6)'; [0.25, 0.75].forEach(function (f) { g.beginPath(); g.arc(x + len * f, y * bw + bw * 0.5, 2, 0, 7); g.fill(); }); });
       blots(g, N, r, 70, 40, 160, true); grain(g, N, r, 14); } },
     /* oak boards, narrower and darker, waxed; the ordinary lived-in floor */
     oak: { rep: 1.8, draw: function (g, N, r) {
       g.fillStyle = rgb(40, 24, 12); g.fillRect(0, 0, N, N); var bw = N / 12, y;
-      for (y = 0; y < 12; y++) { var x = -r() * N * 0.6;
-        while (x < N) { var len = N * (0.45 + r() * 0.55), c = mix([104, 74, 46], [78, 54, 34], r());
-          plank(g, x + 1.5, y * bw + 1.5, len - 3, bw - 3, c, r, true); x += len; } }
+      for (y = 0; y < 12; y++) boardRow(N, r, -r() * N * 0.6, 0.45, function (x, len, rr) {
+        plank(g, x + 1.5, y * bw + 1.5, len - 3, bw - 3, mix([104, 74, 46], [78, 54, 34], rr()), rr, true); });
       blots(g, N, r, 60, 40, 160, true); blots(g, N, r, 30, 50, 150, false); grain(g, N, r, 12); } },
     /* parquet, blocks of three slats laid across and then along: the Georgian and Victorian gentleman's floor */
     parquet: { rep: 1.2, draw: function (g, N, r) {

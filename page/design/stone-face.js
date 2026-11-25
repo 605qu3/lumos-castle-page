@@ -20,7 +20,7 @@
   var FACED = { 'late-pale': true };
   /* v2 (the one-castle gate, 17 November 2026): 'dressed', a trim stone's face, one stone with no joints in it (its 6 mm
      piece gaps carry the joints), so a voussoir or pilaster no longer shows the wall's coursing running through it */
-  var KINDS = { coursed: 'coursed', ashlar: 'ashlar', rubble: 'rubble', limewash: 'limewash', flags: 'flags', dressed: 'dressed' };
+  var KINDS = { coursed: 'coursed', ashlar: 'ashlar', rubble: 'rubble', limewash: 'limewash', flags: 'flags', dressed: 'dressed', dressed2: 'dressed2' };   /* g23 (Masonry, private): dressed2 */
   var maps = {};
 
   function rnd(s) { return function () { s = (s * 16807) % 2147483647; return s / 2147483647; }; }
@@ -57,7 +57,12 @@
       gr.addColorStop(0, grey(v + 8)); gr.addColorStop(0.5, grey(v)); gr.addColorStop(1, grey(v - 10));
       g.fillStyle = gr; g.fill();
     }
-    if (kind === 'dressed') {   /* the ashlar's own stone (its mean grey 242), weathered and speckled the same, no joint */
+    if (kind === 'dressed2') {   /* g23 (Masonry, private): the dressed stone tooled, its grain at the walling's scale */
+      g.fillStyle = grey(236); g.fillRect(0, 0, N, N);
+      blots(500, 30, 140, 200, 255, 0.28);
+      blots(160, 60, 220, 200, 255, 0.18);
+      speckle(22);
+    } else if (kind === 'dressed') {   /* the ashlar's own stone (its mean grey 242), weathered and speckled the same, no joint */
       g.fillStyle = grey(242); g.fillRect(0, 0, N, N);
       blots(160, 60, 220, 200, 255, 0.18);
       speckle(12);
@@ -125,5 +130,14 @@
     return m;
   }
 
-  window.CastleStoneFace = { version: 4, FACED: FACED, kind: function (d) { return KINDS[d] || null; }, dress: dress, maps: maps };
+  /* g23: the mean of a face's linear multiplier, pow(v / 255, 2.2) over the canvas, as dress() applies it */
+  var means = {};
+  function faceMean(THREE, kind) {
+    if (!kind || !KINDS[kind]) return 1;
+    if (means[kind] != null) return means[kind];
+    var tex = maps[kind] || (maps[kind] = face(THREE, kind)), cv = tex.image, d = cv.getContext('2d').getImageData(0, 0, cv.width, cv.height).data, s = 0, n = 0;
+    for (var i = 0; i < d.length; i += 16) { s += Math.pow(d[i] / 255, 2.2); n++; }
+    return (means[kind] = s / n);
+  }
+  window.CastleStoneFace = { version: 4, FACED: FACED, kind: function (d) { return KINDS[d] || null; }, dress: dress, maps: maps, faceMean: faceMean };
 })();

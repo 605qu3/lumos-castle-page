@@ -96,6 +96,48 @@ function glassSection(GH) {
 
 /* a place by id: a room, or a mass or court by its id made a slug ("stair hall" is stair-hall); its plan as a site
    polygon (counter-clockwise), its floor and ceiling as heights in the castle's frame */
+/* req 5922, one wall face (Architect, 18 November 2026; docs/handoff/architect.md 'Gate, one wall face'): under ?arch=whole a
+   room's plan follows the outline the prep carved for the glb (page/arch/clear-5590.js, window.lumosClear), so a piece placed
+   against a shared wall lands on the glb's face. Edge by edge, keeping the model's order (the walls are keyed by edge): an
+   edge moves in by the measured inset when the clear outline runs 0.12 to 0.18 m inside it at every sample from 20 to 80 per
+   cent of its length (a partition along all of it); one with every sample under 0.03 m stays; any other (shared along part of
+   its length, the face stepping) stays on the model's line and is listed in window.__clearPartial. The corners are where the
+   moved edges meet. v1 matched corners to the nearest clear corner, and a notch's corner moved a whole edge in where only part
+   was shared (Masonry's bearing check, f7, 4.09 am: six corbels that bore stopped bearing). The plain page never reads it. */
+function clearPlan(id, pts) {
+  var C = typeof window !== 'undefined' && window.lumosClear && /[?&]arch=whole/.test(location.search) && window.lumosClear.rooms[id];
+  if (!C || pts.length < 3) return pts;
+  var n = pts.length, A2 = 0, i, k;
+  for (i = 0; i < n; i++) A2 += pts[i][0] * pts[(i + 1) % n][1] - pts[(i + 1) % n][0] * pts[i][1];
+  var sg = A2 >= 0 ? 1 : -1;   /* counter-clockwise: the inside is to the left */
+  function dSeg(p, a, b) { var dx = b[0] - a[0], dy = b[1] - a[1], L2 = dx * dx + dy * dy, t = L2 ? Math.max(0, Math.min(1, ((p[0] - a[0]) * dx + (p[1] - a[1]) * dy) / L2)) : 0;
+    return Math.hypot(p[0] - a[0] - t * dx, p[1] - a[1] - t * dy); }
+  function dC(p) { var m = 1e9; for (var j = 0; j < C.length; j++) m = Math.min(m, dSeg(p, C[j], C[(j + 1) % C.length])); return m; }
+  var off = [], nr = [], moved = 0, partial = 0;
+  for (i = 0; i < n; i++) {
+    var a = pts[i], b = pts[(i + 1) % n], dx = b[0] - a[0], dy = b[1] - a[1], L = Math.hypot(dx, dy);
+    nr.push(L ? [-dy / L * sg, dx / L * sg] : [0, 0]);
+    if (L < 0.6) { off.push(0); continue; }
+    var ds = []; for (k = 2; k <= 8; k++) { var t = k / 10; ds.push(dC([a[0] + t * dx, a[1] + t * dy])); }
+    var lo = Math.min.apply(null, ds), hi = Math.max.apply(null, ds);
+    if (lo >= 0.12 && hi <= 0.18) { off.push(ds.reduce(function (s, v) { return s + v; }, 0) / ds.length); moved++; }
+    else { off.push(0); if (hi >= 0.03) partial++; }
+  }
+  if (partial) (window.__clearPartial = window.__clearPartial || []).push(id + ':' + partial);
+  if (!moved) return pts;
+  var out = [];
+  for (i = 0; i < n; i++) {
+    var h = (i - 1 + n) % n, p0 = [pts[h][0] + nr[h][0] * off[h], pts[h][1] + nr[h][1] * off[h]], d0 = [pts[i][0] - pts[h][0], pts[i][1] - pts[h][1]];
+    var p1 = [pts[i][0] + nr[i][0] * off[i], pts[i][1] + nr[i][1] * off[i]], d1 = [pts[(i + 1) % n][0] - pts[i][0], pts[(i + 1) % n][1] - pts[i][1]];
+    var cr = d0[0] * d1[1] - d0[1] * d1[0];
+    if (Math.abs(cr) < 1e-9) { out.push(p1); continue; }
+    var s = ((p1[0] - p0[0]) * d1[1] - (p1[1] - p0[1]) * d1[0]) / cr;
+    out.push([p0[0] + s * d0[0], p0[1] + s * d0[1]]);
+  }
+  (window.__clearUsed = window.__clearUsed || []).push(id);
+  out.loc = pts;   /* req 5922's route (Fawkes on req 5971): the model's own corners, the location line, same count and order */
+  return out;
+}
 function findPlace(M, id) {
   var r = (M.rooms || []).filter(function (x) { return x.id === id; })[0];
   /* v74 (model v176): a room with its own `z` (the level-T rooms: the head's office, Divination and its landing, the
@@ -105,7 +147,7 @@ function findPlace(M, id) {
   function ceilOf(b) { return zb != null ? (r.ceiling != null ? r.ceiling : zb + (M.site.storey || 5.2) - 0.7) : b + (r.ceiling != null ? r.ceiling : (M.site.storey || 5.2) - 0.7); }
   if (r && r.shape && r.shape.rect) {
     var a = r.shape.rect, base = zb != null ? zb : levelZ(M, r.level) + (r.group ? M.groups.filter(function (g) { return g.id === r.group; })[0].place.z - levelZ(M, r.level) : 0);
-    var pts = [[a[0], a[1]], [a[2], a[1]], [a[2], a[3]], [a[0], a[3]]].map(function (p) { return toSite(M, r.group, p); });
+    var pts = clearPlan(r.id, [[a[0], a[1]], [a[2], a[1]], [a[2], a[3]], [a[0], a[3]]].map(function (p) { return toSite(M, r.group, p); }));
     var floor = base + (r.floor || 0);
     /* v93 (model v224, ledger 311 and 312): a glasshouse room (`glasshouse`: the grounds record and its house) carries
        that house's record; buildPlace hands it to buildGlasshouse */
@@ -117,7 +159,7 @@ function findPlace(M, id) {
   /* v12: a room drawn by its plan's corners ({ poly }, counter-clockwise: the gunners' casemate between two drums' faces,
      ledger line 94), floor and ceiling as a rect room's */
   if (r && r.shape && r.shape.poly) {
-    var pb = zb != null ? zb : levelZ(M, r.level), pp = r.shape.poly.map(function (p) { return toSite(M, r.group, p); });
+    var pb = zb != null ? zb : levelZ(M, r.level), pp = clearPlan(r.id, r.shape.poly.map(function (p) { return toSite(M, r.group, p); }));
     return { id: r.id, name: r.name, kind: 'room', poly: pp, floor: pb + (r.floor || 0), ceiling: ceilOf(pb),
       wall: r.wall || WALL_T, walls: Array.isArray(r.walls) ? r.walls : null, rec: r };
   }
@@ -273,7 +315,7 @@ function findPlace(M, id) {
     var b = m.rect;
     /* a mass with its roof in the model (v20, the stair hall's: ledger line 15) rises to it, its flat part the ceiling */
     /* req 899 (v61): only a roof with its lead flat is built as the stair hall's is; a range's roof without one (or a bare number) leaves the mass its top storey */
-    return { id: slug(m.id), name: m.id, kind: 'mass', poly: [[b[0], b[1]], [b[2], b[1]], [b[2], b[3]], [b[0], b[3]]], floor: lo,
+    return { id: slug(m.id), name: m.id, kind: 'mass', poly: clearPlan(m.id, [[b[0], b[1]], [b[2], b[1]], [b[2], b[3]], [b[0], b[3]]]), floor: lo,   /* req 5922 f2: a mass place (the stair hall) takes the carved outline too, keyed by the model's name */
       ceiling: m.court ? null : (m.roof && m.roof.flat) ? m.roof.flat.z : hi, wall: WALL_T, walls: null, rec: m, roof: (m.roof && m.roof.flat) ? m.roof : null };
   }
   return null;
@@ -360,6 +402,27 @@ function alongEdge(E, i, p) {
   return Math.max(0, Math.min(L, ((p[0] - a[0]) * dx + (p[1] - a[1]) * dy) / L));
 }
 
+/* req 5922, the wall face's route (Architect, 21 November 2026; Fawkes's rulings on req 5971; docs/handoff/architect.md
+   'Gate, the wall face's route'): two lines per wall. Under ?arch=whole a place's plan is the carved face (clearPlan), and
+   the model's own corners ride on it as `loc`, the location line. A point the model authors (an opening's span or at, a
+   feature's at, a way's at) is found on the location edges exactly as on the plain page, then carried by edge index onto
+   the face: clearPlan moves each edge parallel to itself, so edge i of one is edge i of the other. */
+function locPts(Q) { var L = Q && !Q.loops && Q.poly && Q.poly.loc; return L && L.length === Q.poly.length ? L : null; }
+function locEdges(Q, E) { var L = locPts(Q); return L && E.length === L.length ? edgesOf([L], Q.loopH, Q.loopT) : E; }
+/* s along location edge i, as s along face edge i: less the face edge's start, measured along the location edge */
+function toFaceS(EL, E, i, s) {
+  if (EL === E) return s;
+  var a = EL[i].a, b = EL[i].b, L = Math.hypot(b[0] - a[0], b[1] - a[1]);
+  return L < 1e-9 ? s : s - ((E[i].a[0] - a[0]) * (b[0] - a[0]) + (E[i].a[1] - a[1]) * (b[1] - a[1])) / L;
+}
+/* onEdgeE on the location line, its answer on the face: { i, s, d, L } with s and L the face edge's, d from the location line */
+function locate(Q, E, p, tol) {
+  var EL = locEdges(Q, E), e = onEdgeE(EL, p, tol);
+  if (!e || EL === E) return e;
+  var fa = E[e.i].a, fb = E[e.i].b;
+  return { i: e.i, s: toFaceS(EL, E, e.i, e.s), d: e.d, L: Math.hypot(fb[0] - fa[0], fb[1] - fa[1]) };
+}
+
 /* v199 (req 3344/3397 step 3, the Architect, 9 November 2026): where the rules above find an opening on no side of this
    place (one point, no `into`: a floor way is in no wall), a doorway pierces the whole wall between its two rooms, so its
    face here is found across the wall from the face its other room finds: from that face's foot, square out of the other
@@ -369,15 +432,15 @@ function alongEdge(E, i, p) {
    degrees) is cut at that corner, on into the next side. `fb` marks the find: no hold along the side for it, so the
    two faces stay square across the wall */
 function farFind(M, Q, E, op, p) {
-  if (op.into || inPoly(Q.poly, p[0], p[1])) return null;
+  if (op.into || inPoly(locPts(Q) || Q.poly, p[0], p[1])) return null;   /* req 5922's route: on the location line */
   var reach = op.depth ? op.depth + 0.2 : 3.5, ids = (op.between || []).map(slug).filter(function (x) { return x !== Q.id; });
   for (var k = 0; k < ids.length; k++) {
     var O = findPlace(M, ids[k]); if (!O || !O.poly) continue;
-    var EO = edgesOf(O.loops || [O.poly], O.loopH, O.loopT), eo = onEdgeE(EO, p, op.depth ? op.depth + 0.2 : null);
+    var EO = locEdges(O, edgesOf(O.loops || [O.poly], O.loopH, O.loopT)), eo = onEdgeE(EO, p, op.depth ? op.depth + 0.2 : null);
     if (!eo) continue;
     var a = EO[eo.i].a, b = EO[eo.i].b, ux = (b[0] - a[0]) / eo.L, uy = (b[1] - a[1]) / eo.L;
     var f = [a[0] + ux * eo.s, a[1] + uy * eo.s], n = [-uy, ux];
-    if (inPoly(O.poly, f[0] + n[0] * 0.05, f[1] + n[1] * 0.05)) n = [uy, -ux];   /* square out of the other room */
+    if (inPoly(locPts(O) || O.poly, f[0] + n[0] * 0.05, f[1] + n[1] * 0.05)) n = [uy, -ux];   /* square out of the other room */
     var best = null;
     for (var i = 0; i < E.length; i++) {
       var A = E[i].a, B = E[i].b, ex = B[0] - A[0], ey = B[1] - A[1], L = Math.hypot(ex, ey); if (L < 1e-6) continue;
@@ -400,6 +463,27 @@ function farFind(M, Q, E, op, p) {
   return lu > 1e-6 && lv > 1e-6 && (uu[0] * vv[0] + uu[1] * vv[1]) / (lu * lv) > Math.cos(Math.PI / 6) ? c : null;
 }
 
+/* req 5922's route, clause (b) (Fawkes, 7.31 pm on req 5971): a stand is accepted only 0.3 m clear inside its own place's
+   outline (its area's outer less its holes, or its plan), not inside the room's box plus 0.01 as onLevel accepts it. clearOf:
+   a site point's least distance to the outline's sides, negative outside it or in a hole. standPick: from `off` along the
+   door's inward line, 5 cm nearer at a time until 0.3 clear (0.2 steps skipped a 0.8 m passage's clear middle); where none is (a place too
+   narrow: seat-den-hatch-3 has no point 0.3 clear anywhere), the point of most clearance on the door's line, marked fallback */
+function clearOf(q, x, y) {
+  var loops = q.area ? [q.area.outer].concat(q.area.holes || []) : [q.poly], m = Infinity;
+  loops.forEach(function (L) { for (var i = 0, j = L.length - 1; i < L.length; j = i++) {
+    var a = L[j], b = L[i], dx = b[0] - a[0], dy = b[1] - a[1], L2 = dx * dx + dy * dy, t = L2 ? Math.max(0, Math.min(1, ((x - a[0]) * dx + (y - a[1]) * dy) / L2)) : 0;
+    m = Math.min(m, Math.hypot(x - a[0] - t * dx, y - a[1] - t * dy)); } });
+  var inside = inPoly(loops[0], x, y) && !loops.slice(1).some(function (h) { return inPoly(h, x, y); });
+  return inside ? m : -m;
+}
+function standPick(q, mid, inw, off) {
+  var c = function (o) { return clearOf(q, mid[0] + inw[0] * o, mid[1] + inw[1] * o); };
+  if (c(off) >= 0.3) return { off: off, fallback: false };
+  var best = null;
+  for (var k = Math.floor(off / 0.05 + 1e-9); k >= 1; k--) { var v = c(k * 0.05); if (v >= 0.3) return { off: k * 0.05, fallback: false }; if (!best || v > best.v + 1e-9) best = { off: k * 0.05, v: v }; }
+  return best ? { off: best.off, fallback: true, clear: best.v } : { off: off, fallback: true, clear: c(off) };
+}
+
 /* each panelled room's grade on Design's ladder (CastlePanelling.GRADES, 0 plain to 3 rich), one line a room when Godric
    grades them (design-panelling-grades-1021); a room not named takes grade 2, his 1 on design-panelling-staff-1021.
    Graded by rank, his 1 on design-panelling-grades-1021 (21 October 2026, 7.10 am; Design's req 844): the teachers'
@@ -417,6 +501,16 @@ var PANEL_GRADE = {
    caps buildPlace draws over a shaft's corner sills */
 function gapsOf(M, Q, E, H) {
     var gaps = E.map(function () { return []; }), caps = [];
+    /* req 5922's route: every find, end, refind, spill and hold below on the location line (EL, the plain page's own edges);
+       each gap then carried onto the face edge of the same index (EF) and held to it; a face edge of no length is listed */
+    var EF = E; E = locEdges(Q, EF);
+    var onFace = EF === E ? function (g) { return g; } : function (g, i) {
+      var Lf = Math.hypot(EF[i].b[0] - EF[i].a[0], EF[i].b[1] - EF[i].a[1]);
+      var a = Math.max(0, toFaceS(E, EF, i, g.s0)), b = Math.min(Lf, toFaceS(E, EF, i, g.s1));
+      if (Lf < 1e-6 || b - a < 1e-6) { (window.__clearDegenerate = window.__clearDegenerate || []).push(Q.id + ':' + g.op.id + ':' + i); return null; }
+      g.s0 = a; g.s1 = b; return g;
+    };
+    var push = function (i, g) { g = onFace(g, i); if (g) gaps[i].push(g); };
     (M.openings || []).concat(Q.ops || []).forEach(function (op) {
       if (!matches(M, op, Q.id) || op.hatch || op.state === 'set aside') return;   /* v159 (req 2137): an opening the model sets aside builds no door. v134: a flag in a floor (`hatch`) is in no wall; built below as a hatch */
       /* a doorway behind a panel or a tapestry reads as wall; v8 (req 520): from the hidden place it opens off (its
@@ -498,9 +592,9 @@ function gapsOf(M, Q, E, H) {
       /* v23: an arch's `soffit` gives its head at each room's face (absolute), under a room's raised head */
       var sof = op.soffit && !hid ? op.soffit : null, near = sof && sof[Q.id], far = sof && sof[other(op, Q.id)];
       if (near != null) h = near - Q.floor;
-      gaps[e.i].push({ s0: s0, s1: s1, sill: sill, h: h, op: op, far: op.depth && e.d > 0.5 ? e.d : 0, back: back, hidden: hid,
+      push(e.i, { s0: s0, s1: s1, sill: sill, h: h, op: op, far: op.depth && e.d > 0.5 ? e.d : 0, back: back, hidden: hid,
         soffit: near != null ? [h, far != null ? far - Q.floor : h] : null, recess: RC, lights: LT });
-      spill.forEach(function (sp) { gaps[sp.k].push({ s0: sp.s0, s1: sp.s1, sill: sill, h: h, op: op, back: back, hidden: false, spill: true }); });
+      spill.forEach(function (sp) { push(sp.k, { s0: sp.s0, s1: sp.s1, sill: sill, h: h, op: op, back: back, hidden: false, spill: true }); });
       /* v84: a shaft's opening over a corner (H82's cleft): a round wall's sides meet at their inner faces, leaving a V
          outside each corner that the wall's height hides; a sill across the corner shows its top, so a cap over it */
       if (Q.shaft && sill > 0) spill.forEach(function (sp) { caps.push({ sp: sp, e: e, op: op, sill: sill }); });
@@ -1725,7 +1819,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
        part, its head round */
     (M.features || []).forEach(function (ft) {
       if (!ft.depth || !ft.at || !ft.room || (ft.room !== Q.id && slug(ft.room) !== Q.id)) return;
-      var e = onEdgeE(E, toSite(M, ft.group || null, ft.at));
+      var e = locate(Q, E, toSite(M, ft.group || null, ft.at));   /* req 5922's route: on the location line */
       if (!e) return;
       var ns0 = e.s - ft.w / 2, ns1 = e.s + ft.w / 2, nsill = ft.sill || 0, nh = Math.min(H, (ft.h || 2.2) + (ft.sill || 0));
       var ng = { s0: ns0, s1: ns1, sill: nsill, h: nh, op: ft, niche: true };
@@ -1841,7 +1935,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
       }); });
       (M.features || []).forEach(function (ft) {
         if (!ft.at || !ft.w || !/fireplace/.test(ft.kind || '') || !ft.room || (ft.room !== Q.id && slug(ft.room) !== Q.id)) return;
-        var e = onEdgeE(E, toSite(M, ft.group || null, ft.at));
+        var e = locate(Q, E, toSite(M, ft.group || null, ft.at));   /* req 5922's route: on the location line */
         if (!e) return;
         var fh = ft.h || (ft.opening ? ft.opening[1] : 1.2);
         /* v65 (req 908): a fireplace with its own surround's width stops the panelling 1 cm onto that surround */
@@ -2946,7 +3040,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
     /* a built room (one with its own page) is never shelled: the way takes him to its page (line 5's rule) */
     if (Q && Q.rec && Q.rec.page) { w.built = true; w.page = Q.rec.page; if (EXT) { pageShell(Q, w); return; } }
     /* v13: a deep way (the flanker's arch through the spur's 1.2) finds its far room at its far face, as its gap does */
-    else if (Q && onEdge(Q.poly, w.at, w.depth > 1.0 || Q.shaft ? w.depth + 0.2 : null)) { out.places.push(Q); buildPlace(Q); w.built = true; return; }
+    else if (Q && onEdge(locPts(Q) || Q.poly, w.at, w.depth > 1.0 || Q.shaft ? w.depth + 0.2 : null)) { out.places.push(Q); buildPlace(Q); w.built = true; return; }   /* req 5922's route: on the location line */
     /* v179 (req 3188, Exterior's E1 P01): under the outside view (o.exterior, shell.html's &exterior) a way whose far
        side is no model place (the gate arch onto the grounds) builds no dark recess: the view draws the outside itself,
        and the 3 m box stood out of the Astronomy drum's foot as a black block on legs. Every other view unchanged */
@@ -3365,6 +3459,19 @@ window.CastleShell = { build: function (F, M, placeId, o) {
        in the room beyond its far wall, the door out of sight; he stands in the door's own place, 0.4 m clear of its far side */
     var own = o.floor && out.places.filter(function (q) { return q.id === d.place; })[0];
     if (own) while (off > 0.6 && !inArea(own, d.mid.x + d.inward.x * (off + 0.4) + cx, cy - (d.mid.z + d.inward.z * (off + 0.4)))) { off -= 0.2; pos = d.mid.clone().add(d.inward.clone().multiplyScalar(off)); pos.y = d.mid.y + d.lift + EYE; }
+    /* req 5922's route (b): 0.3 m clear inside the stand's own place. v251 (req 5979, Fawkes's ruling on req 5998, 22 November
+       2026): on every view, the plain page too, so a way back's stand never puts his eye against a wall end; window.__standWould
+       lists the stands moved, by name, and window.__standFallback those with no clear point on the door's line */
+    var spQ = d.place === P.id ? P : out.places.filter(function (q) { return q.id === d.place; })[0];
+    if (spQ && (spQ.area || (spQ.poly && spQ.poly.length > 2))) {
+      var smid = [d.mid.x + cx, cy - d.mid.z], sp = standPick(spQ, smid, [d.inward.x, -d.inward.z], off);
+      if (Math.abs(sp.off - off) > 1e-9 || sp.fallback) {
+        var rec = name + ' in ' + d.place + ': ' + off.toFixed(2) + ' to ' + sp.off.toFixed(2) + (sp.fallback ? ', most clearance ' + sp.clear.toFixed(2) : '');
+        off = sp.off; pos = d.mid.clone().add(d.inward.clone().multiplyScalar(off)); pos.y = d.mid.y + d.lift + EYE;
+        (window.__standWould = window.__standWould || []).push(rec);
+        if (sp.fallback) (window.__standFallback = window.__standFallback || []).push(rec);
+      }
+    }
     if (P.ring && d.place === P.id) pos = midRing(pos);
     var look = d.mid.clone(); look.y = d.mid.y + d.lift + (d.lift ? EYE : Math.max(EYE, d.h * 0.45));
     return { name: name, pos: pos, look: look, thing: d.mesh, level: d.level };
@@ -3414,6 +3521,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
        sight (Events' ninety-first, 3.19 am, 16 October: from the arch's mouth the reveal hid it at the head's full turn) */
     var viaIn = P.round ? P.round.r * 0.8 : 1.0;
     var back = d.back ? 0.5 : d.mesh.userData.way ? (d.via ? viaIn : d.page || !d.built ? -0.3 : -1.0) : P.shaft ? (shaftStepped[d.id] ? 0.35 : Math.min(1.0, 0.6 * P.round.r)) : STAND_OFF;   /* v25: a narrower well, a shorter step in, clear of its newel */
+    var usualIn = !d.back && !d.mesh.userData.way && !P.shaft;   /* v257: the usual step in (STAND_OFF), for the last pass */
     var pos = d.mid.clone().add(d.inward.clone().multiplyScalar(back)); pos.y = d.mid.y + d.lift + EYE;
     /* v10: never off the floor (a ring 0.9 wide): nearer the door until he stands on it */
     while (back > 0.6 && !onLevel(pos.x + cx, cy - pos.z, d.level)) { back -= 0.2; pos = d.mid.clone().add(d.inward.clone().multiplyScalar(back)); pos.y = d.mid.y + d.lift + EYE; }
@@ -3440,15 +3548,22 @@ window.CastleShell = { build: function (F, M, placeId, o) {
       if (!onLevel(q2[0], q2[1], d.level)) { tx = -tx; ty = -ty; }
       look = toLocal(sp[0] + tx * 6, sp[1] + ty * 6, d.level + EYE);
     }
+    if (name === 'start' && usualIn && !P.ring && !d.via) fiStart = { d: d, pos: pos.clone() };   /* v257 */
     return { name: name, pos: pos, look: look, thing: null, level: d.level };
   }
+  var fiStart = null;   /* v257: the start stand facingIn built at a door with the usual step in, and where it put it */
   var all = out.doors.concat(out.ways), mine = all.filter(function (d) { return d.place === P.id; });
   var entry = mine.filter(function (d) { return o.from && d.to === o.from; })[0] ||
-    (P.shaft ? out.hidden.filter(function (d) { return d.place === P.id && o.from && d.to === o.from; })[0] : null) ||   /* v17: in by a hidden door, beside it */ mine.filter(function (d) { return o.start && d.id === o.start; })[0] ||
+    (P.shaft ? out.hidden.filter(function (d) { return d.place === P.id && o.from && d.to === o.from; })[0] : null) ||   /* v17: in by a hidden door, beside it */
+    /* v254 (req 5979, line 3): no opening of his leads back to where he came from, so he starts at the door his link names
+       (by=), when it is this place's own, standing where he came in, not at the first door */
+    mine.filter(function (d) { return o.by && o.byStart !== false && d.id === o.by && d.mid; })[0] ||
+    mine.filter(function (d) { return o.start && d.id === o.start; })[0] ||
     (P.shaft ? mine.filter(function (d) { return d.level <= P.floor + 0.05; })[0] : null) || mine[0] ||   /* v17: a stair's well, at its foot */
     /* v38: a place whose ways in are all hidden (the kitchens' jibs, a corridor's pretending wall) starts beside one, facing
        in, not at its middle (the kitchens' middle is a pier) */
     out.hidden.filter(function (d) { return d.place === P.id && o.from && d.to === o.from; })[0] || out.hidden.filter(function (d) { return d.place === P.id; })[0];
+  out.entry = entry ? entry.id : null;   /* v254: the opening his start was built at, for checks */
   all = all.concat(out.hidden);
   if (entry) out.stands.push(facingIn(entry, 'start'));
   else {
@@ -3674,6 +3789,17 @@ window.CastleShell = { build: function (F, M, placeId, o) {
       here_.forEach(function (d) { if (seen.indexOf(d) < 0 && inReach(s_, d)) { seen.push(d); if (d.stand) q.push(d.stand); } });
     }
     var lost = here_.filter(function (d) { return seen.indexOf(d) < 0; });
+    /* v252 (req 5979, the arrival gate's first line; Fawkes's rulings on req 5998 and 5999, 22 November 2026): the way he came
+       by is read directly from the start, not through a chain of other stands: when this page draws a way back to from= and
+       none lies within the start's own turn, the start takes the whole turn and its wide list names them (the chain had let
+       west-cross-corridor-3's start keep 60 degrees with its mouth 180 degrees behind him) */
+    /* v253 (req 5979, the arrival gate's second line; Fawkes's rulings, 22 November 2026): the way back is the door he came by,
+       named by the link (by=), when it is this page's; only when it is not (a stair's down way arriving at its up way) the
+       doors and ways leading to from=, as v252 (from= names the page he left, and a neighbour's door shown there is not one) */
+    var mineB = out.doors.concat(out.ways).filter(function (d) { return d.place === P.id && d.mid; });
+    var byB = o.by ? mineB.filter(function (d) { return d.id === o.by; }) : [];
+    var backs = byB.length ? byB : (o.from ? mineB.filter(function (d) { return d.to === o.from; }) : []);
+    if (backs.length && !backs.some(function (d) { return inReach(st0, d); })) lost = lost.concat(backs.filter(function (d) { return lost.indexOf(d) < 0; }));
     if (lost.length) { st0.lim.turn = 180; st0.wide = lost.map(function (d) { return d.id; }).join(' '); }
   }
   /* v117 (req 1559, Gate 0): the place a stand stands in, by its foot and storey (null on a flight's treads), so on a
@@ -3723,7 +3849,9 @@ window.CastleShell = { build: function (F, M, placeId, o) {
         var L = Math.hypot(ed.b[0] - ed.a[0], ed.b[1] - ed.a[1]); if (L < 1e-6) return;
         var fu = [(ed.b[0] - ed.a[0]) / L, (ed.b[1] - ed.a[1]) / L], fn = [fu[1], -fu[0]];
         (w.gaps[i] || []).forEach(function (g) {
-          if (g.hidden || g.recess) return;
+          if (g.hidden) return;
+          /* v260 (req 6024, Fawkes's ruling of 23 November 2026): a recess is cut through its own strip as a plain opening,
+             sill to head, as v1 cuts it on floors 2 and 3; the recess body (sides, soffit, floor and back) is v1's, drawn already */
           /* v210 (req 3481, Fawkes's 1 on req 3535): a niche cuts its own room's strip, swept only its depth, square headed
              (v1's head piece draws the arch), its back drawn after the strip (v1 cut it; v2 left the hourglasses walled in) */
           /* v217 (req 3344, carrying v216 to v2): a niche wider than its side on a curve is swept once, whole and straight on
@@ -3744,7 +3872,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
           var headed = (hk === 'round' && g.op.head === 'round' || hk === 'pointed' || hk === 'tudor') && !g.back && !g.soffit && (isDoor(g.op.kind) || isWay(g.op.kind) || win_);
           var rr = (g.s1 - g.s0) / 2, up = !headed ? 0 : hk === 'pointed' ? Math.sqrt(3) * rr : hk === 'tudor' ? (window.CastleTrim && CastleTrim.rise ? CastleTrim.rise('tudor', rr, 0) : rr * 0.6) : rr;
           OPS.push({ rooms: far ? [r, far] : [r], q: [[pa[0] - fn[0] * 0.02, pa[1] - fn[1] * 0.02], [pb[0] - fn[0] * 0.02, pb[1] - fn[1] * 0.02], [pb[0] + fn[0] * D, pb[1] + fn[1] * D], [pa[0] + fn[0] * D, pa[1] + fn[1] * D]],
-            z0: w.Q.floor + g.sill, z1: w.Q.floor + g.h, head: headed ? hk : null, up: up, id: g.op.id, win: winKind(g.op.kind) });
+            z0: w.Q.floor + g.sill, z1: w.Q.floor + g.h, head: headed ? hk : null, up: up, id: g.op.id, win: winKind(g.op.kind), recess: !!g.recess });
         });
       });
     });
@@ -3831,7 +3959,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
         /* v207 (req 3481 cause B): a window of one room cuts no strip it shares with a roofed room; as v1 it stops blind in
            its own wall (lake-corridor-g-east's two lake windows came out in Hidden Ways' loop gallery) */
         if (O.win && O.rooms.length === 1 && sg.rooms.some(function (x) { return x !== O.rooms[0] && roofed(x); })) { (res.blindWins = res.blindWins || []).push(O.id + '@' + sg.rooms.join('/')); return; }
-        holes.push({ s0: c[0], s1: c[1], z0: O.z0, z1: O.z1, head: O.head, up: O.up, op: O.id, from: O.rooms[0], niche: O.niche });
+        holes.push({ s0: c[0], s1: c[1], z0: O.z0, z1: O.z1, head: O.head, up: O.up, op: O.id, from: O.rooms[0], niche: O.niche, recess: O.recess });
       });
       /* v208 (req 3481, D's slanted case): an opening swept from both its rooms cuts a strip with the sweeps of the room
          whose own face the strip is, where that room swept it; the drum's 16-gon door swept on along the drum side's normal
@@ -4120,9 +4248,10 @@ window.CastleShell = { build: function (F, M, placeId, o) {
            by 3.6 m round a 2.6 m door by kitchens-steps), entrance-hall's strip drew no stone there and its lining stood
            0.15 m into stair-hall, as charms-passage's did into charms-landing-passage-3 */
         var uH = CastleStrip.unite(spec.holes.map(function (h, kq) { var cut = h.z1 > top - lo + 0.005, rq = RECop[holes[kq].op]; return { rz: rq ? (rq.face1 ? [0.001, sg.off[1] - sg.off[0] - rq.D] : [rq.D, sg.off[1] - sg.off[0] - 0.001]) : null, s0: Math.max(x0L, h.s0), s1: Math.min(x1L, h.s1), z0: Math.max(0, h.z0), z1: Math.min(top - lo, h.z1), head: cut ? null : (h.head || null), up: cut ? 0 : (h.up || 0),
-            sq: !!CASED && !cut && !h.niche && !h.head && h.z0 < 0.1 && h.z1 - h.z0 > 1.7 }; })   /* v219 (req 5176, ?cased=): a square-headed door or way's reveal is lined too */
+            rec: !!holes[kq].recess, sq: !!CASED && !cut && !h.niche && !h.head && h.z0 < 0.1 && h.z1 - h.z0 > 1.7 }; })   /* v219 (req 5176, ?cased=): a square-headed door or way's reveal is lined too */
           .filter(function (h) { return h.s1 - h.s0 > 0.02 && h.z1 - h.z0 > 0.02; })).holes;
         uH.forEach(function (h) {
+          if (h.rec) return;   /* v260 (req 6024, Fawkes's ruling of 12.24 am, 24 November 2026): a recess is dressed by v1's recess body; its lining lay 3 mm off that face (3 fights a G recess) */
           if (!h.sq && (!h.head || !(h.up > 0.01))) return;
           if (uH.some(function (o) { return o !== h && o.s0 <= h.s0 + 0.01 && o.s1 >= h.s1 - 0.01 && o.z0 <= h.z1 - h.up + 0.01 &&
             Math.min(CastleStrip.topAt(o, h.s0), CastleStrip.topAt(o, (h.s0 + h.s1) / 2), CastleStrip.topAt(o, h.s1)) >= h.z1 - 0.01; })) return;
@@ -4374,6 +4503,107 @@ window.CastleShell = { build: function (F, M, placeId, o) {
     var mesh = F.register(new THREE.Mesh(g, mats.wall), LAYER.wall); mesh.name = /^fill-/.test(fl.id) ? fl.id : 'fill-' + fl.id; group.add(mesh);
     out.fills.push(fl.id);
   });
+  /* v258 (22 November 2026, the 7.53 pm session): where his look is turned, the trigger is the room ahead along it; no move where D is under 0.4 m.
+     v257 (the landing clear of stone; Fawkes's yes of 4.52 pm, 22 November 2026, provisional): a boy who comes in by a door
+     never lands with stone at his face or his eye inside a wall's end or a narrow place's far wall. Nothing tested the
+     stand STAND_OFF in against what is drawn; here, last, when the v2 walls of G and 1 are drawn, three level rays from the
+     door's middle at his eye height along the inward line (the centre and the shoulders' lines 0.25 m either side; the
+     opening's own parts and what does not draw left out), D the nearest stone; where less than 0.6 m would be left ahead,
+     he stands at the middle of the clear depth, at least 0.3 m in, never past the stone less the camera's near plane */
+  (function () {
+    var st = out.stands.filter(function (s) { return s.name === 'start'; })[0], fi = fiStart;
+    if (!st || !fi || !fi.d.mid || !fi.d.inward || st.pos.distanceTo(fi.pos) > 1e-6) return;
+    var d = fi.d, inw = d.inward.clone(); inw.y = 0; if (inw.lengthSq() < 1e-9) return; inw.normalize();
+    group.updateMatrixWorld(true);
+    var ownC = function (q) { if (q === d.mesh) return true; var u = q.userData || {};
+      return u.way === d.id || (!!u.stair && (d.id === u.stair + '-up' || d.id === u.stair + '-down')); };
+    var keepC = function (h) { var ob = h.object; if (!ob.visible) return false;
+      for (var q = ob; q; q = q.parent) if (ownC(q)) return false;
+      var m = ob.material; return !(m && (m.visible === false || (m.transparent && m.opacity < 0.5))); };
+    var side = new THREE.Vector3(-inw.z, 0, inw.x), o0 = d.mid.clone(); o0.y = d.mid.y + (d.lift || 0) + EYE;
+    var DC = Infinity; [0, 0.25, -0.25].forEach(function (sd) {
+      var h = new THREE.Raycaster(o0.clone().add(side.clone().multiplyScalar(sd)), inw, 0, 8).intersectObject(group, true).filter(keepC)[0];
+      if (h && h.distance < DC) DC = h.distance; });
+    var step = st.pos.clone().sub(o0).dot(inw);
+    if (DC < 0.4) return;   /* v258 (2): the ray from the door's middle born in stone, no clear depth on the inward line */
+    var lk = st.look.clone().sub(st.pos); lk.y = 0;
+    var turned = o.standClear !== 'plant' && lk.lengthSq() > 1e-9 && lk.normalize().dot(inw) < 0.7071;   /* v258 (1): his look more than 45 degrees off */
+    if (turned) { var hv = new THREE.Raycaster(st.pos.clone(), lk, 0, 30).intersectObject(group, true).filter(keepC)[0]; if (!(hv && hv.distance < 0.6)) return; }
+    else if (!(DC - step < 0.6)) return;
+    var nb = o.standClear === 'plant' ? DC - 0.05 : Math.min(Math.max(0.3, DC / 2), DC - 0.1), mv = inw.clone().multiplyScalar(nb - step);   /* 'plant': the measure's known bad, checks only */
+    st.pos = st.pos.clone().add(mv); st.look = st.look.clone().add(mv);
+    out.standClear = { D: Math.round(DC * 100) / 100, step: Math.round(step * 100) / 100, to: Math.round(nb * 100) / 100 };
+  })();
+  /* v259 (23 November 2026, the Architect's 5.02 pm session; req 5979's line, gated on req 6059 with Fawkes's yes on five
+     terms; provisional, rule 12, archive only): the openLook mend. facingIn's openLook (v14) chose his look from the stand
+     2.4 m in and tried only to 80 degrees; v257 and v258 then moved him and carried that look unchanged, so a side door into
+     a 2.5 m corridor left him facing its far wall. Taken again here from the stand where he now stands: where the floor
+     runs under 6 m along his look, the way it runs longest within 90 degrees either side of straight in (openLook's own
+     rule, 10 degrees a step, 0.05 m a step's penalty, 0.5 m to beat), never 60 degrees or less off the door he came by
+     (or past his turn), and only where the line's 30 degree score (the second lowest of 7 level rays at 5 degrees, each
+     stopped at this place's own openings) is not lower than his look's today, one clause for every arrival. Left as they
+     are: a place with a named start in the model (look.stands.start, with a spot or not), a ring, a shaft, a hatch, and
+     the looks Godric has seen (KEEP). Then, the short passage rule (its own switch): where no level ray of 72 reaches
+     3 m, he looks at the onward opening, an opening of this place 60 degrees or more off the door he came by and within
+     his turn, in sight from his eye, the one nearest straight in; built and left OFF (?shortlook=1 turns it on for checks). Switches: window.lumosLook = { mend: false }
+     or { short: true } (shell.html: ?lookmend=0, ?shortlook=1). out.lookMend says what was done. */
+  (function () {
+    var LW = window.lumosLook || {}; if (LW.mend === false) return;
+    var KEEP = { 'boat-and-lamp-store|lake-corridor-b-keep': 1 };   /* looks Godric has seen (Fawkes, req 6053) */
+    var st = out.stands.filter(function (s) { return s.name === 'start'; })[0];
+    var ent = out.doors.concat(out.ways).filter(function (b) { return b.id === out.entry && b.place === P.id; })[0];
+    if (!st || !ent || !ent.inward || !ent.mid || ent.hatch || P.ring || P.shaft) return;
+    if ((P.rec && P.rec.look && P.rec.look.stands || {}).start) return;
+    if (KEEP[P.id + '|' + o.from]) { out.lookMend = { why: 'seen by Godric' }; return; }
+    var pos = st.pos, inw = ent.inward, D2R = Math.PI / 180;
+    var runD = function (dx, dz) { var t = 0.3, on = function (u) { return inArea(P, pos.x + dx * u + cx, cy - (pos.z + dz * u)); };
+      while (t < 2.6 && !on(t)) t += 0.25; var t0 = t; while (t < 20 && on(t)) t += 0.25; return t - t0; };
+    var lk = st.look.clone().sub(pos); lk.y = 0; if (lk.lengthSq() < 1e-9) return; lk.normalize();
+    var runNow = runD(lk.x, lk.z);
+    if (runNow >= 6) { out.lookMend = { why: 'run of 6 m or more along today' }; return; }
+    var rot = function (a) { var c = Math.cos(a), s_ = Math.sin(a); return { dx: inw.x * c + inw.z * s_, dz: -inw.x * s_ + inw.z * c }; };
+    var best = rot(0), score = runD(best.dx, best.dz);
+    if (score < 6) for (var k = -9; k <= 9; k++) { if (!k) continue; var rr = rot(k * 10 * D2R), sc = runD(rr.dx, rr.dz) - Math.abs(k) * 0.05;
+      if (sc > score + 0.5) { best = rr; score = sc; } }
+    group.updateMatrixWorld(true);
+    var ops = out.doors.concat(out.ways, out.hidden || []).filter(function (b) { return b.place === P.id && b.mesh; }).map(function (b) { return b.mesh; });
+    var keepH = function (h) { var ob = h.object; if (!ob.visible) return false; var m = ob.material;
+      return !(m && (m.visible === false || (m.transparent && m.opacity < 0.5))); };
+    var ray = function (a) { var dir = new THREE.Vector3(Math.sin(a), 0, Math.cos(a));
+      var hs = new THREE.Raycaster(pos.clone(), dir, 0, 30).intersectObject(group, true).filter(keepH), raw = hs.length ? hs[0].distance : 30;
+      var ho = ops.length ? new THREE.Raycaster(pos.clone(), dir, 0, 30).intersectObjects(ops, true) : [], od = ho.length ? ho[0].distance : 99;
+      return { d: Math.min(raw, od), op: od <= raw + 0.001 }; };
+    var s30 = function (a) { var R = []; for (var j = -3; j <= 3; j++) R.push(ray(a + j * 5 * D2R).d); R.sort(function (x, y) { return x - y; }); return R[1]; };
+    var bk = ent.mid.clone().sub(pos), bkd = Math.hypot(bk.x, bk.z), aDoor = Math.atan2(bk.x, bk.z);
+    var turn = st.lim && st.lim.turn, lim = turn != null && turn >= 180 ? 180 : (turn || 0) + 10;
+    var adiff = function (a, b) { var x = a - b; return Math.abs(Math.atan2(Math.sin(x), Math.cos(x))) / D2R; };
+    var okDoor = function (a) { if (bkd < 0.3) return true; var off = adiff(a, aDoor); return off >= 60 && off <= lim; };
+    var aNow = Math.atan2(lk.x, lk.z), aLine = Math.atan2(best.dx, best.dz), sNow = s30(aNow), sLine = s30(aLine);
+    var M_ = { why: 'mended', a: Math.round((aLine / D2R + 360) % 360), sNow: Math.round(sNow * 100) / 100, sLine: Math.round(sLine * 100) / 100 };
+    var aSet = null;
+    if (!okDoor(aLine)) M_.why = 'door rule keeps today';
+    else if (sLine < sNow) M_.why = 'lower than today keeps today';
+    else aSet = aLine;
+    if (LW.short === true) {   /* off by default (Fawkes, 7.20 pm, 23 November 2026: no gain on walls, 3 looks short to wall, its frame read as a wall) */
+      var mx = 0; for (var i = 0; i < 72 && mx < 3; i++) mx = Math.max(mx, ray(i * 5 * D2R).d);
+      if (mx < 3) {
+        var aIn = aDoor + Math.PI, on_ = null, onD = 1e9;
+        out.doors.concat(out.ways, out.hidden || []).forEach(function (b) {
+          if (b.place !== P.id || b === ent || !b.mid || !b.mesh) return;
+          var tg = b.mid.clone(); tg.y = b.mid.y + (b.lift || 0) + 1.0;
+          var dv = tg.clone().sub(pos), L = dv.length(); if (L < 0.05) return;
+          var a = Math.atan2(dv.x, dv.z); if (!okDoor(a)) return;
+          var h = new THREE.Raycaster(pos.clone(), dv.clone().normalize(), 0, L + 0.05).intersectObject(group, true).filter(keepH)[0];
+          var own = false; if (h) for (var q = h.object; q; q = q.parent) if (q === b.mesh) own = true;
+          if (h && !own && h.distance < L - 0.05) return;
+          var off = adiff(a, aIn); if (off < onD) { onD = off; on_ = { b: b, a: a }; } });
+        M_.short = on_ ? on_.b.id : 'no onward opening';
+        if (on_) { aSet = on_.a; M_.why = 'short passage: onward opening'; M_.a = Math.round((on_.a / D2R + 360) % 360); }
+      }
+    }
+    if (aSet != null) st.look = new THREE.Vector3(pos.x + Math.sin(aSet) * 20, st.look.y, pos.z + Math.cos(aSet) * 20);
+    out.lookMend = M_;
+  })();
   if (out.panes.length && F.renderer && o.far) out.far = farView(F, M, toLocal, out.panes, mats.pane, P.shaft);
   return out;
 } };
@@ -4760,6 +4990,7 @@ function skyTop(Q) {
   top.sky = { min: Math.min.apply(null, hs), max: Math.max.apply(null, hs) };
   return top;
 }
+window.CastleShell.standPick = standPick;   /* req 5922's route (b), for its fixture */
 window.CastleShell.wallTop = function (M, id) { var Q = findPlace(M, id); return Q && Q.glasshouse && Q.glasshouse.house ? glassSection(Q.glasshouse).top : skyTop(Q); };
 /* v198: openingCuts(M, id) -> the cuts the builder makes in place id's walls, in site coordinates: [{ op, edge, a, b,
    s0, s1, z0, z1, far }], a and b the edge's ends, s along it from a, z absolute (its floor plus the gap's sill and head) */
