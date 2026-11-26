@@ -32,7 +32,7 @@
 <script>
 (function () {
   'use strict';
-  var HASH = (/^[0-9a-f]{8}$/.test(new URLSearchParams(location.search).get('hash') || '') && new URLSearchParams(location.search).get('hash')) || '717f2361';   // ?hash= loads another build in page/arch, for a probe's known bad
+  var HASH = (/^[0-9a-f]{8}$/.test(new URLSearchParams(location.search).get('hash') || '') && new URLSearchParams(location.search).get('hash')) || 'b21e8232';   // ?hash= loads another build in page/arch, for a probe's known bad
   /* ?stone=1 (Masonry, 24 November 2026, the Architect's yes at 11.30 pm): the same build after the stone pass
      (tools/masonry-stone-pass-blender.py), arch/castle-stone-<hash>.glb, drawn in its own laid stone; ?stone=grey draws that
      same file in the plain grey, for a like-for-like picture. Without ?stone the page is as it was. */
@@ -459,7 +459,11 @@
   var ROUTE = [[72.7,95],[72.7,90.89],[72.7,86.27],[74.99,87],[80.01,87],[80,83.99],[80.5,77.01],[81,70.5],[81,66],[69.5,60.3],[66.49,60.3],[65,60.3],[61.99,60.3],[62,64.71],[44.99,64.7],[45,65.49],[20.49,64.7],[17.5,64.7]];
   var BENCH_OFF = 0.725;
   // six seats: [x, table y, side] side +1 is the bench on the table's +y side (faces -y), -1 the other (faces +y)
-  var SEATS = [[30.0, 62.6, 1, 3.14], [32.0, 62.6, 1, 2.6], [34.5, 62.6, -1, -2.6], [40.0, 58.4, 1, 3.14], [42.0, 58.4, -1, 2.2], [27.0, 66.8, -1, -2.2]];   // 4th: the turn from facing the table; the model's tables are solid blocks (no knee room), so they sit turned to the aisle, backs to the table, until the tables give knee room (then 0)
+  /* [x, table's y, bench side (1 south, -1 north), turn]; turn 0 faces the table. w45c (b21e8232) gives knee room (table top 0.75, aprons 0.70, benches 0.44,
+     0.05 off the table), so every pupil faces the table; row 6430. Tables at y 54.2, 58.4, 62.6, 66.8, a few pupils on each. */
+  var SEATS = [[30.0, 62.6, 1, 0], [32.0, 62.6, 1, 0], [34.5, 62.6, -1, 0], [40.0, 58.4, 1, 0], [42.0, 58.4, -1, 0], [27.0, 66.8, -1, 0],
+    [28.0, 54.2, 1, 0], [31.0, 54.2, -1, 0], [38.0, 54.2, 1, 0], [36.0, 58.4, 1, 0], [48.5, 58.4, -1, 0], [44.0, 62.6, -1, 0],
+    [33.0, 66.8, 1, 0], [40.0, 66.8, -1, 0], [48.5, 66.8, 1, 0]];
   var routeLen = [], routeTot = 0, routeD = 0, routeY = -3, routeH = null;
   for (var ri = 0; ri < ROUTE.length - 1; ri++) { var rl = Math.hypot(ROUTE[ri + 1][0] - ROUTE[ri][0], ROUTE[ri + 1][1] - ROUTE[ri][1]); routeLen.push(rl); routeTot += rl; }
   function routeAt(d) {
@@ -524,11 +528,11 @@
     return { sole: lo, seat: seat, top: hi };
   }
   function loadSeated(buf) {
-    var clipNames = ['Sitting_Idle_Loop', 'Sitting_Idle_Loop', 'Sitting_Talking_Loop', 'Sitting_Idle_Loop', 'Sitting_Talking_Loop', 'Sitting_Idle_Loop'];
+    var I_ = 'Sitting_Idle_Loop', T_ = 'Sitting_Talking_Loop', clipNames = [I_, I_, T_, I_, T_, I_, T_, I_, I_, T_, I_, I_, T_, I_, I_];   // 11th idle: the talking lean puts a forearm 7 cm into the table's apron at its phase
     var left = SEATS.length;
     SEATS.forEach(function (st, n) {
       new THREE.GLTFLoader().parse(buf.slice(0), '', function (g) {
-        var model = g.scene, f = { skin: [], model: model, spec: st, name: clipNames[n] };
+        var model = g.scene, f = { skin: [], model: model, spec: st, name: clipNames[n % clipNames.length] };
         model.traverse(function (o) { if (o.isSkinnedMesh) { o.frustumCulled = false; f.skin.push(o); o.material = new THREE.MeshStandardMaterial({ color: 0x24222b, roughness: 0.9, metalness: 0, skinning: true }); } });
         var clip = null; for (var i = 0; i < g.animations.length; i++) if (g.animations[i].name === f.name) clip = g.animations[i];
         if (!clip) { SL.err = 'no ' + f.name; return; }
@@ -542,7 +546,7 @@
   }
   // the bench top is read from the glb under the seat: a ray down from 1.0 at the bench centre
   function placeSeated(f, opt) {
-    opt = opt || {}; var st = f.spec, by = st[1] + st[2] * BENCH_OFF, x = st[0] + (opt.dx || 0), yy = by + st[2] * (opt.back === undefined ? 0.15 : opt.back) + (opt.dy || 0);
+    opt = opt || {}; var st = f.spec, by = st[1] + st[2] * BENCH_OFF, x = st[0] + (opt.dx || 0), yy = by + st[2] * (opt.back === undefined ? 0.08 : opt.back) + (opt.dy || 0);
     f.holder.rotation.y = (st[2] > 0 ? 0 : Math.PI) + (opt.yaw !== undefined ? opt.yaw : (st[3] || 0));
     f.holder.position.set(0, 0, 0); f.holder.updateMatrixWorld(true);
     var pel = new THREE.Vector3(); f.model.traverse(function (o) { if (o.isBone && o.name === 'pelvis') o.getWorldPosition(pel); });
