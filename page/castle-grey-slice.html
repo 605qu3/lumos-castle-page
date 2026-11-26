@@ -63,17 +63,23 @@
   var glass = new THREE.MeshStandardMaterial({ color: 0xc4d6de, roughness: 0.2, metalness: 0, transparent: true, opacity: 0.28, depthWrite: false });
 
   // the walk's triangles: one flat array in world space, bucketed on a plain grid over x and z
-  var T = null, grid = new Map(), gx0 = 0, gz0 = 0, gx1 = 0, gz1 = 0;
+  /* Furniture is not floor (Fawkes, 26 November 2026, 4.31 pm; row 6429, ported from castle-grey.html at e69546647): a triangle of a mesh
+     the build marks furniture never carries a walker (place, tick, storey, the route and the stand-in's floor) and stops him inside its
+     own vertical span; __grey.floorAt still reads every face. A glb with no mark walks as before. */
+  var T = null, FUR = null, grid = new Map(), gx0 = 0, gz0 = 0, gx1 = 0, gz1 = 0;
   function key(i, k) { return i * 100003 + k; }
   function build(root) {
-    var all = [];
+    var all = [], fur = [];
     root.updateMatrixWorld(true);
     root.traverse(function (o) {
       if (!o.isMesh || o.userData.glass) return;
+      var isFur = !!(o.userData.furniture || (o.parent && o.parent.userData.furniture));
       var g = o.geometry, p = g.attributes.position, idx = g.index, n = idx ? idx.count : p.count, v = new THREE.Vector3();
       for (var t = 0; t < n; t++) { v.fromBufferAttribute(p, idx ? idx.getX(t) : t).applyMatrix4(o.matrixWorld); all.push(v.x, v.y, v.z); }
+      for (var t3 = 0; t3 < n / 3; t3++) fur.push(isFur ? 1 : 0);
     });
-    T = new Float32Array(all); G_.tris = T.length / 9;
+    T = new Float32Array(all); FUR = new Uint8Array(fur); G_.tris = T.length / 9;
+    G_.furnitureTris = fur.reduce(function (a, b) { return a + b; }, 0);
     gx0 = Infinity; gz0 = Infinity; gx1 = -Infinity; gz1 = -Infinity;
     for (var t = 0; t < G_.tris; t++) {
       var b = t * 9, xa = Math.min(T[b], T[b + 3], T[b + 6]), xb = Math.max(T[b], T[b + 3], T[b + 6]),
@@ -111,9 +117,24 @@
     return d > 1e-6 ? d : -1;
   }
   // the highest stone face under (x, top, z), or null
-  function floorUnder(x, top, z) {
+  function floorUnder(x, top, z, walker) {     // walker: the walker's own floor, which no furniture carries
     var c = near(x, z, x, z), best = null;
-    for (var j = 0; j < c.length; j++) { var d = hit(c[j], x, top, z, 0, -1, 0); if (d >= 0 && (best === null || top - d > best)) best = top - d; }
+    for (var j = 0; j < c.length; j++) {
+      if (walker && FUR[c[j]]) continue;
+      var d = hit(c[j], x, top, z, 0, -1, 0); if (d >= 0 && (best === null || top - d > best)) best = top - d;
+    }
+    return best;
+  }
+  // the nearest furniture along a level ray from the feet, each triangle met at a height inside its own span between the feet
+  // and the head (so a 0.44 seat or a 0.05 slab edge stops him as surely as a wall), or Infinity
+  function furnitureAlong(ox, feet, oz, dx, dz, len) {
+    var c = near(ox, oz, ox + dx * len, oz + dz * len), best = Infinity;
+    for (var j = 0; j < c.length; j++) {
+      var t = c[j]; if (!FUR[t]) continue;
+      var b = t * 9, lo = Math.max(Math.min(T[b + 1], T[b + 4], T[b + 7]), feet + 0.02), hi = Math.min(Math.max(T[b + 1], T[b + 4], T[b + 7]), feet + EYE + 0.2);
+      if (hi - lo < 1e-4) continue;             // a level face (a seat's top): its sides stop him
+      var d = hit(t, ox, (lo + hi) / 2, oz, dx, 0, dz); if (d >= 0 && d < best) best = d;
+    }
     return best;
   }
   // the nearest stone along a level ray, or Infinity
@@ -134,7 +155,7 @@
   // the walker: feet at P (three's frame), a yaw and a pitch, a fall speed
   var P = new THREE.Vector3(), yaw = 0, pitch = -0.05, vy = 0, keys = {};
   function place(x, y, z, yawDeg) {
-    var top = z === undefined ? 30 : z + STEP, f = floorUnder(x, top, -y);
+    var top = z === undefined ? 30 : z + STEP, f = floorUnder(x, top, -y, true);
     P.set(x, f === null ? (z || 0) : f, -y); vy = 0;
     if (yawDeg !== undefined) yaw = yawDeg * Math.PI / 180;
   }
@@ -142,6 +163,7 @@
     var len = Math.hypot(mx, mz); if (len < 1e-9) return true;
     var dx = mx / len, dz = mz / len;
     for (var h = 0; h < WALL_H.length; h++) if (wallAlong(P.x, P.y + WALL_H[h], P.z, dx, dz, len + BODY) < len + BODY) return false;
+    if (furnitureAlong(P.x, P.y, P.z, dx, dz, len + BODY) < len + BODY) return false;
     P.x += mx; P.z += mz; return true;
   }
   function tick(dt, inp) {
@@ -150,7 +172,7 @@
     var fx = -Math.sin(yaw), fz = -Math.cos(yaw), rx = Math.cos(yaw), rz = -Math.sin(yaw);
     var mx = (fx * fw + rx * st) * sp, mz = (fz * fw + rz * st) * sp;
     if (!moveBy(mx, mz)) { if (!moveBy(mx, 0)) moveBy(0, mz); }
-    var f = floorUnder(P.x, P.y + STEP, P.z), drop = 0;
+    var f = floorUnder(P.x, P.y + STEP, P.z, true), drop = 0;
     if (f !== null && f >= P.y - 1e-4) { P.y = f; vy = 0; }
     else {
       vy -= G * dt; var ny = P.y + vy * dt;
@@ -163,8 +185,8 @@
   function storey(up) {
     var y = P.y, f;
     for (var tries = 0; tries < 40; tries++) {
-      if (up) { y += 0.6; f = floorUnder(P.x, y + EYE, P.z); if (f !== null && f > P.y + 1.5 && !inStone(P.x, f + EYE, P.z)) break; }
-      else { f = floorUnder(P.x, y - 0.3, P.z); if (f === null) return false; y = f; if (!inStone(P.x, f + EYE, P.z) && !inStone(P.x, f + 0.2, P.z)) break; }
+      if (up) { y += 0.6; f = floorUnder(P.x, y + EYE, P.z, true); if (f !== null && f > P.y + 1.5 && !inStone(P.x, f + EYE, P.z)) break; }
+      else { f = floorUnder(P.x, y - 0.3, P.z, true); if (f === null) return false; y = f; if (!inStone(P.x, f + EYE, P.z) && !inStone(P.x, f + 0.2, P.z)) break; }
       f = null;
     }
     if (f === null || f === undefined) return false;
@@ -355,7 +377,7 @@
     siX += siDir * SI.speed * dt;
     if (siX < CORR.x1) siX = CORR.x0;
     siMixer.update(dt * SI.rate);
-    var wy = CORR.y, fl = floorUnder(siX, STEP + 0.2, -wy);
+    var wy = CORR.y, fl = floorUnder(siX, STEP + 0.2, -wy, true);
     siHolder.position.set(siX, (fl === null ? 0 : fl) + SI.floorOffset, -wy);
     siHolder.rotation.y = -Math.PI / 2;                  // the model faces +z; west is -x
     siHolder.updateMatrixWorld(true);
@@ -370,7 +392,7 @@
     for (var i = 0; i < n; i++) {
       var ph = i / n, t = ph * SI.T;
       siAction.time = t; siMixer.update(0);
-      var fl = floorUnder(x0, STEP + 0.2, -wy);
+      var fl = floorUnder(x0, STEP + 0.2, -wy, true);
       siHolder.position.set(x0 - SI.speed * (t / SI.rate), (fl || 0) + SI.floorOffset, -wy); siHolder.rotation.y = -Math.PI / 2; siHolder.updateMatrixWorld(true);
       var fx = siHolder.position.x;
       if (view === 'front') { cam.position.set(fx - 3.4, fl + 1.1, -wy - 0.9); } else { cam.position.set(fx + 3.4, fl + 1.1, -wy + 0.9); }
@@ -390,7 +412,7 @@
     renderer.clippingPlanes = [new THREE.Plane(new THREE.Vector3(0, -1, 0), 4.2)];
     var cam = new THREE.PerspectiveCamera(42, asp, 0.5, 300), cx = 79, cy = 60;
     cam.position.set(cx, 36, -cy + 24); cam.lookAt(cx, 0, -cy - 1); cam.updateProjectionMatrix(); cam.updateMatrixWorld(true);
-    var fl = floorUnder(CORR.x0, STEP + 0.2, -CORR.y) || 0;
+    var fl = floorUnder(CORR.x0, STEP + 0.2, -CORR.y, true) || 0;
     siAction.time = 0.1; siMixer.update(0);
     siHolder.position.set(CORR.x0, fl + SI.floorOffset, -CORR.y); siHolder.rotation.y = -Math.PI / 2; siHolder.updateMatrixWorld(true);
     var ring = new THREE.Mesh(new THREE.RingGeometry(0.7, 1.0, 32), new THREE.MeshBasicMaterial({ color: 0xe8453c, side: THREE.DoubleSide }));
@@ -457,7 +479,7 @@
     if (!SI.ready || SI.hold) return;
     if (SL.fixD !== undefined) routeD = SL.fixD; else routeD += SI.speed * dt; if (routeD >= routeTot) { routeD = 0; routeY = -3; routeH = null; }
     var r = routeAt(routeD), x = r.x, y = r.y + SL.shift;
-    var fl = floorUnder(x, routeY + 0.65, -y); if (fl !== null) routeY = fl;
+    var fl = floorUnder(x, routeY + 0.65, -y, true); if (fl !== null) routeY = fl;
     var th = Math.atan2(r.dx, -r.dy), cur = routeH === null ? th : routeH, dd = Math.atan2(Math.sin(th - cur), Math.cos(th - cur));
     routeH = cur + dd * Math.min(1, dt * 6);
     siMixer.update(dt * SI.rate);
@@ -471,7 +493,7 @@
     var saveRoute = routeD;
     for (var i = 0; i < n; i += (step || 1)) {
       routeD = i * SI.speed / 60; var r = routeAt(routeD), y = r.y + SL.shift, x = r.x;
-      var fl = floorUnder(x, routeY + 0.65, -y);
+      var fl = floorUnder(x, routeY + 0.65, -y, true);
       if (fl === null) { out.noFloor++; continue; }
       var slope = Math.abs(fl - routeY); routeY = fl;
       var th = Math.atan2(r.dx, -r.dy); siHolder.rotation.y = th; siHolder.position.set(x, fl + SI.floorOffset, -y); siAction.time = (i / 60 * SI.rate) % SI.T; siMixer.update(0); siHolder.updateMatrixWorld(true);
@@ -532,10 +554,10 @@
   }
   SL.place = placeSeated;
   // a camera for a sheet: eye at (x, y) model metres and height z above the floor under it, yaw and pitch in degrees (yaw 90 looks west)
-  SL.view = function (x, y, z, yawDeg, pitchDeg) { var fl = floorUnder(x, 5, -y) || 0; P.set(x, fl + z - EYE, -y); yaw = yawDeg * Math.PI / 180; pitch = pitchDeg * Math.PI / 180; };
+  SL.view = function (x, y, z, yawDeg, pitchDeg) { var fl = floorUnder(x, 5, -y, true) || 0; P.set(x, fl + z - EYE, -y); yaw = yawDeg * Math.PI / 180; pitch = pitchDeg * Math.PI / 180; };
   // fix the walker at a distance along the route; the floor under it is walked up to from the start so it does not start sunk
   SL.at = function (d) {
-    routeY = -3; for (var dd = 0; dd <= d; dd += 0.05) { var q = routeAt(dd), f2 = floorUnder(q.x, routeY + 0.65, -q.y); if (f2 !== null) routeY = f2; }
+    routeY = -3; for (var dd = 0; dd <= d; dd += 0.05) { var q = routeAt(dd), f2 = floorUnder(q.x, routeY + 0.65, -q.y, true); if (f2 !== null) routeY = f2; }
     SL.fixD = d;
   };
   // the floor under the walker at each leg's end, against the Architect's own end heights (docs/architect/slice-walk-6418-w45.json)
@@ -544,15 +566,15 @@
     var out = [], d = 0, y = -3, worst = 0;
     for (var k = 0; k < routeLen.length; k++) {
       var end = d + routeLen[k];
-      for (; d < end; d += 0.05) { var q = routeAt(d), f2 = floorUnder(q.x, y + 0.65, -q.y); if (f2 !== null) y = f2; }
-      var q2 = routeAt(end), f3 = floorUnder(q2.x, y + 0.65, -q2.y); if (f3 !== null) y = f3;
+      for (; d < end; d += 0.05) { var q = routeAt(d), f2 = floorUnder(q.x, y + 0.65, -q.y, true); if (f2 !== null) y = f2; }
+      var q2 = routeAt(end), f3 = floorUnder(q2.x, y + 0.65, -q2.y, true); if (f3 !== null) y = f3;
       out.push(+(y - ENDZ[k]).toFixed(2)); if (Math.abs(y - ENDZ[k]) > worst) worst = Math.abs(y - ENDZ[k]);
     }
     return { diffs: out, worst: +worst.toFixed(2) };
   };
   SL.seatReport = function () {
     return SL.figs.map(function (f) {
-      var fb = floorUnder(f.at.x, 0.3, -(f.spec[1] + f.spec[2] * 1.0));
+      var fb = floorUnder(f.at.x, 0.3, -(f.spec[1] + f.spec[2] * 1.0), true);
       return { at: [f.at.x, +f.at.y.toFixed(3)], bench: f.bench, seat_cm_over_bench: +((f.m.seat - f.bench) * 100).toFixed(1), sole_cm_over_floor: fb === null ? null : +((f.m.sole - fb) * 100).toFixed(1), headY: +f.m.top.toFixed(3), clip: f.name };
     });
   };
@@ -579,6 +601,7 @@
   G_.pos = function () { var m = t2m(P); return { x: m.x, y: m.y, z: m.z, yaw: yaw * 180 / Math.PI }; };
   G_.set = function (x, y, z, yawDeg) { place(x, y, z, yawDeg); return G_.pos(); };
   G_.floorAt = function (x, y, top) { var f = floorUnder(x, top, -y); return f === null ? null : f; };
+  G_.walkFloorAt = function (x, y, top) { var f = floorUnder(x, top, -y, true); return f === null ? null : f; };   // the walker's floor: no furniture
   G_.inStoneAt = function (x, y, z) { return inStone(x, z, -y); };
   G_.storey = function (up) { var ok = storey(up); return { ok: ok, at: G_.pos() }; };
   G_.walk = function (inp, seconds, every) {
