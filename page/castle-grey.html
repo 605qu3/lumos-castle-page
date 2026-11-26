@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The castle in grey stone</title>
+<style>
+  html, body { margin: 0; height: 100%; overflow: hidden; background: #b9c4cc; font: 14px/1.35 Georgia, serif; }
+  canvas { display: block; }
+  #help { position: fixed; left: 12px; top: 10px; max-width: 30em; padding: 8px 11px; background: rgba(30,28,26,.72);
+          color: #efe9dd; border-radius: 6px; }
+  #help b { color: #fff; }
+  #aid { color: #f3d58a; }
+  #where { margin-top: 4px; color: #cfc7b8; }
+  #stats { position: fixed; right: 10px; bottom: 8px; color: #333; font: 12px monospace; }
+</style>
+</head>
+<body>
+<!-- Step 4b of the Blender castle (Godric's ruling, 24 November 2026): the castle the generator builds in Blender, shown
+     alone, grey, with nothing of the page castle loaded. One glb, named by its build input's hash. The walk stands on and
+     is stopped by that glb's own triangles, on a plain triangle grid. The storey keys are a viewing aid only, until the
+     stairs are built in stone. No doors, panels, panes or props: an opening is a hole in the stone. -->
+<div id="help"><b>The castle in grey stone</b>, as built from the model, before any detail.<br>
+  Walk: <b>W</b> / <b>S</b> or <b>&uarr;</b> / <b>&darr;</b>. Step aside: <b>A</b> / <b>D</b>. Turn: <b>&larr;</b> / <b>&rarr;</b> or drag. Hurry: hold <b>Shift</b>.<br>
+  <span id="aid">Up or down one floor: <b>PageUp</b> / <b>PageDown</b> (or <b>R</b> / <b>F</b>). A viewing aid only, until the stairs are stone.</span>
+  <div id="where">loading the castle...</div></div>
+<div id="stats">starting</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="people/GLTFLoader.js"></script>
+<script>
+(function () {
+  'use strict';
+  var HASH = (/^[0-9a-f]{8}$/.test(new URLSearchParams(location.search).get('hash') || '') && new URLSearchParams(location.search).get('hash')) || '8aa5a919';   // ?hash= loads another build in page/arch, for a probe's known bad
+  /* ?stone=1 (Masonry, 24 November 2026, the Architect's yes at 11.30 pm): the same build after the stone pass
+     (tools/masonry-stone-pass-blender.py), arch/castle-stone-<hash>.glb, drawn in its own laid stone; ?stone=grey draws that
+     same file in the plain grey, for a like-for-like picture. Without ?stone the page is as it was. */
+  var STONE = new URLSearchParams(location.search).get('stone');
+  STONE = STONE === '1' ? 'stone' : STONE === 'grey' ? 'grey' : null;
+  var FILE = STONE ? 'arch/castle-stone-' + HASH + '.glb' : 'arch/castle-grey-' + HASH + '.glb';
+  var EYE = 1.4, STEP = 0.45, BODY = 0.3, WALL_H = [0.5, 1.1, 1.6], CELL = 2, G = 9.8, WALK = 1.4, HURRY = 3.2, TURN = 1.6;
+  var START = { x: 80, y: 60, yaw: 90 };          // the Entrance Hall's seed (check-model.json), facing west to the Great Hall doors
+  var G_ = window.__grey = { ready: false, hash: HASH, err: null, glbMeshes: 0, tris: 0, fps: 0 };
+
+  // the model's frame (x east, y north, z up) to the glb's three.js frame (glTF is y up): (x, z, -y)
+  function m2t(x, y, z) { return new THREE.Vector3(x, z, -y); }
+  function t2m(v) { return { x: v.x, y: -v.z, z: v.y }; }
+
+  var renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  if (STONE === 'stone') renderer.outputEncoding = THREE.sRGBEncoding;   /* the glb's textures are sRGB; only under ?stone=1 */
+  document.body.appendChild(renderer.domElement);
+  var scene = new THREE.Scene();
+  scene.background = new THREE.Color(0xb9c4cc);
+  var camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.05, 900);
+  camera.rotation.order = 'YXZ';
+  scene.add(new THREE.HemisphereLight(0xdfe8f0, 0x9a9088, 0.8));
+  var sun = new THREE.DirectionalLight(0xfff4e2, 0.7); sun.position.set(60, 120, 80); scene.add(sun);
+  var north = new THREE.DirectionalLight(0xe4ecf2, 0.35); north.position.set(-50, 70, -90); scene.add(north);   // so faces turned from the sun still read
+  var stone = new THREE.MeshStandardMaterial({ color: 0x8f8b84, roughness: 0.95, metalness: 0 });
+  var glass = new THREE.MeshStandardMaterial({ color: 0xc4d6de, roughness: 0.2, metalness: 0, transparent: true, opacity: 0.28, depthWrite: false });
+
+  // the walk's triangles: one flat array in world space, bucketed on a plain grid over x and z
+  var T = null, grid = new Map(), gx0 = 0, gz0 = 0, gx1 = 0, gz1 = 0;
+  function key(i, k) { return i * 100003 + k; }
+  function build(root) {
+    var all = [];
+    root.updateMatrixWorld(true);
+    root.traverse(function (o) {
+      if (!o.isMesh || o.userData.glass) return;
+      var g = o.geometry, p = g.attributes.position, idx = g.index, n = idx ? idx.count : p.count, v = new THREE.Vector3();
+      for (var t = 0; t < n; t++) { v.fromBufferAttribute(p, idx ? idx.getX(t) : t).applyMatrix4(o.matrixWorld); all.push(v.x, v.y, v.z); }
+    });
+    T = new Float32Array(all); G_.tris = T.length / 9;
+    gx0 = Infinity; gz0 = Infinity; gx1 = -Infinity; gz1 = -Infinity;
+    for (var t = 0; t < G_.tris; t++) {
+      var b = t * 9, xa = Math.min(T[b], T[b + 3], T[b + 6]), xb = Math.max(T[b], T[b + 3], T[b + 6]),
+          za = Math.min(T[b + 2], T[b + 5], T[b + 8]), zb = Math.max(T[b + 2], T[b + 5], T[b + 8]);
+      gx0 = Math.min(gx0, xa); gx1 = Math.max(gx1, xb); gz0 = Math.min(gz0, za); gz1 = Math.max(gz1, zb);
+      for (var i = Math.floor(xa / CELL); i <= Math.floor(xb / CELL); i++)
+        for (var k = Math.floor(za / CELL); k <= Math.floor(zb / CELL); k++) {
+          var c = grid.get(key(i, k)); if (!c) grid.set(key(i, k), c = []); c.push(t);
+        }
+    }
+  }
+  // the triangles in the cells a box over x and z touches, each once
+  var seen = new Uint32Array(1), stamp = 0;
+  function near(xa, za, xb, zb) {
+    if (seen.length < G_.tris) seen = new Uint32Array(G_.tris);
+    stamp++; var out = [];
+    for (var i = Math.floor(Math.min(xa, xb) / CELL); i <= Math.floor(Math.max(xa, xb) / CELL); i++)
+      for (var k = Math.floor(Math.min(za, zb) / CELL); k <= Math.floor(Math.max(za, zb) / CELL); k++) {
+        var c = grid.get(key(i, k)); if (!c) continue;
+        for (var j = 0; j < c.length; j++) if (seen[c[j]] !== stamp) { seen[c[j]] = stamp; out.push(c[j]); }
+      }
+    return out;
+  }
+  // ray against one triangle (Moller and Trumbore); the distance along d, or -1
+  function hit(t, ox, oy, oz, dx, dy, dz) {
+    var b = t * 9, ax = T[b], ay = T[b + 1], az = T[b + 2];
+    var e1x = T[b + 3] - ax, e1y = T[b + 4] - ay, e1z = T[b + 5] - az, e2x = T[b + 6] - ax, e2y = T[b + 7] - ay, e2z = T[b + 8] - az;
+    var px = dy * e2z - dz * e2y, py = dz * e2x - dx * e2z, pz = dx * e2y - dy * e2x, det = e1x * px + e1y * py + e1z * pz;
+    if (Math.abs(det) < 1e-12) return -1;
+    var inv = 1 / det, sx = ox - ax, sy = oy - ay, sz = oz - az, u = (sx * px + sy * py + sz * pz) * inv;
+    if (u < 0 || u > 1) return -1;
+    var qx = sy * e1z - sz * e1y, qy = sz * e1x - sx * e1z, qz = sx * e1y - sy * e1x, w = (dx * qx + dy * qy + dz * qz) * inv;
+    if (w < 0 || u + w > 1) return -1;
+    var d = (e2x * qx + e2y * qy + e2z * qz) * inv;
+    return d > 1e-6 ? d : -1;
+  }
+  // the highest stone face under (x, top, z), or null
+  function floorUnder(x, top, z) {
+    var c = near(x, z, x, z), best = null;
+    for (var j = 0; j < c.length; j++) { var d = hit(c[j], x, top, z, 0, -1, 0); if (d >= 0 && (best === null || top - d > best)) best = top - d; }
+    return best;
+  }
+  // the nearest stone along a level ray, or Infinity
+  function wallAlong(ox, oy, oz, dx, dz, len) {
+    var c = near(ox, oz, ox + dx * len, oz + dz * len), best = Infinity;
+    for (var j = 0; j < c.length; j++) { var d = hit(c[j], ox, oy, oz, dx, 0, dz); if (d >= 0 && d < best) best = d; }
+    return best;
+  }
+  // inside the stone? count the faces a ray crosses on its way out to the east (odd: in stone)
+  function inStone(x, y, z) {
+    var dx = 1, dy = 0.00113, dz = 0.00157, len = gx1 - x + 1;
+    if (len <= 0) return false;
+    var c = near(x, z - 0.6, gx1 + 1, z + 0.6), n = 0;
+    for (var j = 0; j < c.length; j++) if (hit(c[j], x + 1.3e-4, y + 1.7e-4, z + 0.9e-4, dx, dy, dz) >= 0) n++;
+    return n % 2 === 1;
+  }
+
+  // the walker: feet at P (three's frame), a yaw and a pitch, a fall speed
+  var P = new THREE.Vector3(), yaw = 0, pitch = -0.05, vy = 0, keys = {};
+  function place(x, y, z, yawDeg) {
+    var top = z === undefined ? 30 : z + STEP, f = floorUnder(x, top, -y);
+    P.set(x, f === null ? (z || 0) : f, -y); vy = 0;
+    if (yawDeg !== undefined) yaw = yawDeg * Math.PI / 180;
+  }
+  function moveBy(mx, mz) {
+    var len = Math.hypot(mx, mz); if (len < 1e-9) return true;
+    var dx = mx / len, dz = mz / len;
+    for (var h = 0; h < WALL_H.length; h++) if (wallAlong(P.x, P.y + WALL_H[h], P.z, dx, dz, len + BODY) < len + BODY) return false;
+    P.x += mx; P.z += mz; return true;
+  }
+  function tick(dt, inp) {
+    yaw += ((inp.left ? 1 : 0) - (inp.right ? 1 : 0)) * TURN * dt;
+    var sp = (inp.hurry ? HURRY : WALK) * dt, fw = (inp.fwd ? 1 : 0) - (inp.back ? 1 : 0), st = (inp.sright ? 1 : 0) - (inp.sleft ? 1 : 0);
+    var fx = -Math.sin(yaw), fz = -Math.cos(yaw), rx = Math.cos(yaw), rz = -Math.sin(yaw);
+    var mx = (fx * fw + rx * st) * sp, mz = (fz * fw + rz * st) * sp;
+    if (!moveBy(mx, mz)) { if (!moveBy(mx, 0)) moveBy(0, mz); }
+    var f = floorUnder(P.x, P.y + STEP, P.z), drop = 0;
+    if (f !== null && f >= P.y - 1e-4) { P.y = f; vy = 0; }
+    else {
+      vy -= G * dt; var ny = P.y + vy * dt;
+      if (f !== null && ny <= f) { drop = P.y - f; P.y = f; vy = 0; } else { drop = P.y - ny; P.y = ny; }
+      if (P.y < -60) place(START.x, START.y, 0, START.yaw);
+    }
+    return drop;
+  }
+  // the storey keys: to the next floor above or below this spot whose eye is in air
+  function storey(up) {
+    var y = P.y, f;
+    for (var tries = 0; tries < 40; tries++) {
+      if (up) { y += 0.6; f = floorUnder(P.x, y + EYE, P.z); if (f !== null && f > P.y + 1.5 && !inStone(P.x, f + EYE, P.z)) break; }
+      else { f = floorUnder(P.x, y - 0.3, P.z); if (f === null) return false; y = f; if (!inStone(P.x, f + EYE, P.z) && !inStone(P.x, f + 0.2, P.z)) break; }
+      f = null;
+    }
+    if (f === null || f === undefined) return false;
+    P.y = f; vy = 0; return true;
+  }
+
+  function input() {
+    return { fwd: keys.KeyW || keys.ArrowUp, back: keys.KeyS || keys.ArrowDown, sleft: keys.KeyA, sright: keys.KeyD,
+             left: keys.ArrowLeft, right: keys.ArrowRight, hurry: keys.ShiftLeft || keys.ShiftRight };
+  }
+  window.addEventListener('keydown', function (e) {
+    if (e.code === 'PageUp' || e.code === 'KeyR') { storey(true); e.preventDefault(); return; }
+    if (e.code === 'PageDown' || e.code === 'KeyF') { storey(false); e.preventDefault(); return; }
+    keys[e.code] = true; if (e.code.indexOf('Arrow') === 0) e.preventDefault();
+  });
+  window.addEventListener('keyup', function (e) { keys[e.code] = false; });
+  window.addEventListener('blur', function () { keys = {}; });
+  var drag = null;
+  renderer.domElement.addEventListener('pointerdown', function (e) { drag = { x: e.clientX, y: e.clientY }; });
+  window.addEventListener('pointerup', function () { drag = null; });
+  window.addEventListener('pointermove', function (e) {
+    if (!drag) return;
+    yaw += (e.clientX - drag.x) * 0.004; pitch = Math.max(-1.2, Math.min(1.2, pitch + (e.clientY - drag.y) * 0.004));
+    drag = { x: e.clientX, y: e.clientY };
+  });
+  window.addEventListener('resize', function () {
+    camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth, window.innerHeight);
+  });
+
+  var where = document.getElementById('where'), stats = document.getElementById('stats'), last = performance.now(), frames = 0, t0 = last;
+  function frame(now) {
+    var dt = Math.min(0.05, (now - last) / 1000); last = now;
+    if (G_.ready) tick(dt, input());
+    camera.position.set(P.x, P.y + EYE, P.z); camera.rotation.set(pitch, yaw, 0);
+    renderer.render(scene, camera);
+    frames++;
+    if (now - t0 > 1000) {
+      G_.fps = Math.round(frames * 1000 / (now - t0)); frames = 0; t0 = now;
+      stats.textContent = G_.fps + ' fps, ' + G_.tris + ' triangles';
+      if (G_.ready) { var m = t2m(P); where.textContent = 'standing at ' + m.x.toFixed(1) + ', ' + m.y.toFixed(1) + ', floor ' + m.z.toFixed(1) + ' m'; }
+    }
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+
+  new THREE.GLTFLoader().load(FILE, function (g) {
+    g.scene.traverse(function (o) {
+      o.userData.fromGlb = true;
+      if (o.isMesh) {
+        var isGlass = /^glass-/.test(o.name) || (o.parent && /^glass-/.test(o.parent.name));
+        o.userData.glass = isGlass; G_.glbMeshes++;
+        if (isGlass || STONE !== 'stone') o.material = isGlass ? glass : stone;   /* ?stone=1 keeps the glb's own stone */
+      }
+    });
+    scene.add(g.scene);
+    build(g.scene);
+    place(START.x, START.y, 0, START.yaw);
+    G_.ready = true;
+  }, undefined, function (e) { G_.err = String(e && e.message || e); console.error('castle-grey: the glb did not load: ' + G_.err); where.textContent = 'the castle did not load'; });
+
+  // for the probe (tools/castle-grey-probe.mjs): the same walk code, stepped at 60 a second
+  G_.foreign = function () { var n = 0; scene.traverse(function (o) { if (o.isMesh && !o.userData.fromGlb) n++; }); return n; };
+  G_.plantCube = function () { var m = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), stone); m.position.copy(P); scene.add(m); return m; };
+  G_.pos = function () { var m = t2m(P); return { x: m.x, y: m.y, z: m.z, yaw: yaw * 180 / Math.PI }; };
+  G_.set = function (x, y, z, yawDeg) { place(x, y, z, yawDeg); return G_.pos(); };
+  G_.floorAt = function (x, y, top) { var f = floorUnder(x, top, -y); return f === null ? null : f; };
+  G_.inStoneAt = function (x, y, z) { return inStone(x, z, -y); };
+  G_.storey = function (up) { var ok = storey(up); return { ok: ok, at: G_.pos() }; };
+  G_.walk = function (inp, seconds, every) {
+    var out = [], n = Math.round(seconds * 60), worst = 0;
+    for (var i = 0; i < n; i++) {
+      var d = tick(1 / 60, inp); if (d > worst) worst = d;
+      if (i % (every || 15) === 0 || i === n - 1) { var m = t2m(P); out.push([+m.x.toFixed(3), +m.y.toFixed(3), +m.z.toFixed(3), inStone(P.x, P.y + EYE, P.z) ? 1 : 0]); }
+    }
+    return { trace: out, worstDrop: worst, at: G_.pos() };
+  };
+})();
+</script>
+</body>
+</html>
