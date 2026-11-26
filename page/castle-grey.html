@@ -61,17 +61,23 @@
   var glass = new THREE.MeshStandardMaterial({ color: 0xc4d6de, roughness: 0.2, metalness: 0, transparent: true, opacity: 0.28, depthWrite: false });
 
   // the walk's triangles: one flat array in world space, bucketed on a plain grid over x and z
-  var T = null, grid = new Map(), gx0 = 0, gz0 = 0, gx1 = 0, gz1 = 0;
+  /* Furniture is not floor (Fawkes's ruling of 26 November 2026, 4.31 pm): a triangle of a mesh the build marks furniture (extra
+     furniture 1, its stand-in tables and benches) never carries the walker (place, tick, storey) and stops him at any height inside
+     its own vertical span; __grey.floorAt still reads every face, so a seat's height can be measured. A glb with no mark walks as before. */
+  var T = null, FUR = null, grid = new Map(), gx0 = 0, gz0 = 0, gx1 = 0, gz1 = 0;
   function key(i, k) { return i * 100003 + k; }
   function build(root) {
-    var all = [];
+    var all = [], fur = [];
     root.updateMatrixWorld(true);
     root.traverse(function (o) {
       if (!o.isMesh || o.userData.glass) return;
+      var isFur = !!(o.userData.furniture || (o.parent && o.parent.userData.furniture));
       var g = o.geometry, p = g.attributes.position, idx = g.index, n = idx ? idx.count : p.count, v = new THREE.Vector3();
       for (var t = 0; t < n; t++) { v.fromBufferAttribute(p, idx ? idx.getX(t) : t).applyMatrix4(o.matrixWorld); all.push(v.x, v.y, v.z); }
+      for (var t3 = 0; t3 < n / 3; t3++) fur.push(isFur ? 1 : 0);
     });
-    T = new Float32Array(all); G_.tris = T.length / 9;
+    T = new Float32Array(all); FUR = new Uint8Array(fur); G_.tris = T.length / 9;
+    G_.furnitureTris = fur.reduce(function (a, b) { return a + b; }, 0);
     gx0 = Infinity; gz0 = Infinity; gx1 = -Infinity; gz1 = -Infinity;
     for (var t = 0; t < G_.tris; t++) {
       var b = t * 9, xa = Math.min(T[b], T[b + 3], T[b + 6]), xb = Math.max(T[b], T[b + 3], T[b + 6]),
@@ -109,9 +115,24 @@
     return d > 1e-6 ? d : -1;
   }
   // the highest stone face under (x, top, z), or null
-  function floorUnder(x, top, z) {
+  function floorUnder(x, top, z, walker) {     // walker: the walker's own floor, which no furniture carries
     var c = near(x, z, x, z), best = null;
-    for (var j = 0; j < c.length; j++) { var d = hit(c[j], x, top, z, 0, -1, 0); if (d >= 0 && (best === null || top - d > best)) best = top - d; }
+    for (var j = 0; j < c.length; j++) {
+      if (walker && FUR[c[j]]) continue;
+      var d = hit(c[j], x, top, z, 0, -1, 0); if (d >= 0 && (best === null || top - d > best)) best = top - d;
+    }
+    return best;
+  }
+  // the nearest furniture along a level ray from the feet, each triangle met at a height inside its own span between the feet
+  // and the head (so a 0.44 seat or a 0.05 slab edge stops him as surely as a wall), or Infinity
+  function furnitureAlong(ox, feet, oz, dx, dz, len) {
+    var c = near(ox, oz, ox + dx * len, oz + dz * len), best = Infinity;
+    for (var j = 0; j < c.length; j++) {
+      var t = c[j]; if (!FUR[t]) continue;
+      var b = t * 9, lo = Math.max(Math.min(T[b + 1], T[b + 4], T[b + 7]), feet + 0.02), hi = Math.min(Math.max(T[b + 1], T[b + 4], T[b + 7]), feet + EYE + 0.2);
+      if (hi - lo < 1e-4) continue;             // a level face (a seat's top): its sides stop him
+      var d = hit(t, ox, (lo + hi) / 2, oz, dx, 0, dz); if (d >= 0 && d < best) best = d;
+    }
     return best;
   }
   // the nearest stone along a level ray, or Infinity
@@ -132,7 +153,7 @@
   // the walker: feet at P (three's frame), a yaw and a pitch, a fall speed
   var P = new THREE.Vector3(), yaw = 0, pitch = -0.05, vy = 0, keys = {};
   function place(x, y, z, yawDeg) {
-    var top = z === undefined ? 30 : z + STEP, f = floorUnder(x, top, -y);
+    var top = z === undefined ? 30 : z + STEP, f = floorUnder(x, top, -y, true);
     P.set(x, f === null ? (z || 0) : f, -y); vy = 0;
     if (yawDeg !== undefined) yaw = yawDeg * Math.PI / 180;
   }
@@ -140,6 +161,7 @@
     var len = Math.hypot(mx, mz); if (len < 1e-9) return true;
     var dx = mx / len, dz = mz / len;
     for (var h = 0; h < WALL_H.length; h++) if (wallAlong(P.x, P.y + WALL_H[h], P.z, dx, dz, len + BODY) < len + BODY) return false;
+    if (furnitureAlong(P.x, P.y, P.z, dx, dz, len + BODY) < len + BODY) return false;
     P.x += mx; P.z += mz; return true;
   }
   function tick(dt, inp) {
@@ -148,7 +170,7 @@
     var fx = -Math.sin(yaw), fz = -Math.cos(yaw), rx = Math.cos(yaw), rz = -Math.sin(yaw);
     var mx = (fx * fw + rx * st) * sp, mz = (fz * fw + rz * st) * sp;
     if (!moveBy(mx, mz)) { if (!moveBy(mx, 0)) moveBy(0, mz); }
-    var f = floorUnder(P.x, P.y + STEP, P.z), drop = 0;
+    var f = floorUnder(P.x, P.y + STEP, P.z, true), drop = 0;
     if (f !== null && f >= P.y - 1e-4) { P.y = f; vy = 0; }
     else {
       vy -= G * dt; var ny = P.y + vy * dt;
@@ -161,8 +183,8 @@
   function storey(up) {
     var y = P.y, f;
     for (var tries = 0; tries < 40; tries++) {
-      if (up) { y += 0.6; f = floorUnder(P.x, y + EYE, P.z); if (f !== null && f > P.y + 1.5 && !inStone(P.x, f + EYE, P.z)) break; }
-      else { f = floorUnder(P.x, y - 0.3, P.z); if (f === null) return false; y = f; if (!inStone(P.x, f + EYE, P.z) && !inStone(P.x, f + 0.2, P.z)) break; }
+      if (up) { y += 0.6; f = floorUnder(P.x, y + EYE, P.z, true); if (f !== null && f > P.y + 1.5 && !inStone(P.x, f + EYE, P.z)) break; }
+      else { f = floorUnder(P.x, y - 0.3, P.z, true); if (f === null) return false; y = f; if (!inStone(P.x, f + EYE, P.z) && !inStone(P.x, f + 0.2, P.z)) break; }
       f = null;
     }
     if (f === null || f === undefined) return false;
@@ -229,6 +251,7 @@
   G_.pos = function () { var m = t2m(P); return { x: m.x, y: m.y, z: m.z, yaw: yaw * 180 / Math.PI }; };
   G_.set = function (x, y, z, yawDeg) { place(x, y, z, yawDeg); return G_.pos(); };
   G_.floorAt = function (x, y, top) { var f = floorUnder(x, top, -y); return f === null ? null : f; };
+  G_.walkFloorAt = function (x, y, top) { var f = floorUnder(x, top, -y, true); return f === null ? null : f; };   // the walker's floor: no furniture
   G_.inStoneAt = function (x, y, z) { return inStone(x, z, -y); };
   G_.storey = function (up) { var ok = storey(up); return { ok: ok, at: G_.pos() }; };
   G_.walk = function (inp, seconds, every) {
