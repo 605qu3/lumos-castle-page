@@ -437,7 +437,7 @@
   var ROUTE = [[72.7,95],[72.7,90.89],[72.7,86.27],[74.99,87],[80.01,87],[80,83.99],[80.5,77.01],[81,70.5],[81,66],[69.5,60.3],[66.49,60.3],[65,60.3],[61.99,60.3],[62,64.71],[44.99,64.7],[45,65.49],[20.49,64.7],[17.5,64.7]];
   var BENCH_OFF = 0.725;
   // six seats: [x, table y, side] side +1 is the bench on the table's +y side (faces -y), -1 the other (faces +y)
-  var SEATS = [[30.0, 62.6, 1], [32.0, 62.6, 1], [34.5, 62.6, -1], [40.0, 58.4, 1], [42.0, 58.4, -1], [27.0, 66.8, -1]];
+  var SEATS = [[30.0, 62.6, 1, 3.14], [32.0, 62.6, 1, 2.6], [34.5, 62.6, -1, -2.6], [40.0, 58.4, 1, 3.14], [42.0, 58.4, -1, 2.2], [27.0, 66.8, -1, -2.2]];   // 4th: the turn from facing the table; the model's tables are solid blocks (no knee room), so they sit turned to the aisle, backs to the table, until the tables give knee room (then 0)
   var routeLen = [], routeTot = 0, routeD = 0, routeY = -3, routeH = null;
   for (var ri = 0; ri < ROUTE.length - 1; ri++) { var rl = Math.hypot(ROUTE[ri + 1][0] - ROUTE[ri][0], ROUTE[ri + 1][1] - ROUTE[ri][1]); routeLen.push(rl); routeTot += rl; }
   function routeAt(d) {
@@ -455,7 +455,7 @@
     if (SL.ready) SL.figs.forEach(function (f) { if (!SI.hold) f.mixer.update(dt); });
     if (QS.get('route') === '0') { siUpdateOld(dt); return; }
     if (!SI.ready || SI.hold) return;
-    routeD += SI.speed * dt; if (routeD >= routeTot) { routeD = 0; routeY = -3; routeH = null; }
+    if (SL.fixD !== undefined) routeD = SL.fixD; else routeD += SI.speed * dt; if (routeD >= routeTot) { routeD = 0; routeY = -3; routeH = null; }
     var r = routeAt(routeD), x = r.x, y = r.y + SL.shift;
     var fl = floorUnder(x, routeY + 0.65, -y); if (fl !== null) routeY = fl;
     var th = Math.atan2(r.dx, -r.dy), cur = routeH === null ? th : routeH, dd = Math.atan2(Math.sin(th - cur), Math.cos(th - cur));
@@ -521,7 +521,7 @@
   // the bench top is read from the glb under the seat: a ray down from 1.0 at the bench centre
   function placeSeated(f, opt) {
     opt = opt || {}; var st = f.spec, by = st[1] + st[2] * BENCH_OFF, x = st[0] + (opt.dx || 0), yy = by + st[2] * (opt.back === undefined ? 0.15 : opt.back) + (opt.dy || 0);
-    f.holder.rotation.y = st[2] > 0 ? 0 : Math.PI;
+    f.holder.rotation.y = (st[2] > 0 ? 0 : Math.PI) + (opt.yaw !== undefined ? opt.yaw : (st[3] || 0));
     f.holder.position.set(0, 0, 0); f.holder.updateMatrixWorld(true);
     var pel = new THREE.Vector3(); f.model.traverse(function (o) { if (o.isBone && o.name === 'pelvis') o.getWorldPosition(pel); });
     f.holder.position.set(x - pel.x, 0, -yy - pel.z); f.holder.updateMatrixWorld(true);
@@ -531,6 +531,25 @@
     f.m = seatMeasure(f); f.at = { x: x, y: yy };
   }
   SL.place = placeSeated;
+  // a camera for a sheet: eye at (x, y) model metres and height z above the floor under it, yaw and pitch in degrees (yaw 90 looks west)
+  SL.view = function (x, y, z, yawDeg, pitchDeg) { var fl = floorUnder(x, 5, -y) || 0; P.set(x, fl + z - EYE, -y); yaw = yawDeg * Math.PI / 180; pitch = pitchDeg * Math.PI / 180; };
+  // fix the walker at a distance along the route; the floor under it is walked up to from the start so it does not start sunk
+  SL.at = function (d) {
+    routeY = -3; for (var dd = 0; dd <= d; dd += 0.05) { var q = routeAt(dd), f2 = floorUnder(q.x, routeY + 0.65, -q.y); if (f2 !== null) routeY = f2; }
+    SL.fixD = d;
+  };
+  // the floor under the walker at each leg's end, against the Architect's own end heights (docs/architect/slice-walk-6418-w45.json)
+  var ENDZ = [-2.8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.45];
+  SL.legEnds = function () {
+    var out = [], d = 0, y = -3, worst = 0;
+    for (var k = 0; k < routeLen.length; k++) {
+      var end = d + routeLen[k];
+      for (; d < end; d += 0.05) { var q = routeAt(d), f2 = floorUnder(q.x, y + 0.65, -q.y); if (f2 !== null) y = f2; }
+      var q2 = routeAt(end), f3 = floorUnder(q2.x, y + 0.65, -q2.y); if (f3 !== null) y = f3;
+      out.push(+(y - ENDZ[k]).toFixed(2)); if (Math.abs(y - ENDZ[k]) > worst) worst = Math.abs(y - ENDZ[k]);
+    }
+    return { diffs: out, worst: +worst.toFixed(2) };
+  };
   SL.seatReport = function () {
     return SL.figs.map(function (f) {
       var fb = floorUnder(f.at.x, 0.3, -(f.spec[1] + f.spec[2] * 1.0));
