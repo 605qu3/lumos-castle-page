@@ -261,7 +261,9 @@
 
   function loadStandin() {
     if (QS.get('standin') === '0') return;
-    new THREE.GLTFLoader().load('people/models/ual-standin.glb', function (g) {
+    /* ?body=boy11: our own boy-11 (MPFB) on the CMU 02_01 walk Godric passed, in the stand-in's place (row 6434's follow-on, Fawkes 6.57 pm); the seated stay the free stand-in */
+    var BOY = QS.get('body') === 'boy11', WALKNAME = BOY ? 'CMU_02_01' : 'Walk_Loop';
+    new THREE.GLTFLoader().load(BOY ? 'people/models/boy-11-walk-02_01.glb' : 'people/models/ual-standin.glb', function (g) {
       var model = g.scene, dark = { M_Main: 0x24222b, M_Joints: 0x1b1b21 };
       model.traverse(function (o) {
         if (o.isBone) siBones[o.name] = o;
@@ -272,15 +274,18 @@
         }
       });
       var clip = null;
-      for (var i = 0; i < g.animations.length; i++) if (g.animations[i].name === 'Walk_Loop') clip = g.animations[i];
-      if (!clip || !siSkin.length) { SI.err = 'no Walk_Loop or no skin'; return; }
+      for (var i = 0; i < g.animations.length; i++) if (g.animations[i].name === WALKNAME) clip = g.animations[i];
+      if (!clip || !siSkin.length) { SI.err = 'no ' + WALKNAME + ' or no skin'; return; }
       // the figure's own height, at the clip's first frame, from the skinned vertices
+      if (BOY) model.rotation.y = Math.PI;   // boy-11 is exported facing -z; the page walks +z
       siHolder = new THREE.Group(); siHolder.add(model); scene.add(siHolder);
       siMixer = new THREE.AnimationMixer(model); siAction = siMixer.clipAction(clip); siAction.play(); SI.T = clip.duration;
       pose(0);
       var mm = meshY(), s = SI.H / (mm.max - mm.min);
       siHolder.scale.setScalar(s); SI.scale = s; SI.nativeHeight = mm.max - mm.min;
       calibrate();
+      /* boy-11's ball joints rise twice a step, so the ball counter above doubles its contacts and misreads the feet's speed; the speed that plants his feet is the one the lowest-skin-point counter reads on this clip (docs/characters/pupils/walk-6392/walk_marks.py: 0.6981 body heights a second, slip 0.0316 H) */
+      if (BOY) SI.speed = 0.6981 * SI.H;
       SI.ready = true;
       var cam = QS.get('cam');
       if (cam === 'back') place(CORR.x0 + 3, CORR.y, 0, 90);
