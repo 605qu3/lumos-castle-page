@@ -259,11 +259,16 @@
   var CORR = { x0: 88.0, x1: 71.0, y: 60.0 };               // the Entrance Hall, ground, from its seed (80, 60) west toward the Great Hall doors passage (castle-model-G.js, x 65 to 68); Fawkes, row 6416
   var siHolder = null, siMixer = null, siAction = null, siSkin = [], siBones = {}, siX = 0, siDir = 1;
 
+  /* our six (row 6438): [file stem, height m (walk_marks.py H), speed in H a second (its skin-point counter's global)] */
+  var BODIES = { boy11: ['boy-11', 1.4504, 0.6981], boy14: ['boy-14', 1.62, 0.7010], boy17: ['boy-17', 1.76, 0.7041], girl11: ['girl-11', 1.45, 0.6743], girl14: ['girl-14', 1.5801, 0.6783], girl17: ['girl-17', 1.6501, 0.6722] };
   function loadStandin() {
     if (QS.get('standin') === '0') return;
     /* ?body=boy11: our own boy-11 (MPFB) on the CMU 02_01 walk Godric passed, in the stand-in's place (row 6434's follow-on, Fawkes 6.57 pm); the seated stay the free stand-in */
-    var BOY = QS.get('body') === 'boy11', WALKNAME = BOY ? 'CMU_02_01' : 'Walk_Loop';
-    new THREE.GLTFLoader().load(BOY ? 'people/models/boy-11-walk-02_01.glb' : 'people/models/ual-standin.glb', function (g) {
+    /* ?body=boy14, boy17, girl11, girl14, girl17 the same for each of our other five, at its own height (the glb's own metres) and its own speed;
+       ?body=six plays all six at once (row 6438): boy-11 as the walker below, the other five as followers on the same route (SL.followers). Speeds: walk_marks.py global, H a second. */
+    var BKEY = QS.get('body') === 'six' ? 'boy11' : QS.get('body'), BD = BODIES[BKEY] || null, BOY = !!BD, WALKNAME = BOY ? 'CMU_02_01' : 'Walk_Loop';
+    if (BOY) SI.H = BD[1];
+    new THREE.GLTFLoader().load(BOY ? 'people/models/' + BD[0] + '-walk-02_01.glb' : 'people/models/ual-standin.glb', function (g) {
       var model = g.scene, dark = { M_Main: 0x24222b, M_Joints: 0x1b1b21 };
       model.traverse(function (o) {
         if (o.isBone) siBones[o.name] = o;
@@ -281,12 +286,14 @@
       siHolder = new THREE.Group(); siHolder.add(model); scene.add(siHolder);
       siMixer = new THREE.AnimationMixer(model); siAction = siMixer.clipAction(clip); siAction.play(); SI.T = clip.duration;
       pose(0);
-      var mm = meshY(), s = SI.H / (mm.max - mm.min);
+      var mm = meshY(), s = BOY ? 1 : SI.H / (mm.max - mm.min);   // ours keep the glb's own metres (row 6438); the free stand-in is scaled to 1.45 m
       siHolder.scale.setScalar(s); SI.scale = s; SI.nativeHeight = mm.max - mm.min;
       calibrate();
       /* boy-11's ball joints rise twice a step, so the ball counter above doubles its contacts and misreads the feet's speed; the speed that plants his feet is the one the lowest-skin-point counter reads on this clip (docs/characters/pupils/walk-6392/walk_marks.py: 0.6981 body heights a second, slip 0.0316 H) */
-      if (BOY) SI.speed = 0.6981 * SI.H;
+      if (BOY) SI.speed = BD[2] * SI.H;
       SI.ready = true;
+      if (BOY) SL.seatScale = 0.818;   // the seated are the free stand-in, scaled once to 1.45 m (0.818); SI.scale is boy-11's, near 1
+      if (QS.get('body') === 'six') SL.loadFollowers();
       var cam = QS.get('cam');
       if (cam === 'back') place(CORR.x0 + 3, CORR.y, 0, 90);
       siX = CORR.x0; siDir = -1;
@@ -460,7 +467,7 @@
   /* The slice (row 6423; Fawkes, 26 November 2026): the same stand-in on the Architect's own route, lawn to dais, and six more
      seated on the Great Hall's benches on the Sitting_Idle_Loop clip. Route: docs/architect/slice-walk-6418-w45.json (legs).
      Tables and benches as page/great-hall.html draws them. ?seated=0 leaves the seated out; ?route=0 keeps the old hall line. */
-  var SL = window.__slice = { figs: [], err: null, ready: false, shift: 0 };
+  var SL = window.__slice = { figs: [], err: null, ready: false, shift: 0, p0: { key: 'boy11', lane: 0, vScale: 1 } };
   var ROUTE = [[72.7,95],[72.7,90.89],[72.7,86.27],[74.99,87],[80.01,87],[80,83.99],[80.5,77.01],[81,70.5],[81,66],[69.5,60.3],[66.49,60.3],[65,60.3],[61.99,60.3],[62,64.71],[44.99,64.7],[45,65.49],[20.49,64.7],[19.0,64.7]];   // ends 0.5 m short of where the staff table halts the walk (x 18.51, row 6431), not inside it
   var BENCH_OFF = 0.725;
   // six seats: [x, table y, side] side +1 is the bench on the table's +y side (faces -y), -1 the other (faces +y)
@@ -486,14 +493,122 @@
     if (SL.ready) SL.figs.forEach(function (f) { if (!SI.hold) f.mixer.update(dt); });
     if (QS.get('route') === '0') { siUpdateOld(dt); return; }
     if (!SI.ready || SI.hold) return;
-    if (SL.fixD !== undefined) routeD = SL.fixD; else routeD += SI.speed * dt; if (routeD >= routeTot) { routeD = 0; routeY = -3; routeH = null; }
-    var r = routeAt(routeD), x = r.x, y = r.y + SL.shift;
+    if (SL.fixD !== undefined) routeD = SL.fixD; else routeD += SI.speed * SL.p0.vScale * dt; if (routeD >= routeTot) { routeD = 0; routeY = -3; routeH = null; }
+    var r = routeAt(routeD), lp0 = lanePos(r, SL.p0.lane), x = lp0.x, y = lp0.y + SL.shift;
     var fl = floorUnder(x, routeY + 0.65, -y, true); if (fl !== null) routeY = fl;
     var th = Math.atan2(r.dx, -r.dy), cur = routeH === null ? th : routeH, dd = Math.atan2(Math.sin(th - cur), Math.cos(th - cur));
     routeH = cur + dd * Math.min(1, dt * 6);
-    siMixer.update(dt * SI.rate);
+    siMixer.update(dt * SI.rate * SL.p0.vScale);
     siHolder.position.set(x, routeY + SI.floorOffset, -y); siHolder.rotation.y = routeH; siHolder.updateMatrixWorld(true);
     SL.walker = { x: x, y: y, z: routeY, leg: r.leg, d: routeD };
+  };
+  /* ?body=six (row 6438): the other five of ours walk the same route, each at its own height and speed, from its own start spaced round the route
+     and at its own phase of the loop. Not measured by SI.measure (the ball counter cannot judge them, row 6400); their feet rest on walk_marks.py. */
+  SL.followers = []; SL.fready = false; SL.FOLLOW = ['boy14', 'boy17', 'girl11', 'girl14', 'girl17'];
+  function skinLow(w) {
+    var lo = Infinity, v = new THREE.Vector3();
+    w.skin.forEach(function (m) { m.skeleton.update(); var p = m.geometry.attributes.position; for (var i = 0; i < p.count; i += 2) { v.fromBufferAttribute(p, i); m.boneTransform(i, v); v.applyMatrix4(m.matrixWorld); if (v.y < lo) lo = v.y; } });
+    return lo;
+  }
+  function walkUp(d) { var y = -3; for (var dd = 0; dd <= d; dd += 0.05) { var q = routeAt(dd), f2 = floorUnder(q.x, y + 0.65, -q.y, true); if (f2 !== null) y = f2; } return y; }
+  function lanePos(r, lane) { var l = Math.hypot(r.dx, r.dy) || 1; return { x: r.x - r.dy / l * lane, y: r.y + r.dx / l * lane }; }
+  SL.loadFollowers = function () {
+    var left = SL.FOLLOW.length;
+    SL.FOLLOW.forEach(function (k, n) {
+      var bd = BODIES[k];
+      new THREE.GLTFLoader().load('people/models/' + bd[0] + '-walk-02_01.glb', function (g) {
+        var w = { key: k, H: bd[1], speed: bd[2] * bd[1], skin: [], lane: 0, vScale: 1 }, model = g.scene, clip = null, i;
+        model.traverse(function (o) { if (o.isSkinnedMesh) { o.frustumCulled = false; w.skin.push(o); o.material = new THREE.MeshStandardMaterial({ color: 0x24222b, roughness: 0.9, metalness: 0, skinning: true }); } });
+        for (i = 0; i < g.animations.length; i++) if (g.animations[i].name === 'CMU_02_01') clip = g.animations[i];
+        if (!clip || !w.skin.length) { SL.err = 'follower ' + k + ': no clip or no skin'; return; }
+        model.rotation.y = Math.PI;                       // exported facing -z, as boy-11
+        w.holder = new THREE.Group(); w.holder.add(model); scene.add(w.holder);
+        w.mixer = new THREE.AnimationMixer(model); w.action = w.mixer.clipAction(clip); w.action.play(); w.T = clip.duration; w.model = model;
+        var lows = []; for (i = 0; i < 27; i++) { w.action.time = i / 27 * w.T; w.mixer.update(0); w.holder.updateMatrixWorld(true); lows.push(skinLow(w)); }
+        lows.sort(function (a, b) { return a - b; }); w.floorOffset = -lows[lows.length >> 1];
+        var meas = (function () { var lo = Infinity, hi = -Infinity, v = new THREE.Vector3(); w.action.time = 0; w.mixer.update(0); w.holder.updateMatrixWorld(true); w.skin.forEach(function (m) { m.skeleton.update(); var p = m.geometry.attributes.position; for (var q = 0; q < p.count; q += 2) { v.fromBufferAttribute(p, q); m.boneTransform(q, v); v.applyMatrix4(m.matrixWorld); if (v.y < lo) lo = v.y; if (v.y > hi) hi = v.y; } }); return hi - lo; })();
+        w.nativeHeight = meas;
+        w.d0 = (n + 1) * routeTot / (SL.FOLLOW.length + 1); w.d = w.d0; w.y = walkUp(w.d); w.h = null; w.vScale = 1; w.t = (n + 1) * 0.37 * w.T;
+        SL.followers[n] = w; if (--left === 0) SL.fready = true;
+      }, undefined, function (e) { SL.err = String(e && e.message || e); });
+    });
+  };
+  function stepFollower(w, dt) {
+    w.d += w.speed * w.vScale * dt; if (w.d >= routeTot) { w.d = 0; w.y = -3; w.h = null; }
+    var r = routeAt(w.d), q = lanePos(r, w.lane), fl = floorUnder(q.x, w.y + 0.65, -q.y, true); if (fl !== null) w.y = fl;
+    var th = Math.atan2(r.dx, -r.dy), cur = w.h === null ? th : w.h, dd = Math.atan2(Math.sin(th - cur), Math.cos(th - cur));
+    w.h = cur + dd * Math.min(1, dt * 6);
+    w.mixer.update(dt * SI.rate * w.vScale);
+    w.holder.position.set(q.x, w.y + w.floorOffset, -q.y); w.holder.rotation.y = w.h; w.holder.updateMatrixWorld(true);
+  }
+  var siUpdateSlice = SI.update;
+  SI.update = function (dt) { if (SL.fready && !SI.hold && QS.get('route') !== '0') SL.followers.forEach(function (w) { stepFollower(w, dt); }); siUpdateSlice(dt); };
+  // one follower alone along the whole route, 60 a second: head and chest in stone, the lowest vertex over the floor on level samples
+  SL.followCheck = function (n, step, shift) {
+    var w = SL.followers[n], N = Math.ceil(routeTot / (w.speed / 60)), out = { key: w.key, n: N, H: w.H, headInStone: 0, chestInStone: 0, worstSink: 0, worstFloat: 0, noFloor: 0, levelSamples: 0 }, y = -3, i;
+    var wasHold = SI.hold; SI.hold = true;
+    for (i = 0; i < N; i += (step || 1)) {
+      var r = routeAt(i * w.speed / 60), q = lanePos(r, w.lane + (shift || 0)), fl = floorUnder(q.x, y + 0.65, -q.y, true);
+      if (fl === null) { out.noFloor++; continue; }
+      var slope = Math.abs(fl - y); y = fl;
+      w.holder.rotation.y = Math.atan2(r.dx, -r.dy); w.holder.position.set(q.x, fl + w.floorOffset, -q.y); w.action.time = (i / 60 * SI.rate) % w.T; w.mixer.update(0); w.holder.updateMatrixWorld(true);
+      var off = skinLow(w) - fl;
+      if (inStone(q.x, fl + w.H - 0.1, -q.y)) out.headInStone++;
+      if (inStone(q.x, fl + w.H * 0.7, -q.y)) out.chestInStone++;
+      if (slope < 0.002) { out.levelSamples++; if (-off > out.worstSink) out.worstSink = -off; if (off > out.worstFloat) out.worstFloat = off; }
+    }
+    SI.hold = wasHold; out.worstSink = +out.worstSink.toFixed(4); out.worstFloat = +out.worstFloat.toFixed(4); return out;
+  };
+  /* Walking in file (row 6438): the six walk at their own speeds on one route, so a faster one comes up behind a slower and would pass through it. The
+     route has right-angle corners and doorways, so nobody overtakes: a walker within 4 m behind another matches that one's pace (its feet and its clip slowed
+     together, so the feet stay planted) and keeps 2.5 m between them, and at 4 m or more it walks its own pace again. Each entry: key, speed, d, y, H, lane, vScale. */
+  function wrapDelta(x) { var T = routeTot; return ((x % T) + T * 1.5) % T - T / 2; }
+  SL.HEAD = 2.5; SL.HEADFAR = 4.0;
+  SL.avoid = function (ents, dt) {
+    ents.forEach(function (a) {
+      var best = null;
+      ents.forEach(function (b) { if (b === a) return; var dl = wrapDelta(b.d - a.d); if (dl > 0 && dl < SL.HEADFAR && (!best || dl < best.dl)) best = { b: b, dl: dl }; });
+      var tv = 1;
+      if (best) { var vt = best.b.speed * best.b.vScale + 0.5 * (best.dl - SL.HEAD); tv = Math.max(0.3, Math.min(1, vt / a.speed)); }
+      a.vScale += Math.max(-1.0 * dt, Math.min(1.0 * dt, tv - a.vScale));
+    });
+  };
+  SL.liveEnts = function () {
+    var p = SL.p0; p.speed = SI.speed; p.d = routeD; p.y = routeY; p.H = SI.H;
+    return [p].concat(SL.followers);
+  };
+  /* a line-up for the sheet: the six side by side in a file at the hall's east end, facing west, each at the same phase of the clip; the page then stops moving them (SL.frozen) */
+  SL.lineup = function (phase, x0, y, gap) {
+    SL.frozen = true; SI.hold = false; x0 = x0 === undefined ? 74 : x0; y = y === undefined ? 60 : y; gap = gap || 1.5;
+    var all = [{ holder: siHolder, mixer: siMixer, T: SI.T, off: SI.floorOffset, action: siAction }].concat(SL.followers.map(function (w) { return { holder: w.holder, mixer: w.mixer, T: w.T, off: w.floorOffset, action: w.action }; }));
+    all.forEach(function (e, i) {
+      var x = x0 + i * gap, fl = floorUnder(x, 3.0, -y, true) || 0;
+      e.action.time = phase * e.T; e.mixer.update(0); e.holder.position.set(x, fl + e.off, -y); e.holder.rotation.y = -Math.PI / 2; e.holder.updateMatrixWorld(true);
+    });
+    return all.length;
+  };
+  var siUpdateAvoid = SI.update;
+  SI.update = function (dt) { if (SL.frozen) return; if (SL.fready && !SI.hold && QS.get('route') !== '0' && QS.get('avoid') !== '0') SL.avoid(SL.liveEnts(), dt); siUpdateAvoid(dt); };
+  // the six on the route as numbers only (their own copies, the live ones untouched): `loops` laps of the slowest at 0.1 s; opt.noAvoid is the planted bad, opt.d0 overrides a start (0 is boy-11)
+  SL.simSix = function (loops, opt) {
+    opt = opt || {};
+    var ents = [{ key: 'boy11', speed: BODIES.boy11[2] * BODIES.boy11[1], H: BODIES.boy11[1], d: 0, lane: 0, vScale: 1 }];
+    SL.FOLLOW.forEach(function (k, n) { ents.push({ key: k, speed: BODIES[k][2] * BODIES[k][1], H: BODIES[k][1], d: (n + 1) * routeTot / (SL.FOLLOW.length + 1), lane: 0, vScale: 1 }); });
+    if (opt.d0) opt.d0.forEach(function (v, i) { if (v !== null && v !== undefined) ents[i].d = v; });
+    ents.forEach(function (a) { a.y = walkUp(a.d); });
+    var slow = Math.min.apply(null, ents.map(function (q) { return q.speed; })), T = loops * routeTot / slow, dt = 0.1, t, i, j;
+    var best = { dist: Infinity }, stone = 0, minV = 1, maxLane = 0, dodgeSteps = 0;
+    for (t = 0; t < T; t += dt) {
+      if (!opt.noAvoid) SL.avoid(ents, dt);
+      ents.forEach(function (a) {
+        a.d = (a.d + a.speed * a.vScale * dt) % routeTot; var r = routeAt(a.d), q = lanePos(r, a.lane), fl = floorUnder(q.x, a.y + 0.65, -q.y, true); if (fl !== null) a.y = fl;
+        a.pos = [q.x, q.y];
+        if (inStone(q.x, a.y + a.H - 0.1, -q.y) || inStone(q.x, a.y + a.H * 0.7, -q.y)) stone++;
+        if (a.vScale < minV) minV = a.vScale; if (Math.abs(a.lane) > maxLane) maxLane = Math.abs(a.lane); if (Math.abs(a.lane) > 0.05) dodgeSteps++;
+      });
+      for (i = 0; i < ents.length; i++) for (j = i + 1; j < ents.length; j++) { var dd = Math.hypot(ents[i].pos[0] - ents[j].pos[0], ents[i].pos[1] - ents[j].pos[1]); if (dd < best.dist) best = { dist: dd, a: ents[i].key, b: ents[j].key, t: +t.toFixed(1), lanes: [+ents[i].lane.toFixed(2), +ents[j].lane.toFixed(2)], ds: [+ents[i].d.toFixed(1), +ents[j].d.toFixed(1)], leg: routeAt(ents[i].d).leg }; }
+    }
+    best.dist = +best.dist.toFixed(3); best.seconds = Math.round(T); best.stoneSamples = stone; best.minVScale = +minV.toFixed(3); best.maxLane = +maxLane.toFixed(2); best.dodgeSteps = dodgeSteps; return best;
   };
   // a walker sample for the marks: the head and chest in stone, the lowest vertex against the floor, 60 a second, the whole route
   SL.walkCheck = function (step) {
@@ -532,16 +647,18 @@
     });
     return { sole: lo, seat: seat, top: hi };
   }
-  function loadSeated(buf) {
+  function loadSeated(buf, ours) {   // ours (row 6438): the glbs of our own seated, replacing the first seats (?sit=ours): boy-11 then girl-11, at their own height, facing -z so turned half a turn
     var I_ = 'Sitting_Idle_Loop', T_ = 'Sitting_Talking_Loop', clipNames = [I_, I_, I_, I_, I_, I_, I_, I_, I_, I_, I_, I_, I_, I_, I_];   // w45d: the talking clip's hands reach plates and goblets (row 6432)   // 11th idle: the talking lean puts a forearm 7 cm into the table's apron at its phase
     var left = SEATS.length;
     SEATS.forEach(function (st, n) {
-      new THREE.GLTFLoader().parse(buf.slice(0), '', function (g) {
-        var model = g.scene, f = { skin: [], model: model, spec: st, name: clipNames[n % clipNames.length] };
+      var own = ours && n < ours.length;
+      new THREE.GLTFLoader().parse((own ? ours[n] : buf).slice(0), '', function (g) {
+        var model = g.scene, f = { skin: [], model: model, spec: st, name: own ? 'Sitting_Idle_Loop' : clipNames[n % clipNames.length], own: own ? ['boy-11', 'girl-11'][n] : null };
+        if (own) model.rotation.y = Math.PI;
         model.traverse(function (o) { if (o.isSkinnedMesh) { o.frustumCulled = false; f.skin.push(o); o.material = new THREE.MeshStandardMaterial({ color: 0x24222b, roughness: 0.9, metalness: 0, skinning: true }); } });
         var clip = null; for (var i = 0; i < g.animations.length; i++) if (g.animations[i].name === f.name) clip = g.animations[i];
         if (!clip) { SL.err = 'no ' + f.name; return; }
-        f.holder = new THREE.Group(); f.holder.add(model); scene.add(f.holder); f.holder.scale.setScalar(SI.scale);
+        f.holder = new THREE.Group(); f.holder.add(model); scene.add(f.holder); f.holder.scale.setScalar(own ? 1 : (SL.seatScale || SI.scale));
         f.mixer = new THREE.AnimationMixer(model); f.action = f.mixer.clipAction(clip); f.action.play(); f.action.time = (n * 0.7) % clip.duration; f.mixer.update(0);
         SL.figs.push(f);
         placeSeated(f);
@@ -599,8 +716,10 @@
     });
   };
   if (QS.get('seated') !== '0' && QS.get('standin') !== '0') {
-    fetch('people/models/ual-standin.glb').then(function (r) { return r.arrayBuffer(); }).then(function (buf) {
-      var wait = setInterval(function () { if (SI.ready) { clearInterval(wait); loadSeated(buf); } }, 100);
+    var urls = ['people/models/ual-standin.glb'];
+    if (QS.get('sit') === 'ours') urls.push('people/models/boy-11-sit.glb', 'people/models/girl-11-sit.glb');
+    Promise.all(urls.map(function (u) { return fetch(u).then(function (r) { return r.arrayBuffer(); }); })).then(function (bufs) {
+      var wait = setInterval(function () { if (SI.ready) { clearInterval(wait); loadSeated(bufs[0], bufs.length > 1 ? bufs.slice(1) : null); } }, 100);
     }).catch(function (e) { SL.err = String(e); });
   }
 
