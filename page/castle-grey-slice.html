@@ -39,7 +39,7 @@
   var STONE = new URLSearchParams(location.search).get('stone');
   STONE = STONE === '1' ? 'stone' : STONE === 'grey' ? 'grey' : null;
   var FILE = STONE ? 'arch/castle-stone-' + HASH + '.glb' : 'arch/castle-grey-' + HASH + '.glb';
-  var EYE = 1.4, STEP = 0.45, BODY = 0.3, WALL_H = [0.5, 1.1, 1.6], CELL = 2, G = 9.8, WALK = 1.4, HURRY = 3.2, TURN = 1.6;
+  var EYE = 1.4, STEP = 0.45, REACH = 0.46, BODY = 0.3, WALL_H = [0.5, 1.1, 1.6], CELL = 2, G = 9.8, WALK = 1.4, HURRY = 3.2, TURN = 1.6;
   var START = { x: 80, y: 60, yaw: 90 };          // the Entrance Hall's seed (check-model.json), facing west to the Great Hall doors
   var G_ = window.__grey = { ready: false, hash: HASH, err: null, glbMeshes: 0, tris: 0, fps: 0 };
 
@@ -155,7 +155,7 @@
   // the walker: feet at P (three's frame), a yaw and a pitch, a fall speed
   var P = new THREE.Vector3(), yaw = 0, pitch = -0.05, vy = 0, keys = {};
   function place(x, y, z, yawDeg) {
-    var top = z === undefined ? 30 : z + STEP, f = floorUnder(x, top, -y, true);
+    var top = z === undefined ? 30 : z + REACH, f = floorUnder(x, top, -y, true);
     P.set(x, f === null ? (z || 0) : f, -y); vy = 0;
     if (yawDeg !== undefined) yaw = yawDeg * Math.PI / 180;
   }
@@ -172,7 +172,7 @@
     var fx = -Math.sin(yaw), fz = -Math.cos(yaw), rx = Math.cos(yaw), rz = -Math.sin(yaw);
     var mx = (fx * fw + rx * st) * sp, mz = (fz * fw + rz * st) * sp;
     if (!moveBy(mx, mz)) { if (!moveBy(mx, 0)) moveBy(0, mz); }
-    var f = floorUnder(P.x, P.y + STEP, P.z, true), drop = 0;
+    var f = floorUnder(P.x, P.y + REACH, P.z, true), drop = 0;   // REACH: the step plus 1 cm, so a 0.45 block (the dais top, 0.44999999) is not missed by a float tie (row 6434)
     if (f !== null && f >= P.y - 1e-4) { P.y = f; vy = 0; }
     else {
       vy -= G * dt; var ny = P.y + vy * dt;
@@ -456,7 +456,7 @@
      seated on the Great Hall's benches on the Sitting_Idle_Loop clip. Route: docs/architect/slice-walk-6418-w45.json (legs).
      Tables and benches as page/great-hall.html draws them. ?seated=0 leaves the seated out; ?route=0 keeps the old hall line. */
   var SL = window.__slice = { figs: [], err: null, ready: false, shift: 0 };
-  var ROUTE = [[72.7,95],[72.7,90.89],[72.7,86.27],[74.99,87],[80.01,87],[80,83.99],[80.5,77.01],[81,70.5],[81,66],[69.5,60.3],[66.49,60.3],[65,60.3],[61.99,60.3],[62,64.71],[44.99,64.7],[45,65.49],[20.49,64.7],[17.5,64.7]];
+  var ROUTE = [[72.7,95],[72.7,90.89],[72.7,86.27],[74.99,87],[80.01,87],[80,83.99],[80.5,77.01],[81,70.5],[81,66],[69.5,60.3],[66.49,60.3],[65,60.3],[61.99,60.3],[62,64.71],[44.99,64.7],[45,65.49],[20.49,64.7],[19.0,64.7]];   // ends 0.5 m short of where the staff table halts the walk (x 18.51, row 6431), not inside it
   var BENCH_OFF = 0.725;
   // six seats: [x, table y, side] side +1 is the bench on the table's +y side (faces -y), -1 the other (faces +y)
   /* [x, table's y, bench side (1 south, -1 north), turn]; turn 0 faces the table. w45c (b21e8232) gives knee room (table top 0.75, aprons 0.70, benches 0.44,
@@ -502,8 +502,8 @@
       var slope = Math.abs(fl - routeY); routeY = fl;
       var th = Math.atan2(r.dx, -r.dy); siHolder.rotation.y = th; siHolder.position.set(x, fl + SI.floorOffset, -y); siAction.time = (i / 60 * SI.rate) % SI.T; siMixer.update(0); siHolder.updateMatrixWorld(true);
       var low = meshY().min, off = low - fl;
-      if (inStone(x, fl + SI.H - 0.1, -y)) out.headInStone++;
-      if (inStone(x, fl + SI.H * 0.7, -y)) out.chestInStone++;
+      if (inStone(x, fl + SI.H - 0.1, -y)) { out.headInStone++; (out.hits = out.hits || []).push(['h', +x.toFixed(2), +y.toFixed(2), +(fl + SI.H - 0.1).toFixed(2), r.leg]); }
+      if (inStone(x, fl + SI.H * 0.7, -y)) { out.chestInStone++; (out.hits = out.hits || []).push(['c', +x.toFixed(2), +y.toFixed(2), +(fl + SI.H * 0.7).toFixed(2), r.leg]); }
       if (slope < 0.002) { out.levelSamples++; if (-off > out.worstSink) out.worstSink = -off; if (off > out.worstFloat) out.worstFloat = off; }
     }
     routeD = 0; routeY = -3; routeH = null; SI.hold = false;
@@ -528,7 +528,7 @@
     return { sole: lo, seat: seat, top: hi };
   }
   function loadSeated(buf) {
-    var I_ = 'Sitting_Idle_Loop', T_ = 'Sitting_Talking_Loop', clipNames = [I_, I_, T_, I_, T_, I_, T_, I_, I_, T_, I_, I_, T_, I_, I_];   // 11th idle: the talking lean puts a forearm 7 cm into the table's apron at its phase
+    var I_ = 'Sitting_Idle_Loop', T_ = 'Sitting_Talking_Loop', clipNames = [I_, I_, I_, I_, I_, I_, I_, I_, I_, I_, I_, I_, I_, I_, I_];   // w45d: the talking clip's hands reach plates and goblets (row 6432)   // 11th idle: the talking lean puts a forearm 7 cm into the table's apron at its phase
     var left = SEATS.length;
     SEATS.forEach(function (st, n) {
       new THREE.GLTFLoader().parse(buf.slice(0), '', function (g) {
